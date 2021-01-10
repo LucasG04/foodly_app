@@ -9,6 +9,8 @@
 .history
 .svn/
 
+hosting.*
+
 # IntelliJ related
 *.iml
 *.ipr
