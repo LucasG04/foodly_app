@@ -2,26 +2,56 @@ import 'package:flutter/material.dart';
 import 'package:foodly/constants.dart';
 import 'package:foodly/models/meal.dart';
 import 'package:foodly/screens/tab_navigation/meal_list_view/meal_list_tile.dart';
+import 'package:foodly/screens/tab_navigation/meal_list_view/meal_list_title.dart';
 import 'package:foodly/services/meal_service.dart';
-import 'package:foodly/widgets/page_title.dart';
 import 'package:group_list_view/group_list_view.dart';
 
-class MealListView extends StatelessWidget {
+class MealListView extends StatefulWidget {
+  @override
+  _MealListViewState createState() => _MealListViewState();
+}
+
+class _MealListViewState extends State<MealListView> {
+  List<Meal> allMeals;
+  List<Meal> filterMeals;
+
+  @override
+  void initState() {
+    super.initState();
+
+    MealService.getMeals(100).then((values) {
+      setState(() {
+        this.allMeals = values;
+        this.filterMeals = values;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final tagList = _groupMealsByTags(this.filterMeals ?? []);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
             SizedBox(height: kPadding),
-            PageTitle(text: 'Gerichte'),
-            FutureBuilder<List<Meal>>(
-              future: MealService.getMeals(100),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final tagList = _groupMealsByTags(snapshot.data);
-
-                  return GroupListView(
+            MealListTitle((searchTerm) {
+              setState(() {
+                if (searchTerm.isNotEmpty) {
+                  this.filterMeals = this
+                      .allMeals
+                      .where((el) => el.name
+                          .toLowerCase()
+                          .contains(searchTerm.toLowerCase()))
+                      .toList();
+                } else {
+                  this.filterMeals = this.allMeals;
+                }
+              });
+            }),
+            this.allMeals != null
+                ? GroupListView(
                     itemBuilder: (_, item) => MealListTile(
                       tagList[item.section].meals[item.index],
                     ),
@@ -34,13 +64,8 @@ class MealListView extends StatelessWidget {
                         tagList[section].meals.length,
                     physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                  );
-                } else {
-                  // TODO: Skeleton
-                  return Container();
-                }
-              },
-            ),
+                  )
+                : CircularProgressIndicator()
           ],
         ),
       ),
