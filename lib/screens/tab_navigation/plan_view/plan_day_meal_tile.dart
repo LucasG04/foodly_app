@@ -2,14 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
-import 'package:foodly/providers/state_providers.dart';
-import 'package:foodly/services/plan_service.dart';
 
+import '../../../constants.dart';
 import '../../../models/meal.dart';
 import '../../../models/plan_meal.dart';
+import '../../../providers/state_providers.dart';
 import '../../../services/meal_service.dart';
+import '../../../services/plan_service.dart';
 import '../../../widgets/meal_tag.dart';
-import '../../../constants.dart';
 
 class PlanDayMealTile extends StatelessWidget {
   final bool enableVoting;

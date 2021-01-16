@@ -3,15 +3,16 @@ import 'package:auto_route/auto_route_annotations.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
-import 'package:foodly/constants.dart';
-import 'package:foodly/models/meal.dart';
-import 'package:foodly/models/plan_meal.dart';
-import 'package:foodly/providers/state_providers.dart';
-import 'package:foodly/screens/meal-select/select_meal_tile.dart';
-import 'package:foodly/services/meal_service.dart';
-import 'package:foodly/services/plan_service.dart';
-import 'package:foodly/widgets/page_title.dart';
-import 'package:foodly/widgets/small_circular_progress_indicator.dart';
+
+import '../../constants.dart';
+import '../../models/meal.dart';
+import '../../models/plan_meal.dart';
+import '../../providers/state_providers.dart';
+import '../../services/meal_service.dart';
+import '../../services/plan_service.dart';
+import '../../widgets/page_title.dart';
+import '../../widgets/small_circular_progress_indicator.dart';
+import 'select_meal_tile.dart';
 
 class MealSelectScreen extends StatelessWidget {
   /// both are strings because the need to be extracted from the url

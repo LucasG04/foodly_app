@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:foodly/constants.dart';
-import 'package:foodly/models/plan.dart';
-import 'package:foodly/models/plan_meal.dart';
-import 'package:foodly/providers/state_providers.dart';
-import 'package:foodly/screens/tab_navigation/plan_view/plan_day_card.dart';
-import 'package:foodly/services/plan_service.dart';
-import 'package:foodly/widgets/page_title.dart';
+
+import '../../../constants.dart';
+import '../../../models/plan.dart';
+import '../../../models/plan_meal.dart';
+import '../../../providers/state_providers.dart';
+import '../../../services/plan_service.dart';
+import '../../../widgets/page_title.dart';
+import 'plan_day_card.dart';
 
 class PlanTabView extends ConsumerWidget {
   @override

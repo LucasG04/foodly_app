@@ -1,8 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/models/meal.dart';
-import 'package:foodly/widgets/meal_tag.dart';
+
 import '../../../constants.dart';
+import '../../../models/meal.dart';
+import '../../../widgets/meal_tag.dart';
 
 class MealListTile extends StatelessWidget {
   final height = 75.0;

@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:foodly/models/plan.dart';
-import 'package:foodly/models/plan_meal.dart';
 import 'package:hive/hive.dart';
+
+import '../models/plan.dart';
+import '../models/plan_meal.dart';
 
 class PlanService {
   PlanService._();

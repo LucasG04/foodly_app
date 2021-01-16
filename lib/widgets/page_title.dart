@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/constants.dart';
+import '../constants.dart';
 
 class PageTitle extends StatelessWidget {
   final String text;

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
-import 'package:foodly/models/meal.dart';
+
+import '../models/meal.dart';
 
 class MealService {
   MealService._();

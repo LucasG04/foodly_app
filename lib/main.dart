@@ -1,11 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
-import 'package:foodly/app_router.gr.dart';
-import 'package:foodly/models/plan.dart';
-import 'package:foodly/providers/state_providers.dart';
-import 'package:foodly/services/plan_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
+
+import 'app_router.gr.dart';
+import 'models/plan.dart';
+import 'providers/state_providers.dart';
+import 'services/plan_service.dart';
 
 void main() {
   runApp(ProviderScope(child: FoodlyApp()));

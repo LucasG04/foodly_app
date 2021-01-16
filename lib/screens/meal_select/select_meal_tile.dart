@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/constants.dart';
-import 'package:foodly/models/meal.dart';
-import 'package:foodly/widgets/meal_tag.dart';
-import 'package:foodly/widgets/small_circular_progress_indicator.dart';
+import '../../constants.dart';
+import '../../models/meal.dart';
+import '../../widgets/meal_tag.dart';
+import '../../widgets/small_circular_progress_indicator.dart';
 
 class SelectMealTile extends StatefulWidget {
   final Meal meal;

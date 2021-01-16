@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:foodly/constants.dart';
-import 'package:foodly/models/meal.dart';
-import 'package:foodly/screens/tab_navigation/meal_list_view/meal_list_tile.dart';
-import 'package:foodly/screens/tab_navigation/meal_list_view/meal_list_title.dart';
-import 'package:foodly/services/meal_service.dart';
 import 'package:group_list_view/group_list_view.dart';
+
+import '../../../constants.dart';
+import '../../../models/meal.dart';
+import '../../../services/meal_service.dart';
+import 'meal_list_tile.dart';
+import 'meal_list_title.dart';
 
 class MealListView extends StatefulWidget {
   @override
