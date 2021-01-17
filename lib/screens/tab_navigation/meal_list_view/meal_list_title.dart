@@ -1,15 +1,17 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
+import '../../../app_router.gr.dart';
 import '../../../constants.dart';
 
 class MealListTitle extends StatefulWidget {
-  final void Function(String) onInputChanged;
-
   MealListTitle(this.onInputChanged);
 
   @override
   _MealListTitleState createState() => _MealListTitleState();
+
+  final void Function(String) onInputChanged;
 }
 
 class _MealListTitleState extends State<MealListTitle> {
@@ -45,7 +47,9 @@ class _MealListTitleState extends State<MealListTitle> {
               !_searchActive
                   ? IconButton(
                       icon: Icon(EvaIcons.plusCircleOutline),
-                      onPressed: () => print('add'),
+                      onPressed: () => ExtendedNavigator.root.push(
+                        Routes.mealCreateScreen,
+                      ),
                       splashRadius: 25.0,
                     )
                   : SizedBox(),
