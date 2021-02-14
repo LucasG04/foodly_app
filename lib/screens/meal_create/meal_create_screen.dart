@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:foodly/constants.dart';
-import 'package:foodly/models/meal.dart';
-import 'package:foodly/screens/meal-create/edit_ingredients.dart';
-import 'package:foodly/widgets/main_image_picker.dart';
-import 'package:foodly/widgets/main_text_field.dart';
-import 'package:foodly/widgets/page_title.dart';
+
+import '../../constants.dart';
+import '../../models/meal.dart';
+import '../../widgets/main_image_picker.dart';
+import '../../widgets/main_text_field.dart';
+import '../../widgets/page_title.dart';
+import 'edit_ingredients.dart';
 
 class MealCreateScreen extends StatefulWidget {
   @override
@@ -13,7 +14,6 @@ class MealCreateScreen extends StatefulWidget {
 
 class _MealCreateScreenState extends State<MealCreateScreen> {
   Meal _meal = new Meal();
-
   TextEditingController _titleController = new TextEditingController();
 
   @override

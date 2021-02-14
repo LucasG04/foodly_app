@@ -1,9 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/constants.dart';
-import 'package:foodly/widgets/main_text_field.dart';
-import 'package:foodly/widgets/small_circular_progress_indicator.dart';
+
+import '../constants.dart';
+import 'main_text_field.dart';
+import 'small_circular_progress_indicator.dart';
 
 class MainImagePicker extends StatefulWidget {
   final String imageUrl;
