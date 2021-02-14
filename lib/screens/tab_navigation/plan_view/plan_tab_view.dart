@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:foodly/models/meal.dart';
 
 import '../../../constants.dart';
 import '../../../models/plan.dart';
@@ -61,7 +62,7 @@ class PlanTabView extends ConsumerWidget {
 
   List<PlanDay> _getMealsForDays(Plan plan) {
     final List<PlanDay> result = [];
-    final meals = plan.meals;
+    final updatedMeals = [...plan.meals];
 
     final now =
         new DateTime.now().toUtc().add(Duration(days: plan.hourDiffToUtc));
@@ -70,23 +71,24 @@ class PlanTabView extends ConsumerWidget {
     // DateTime firstDate = meals.first.date;
 
     // remove old plan days
-    bool mealsChanged = false;
-    for (var meal in meals) {
+    for (var meal in plan.meals) {
       if (meal.date.isBefore(today)) {
-        meals.remove(meal);
-        mealsChanged = true;
+        updatedMeals.remove(meal);
       }
     }
 
-    if (mealsChanged) {
-      plan.meals = meals;
+    if (plan.meals != updatedMeals) {
+      plan.meals = updatedMeals;
       PlanService.updatePlan(plan);
     }
 
     for (var i = 0; i < 8; i++) {
       final date = today.add(Duration(days: i));
-      result.add(PlanDay(
-          date, [...meals.where((element) => element.date == date).toList()]));
+      result.add(
+        PlanDay(date, [
+          ...updatedMeals.where((element) => element.date == date).toList()
+        ]),
+      );
     }
 
     return result;

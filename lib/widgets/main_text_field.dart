@@ -10,6 +10,7 @@ class MainTextField extends StatefulWidget {
   final TextInputAction textInputAction;
   final TextInputType keyboardType;
   final void Function() onSubmit;
+  final void Function(String) onChange;
   final bool isDense;
   final bool obscureText;
   final TextAlign textAlign;
@@ -24,6 +25,7 @@ class MainTextField extends StatefulWidget {
     this.textInputAction = TextInputAction.done,
     this.keyboardType = TextInputType.text,
     this.onSubmit,
+    this.onChange,
     this.isDense = false,
     this.obscureText = false,
     this.textAlign = TextAlign.start,
@@ -121,6 +123,7 @@ class _MainTextFieldState extends State<MainTextField> {
 
           widget.onSubmit();
         },
+        onChanged: widget.onChange,
       ),
       onFocusChange: (value) {
         setState(() {

@@ -22,16 +22,16 @@ class PlanDayMealTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: kPadding / 2),
       child: planMeal.meal.startsWith(kPlaceholderSymbol)
-          ? _buildPlaceholderRow(
-              planMeal.meal.split(kPlaceholderSymbol)[1],
+          ? _buildDataRow(
               context,
+              placeholder: planMeal.meal.split(kPlaceholderSymbol)[1],
             )
           : FutureBuilder<Meal>(
               future: MealService.getMealById(this.planMeal.meal),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final meal = snapshot.data;
-                  return _buildDataRow(meal);
+                  return _buildDataRow(context, meal: meal);
                 } else {
                   // TODO: Skeleton loading
                   return CircularProgressIndicator();
@@ -41,26 +41,67 @@ class PlanDayMealTile extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceholderRow(String text, BuildContext context) {
+  Row _buildDataRow(BuildContext context, {String placeholder, Meal meal}) {
+    bool isPlaceholder = placeholder != null && placeholder.isNotEmpty;
     return Row(
       children: [
         Container(
           width: 50.0,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10000),
-            child: Center(child: Icon(EvaIcons.codeOutline)),
+            child: isPlaceholder
+                ? Container(
+                    width: 50.0,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10000),
+                      child: Center(child: Icon(EvaIcons.codeOutline)),
+                    ),
+                  )
+                : meal.imageUrl != null && meal.imageUrl.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: meal.imageUrl,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.asset(
+                        'assets/images/food_fallback.png',
+                        fit: BoxFit.cover,
+                      ),
           ),
         ),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: isPlaceholder || (meal.tags == null || meal.tags.isEmpty)
+                ? Text(
+                    isPlaceholder ? placeholder : meal.name,
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        child: Text(
+                          meal.name,
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: MealTag.tagHeight,
+                        child: Wrap(
+                          clipBehavior: Clip.hardEdge,
+                          children: meal.tags.map((e) => MealTag(e)).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
           ),
         ),
         if (enableVoting) ...[
@@ -88,11 +129,6 @@ class PlanDayMealTile extends StatelessWidget {
           ),
           SizedBox(width: kPadding / 2),
         ],
-        // IconButton(
-        //   icon: Icon(EvaIcons.moreVerticalOutline),
-        //   onPressed: () => print('more'),
-        //   splashRadius: 25.0,
-        // ),
         PopupMenuButton(
           onSelected: (value) {
             if (value == 'delete') {
@@ -112,86 +148,6 @@ class PlanDayMealTile extends StatelessWidget {
               ),
             ];
           },
-        ),
-      ],
-    );
-  }
-
-  Row _buildDataRow(Meal meal) {
-    return Row(
-      children: [
-        Container(
-          width: 50.0,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10000),
-            child: meal.imageUrl != null && meal.imageUrl.isNotEmpty
-                ? CachedNetworkImage(
-                    imageUrl: meal.imageUrl,
-                    fit: BoxFit.cover,
-                  )
-                : Image.asset(
-                    'assets/images/food_fallback.png',
-                    fit: BoxFit.cover,
-                  ),
-          ),
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                  child: Text(
-                    meal.name,
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                Container(
-                  height: MealTag.tagHeight,
-                  child: Wrap(
-                    clipBehavior: Clip.hardEdge,
-                    children: meal.tags.map((e) => MealTag(e)).toList(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        if (enableVoting) ...[
-          SizedBox(width: kPadding / 2),
-          Column(
-            children: [
-              IconButton(
-                icon: Icon(EvaIcons.arrowIosUpwardOutline),
-                onPressed: () => print('upvote'),
-                splashRadius: 15.0,
-              ),
-              Text(planMeal.upvotes.length.toString()),
-            ],
-          ),
-          SizedBox(width: kPadding / 4),
-          Column(
-            children: [
-              IconButton(
-                icon: Icon(EvaIcons.arrowIosDownwardOutline),
-                onPressed: () => print('downvote'),
-                splashRadius: 15.0,
-              ),
-              Text(planMeal.downvotes.length.toString()),
-            ],
-          ),
-          SizedBox(width: kPadding / 2),
-        ],
-        IconButton(
-          icon: Icon(EvaIcons.moreVerticalOutline),
-          onPressed: () => print('more'),
-          splashRadius: 25.0,
         ),
       ],
     );

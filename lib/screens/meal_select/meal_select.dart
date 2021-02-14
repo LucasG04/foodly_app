@@ -1,4 +1,5 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:auto_route/auto_route_annotations.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,7 @@ class MealSelectScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(height: kPadding),
+            SizedBox(height: kPadding * 2),
             PageTitle(text: 'Gerichtauswahl', showBackButton: true),
             _buildContainer(
               width,
@@ -52,32 +53,31 @@ class MealSelectScreen extends StatelessWidget {
               () => print('new meal'),
             ),
             FutureBuilder<List<Meal>>(
-                future: MealService.getMeals(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Container(
-                      height: snapshot.data.length * SelectMealTile.fullHeight,
-                      child: ListView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: snapshot.data.length,
-                        itemBuilder: (context, index) => SelectMealTile(
-                          meal: snapshot.data[index],
-                          onAddMeal: () => _addMealToPlan(
-                            snapshot.data[index].id,
-                            acitvePlan.id,
-                          ),
-                        ),
+              future: MealService.getMeals(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: snapshot.data.length,
+                    itemBuilder: (context, index) => SelectMealTile(
+                      meal: snapshot.data[index],
+                      onAddMeal: () => _addMealToPlan(
+                        snapshot.data[index].id,
+                        acitvePlan.id,
                       ),
-                    );
-                  } else {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(kPadding),
-                        child: SmallCircularProgressIndicator(),
-                      ),
-                    );
-                  }
-                }),
+                    ),
+                  );
+                } else {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(kPadding),
+                      child: SmallCircularProgressIndicator(),
+                    ),
+                  );
+                }
+              },
+            ),
           ],
         ),
       ),
@@ -132,9 +132,13 @@ class MealSelectScreen extends StatelessWidget {
             height: height / 2,
             width: height / 2,
             margin: const EdgeInsets.only(right: 20.0),
-            child: OutlineButton(
+            child: OutlinedButton(
               onPressed: action,
-              child: Icon(EvaIcons.arrowIosForwardOutline),
+              child: Icon(EvaIcons.arrowIosForwardOutline, color: Colors.black),
+              style: ButtonStyle(
+                padding: MaterialStateProperty.resolveWith(
+                    (states) => const EdgeInsets.all(0)),
+              ),
             ),
           ),
         ],
@@ -155,11 +159,12 @@ class MealSelectScreen extends StatelessWidget {
       cancelLabel: 'ABBRECHEN',
     );
 
-    if (texts != null) {
+    if (texts != null && texts.isNotEmpty) {
       await _addMealToPlan(
         kPlaceholderSymbol + texts.first,
         context.read(planProvider).state.id,
       );
+      ExtendedNavigator.root.pop();
     }
   }
 

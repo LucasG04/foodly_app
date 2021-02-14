@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -17,43 +16,47 @@ class _TabNavigationScreenState extends State<TabNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: PageView(
-        controller: _pageController,
-        physics: NeverScrollableScrollPhysics(),
-        children: [
-          PlanTabView(),
-          PlanTabView(),
-          MealListView(),
-        ],
-      ),
-      bottomNavigationBar: SnakeNavigationBar.color(
-        currentIndex: _currentIndex,
-        onTap: (value) {
-          setState(() {
-            _currentIndex = value;
-          });
+    return SafeArea(
+      bottom: false,
+      top: false,
+      child: Scaffold(
+        body: PageView(
+          controller: _pageController,
+          physics: NeverScrollableScrollPhysics(),
+          children: [
+            Container(),
+            PlanTabView(),
+            MealListView(),
+          ],
+        ),
+        bottomNavigationBar: SnakeNavigationBar.color(
+          currentIndex: _currentIndex,
+          onTap: (value) {
+            setState(() {
+              _currentIndex = value;
+            });
 
-          _pageController.animateToPage(
-            value,
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeIn,
-          );
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(EvaIcons.shoppingBagOutline),
-            label: 'shopping',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(EvaIcons.homeOutline),
-            label: 'home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(EvaIcons.bookOutline),
-            label: 'meals',
-          )
-        ],
+            _pageController.animateToPage(
+              value,
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeIn,
+            );
+          },
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(EvaIcons.shoppingBagOutline),
+              label: 'shopping',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(EvaIcons.homeOutline),
+              label: 'home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(EvaIcons.bookOutline),
+              label: 'meals',
+            )
+          ],
+        ),
       ),
     );
   }

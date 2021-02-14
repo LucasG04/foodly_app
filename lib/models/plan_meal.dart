@@ -37,8 +37,8 @@ class PlanMeal {
         (e) => e.toString() == map['type'],
         orElse: () => MealType.LUNCH,
       ),
-      upvotes: List<String>.from(map['upvotes']),
-      downvotes: List<String>.from(map['downvotes']),
+      upvotes: List<String>.from(map['upvotes'] ?? []),
+      downvotes: List<String>.from(map['downvotes'] ?? []),
     );
   }
 
