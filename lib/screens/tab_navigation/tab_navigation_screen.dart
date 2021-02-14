@@ -16,11 +16,9 @@ class _TabNavigationScreenState extends State<TabNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      top: false,
-      child: Scaffold(
-        body: PageView(
+    return Scaffold(
+      body: SafeArea(
+        child: PageView(
           controller: _pageController,
           physics: NeverScrollableScrollPhysics(),
           children: [
@@ -29,34 +27,34 @@ class _TabNavigationScreenState extends State<TabNavigationScreen> {
             MealListView(),
           ],
         ),
-        bottomNavigationBar: SnakeNavigationBar.color(
-          currentIndex: _currentIndex,
-          onTap: (value) {
-            setState(() {
-              _currentIndex = value;
-            });
+      ),
+      bottomNavigationBar: SnakeNavigationBar.color(
+        currentIndex: _currentIndex,
+        onTap: (value) {
+          setState(() {
+            _currentIndex = value;
+          });
 
-            _pageController.animateToPage(
-              value,
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeIn,
-            );
-          },
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(EvaIcons.shoppingBagOutline),
-              label: 'shopping',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(EvaIcons.homeOutline),
-              label: 'home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(EvaIcons.bookOutline),
-              label: 'meals',
-            )
-          ],
-        ),
+          _pageController.animateToPage(
+            value,
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeIn,
+          );
+        },
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(EvaIcons.shoppingBagOutline),
+            label: 'shopping',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(EvaIcons.homeOutline),
+            label: 'home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(EvaIcons.bookOutline),
+            label: 'meals',
+          )
+        ],
       ),
     );
   }

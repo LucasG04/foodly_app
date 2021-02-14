@@ -23,7 +23,6 @@ class Meal {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'name': name,
       'source': source,
       'instruction': instruction,
@@ -44,8 +43,8 @@ class Meal {
       instruction: map['instruction'],
       imageUrl: map['imageUrl'],
       duration: int.tryParse(map['duration'].toString()) ?? 0,
-      ingredients: List<String>.from(map['ingredients']),
-      tags: List<String>.from(map['tags']),
+      ingredients: List<String>.from(map['ingredients'] ?? []),
+      tags: List<String>.from(map['tags'] ?? []),
     );
   }
 

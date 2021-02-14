@@ -27,7 +27,7 @@ class MainTextField extends StatefulWidget {
     this.keyboardType = TextInputType.text,
     this.onSubmit,
     this.onChange,
-    this.isDense = false,
+    this.isDense = true,
     this.obscureText = false,
     this.textAlign = TextAlign.start,
     this.suffix,
@@ -52,7 +52,7 @@ class _MainTextFieldState extends State<MainTextField> {
   Widget build(BuildContext context) {
     return Container(
       padding: widget.isDense
-          ? const EdgeInsets.all(0.0)
+          ? const EdgeInsets.symmetric(vertical: 8.0)
           : const EdgeInsets.symmetric(
               horizontal: kPadding,
               vertical: kPadding / 2,

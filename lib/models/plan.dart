@@ -21,7 +21,6 @@ class Plan {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'name': name,
       'meals': meals?.map((x) => x?.toMap())?.toList(),
       'users': users,
