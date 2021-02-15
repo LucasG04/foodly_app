@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
+import 'package:foodly/utils/secrets.dart';
 
 import '../models/meal.dart';
 
@@ -30,6 +31,10 @@ class MealService {
   }
 
   static Future<Meal> createMeal(Meal meal) async {
+    if (meal.imageUrl == null || meal.imageUrl.isEmpty) {
+      meal.imageUrl = (await _getMealPhotos(meal.name))[0] ?? '';
+    }
+
     try {
       final doc = await _firestore.collection('meals').add(meal.toMap());
       meal.id = doc.id;
@@ -44,24 +49,20 @@ class MealService {
   static Future<List<String>> _getMealPhotos(String mealName) async {
     Dio dio = new Dio();
     final response = await dio.get(
-      'https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/ImageSearchAPI',
+      'https://pixabay.com/api/',
       queryParameters: {
-        'q': mealName.toString(),
-        'pageNumber': '0',
-        'pageSize': '5',
-        'autoCorrect': 'false',
+        'key': secretPixabay,
+        'q': mealName.toString() + ' food',
+        'per_page': '3',
+        'safesearch': 'true',
       },
-      options: Options(headers: {
-        'x-rapidapi-key': '352371f8c3msh956a7329ca16f9ap1c0f76jsn793ed5446e07',
-        'x-rapidapi-host': 'contextualwebsearch-websearch-v1.p.rapidapi.com',
-      }),
     );
 
     List<String> urls = [];
 
     if (response.data != null) {
-      for (var item in response.data['value']) {
-        urls.add(item['url']);
+      for (var item in response.data['hits']) {
+        urls.add(item['webformatURL']);
       }
     }
 
