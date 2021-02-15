@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/all.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'app_router.gr.dart';
+import 'constants.dart';
 import 'models/plan.dart';
 import 'providers/state_providers.dart';
 import 'services/plan_service.dart';
@@ -23,16 +24,29 @@ class FoodlyApp extends ConsumerWidget {
 
     // TODO: Nunito default font?
     return MaterialApp(
+      theme: ThemeData(
+        brightness: Brightness.light,
+        // textTheme: MediaQuery.of(context).size.width < 500
+        //     ? kSmallTextTheme
+        //     : kTextTheme,
+      ),
       builder: ExtendedNavigator<AppRouter>(
         router: AppRouter(),
-        // builder: (context, extendedNav) => Theme(
-        //   data: ThemeData(brightness: Brightness.dark),
-        //   child: ScrollConfiguration(
-        //     behavior: ScrollBehaviorModified(),
-        //     child: extendedNav,
-        //   ),
-        // ),
       ),
+      // builder: (context, extendedNav) => Theme(
+      //   data: ThemeData(
+      //     brightness: Brightness.dark,
+      //     textTheme: MediaQuery.of(context).size.width < 500
+      //         ? kSmallTextTheme
+      //         : kTextTheme,
+      //   ),
+      //   child: ScrollConfiguration(
+      //     behavior: ScrollBehaviorModified(),
+      //     child: ExtendedNavigator<AppRouter>(
+      //       router: AppRouter(),
+      //     ),
+      //   ),
+      // ),
     );
   }
 

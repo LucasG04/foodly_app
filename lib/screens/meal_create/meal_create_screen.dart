@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/helpers/main_snackbar.dart';
+import 'package:foodly/utils/main_snackbar.dart';
 import 'package:foodly/services/meal_service.dart';
 import 'package:foodly/widgets/main_button.dart';
 import 'package:foodly/widgets/markdown_editor.dart';
@@ -11,7 +11,7 @@ import '../../models/meal.dart';
 import '../../widgets/main_image_picker.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/page_title.dart';
-import 'edit_ingredients.dart';
+import 'edit_list_content.dart';
 
 class MealCreateScreen extends StatefulWidget {
   @override
@@ -48,6 +48,15 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                     controller: _titleController,
                     title: 'Name',
                   ),
+                  Divider(),
+                  EditListContent(
+                    content: _meal.ingredients,
+                    onChanged: (list) => _meal.ingredients = list,
+                    title: 'Zutaten:',
+                  ),
+                  Divider(),
+                  MarkdownEditor(onChange: (v) => _meal.instruction = v),
+                  Divider(),
                   MainTextField(
                     controller: _urlController,
                     title: 'Link zum Bild',
@@ -75,13 +84,12 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                       ),
                     ],
                   ),
-                  Divider(),
-                  EditIngredients(
-                    ingredients: _meal.ingredients,
-                    onChanged: (list) => _meal.ingredients = list,
-                  ),
-                  Divider(),
-                  MarkdownEditor(onChange: (v) => _meal.instruction = v),
+                  // Divider(),
+                  // EditListContent(
+                  //   content: _meal.ingredients,
+                  //   onChanged: (list) => _meal.ingredients = list,
+                  //   title: 'Tags:',
+                  // ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: kPadding),
                     child: MainButton(

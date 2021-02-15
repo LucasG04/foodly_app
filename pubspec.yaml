@@ -32,6 +32,7 @@ dependencies:
   group_list_view: ^1.0.6
   adaptive_dialog: ^0.9.3
   flutter_markdown:
+  auto_size_text:
 
   # Icons/Styles/Animations
   cupertino_icons: ^1.0.1

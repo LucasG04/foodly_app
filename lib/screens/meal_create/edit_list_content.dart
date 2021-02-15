@@ -3,25 +3,27 @@ import 'package:flutter/material.dart';
 
 import '../../constants.dart';
 
-class EditIngredients extends StatefulWidget {
-  final List<String> ingredients;
+class EditListContent extends StatefulWidget {
+  final List<String> content;
   final void Function(List<String>) onChanged;
+  final String title;
 
-  EditIngredients({
-    @required this.ingredients,
+  EditListContent({
+    @required this.content,
     @required this.onChanged,
+    @required this.title,
   });
 
   @override
-  _EditIngredientsState createState() => _EditIngredientsState();
+  _EditListContentState createState() => _EditListContentState();
 }
 
-class _EditIngredientsState extends State<EditIngredients> {
-  List<String> _ingredients;
+class _EditListContentState extends State<EditListContent> {
+  List<String> _content;
 
   @override
   void initState() {
-    _ingredients = widget.ingredients ?? [];
+    _content = widget.content ?? [];
     super.initState();
   }
 
@@ -32,23 +34,22 @@ class _EditIngredientsState extends State<EditIngredients> {
         Container(
           width: double.infinity,
           child: Text(
-            'Zutaten:',
+            widget.title,
             style: Theme.of(context).textTheme.bodyText1,
           ),
         ),
-        ..._ingredients.map((ingredient) {
+        ..._content.map((value) {
           return Row(
             children: <Widget>[
               Expanded(
-                child: _buildTextField(
-                    ingredient, _ingredients.indexOf(ingredient), context),
+                child: _buildTextField(value, _content.indexOf(value), context),
               ),
               IconButton(
                   icon: Icon(EvaIcons.minusCircleOutline),
                   onPressed: () {
                     setState(() {
-                      _ingredients.remove(ingredient);
-                      widget.onChanged(_ingredients);
+                      _content.remove(value);
+                      widget.onChanged(_content);
                     });
                   }),
             ],
@@ -61,8 +62,8 @@ class _EditIngredientsState extends State<EditIngredients> {
               icon: Icon(EvaIcons.plusCircleOutline),
               onPressed: () {
                 setState(() {
-                  _ingredients.add('');
-                  widget.onChanged(_ingredients);
+                  _content.add('');
+                  widget.onChanged(_content);
                 });
               },
             ),
@@ -76,8 +77,8 @@ class _EditIngredientsState extends State<EditIngredients> {
       String ingredient, int index, BuildContext context) {
     final controller = TextEditingController(text: ingredient);
     controller.addListener(() {
-      _ingredients[index] = controller.text;
-      widget.onChanged(_ingredients);
+      _content[index] = controller.text;
+      widget.onChanged(_content);
     });
 
     return TextField(
