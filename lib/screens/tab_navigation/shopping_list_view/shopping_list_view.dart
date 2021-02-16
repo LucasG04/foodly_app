@@ -30,14 +30,14 @@ class _ShoppingListViewState extends State<ShoppingListView> {
           stream: ShoppingListService.streamShoppingListByPlanId(planId),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              todoItems =
+              final List<Grocery> todoItems =
                   snapshot.data.groceries.where((e) => !e.bought).toList();
-              boughtItems =
+              final List<Grocery> boughtItems =
                   snapshot.data.groceries.where((e) => e.bought).toList();
 
               print('update');
               print('todo ' + todoItems.length.toString());
-              print('update ' + boughtItems.length.toString());
+              print('bought ' + boughtItems.length.toString());
 
               return SingleChildScrollView(
                 child: Column(
@@ -47,17 +47,17 @@ class _ShoppingListViewState extends State<ShoppingListView> {
                       padding: const EdgeInsets.only(left: 5.0),
                       child: PageTitle(text: 'Einkaufsliste'),
                     ),
-                    // ListView.separated(
-                    //   shrinkWrap: true,
-                    //   physics: NeverScrollableScrollPhysics(),
-                    //   itemCount: todoItems.length,
-                    //   itemBuilder: (context, index) =>
-                    //       _buildItemListTile(todoItems[index]),
-                    //   separatorBuilder: (context, index) => Divider(),
-                    // ),
                     AnimatedShoppingList(
                       groceries: todoItems,
-                      onRemove: (item) {},
+                      onRemove: (item) {
+                        todoItems.remove(item);
+                        item.bought = true;
+                        boughtItems.add(item);
+                        ShoppingListService.updateGroceries(
+                          snapshot.data.id,
+                          [...todoItems, ...boughtItems],
+                        );
+                      },
                     ),
                     SizedBox(height: kPadding),
                     ExpansionTile(
@@ -65,7 +65,15 @@ class _ShoppingListViewState extends State<ShoppingListView> {
                       children: [
                         AnimatedShoppingList(
                           groceries: boughtItems,
-                          onRemove: (item) {},
+                          onRemove: (item) {
+                            boughtItems.remove(item);
+                            item.bought = false;
+                            todoItems.add(item);
+                            ShoppingListService.updateGroceries(
+                              snapshot.data.id,
+                              [...todoItems, ...boughtItems],
+                            );
+                          },
                         ),
                       ],
                     ),

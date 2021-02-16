@@ -2,9 +2,11 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:foodly/models/grocery.dart';
 
-class AnimatedShoppingList extends StatefulWidget {
+class AnimatedShoppingList extends StatelessWidget {
   final List<Grocery> groceries;
   final void Function(Grocery) onRemove;
+
+  final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
 
   AnimatedShoppingList({
     @required this.groceries,
@@ -12,38 +14,20 @@ class AnimatedShoppingList extends StatefulWidget {
   });
 
   @override
-  _AnimatedShoppingListState createState() => _AnimatedShoppingListState();
-}
-
-class _AnimatedShoppingListState extends State<AnimatedShoppingList> {
-  GlobalKey<AnimatedListState> listKey = new GlobalKey<AnimatedListState>();
-
-  @override
   Widget build(BuildContext context) {
-    // widget.groceries.addAll([
-    //   Grocery(name: 'Bier'),
-    //   Grocery(name: 'Lachschinken'),
-    //   Grocery(name: 'Zucchini'),
-    //   Grocery(name: 'Flasche Korn'),
-    //   Grocery(name: 'Chips'),
-    //   Grocery(name: 'Halm'),
-    //   Grocery(name: 'Birne'),
-    //   Grocery(name: 'Apfel'),
-    // ]);
-    print(widget.groceries.length);
     return AnimatedList(
       key: listKey,
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
-      initialItemCount: widget.groceries.length,
+      initialItemCount: groceries.length,
       itemBuilder: (context, index, animation) {
-        return _buildSlideTile(context, index, animation);
+        return _buildSlideTile(index, animation);
       },
     );
   }
 
-  Widget _buildSlideTile(BuildContext context, int index, animation) {
-    Grocery grocery = widget.groceries[index];
+  Widget _buildSlideTile(int index, animation) {
+    Grocery grocery = groceries[index];
 
     return SlideTransition(
       position: Tween<Offset>(
@@ -65,24 +49,24 @@ class _AnimatedShoppingListState extends State<AnimatedShoppingList> {
 
   void _addItem(Grocery item) {
     listKey.currentState.insertItem(
-      widget.groceries.length + 1,
+      groceries.length + 1,
       duration: const Duration(milliseconds: 250),
     );
-    final existingGroceries = widget.groceries;
-    widget.groceries.clear();
-    widget.groceries.addAll(existingGroceries);
-    widget.groceries.add(item);
+    final existingGroceries = groceries;
+    groceries.clear();
+    groceries.addAll(existingGroceries);
+    groceries.add(item);
   }
 
   void _removeItem(int index) {
     listKey.currentState.removeItem(
       index,
-      (_, animation) => _buildSlideTile(context, index, animation),
+      (_, animation) => _buildSlideTile(index, animation),
       duration: const Duration(milliseconds: 250),
     );
 
     Future.delayed(
       const Duration(milliseconds: 250),
-    ).then((_) => widget.groceries.removeAt(index));
+    ).then((_) => onRemove(groceries.removeAt(index)));
   }
 }
