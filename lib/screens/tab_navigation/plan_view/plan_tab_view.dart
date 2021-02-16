@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import '../../../models/meal.dart';
 
 import '../../../constants.dart';
 import '../../../models/plan.dart';
