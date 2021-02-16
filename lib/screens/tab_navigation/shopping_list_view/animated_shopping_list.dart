@@ -52,16 +52,16 @@ class AnimatedShoppingList extends StatelessWidget {
     );
   }
 
-  void _addItem(Grocery item) {
-    listKey.currentState.insertItem(
-      groceries.length + 1,
-      duration: const Duration(milliseconds: 250),
-    );
-    final existingGroceries = groceries;
-    groceries.clear();
-    groceries.addAll(existingGroceries);
-    groceries.add(item);
-  }
+  // void _addItem(Grocery item) {
+  //   listKey.currentState.insertItem(
+  //     groceries.length + 1,
+  //     duration: const Duration(milliseconds: 250),
+  //   );
+  //   final existingGroceries = groceries;
+  //   groceries.clear();
+  //   groceries.addAll(existingGroceries);
+  //   groceries.add(item);
+  // }
 
   void _removeItem(int index) {
     listKey.currentState.removeItem(

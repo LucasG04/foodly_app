@@ -24,7 +24,7 @@ class UnknownRouteScreen extends StatelessWidget {
               style: TextStyle(fontSize: 30),
             ),
             SizedBox(height: 40.0),
-            FlatButton(
+            TextButton(
               onPressed: _navigateToHome,
               child: Text('Back to Home'),
             ),

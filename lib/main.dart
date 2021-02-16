@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/all.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'app_router.gr.dart';
-import 'constants.dart';
 import 'models/plan.dart';
 import 'providers/state_providers.dart';
 import 'services/plan_service.dart';

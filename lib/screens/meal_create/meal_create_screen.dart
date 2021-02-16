@@ -8,7 +8,6 @@ import 'package:foodly/widgets/progress_button.dart';
 
 import '../../constants.dart';
 import '../../models/meal.dart';
-import '../../widgets/main_image_picker.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/page_title.dart';
 import 'edit_list_content.dart';

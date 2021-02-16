@@ -97,7 +97,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
     grocery.amount = _amountController.text.trim();
     grocery.bought = _isCreating ? false : grocery.bought;
 
-    if (widget.grocery.name.isNotEmpty) {
+    if (grocery.name.isNotEmpty) {
       setState(() {
         _buttonState = ButtonState.inProgress;
       });

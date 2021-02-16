@@ -1,7 +1,6 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:foodly/models/grocery.dart';
 import 'package:foodly/models/shopping_list.dart';
 import 'package:foodly/providers/state_providers.dart';
@@ -47,7 +46,16 @@ class _ShoppingListViewState extends State<ShoppingListView> {
                           SizedBox(height: kPadding),
                           Padding(
                             padding: const EdgeInsets.only(left: 5.0),
-                            child: PageTitle(text: 'Einkaufsliste'),
+                            child: PageTitle(
+                              text: 'Einkaufsliste',
+                              actions: [
+                                IconButton(
+                                  icon: Icon(EvaIcons.plusCircleOutline),
+                                  onPressed: () => _editGrocery(listId),
+                                  splashRadius: 25.0,
+                                )
+                              ],
+                            ),
                           ),
                           AnimatedShoppingList(
                             groceries: todoItems,
@@ -93,7 +101,7 @@ class _ShoppingListViewState extends State<ShoppingListView> {
     );
   }
 
-  void _editGrocery(String listId, Grocery grocery) {
+  void _editGrocery(String listId, [Grocery grocery]) {
     showModalBottomSheet(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
