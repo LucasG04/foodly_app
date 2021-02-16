@@ -6,6 +6,7 @@ import 'package:foodly/models/grocery.dart';
 import 'package:foodly/models/shopping_list.dart';
 import 'package:foodly/providers/state_providers.dart';
 import 'package:foodly/screens/tab_navigation/shopping_list_view/animated_shopping_list.dart';
+import 'package:foodly/screens/tab_navigation/shopping_list_view/edit_grocery_modal.dart';
 import 'package:foodly/services/shopping_list_service.dart';
 import 'package:foodly/widgets/page_title.dart';
 import 'package:foodly/widgets/small_circular_progress_indicator.dart';
@@ -26,59 +27,60 @@ class _ShoppingListViewState extends State<ShoppingListView> {
     return Consumer(
       builder: (context, watch, child) {
         final planId = watch(planProvider).state.id;
-        return StreamBuilder<ShoppingList>(
-          stream: ShoppingListService.streamShoppingListByPlanId(planId),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final List<Grocery> todoItems =
-                  snapshot.data.groceries.where((e) => !e.bought).toList();
-              final List<Grocery> boughtItems =
-                  snapshot.data.groceries.where((e) => e.bought).toList();
+        return FutureBuilder<ShoppingList>(
+          future: ShoppingListService.getShoppingListByPlanId(planId),
+          builder: (_, shoppingListSnap) {
+            if (shoppingListSnap.hasData) {
+              final listId = shoppingListSnap.data.id;
+              return StreamBuilder<List<Grocery>>(
+                stream: ShoppingListService.streamShoppingList(listId),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final List<Grocery> todoItems =
+                        snapshot.data.where((e) => !e.bought).toList();
+                    final List<Grocery> boughtItems =
+                        snapshot.data.where((e) => e.bought).toList();
 
-              print('update');
-              print('todo ' + todoItems.length.toString());
-              print('bought ' + boughtItems.length.toString());
-
-              return SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SizedBox(height: kPadding),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 5.0),
-                      child: PageTitle(text: 'Einkaufsliste'),
-                    ),
-                    AnimatedShoppingList(
-                      groceries: todoItems,
-                      onRemove: (item) {
-                        todoItems.remove(item);
-                        item.bought = true;
-                        boughtItems.add(item);
-                        ShoppingListService.updateGroceries(
-                          snapshot.data.id,
-                          [...todoItems, ...boughtItems],
-                        );
-                      },
-                    ),
-                    SizedBox(height: kPadding),
-                    ExpansionTile(
-                      title: Text('BEREITS GEKAUFT'),
-                      children: [
-                        AnimatedShoppingList(
-                          groceries: boughtItems,
-                          onRemove: (item) {
-                            boughtItems.remove(item);
-                            item.bought = false;
-                            todoItems.add(item);
-                            ShoppingListService.updateGroceries(
-                              snapshot.data.id,
-                              [...todoItems, ...boughtItems],
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          SizedBox(height: kPadding),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 5.0),
+                            child: PageTitle(text: 'Einkaufsliste'),
+                          ),
+                          AnimatedShoppingList(
+                            groceries: todoItems,
+                            onEdit: (e) => _editGrocery(listId, e),
+                            onRemove: (item) {
+                              item.bought = true;
+                              ShoppingListService.updateGrocery(listId, item);
+                            },
+                          ),
+                          SizedBox(height: kPadding),
+                          ExpansionTile(
+                            title: Text('BEREITS GEKAUFT'),
+                            children: [
+                              AnimatedShoppingList(
+                                groceries: boughtItems,
+                                onEdit: (e) => _editGrocery(listId, e),
+                                onRemove: (item) {
+                                  item.bought = false;
+                                  ShoppingListService.updateGrocery(
+                                      listId, item);
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return Center(
+                      child: SmallCircularProgressIndicator(),
+                    );
+                  }
+                },
               );
             } else {
               return Center(
@@ -88,6 +90,19 @@ class _ShoppingListViewState extends State<ShoppingListView> {
           },
         );
       },
+    );
+  }
+
+  void _editGrocery(String listId, Grocery grocery) {
+    showModalBottomSheet(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(10.0),
+        ),
+      ),
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => EditGroceryModal(listId, grocery),
     );
   }
 }

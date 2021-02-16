@@ -5,12 +5,14 @@ import 'package:foodly/models/grocery.dart';
 class AnimatedShoppingList extends StatelessWidget {
   final List<Grocery> groceries;
   final void Function(Grocery) onRemove;
+  final void Function(Grocery) onEdit;
 
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
 
   AnimatedShoppingList({
     @required this.groceries,
     @required this.onRemove,
+    @required this.onEdit,
   });
 
   @override
@@ -38,9 +40,12 @@ class AnimatedShoppingList extends StatelessWidget {
         onTap: () => _removeItem(index),
         child: ListTile(
           title: Text(grocery.name, style: TextStyle(fontSize: 20.0)),
+          subtitle: grocery.amount != null && grocery.amount.isNotEmpty
+              ? Text(grocery.amount)
+              : null,
           trailing: IconButton(
             icon: Icon(EvaIcons.moreHorizotnalOutline),
-            onPressed: () => print('edit grocery'),
+            onPressed: () => onEdit(grocery),
           ),
         ),
       ),

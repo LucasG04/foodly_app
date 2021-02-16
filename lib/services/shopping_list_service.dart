@@ -11,30 +11,36 @@ class ShoppingListService {
     final snaps = await _firestore
         .collection('shoppinglists')
         .where('planId', isEqualTo: planId)
+        .limit(1)
         .get();
 
     return ShoppingList.fromMap(snaps.docs.first.id, snaps.docs.first.data());
   }
 
-  static Stream<ShoppingList> streamShoppingListByPlanId(String planId) {
+  static Stream<List<Grocery>> streamShoppingList(String listId) {
     return _firestore
         .collection('shoppinglists')
-        .where('planId', isEqualTo: planId)
+        .doc(listId)
+        .collection('groceries')
         .snapshots()
-        .map((snaps) =>
-            ShoppingList.fromMap(snaps.docs.first.id, snaps.docs.first.data()));
+        .map((event) =>
+            event.docs.map((e) => Grocery.fromMap(e.id, e.data())).toList());
   }
 
-  static Future<void> updateGroceries(
-      String id, List<Grocery> groceries) async {
-    return _firestore.collection('shoppinglists').doc(id).update({
-      'groceries': groceries.map((e) => e.toMap()).toList(),
-    });
+  static Future<void> updateGrocery(String listId, Grocery grocery) async {
+    return _firestore
+        .collection('shoppinglists')
+        .doc(listId)
+        .collection('groceries')
+        .doc(grocery.id)
+        .update(grocery.toMap());
   }
 
-  static Future<void> addGrocery(String id, Grocery grocery) async {
-    return _firestore.collection('shoppinglists').doc(id).update({
-      'groceries': FieldValue.arrayUnion([grocery.toMap()]),
-    });
+  static Future<void> addGrocery(String listId, Grocery grocery) async {
+    return _firestore
+        .collection('shoppinglists')
+        .doc(listId)
+        .collection('groceries')
+        .add(grocery.toMap());
   }
 }
