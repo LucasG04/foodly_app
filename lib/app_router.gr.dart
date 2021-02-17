@@ -8,6 +8,7 @@
 
 import 'package:auto_route/auto_route.dart';
 
+import 'screens/authentication/authentication_screen.dart';
 import 'screens/meal/meal_screen.dart';
 import 'screens/meal_create/meal_create_screen.dart';
 import 'screens/meal_select/meal_select.dart';
@@ -15,13 +16,15 @@ import 'screens/tab_navigation/tab_navigation_screen.dart';
 import 'screens/unknown_route/unknown_route_screen.dart';
 
 class Routes {
-  static const String tabNavigationScreen = '/';
+  static const String authenticationScreen = '/';
+  static const String tabNavigationScreen = '/tab-navigation-screen';
   static const String mealSelectScreen = '/meal-select-screen';
   static const String mealCreateScreen = '/meal-create-screen';
   static const String _mealScreen = '/meal/:id';
   static String mealScreen({@required dynamic id}) => '/meal/$id';
   static const String unknownRouteScreen = '*';
   static const all = <String>{
+    authenticationScreen,
     tabNavigationScreen,
     mealSelectScreen,
     mealCreateScreen,
@@ -34,6 +37,7 @@ class AppRouter extends RouterBase {
   @override
   List<RouteDef> get routes => _routes;
   final _routes = <RouteDef>[
+    RouteDef(Routes.authenticationScreen, page: AuthenticationScreen),
     RouteDef(Routes.tabNavigationScreen, page: TabNavigationScreen),
     RouteDef(Routes.mealSelectScreen, page: MealSelectScreen),
     RouteDef(Routes.mealCreateScreen, page: MealCreateScreen),
@@ -43,6 +47,12 @@ class AppRouter extends RouterBase {
   @override
   Map<Type, AutoRouteFactory> get pagesMap => _pagesMap;
   final _pagesMap = <Type, AutoRouteFactory>{
+    AuthenticationScreen: (data) {
+      return buildAdaptivePageRoute<dynamic>(
+        builder: (context) => AuthenticationScreen(),
+        settings: data,
+      );
+    },
     TabNavigationScreen: (data) {
       return buildAdaptivePageRoute<dynamic>(
         builder: (context) => TabNavigationScreen(),
