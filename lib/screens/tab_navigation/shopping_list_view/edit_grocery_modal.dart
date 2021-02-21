@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:foodly/models/grocery.dart';
-import 'package:foodly/services/shopping_list_service.dart';
-import 'package:foodly/widgets/main_button.dart';
-import 'package:foodly/widgets/main_text_field.dart';
-import 'package:foodly/widgets/progress_button.dart';
 
 import '../../../constants.dart';
+import '../../../models/grocery.dart';
+import '../../../services/shopping_list_service.dart';
+import '../../../widgets/main_button.dart';
+import '../../../widgets/main_text_field.dart';
+import '../../../widgets/progress_button.dart';
 
 class EditGroceryModal extends StatefulWidget {
   final String shoppingListId;

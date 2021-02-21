@@ -10,53 +10,64 @@ import '../../../services/plan_service.dart';
 import '../../../widgets/page_title.dart';
 import 'plan_day_card.dart';
 
-class PlanTabView extends ConsumerWidget {
+class PlanTabView extends StatefulWidget {
   @override
-  Widget build(BuildContext context, ScopedReader watch) {
-    final activePlan = watch(planProvider).state;
+  _PlanTabViewState createState() => _PlanTabViewState();
+}
 
-    return activePlan != null
-        ? StreamBuilder(
-            stream: PlanService.streamPlanById(activePlan.id),
-            initialData: activePlan,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                final plan = snapshot.data as Plan;
-                final days = _getMealsForDays(plan);
+class _PlanTabViewState extends State<PlanTabView>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
 
-                return SingleChildScrollView(
-                  child: AnimationLimiter(
-                    child: Column(
-                      children: AnimationConfiguration.toStaggeredList(
-                        duration: const Duration(milliseconds: 250),
-                        childAnimationBuilder: (widget) => SlideAnimation(
-                          child: FadeInAnimation(child: widget),
-                        ),
-                        children: [
-                          SizedBox(height: kPadding),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 5.0),
-                            child: PageTitle(text: 'Essensplan'),
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Consumer(builder: (context, watch, _) {
+      final activePlan = watch(planProvider).state;
+      return activePlan != null
+          ? StreamBuilder(
+              stream: PlanService.streamPlanById(activePlan.id),
+              initialData: activePlan,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final plan = snapshot.data as Plan;
+                  final days = _getMealsForDays(plan);
+
+                  return SingleChildScrollView(
+                    child: AnimationLimiter(
+                      child: Column(
+                        children: AnimationConfiguration.toStaggeredList(
+                          duration: const Duration(milliseconds: 250),
+                          childAnimationBuilder: (widget) => SlideAnimation(
+                            child: FadeInAnimation(child: widget),
                           ),
-                          ...days
-                              .map(
-                                (e) => PlanDayCard(
-                                  date: e.date,
-                                  meals: e.meals,
-                                ),
-                              )
-                              .toList()
-                        ],
+                          children: [
+                            SizedBox(height: kPadding),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 5.0),
+                              child: PageTitle(text: 'Essensplan'),
+                            ),
+                            ...days
+                                .map(
+                                  (e) => PlanDayCard(
+                                    date: e.date,
+                                    meals: e.meals,
+                                  ),
+                                )
+                                .toList()
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                );
-              } else {
-                return Center(child: CircularProgressIndicator());
-              }
-            },
-          )
-        : Center(child: CircularProgressIndicator());
+                  );
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              },
+            )
+          : Center(child: CircularProgressIndicator());
+    });
   }
 
   List<PlanDay> _getMealsForDays(Plan plan) {

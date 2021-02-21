@@ -1,6 +1,7 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/models/grocery.dart';
+
+import '../../../models/grocery.dart';
 
 class AnimatedShoppingList extends StatelessWidget {
   final List<Grocery> groceries;

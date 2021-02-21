@@ -12,20 +12,20 @@ import 'screens/authentication/authentication_screen.dart';
 import 'screens/meal/meal_screen.dart';
 import 'screens/meal_create/meal_create_screen.dart';
 import 'screens/meal_select/meal_select.dart';
-import 'screens/tab_navigation/tab_navigation_screen.dart';
+import 'screens/tab_navigation/home_screen.dart';
 import 'screens/unknown_route/unknown_route_screen.dart';
 
 class Routes {
-  static const String authenticationScreen = '/';
-  static const String tabNavigationScreen = '/tab-navigation-screen';
+  static const String homeScreen = '/';
+  static const String authenticationScreen = '/authentication-screen';
   static const String mealSelectScreen = '/meal-select-screen';
   static const String mealCreateScreen = '/meal-create-screen';
   static const String _mealScreen = '/meal/:id';
   static String mealScreen({@required dynamic id}) => '/meal/$id';
   static const String unknownRouteScreen = '*';
   static const all = <String>{
+    homeScreen,
     authenticationScreen,
-    tabNavigationScreen,
     mealSelectScreen,
     mealCreateScreen,
     _mealScreen,
@@ -37,8 +37,8 @@ class AppRouter extends RouterBase {
   @override
   List<RouteDef> get routes => _routes;
   final _routes = <RouteDef>[
+    RouteDef(Routes.homeScreen, page: HomeScreen),
     RouteDef(Routes.authenticationScreen, page: AuthenticationScreen),
-    RouteDef(Routes.tabNavigationScreen, page: TabNavigationScreen),
     RouteDef(Routes.mealSelectScreen, page: MealSelectScreen),
     RouteDef(Routes.mealCreateScreen, page: MealCreateScreen),
     RouteDef(Routes._mealScreen, page: MealScreen),
@@ -47,15 +47,15 @@ class AppRouter extends RouterBase {
   @override
   Map<Type, AutoRouteFactory> get pagesMap => _pagesMap;
   final _pagesMap = <Type, AutoRouteFactory>{
-    AuthenticationScreen: (data) {
+    HomeScreen: (data) {
       return buildAdaptivePageRoute<dynamic>(
-        builder: (context) => AuthenticationScreen(),
+        builder: (context) => HomeScreen(),
         settings: data,
       );
     },
-    TabNavigationScreen: (data) {
+    AuthenticationScreen: (data) {
       return buildAdaptivePageRoute<dynamic>(
-        builder: (context) => TabNavigationScreen(),
+        builder: (context) => AuthenticationScreen(),
         settings: data,
       );
     },

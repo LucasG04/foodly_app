@@ -20,10 +20,12 @@ dependencies:
   dio: ^3.0.10
   url_launcher:
   flushbar:
+  flutter_toggle_tab: ^0.0.5+4
 
   # Firebase
-  firebase_core: ^0.5.3
-  cloud_firestore: ^0.14.4
+  firebase_core: ^0.7.0
+  cloud_firestore: ^0.16.0+1
+  firebase_auth: ^0.20.1
 
   # Widgets
   flutter_snake_navigationbar: ^0.4.2

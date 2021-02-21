@@ -12,9 +12,13 @@ class MealListView extends StatefulWidget {
   _MealListViewState createState() => _MealListViewState();
 }
 
-class _MealListViewState extends State<MealListView> {
+class _MealListViewState extends State<MealListView>
+    with AutomaticKeepAliveClientMixin {
   List<Meal> allMeals;
   List<Meal> filterMeals;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -30,6 +34,7 @@ class _MealListViewState extends State<MealListView> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final tagList = _groupMealsByTags(this.filterMeals ?? []);
 
     return Scaffold(

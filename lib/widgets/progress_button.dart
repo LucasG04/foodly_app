@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:foodly/constants.dart';
+
+import '../constants.dart';
 import 'small_circular_progress_indicator.dart';
 
 /// A button that animates between state changes.

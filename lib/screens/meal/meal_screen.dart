@@ -4,12 +4,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:foodly/models/meal.dart';
-import 'package:foodly/services/meal_service.dart';
-import 'package:foodly/utils/no_glowing_overscroll_indicator_behavior.dart';
-import 'package:foodly/widgets/small_circular_progress_indicator.dart';
 
 import '../../constants.dart';
+import '../../models/meal.dart';
+import '../../services/meal_service.dart';
+import '../../utils/no_glowing_overscroll_indicator_behavior.dart';
+import '../../widgets/small_circular_progress_indicator.dart';
 import 'border_icon.dart';
 
 class MealScreen extends StatelessWidget {

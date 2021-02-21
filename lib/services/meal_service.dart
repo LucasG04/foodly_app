@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
-import 'package:foodly/utils/secrets.dart';
+import '../utils/secrets.dart';
 
 import '../models/meal.dart';
 

@@ -17,6 +17,7 @@ class MainTextField extends StatefulWidget {
   final TextAlign textAlign;
   final Widget suffix;
   final String errorText;
+  final String Function(String) validator;
 
   const MainTextField({
     @required this.controller,
@@ -32,6 +33,7 @@ class MainTextField extends StatefulWidget {
     this.textAlign = TextAlign.start,
     this.suffix,
     this.errorText,
+    this.validator,
   });
 
   @override
@@ -125,6 +127,7 @@ class _MainTextFieldState extends State<MainTextField> {
           widget.onSubmit();
         },
         onChanged: widget.onChange,
+        validator: widget.validator,
       ),
       onFocusChange: (value) {
         setState(() {

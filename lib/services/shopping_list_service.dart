@@ -1,11 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:foodly/models/grocery.dart';
-import 'package:foodly/models/shopping_list.dart';
+
+import '../models/grocery.dart';
+import '../models/shopping_list.dart';
 
 class ShoppingListService {
   ShoppingListService._();
 
   static FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  static Future<void> createShoppingListWithPlanId(String planId) async {
+    final list = new ShoppingList(meals: [], planId: planId);
+    await _firestore.collection('shoppinglists').add(list.toMap());
+  }
 
   static Future<ShoppingList> getShoppingListByPlanId(String planId) async {
     final snaps = await _firestore

@@ -1,15 +1,15 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/utils/main_snackbar.dart';
-import 'package:foodly/services/meal_service.dart';
-import 'package:foodly/widgets/main_button.dart';
-import 'package:foodly/widgets/markdown_editor.dart';
-import 'package:foodly/widgets/progress_button.dart';
 
 import '../../constants.dart';
 import '../../models/meal.dart';
+import '../../services/meal_service.dart';
+import '../../utils/main_snackbar.dart';
+import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
+import '../../widgets/markdown_editor.dart';
 import '../../widgets/page_title.dart';
+import '../../widgets/progress_button.dart';
 import 'edit_list_content.dart';
 
 class MealCreateScreen extends StatefulWidget {
