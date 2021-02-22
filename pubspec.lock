@@ -684,6 +684,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.25.0"
+  share:
+    dependency: "direct main"
+    description:
+      name: share
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.5+4"
   shelf:
     dependency: transitive
     description:

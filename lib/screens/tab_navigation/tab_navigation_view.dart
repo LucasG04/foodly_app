@@ -2,6 +2,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
+import 'package:foodly/screens/tab_navigation/settings_view/settings_view.dart';
 
 import 'meal_list_view/meal_list_view.dart';
 import 'plan_view/plan_tab_view.dart';
@@ -27,6 +28,7 @@ class _TabNavigationViewState extends State<TabNavigationView> {
             ShoppingListView(),
             PlanTabView(),
             MealListView(),
+            SettingsView(),
           ],
         ),
       ),
@@ -55,7 +57,11 @@ class _TabNavigationViewState extends State<TabNavigationView> {
           BottomNavigationBarItem(
             icon: Icon(EvaIcons.bookOutline),
             label: 'meals',
-          )
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(EvaIcons.settings2Outline),
+            label: 'settings',
+          ),
         ],
       ),
     );

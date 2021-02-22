@@ -101,6 +101,15 @@ class PlanService {
     }
   }
 
+  static Future<void> leavePlan(String planId, String userId) async {
+    final plan = await getPlanById(planId);
+
+    if (plan.users.contains(userId)) {
+      plan.users.remove(userId);
+      _firestore.collection('plans').doc(planId).update({'users': plan.users});
+    }
+  }
+
   static Future<Box> _getFoodlyBox() async {
     return await Hive.boxExists('foodly')
         ? Hive.box('foodly')

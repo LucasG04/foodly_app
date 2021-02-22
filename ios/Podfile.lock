@@ -320,6 +320,8 @@ PODS:
   - path_provider (0.0.1):
     - Flutter
   - PromisesObjC (1.2.11)
+  - share (0.0.1):
+    - Flutter
   - sqflite (0.0.2):
     - Flutter
     - FMDB (>= 2.7.5)
@@ -333,6 +335,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
+  - share (from `.symlinks/plugins/share/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
 
@@ -368,6 +371,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/integration_test/ios"
   path_provider:
     :path: ".symlinks/plugins/path_provider/ios"
+  share:
+    :path: ".symlinks/plugins/share/ios"
   sqflite:
     :path: ".symlinks/plugins/sqflite/ios"
   url_launcher:
@@ -396,6 +401,7 @@ SPEC CHECKSUMS:
   nanopb: 1bf24dd71191072e120b83dd02d08f3da0d65e53
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   PromisesObjC: 8c196f5a328c2cba3e74624585467a557dcb482f
+  share: 0b2c3e82132f5888bccca3351c504d0003b3b410
   sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
 
