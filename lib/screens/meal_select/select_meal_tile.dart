@@ -33,8 +33,14 @@ class _SelectMealTileState extends State<SelectMealTile> {
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(kRadius),
           child: widget.meal.imageUrl != null && widget.meal.imageUrl.isNotEmpty
-              ? CachedNetworkImage(imageUrl: widget.meal.imageUrl)
-              : Image.asset('assets/images/food_fallback.png'),
+              ? CachedNetworkImage(
+                  imageUrl: widget.meal.imageUrl,
+                  fit: BoxFit.cover,
+                )
+              : Image.asset(
+                  'assets/images/food_fallback.png',
+                  fit: BoxFit.cover,
+                ),
         ),
         content: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,

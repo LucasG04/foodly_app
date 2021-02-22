@@ -33,6 +33,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
 
   @override
   Widget build(BuildContext context) {
+    final textColor = Theme.of(context).textTheme.bodyText1.color;
     return Container(
       width: MediaQuery.of(context).size.width > 599
           ? 600
@@ -46,16 +47,16 @@ class _MarkdownEditorState extends State<MarkdownEditor>
         children: [
           TabBar(
             controller: _tabController,
-            // indicatorColor: textColor,
+            indicatorColor: textColor,
             tabs: [
               Tab(
                 child: Wrap(
                   alignment: WrapAlignment.center,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: <Widget>[
-                    Icon(EvaIcons.editOutline),
+                    Icon(EvaIcons.editOutline, color: textColor),
                     SizedBox(width: 8.0),
-                    Text('Edit', style: TextStyle()),
+                    Text('Edit', style: TextStyle(color: textColor)),
                   ],
                 ),
               ),
@@ -64,9 +65,9 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                   alignment: WrapAlignment.center,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: <Widget>[
-                    Icon(EvaIcons.eyeOutline),
+                    Icon(EvaIcons.eyeOutline, color: textColor),
                     SizedBox(width: 8.0),
-                    Text('Preview', style: TextStyle()),
+                    Text('Preview', style: TextStyle(color: textColor)),
                   ],
                 ),
               )

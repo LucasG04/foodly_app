@@ -34,6 +34,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
 
     return Scaffold(
       body: SafeArea(
+        bottom: false,
         child: SingleChildScrollView(
           child: Center(
             child: Container(
@@ -48,12 +49,20 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                     title: 'Name',
                   ),
                   Divider(),
+
                   EditListContent(
                     content: _meal.ingredients,
                     onChanged: (list) => _meal.ingredients = list,
                     title: 'Zutaten:',
                   ),
                   Divider(),
+                  Container(
+                    width: double.infinity,
+                    child: Text(
+                      'Anleitung',
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ),
+                  ),
                   MarkdownEditor(onChange: (v) => _meal.instruction = v),
                   Divider(),
                   MainTextField(

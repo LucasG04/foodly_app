@@ -23,7 +23,7 @@ class _EditListContentState extends State<EditListContent> {
 
   @override
   void initState() {
-    _content = widget.content ?? [];
+    _content = widget.content ?? [''];
     super.initState();
   }
 
@@ -60,12 +60,7 @@ class _EditListContentState extends State<EditListContent> {
             Spacer(),
             IconButton(
               icon: Icon(EvaIcons.plusCircleOutline),
-              onPressed: () {
-                setState(() {
-                  _content.add('');
-                  widget.onChanged(_content);
-                });
-              },
+              onPressed: () => _addNewLine(),
             ),
           ],
         ),
@@ -98,6 +93,14 @@ class _EditListContentState extends State<EditListContent> {
         hintText: '...',
       ),
       style: Theme.of(context).textTheme.bodyText2,
+      onSubmitted: (_) => _addNewLine(),
     );
+  }
+
+  void _addNewLine() {
+    setState(() {
+      _content.add('');
+      widget.onChanged(_content);
+    });
   }
 }
