@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodly/providers/state_providers.dart';
+import 'package:foodly/widgets/small_circular_progress_indicator.dart';
 import 'package:group_list_view/group_list_view.dart';
 
 import '../../../constants.dart';
@@ -14,64 +17,46 @@ class MealListView extends StatefulWidget {
 
 class _MealListViewState extends State<MealListView>
     with AutomaticKeepAliveClientMixin {
-  List<Meal> allMeals;
-  List<Meal> filterMeals;
+  List<Meal> _allMeals;
+  List<Meal> _filteredMeals;
+  String _searchInput = '';
 
   @override
   bool get wantKeepAlive => true;
 
   @override
-  void initState() {
-    super.initState();
-
-    MealService.getMeals(100).then((values) {
-      setState(() {
-        this.allMeals = values;
-        this.filterMeals = values;
-      });
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     super.build(context);
-    final tagList = _groupMealsByTags(this.filterMeals ?? []);
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
             SizedBox(height: kPadding),
-            MealListTitle((searchTerm) {
+            MealListTitle((search) {
               setState(() {
-                if (searchTerm.isNotEmpty) {
-                  this.filterMeals = this
-                      .allMeals
-                      .where((el) => el.name
-                          .toLowerCase()
-                          .contains(searchTerm.toLowerCase()))
-                      .toList();
-                } else {
-                  this.filterMeals = this.allMeals;
-                }
+                _searchInput = search;
+                _filterMeals(search);
               });
             }),
-            this.allMeals != null
-                ? GroupListView(
-                    itemBuilder: (_, item) => MealListTile(
-                      tagList[item.section].meals[item.index],
-                    ),
-                    sectionsCount: tagList.length,
-                    groupHeaderBuilder: (_, group) => _buildSubtitle(
-                      context,
-                      tagList[group].tag,
-                    ),
-                    countOfItemInSection: (section) =>
-                        tagList[section].meals.length,
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                  )
-                : CircularProgressIndicator()
+            Consumer(builder: (context, watch, _) {
+              _allMeals = watch(allMealsProvider).state;
+              _filterMeals(_searchInput);
+              final tagList = _groupMealsByTags(this._filteredMeals ?? []);
+              return GroupListView(
+                itemBuilder: (_, item) => MealListTile(
+                  tagList[item.section].meals[item.index],
+                ),
+                sectionsCount: tagList.length,
+                groupHeaderBuilder: (_, group) => _buildSubtitle(
+                  context,
+                  tagList[group].tag,
+                ),
+                countOfItemInSection: (section) =>
+                    tagList[section].meals.length,
+                physics: NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+              );
+            })
           ],
         ),
       ),
@@ -125,6 +110,17 @@ class _MealListViewState extends State<MealListView>
     }
 
     return tagList;
+  }
+
+  void _filterMeals(String query) {
+    if (query.isNotEmpty) {
+      this._filteredMeals = this
+          ._allMeals
+          .where((el) => el.name.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    } else {
+      this._filteredMeals = this._allMeals;
+    }
   }
 }
 

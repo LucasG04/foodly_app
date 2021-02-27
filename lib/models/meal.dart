@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 class Meal {
   String id;
   String name;
@@ -9,6 +7,8 @@ class Meal {
   List<String> ingredients;
   List<String> tags;
   String imageUrl;
+  String planId;
+  bool isPublic;
 
   Meal({
     this.id,
@@ -19,6 +19,8 @@ class Meal {
     this.ingredients,
     this.tags,
     this.imageUrl,
+    this.planId,
+    this.isPublic,
   });
 
   Map<String, dynamic> toMap() {
@@ -30,6 +32,8 @@ class Meal {
       'ingredients': ingredients,
       'tags': tags,
       'imageUrl': imageUrl,
+      'planId': planId,
+      'isPublic': isPublic ?? false,
     };
   }
 
@@ -45,38 +49,13 @@ class Meal {
       duration: int.tryParse(map['duration'].toString()) ?? 0,
       ingredients: List<String>.from(map['ingredients'] ?? []),
       tags: List<String>.from(map['tags'] ?? []),
+      planId: map['planId'],
+      isPublic: map['isPublic'] ?? false,
     );
   }
 
   @override
   String toString() {
     return 'Meal(id: $id, name: $name, source: $source, instruction: $instruction, duration: $duration, ingredients: $ingredients, tags: $tags)';
-  }
-
-  @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) return true;
-
-    return o is Meal &&
-        o.id == id &&
-        o.name == name &&
-        o.source == source &&
-        o.instruction == instruction &&
-        o.duration == duration &&
-        o.imageUrl == imageUrl &&
-        listEquals(o.ingredients, ingredients) &&
-        listEquals(o.tags, tags);
-  }
-
-  @override
-  int get hashCode {
-    return id.hashCode ^
-        name.hashCode ^
-        source.hashCode ^
-        instruction.hashCode ^
-        duration.hashCode ^
-        imageUrl.hashCode ^
-        ingredients.hashCode ^
-        tags.hashCode;
   }
 }

@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
+import 'package:foodly/services/meal_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
-
+import 'package:async/async.dart';
 import 'app_router.gr.dart';
+import 'models/meal.dart';
 import 'models/plan.dart';
 import 'providers/state_providers.dart';
 import 'services/plan_service.dart';
@@ -15,46 +19,68 @@ Future<void> main() async {
   runApp(ProviderScope(child: FoodlyApp()));
 }
 
-class FoodlyApp extends ConsumerWidget {
+class FoodlyApp extends StatefulWidget {
   @override
-  Widget build(BuildContext context, ScopedReader watch) {
-    initializeDateFormatting();
-    _loadActivePlan(watch(planProvider).state, context);
+  _FoodlyAppState createState() => _FoodlyAppState();
+}
 
-    // TODO: Nunito default font?
-    return MaterialApp(
-      theme: ThemeData(
-        brightness: Brightness.light,
-        // textTheme: MediaQuery.of(context).size.width < 500
-        //     ? kSmallTextTheme
-        //     : kTextTheme,
-      ),
-      builder: ExtendedNavigator<AppRouter>(
-        router: AppRouter(),
-      ),
-      // builder: (context, extendedNav) => Theme(
-      //   data: ThemeData(
-      //     brightness: Brightness.dark,
-      //     textTheme: MediaQuery.of(context).size.width < 500
-      //         ? kSmallTextTheme
-      //         : kTextTheme,
-      //   ),
-      //   child: ScrollConfiguration(
-      //     behavior: ScrollBehaviorModified(),
-      //     child: ExtendedNavigator<AppRouter>(
-      //       router: AppRouter(),
-      //     ),
-      //   ),
-      // ),
-    );
+class _FoodlyAppState extends State<FoodlyApp> {
+  StreamSubscription<List<List<Meal>>> mealsStream;
+
+  @override
+  void dispose() {
+    mealsStream.cancel();
+    super.dispose();
   }
 
-  Future _loadActivePlan(Plan currentPlan, BuildContext context) async {
+  @override
+  Widget build(BuildContext context) {
+    initializeDateFormatting();
+    _loadActivePlan(context);
+
+    return Consumer(builder: (context, watch, _) {
+      watch(planProvider);
+
+      if (context.read(planProvider).state != null) {
+        _streamMeals();
+      }
+      return MaterialApp(
+        theme: ThemeData(
+          // TODO: Nunito default font?
+          brightness: Brightness.light,
+          // textTheme: MediaQuery.of(context).size.width < 500
+          //     ? kSmallTextTheme
+          //     : kTextTheme,
+        ),
+        builder: ExtendedNavigator<AppRouter>(
+          router: AppRouter(),
+        ),
+      );
+    });
+  }
+
+  Future _loadActivePlan(BuildContext context) async {
+    final currentPlan = context.read(planProvider).state;
     if (currentPlan == null) {
       String planId = await PlanService.getCurrentPlanId();
       Plan newPlan = await PlanService.getPlanById(planId);
 
       context.read(planProvider).state = newPlan;
+    }
+  }
+
+  void _streamMeals() {
+    if (mealsStream == null) {
+      mealsStream = StreamZip([
+        MealService.streamPlanMeals(context.read(planProvider).state.id),
+        MealService.streamPublicMeals()
+      ]).listen((lists) {
+        var allSnaps = [...lists[0], ...lists[1]];
+        allSnaps = [
+          ...{...allSnaps}
+        ];
+        context.read(allMealsProvider).state = allSnaps;
+      });
     }
   }
 }

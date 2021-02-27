@@ -1,5 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodly/providers/state_providers.dart';
 
 import '../../constants.dart';
 import '../../models/meal.dart';
@@ -28,6 +30,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _meal.planId = context.read(planProvider).state.id;
     final fullWidth = MediaQuery.of(context).size.width > 699
         ? 700
         : MediaQuery.of(context).size.width * 0.8;
@@ -49,7 +52,6 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                     title: 'Name',
                   ),
                   Divider(),
-
                   EditListContent(
                     content: _meal.ingredients,
                     onChanged: (list) => _meal.ingredients = list,
@@ -128,11 +130,12 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
 
     if (_formIsValid()) {
       try {
-        await MealService.createMeal(_meal);
+        final newMeal = await MealService.createMeal(_meal);
         await Future.delayed(const Duration(seconds: 1));
         _buttonState = ButtonState.normal;
-        ExtendedNavigator.root.pop();
+        ExtendedNavigator.root.pop(newMeal);
       } catch (e) {
+        print(e);
         MainSnackbar(
           message:
               'Es ist ein Fehler aufgetreten. Prüfe deine Internetverbindung oder versuche es später erneut.',
@@ -141,6 +144,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         _buttonState = ButtonState.error;
       }
     } else {
+      print('Form invalid');
       MainSnackbar(
         message: 'Bitte vergib einen Namen und mindestens eine Zutat.',
         isError: true,
