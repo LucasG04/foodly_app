@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
+import 'package:foodly/models/grocery.dart';
+import 'package:foodly/services/shopping_list_service.dart';
 
 import '../../../constants.dart';
 import '../../../models/meal.dart';
@@ -47,6 +49,7 @@ class PlanDayMealTile extends StatelessWidget {
       children: [
         Container(
           width: 50.0,
+          height: 50.0,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10000),
             child: isPlaceholder
@@ -130,15 +133,18 @@ class PlanDayMealTile extends StatelessWidget {
           SizedBox(width: kPadding / 2),
         ],
         PopupMenuButton(
-          onSelected: (value) {
-            if (value == 'delete') {
-              PlanService.deletePlanMealFromPlan(
-                  context.read(planProvider).state.id, planMeal);
-            }
-          },
+          onSelected: (val) =>
+              _onMenuSelected(val, context.read(planProvider).state.id),
           icon: Icon(EvaIcons.moreVerticalOutline),
           itemBuilder: (BuildContext context) {
             return [
+              PopupMenuItem(
+                value: 'tolist',
+                child: ListTile(
+                  title: Text('Zutaten auf Einkaufsliste'),
+                  leading: Icon(EvaIcons.fileAddOutline),
+                ),
+              ),
               PopupMenuItem(
                 value: 'delete',
                 child: ListTile(
@@ -151,5 +157,18 @@ class PlanDayMealTile extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  void _onMenuSelected(String value, String planId) async {
+    if (value == 'delete') {
+      PlanService.deletePlanMealFromPlan(planId, planMeal);
+    } else if (value == 'tolist') {
+      final meal = await MealService.getMealById(planMeal.meal);
+      final listId =
+          (await ShoppingListService.getShoppingListByPlanId(planId)).id;
+      for (var ingredient in meal.ingredients) {
+        ShoppingListService.addGrocery(listId, new Grocery(name: ingredient));
+      }
+    }
   }
 }

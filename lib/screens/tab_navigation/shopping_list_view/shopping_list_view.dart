@@ -72,7 +72,13 @@ class _ShoppingListViewState extends State<ShoppingListView>
                           ),
                           SizedBox(height: kPadding),
                           ExpansionTile(
-                            title: Text('BEREITS GEKAUFT'),
+                            title: Text(
+                              'BEREITS GEKAUFT',
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             children: [
                               AnimatedShoppingList(
                                 groceries: boughtItems,

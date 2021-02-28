@@ -122,11 +122,13 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                 'Neues Gericht erstellen',
                 () => _createNewMeal(),
               )
-            : UserInformation(
-                'assets/images/undraw_empty.png',
-                'Keine Ergebnisse.',
-                'Wir konnten keine Gerichte für deine Suche finden.',
-              );
+            : _isSearching
+                ? UserInformation(
+                    'assets/images/undraw_empty.png',
+                    'Keine Ergebnisse.',
+                    'Wir konnten keine Gerichte für deine Suche finden.',
+                  )
+                : SizedBox();
   }
 
   Widget _buildContainer(IconData iconData, String text, Function action) {

@@ -2,7 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
+import 'package:foodly/widgets/toggle_tab/flutter_toggle_tab.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -25,6 +25,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   ButtonState _buttonState;
   bool _isRegistering;
+  bool _isCreatingPlan;
 
   TextEditingController _nameController;
   TextEditingController _passwordController;
@@ -36,6 +37,7 @@ class _LoginViewState extends State<LoginView> {
   void initState() {
     _buttonState = ButtonState.normal;
     _isRegistering = true;
+    _isCreatingPlan = widget.planId == null || widget.planId.isEmpty;
 
     _nameController = new TextEditingController();
     _passwordController = new TextEditingController();
@@ -69,7 +71,9 @@ class _LoginViewState extends State<LoginView> {
               fontSize: 14,
               fontWeight: FontWeight.w400,
             ),
-            labels: ['Registrieren', 'Anmelden'],
+            labels: _isCreatingPlan
+                ? ['Registrieren']
+                : ['Registrieren', 'Anmelden'],
             // icons: [Icons.person,Icons.pregnant_woman],
             selectedLabelIndex: (index) {
               setState(() {
@@ -97,7 +101,9 @@ class _LoginViewState extends State<LoginView> {
                           ),
                   ),
                   Text(
-                    'um dem Plan beizuteten',
+                    _isCreatingPlan
+                        ? 'um den Plan zu erstellen'
+                        : 'um dem Plan beizuteten',
                     style: _titleTextStyle.copyWith(
                       fontWeight: FontWeight.w400,
                     ),
@@ -191,7 +197,7 @@ class _LoginViewState extends State<LoginView> {
       });
 
       String userId;
-      final plan = widget.planId == null
+      final plan = _isCreatingPlan
           ? await PlanService.createPlan()
           : await PlanService.getPlanById(widget.planId);
 
@@ -203,18 +209,18 @@ class _LoginViewState extends State<LoginView> {
           userId = await AuthenticationService.signInUser(
               _nameController.text, _passwordController.text, plan.code);
         }
+
+        plan.users.add(userId);
+        await PlanService.updatePlan(plan);
+
+        ExtendedNavigator.root.replace(Routes.homeScreen);
+
+        setState(() {
+          _buttonState = ButtonState.normal;
+        });
       } catch (exception) {
         _handleAuthException(exception);
       }
-
-      plan.users.add(userId);
-      await PlanService.updatePlan(plan);
-
-      ExtendedNavigator.root.replace(Routes.homeScreen);
-
-      setState(() {
-        _buttonState = ButtonState.normal;
-      });
     } else {
       setState(() {
         _buttonState = ButtonState.error;
@@ -236,9 +242,9 @@ class _LoginViewState extends State<LoginView> {
       if (exception.code == 'weak-password') {
         print('The password provided is too weak.');
         _passwordErrorText =
-            'Passwort ist zu leicht. Es muss mindestens 6 Zeichen lang sein.';
+            'Daas Passwort ist zu leicht. Es muss mindestens 6 Zeichen lang sein.';
       } else if (exception.code == 'email-already-in-use') {
-        _nameErrorText = 'Name ist bereits vergeben.';
+        _nameErrorText = 'Der Name ist bereits vergeben.';
       } else {
         _unknownErrorText =
             'Anmeldung nicht möglich. Bitte versuche es später erneut.';

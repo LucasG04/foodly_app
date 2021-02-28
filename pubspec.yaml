@@ -35,7 +35,7 @@ dependencies:
   adaptive_dialog: ^0.9.3
   flutter_markdown:
   auto_size_text:
-  flutter_toggle_tab: ^0.0.5+4
+  # flutter_toggle_tab: ^0.0.5+4
 
   # Icons/Styles/Animations
   cupertino_icons: ^1.0.1
