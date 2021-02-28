@@ -101,6 +101,19 @@ class PlanService {
     }
   }
 
+  static Future<void> voteForPlanMeal(
+      String planId, PlanMeal planMeal, String userId) async {
+    final plan = await getPlanById(planId);
+
+    if (plan.meals.contains(planMeal) && !planMeal.upvotes.contains(userId)) {
+      plan.meals[plan.meals.indexOf(planMeal)].upvotes.add(userId);
+      return _firestore
+          .collection('plans')
+          .doc(planId)
+          .update({'meals': plan.meals.map((e) => e.toMap()).toList()});
+    }
+  }
+
   static Future<void> leavePlan(String planId, String userId) async {
     final plan = await getPlanById(planId);
 

@@ -3,7 +3,9 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:foodly/models/grocery.dart';
+import 'package:foodly/services/authentication_service.dart';
 import 'package:foodly/services/shopping_list_service.dart';
+import 'package:foodly/widgets/small_circular_progress_indicator.dart';
 
 import '../../../constants.dart';
 import '../../../models/meal.dart';
@@ -13,23 +15,30 @@ import '../../../services/meal_service.dart';
 import '../../../services/plan_service.dart';
 import '../../../widgets/meal_tag.dart';
 
-class PlanDayMealTile extends StatelessWidget {
+class PlanDayMealTile extends StatefulWidget {
   final bool enableVoting;
   final PlanMeal planMeal;
 
   PlanDayMealTile(this.planMeal, [this.enableVoting = false]);
 
   @override
+  _PlanDayMealTileState createState() => _PlanDayMealTileState();
+}
+
+class _PlanDayMealTileState extends State<PlanDayMealTile> {
+  bool _voteIsLoading = false;
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: kPadding / 2),
-      child: planMeal.meal.startsWith(kPlaceholderSymbol)
+      child: widget.planMeal.meal.startsWith(kPlaceholderSymbol)
           ? _buildDataRow(
               context,
-              placeholder: planMeal.meal.split(kPlaceholderSymbol)[1],
+              placeholder: widget.planMeal.meal.split(kPlaceholderSymbol)[1],
             )
           : FutureBuilder<Meal>(
-              future: MealService.getMealById(this.planMeal.meal),
+              future: MealService.getMealById(this.widget.planMeal.meal),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final meal = snapshot.data;
@@ -45,6 +54,11 @@ class PlanDayMealTile extends StatelessWidget {
 
   Row _buildDataRow(BuildContext context, {String placeholder, Meal meal}) {
     bool isPlaceholder = placeholder != null && placeholder.isNotEmpty;
+    final voteColor =
+        widget.planMeal.upvotes.contains(AuthenticationService.currentUser.uid)
+            ? Theme.of(context).primaryColor
+            : Theme.of(context).textTheme.bodyText1.color;
+
     return Row(
       children: [
         Container(
@@ -107,29 +121,47 @@ class PlanDayMealTile extends StatelessWidget {
                   ),
           ),
         ),
-        if (enableVoting) ...[
+        if (widget.enableVoting) ...[
           SizedBox(width: kPadding / 2),
-          Column(
+          Row(
             children: [
               IconButton(
-                icon: Icon(EvaIcons.arrowIosUpwardOutline),
-                onPressed: () => print('upvote'),
+                icon: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child: _voteIsLoading
+                      ? SmallCircularProgressIndicator()
+                      : Icon(
+                          EvaIcons.arrowIosUpwardOutline,
+                          color: voteColor,
+                        ),
+                ),
+                onPressed: _voteIsLoading
+                    ? null
+                    : () => _voteMeal(
+                          context.read(planProvider).state.id,
+                          AuthenticationService.currentUser.uid,
+                        ),
                 splashRadius: 15.0,
               ),
-              Text(planMeal.upvotes.length.toString()),
-            ],
-          ),
-          SizedBox(width: kPadding / 4),
-          Column(
-            children: [
-              IconButton(
-                icon: Icon(EvaIcons.arrowIosDownwardOutline),
-                onPressed: () => print('downvote'),
-                splashRadius: 15.0,
+              Text(
+                widget.planMeal.upvotes.length.toString(),
+                style: TextStyle(
+                  color: voteColor,
+                ),
               ),
-              Text(planMeal.downvotes.length.toString()),
             ],
           ),
+          // SizedBox(width: kPadding / 4),
+          // Column(
+          //   children: [
+          //     IconButton(
+          //       icon: Icon(EvaIcons.arrowIosDownwardOutline),
+          //       onPressed: () => print('downvote'),
+          //       splashRadius: 15.0,
+          //     ),
+          //     Text(planMeal.downvotes.length.toString()),
+          //   ],
+          // ),
           SizedBox(width: kPadding / 2),
         ],
         PopupMenuButton(
@@ -159,11 +191,21 @@ class PlanDayMealTile extends StatelessWidget {
     );
   }
 
+  void _voteMeal(String planId, String userId) async {
+    setState(() {
+      _voteIsLoading = true;
+    });
+    await PlanService.voteForPlanMeal(planId, widget.planMeal, userId);
+    setState(() {
+      _voteIsLoading = false;
+    });
+  }
+
   void _onMenuSelected(String value, String planId) async {
     if (value == 'delete') {
-      PlanService.deletePlanMealFromPlan(planId, planMeal);
+      PlanService.deletePlanMealFromPlan(planId, widget.planMeal);
     } else if (value == 'tolist') {
-      final meal = await MealService.getMealById(planMeal.meal);
+      final meal = await MealService.getMealById(widget.planMeal.meal);
       final listId =
           (await ShoppingListService.getShoppingListByPlanId(planId)).id;
       for (var ingredient in meal.ingredients) {
