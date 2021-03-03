@@ -15,7 +15,7 @@ import 'screens/unknown_route/unknown_route_screen.dart';
     AdaptiveRoute(page: HomeScreen, initial: true),
     AdaptiveRoute(page: AuthenticationScreen),
     AdaptiveRoute(page: MealSelectScreen),
-    AdaptiveRoute(page: MealCreateScreen),
+    AdaptiveRoute(path: '/meal-create/:id', page: MealCreateScreen),
     AdaptiveRoute(path: '/meal/:id', page: MealScreen),
     AdaptiveRoute(path: '*', page: UnknownRouteScreen),
   ],

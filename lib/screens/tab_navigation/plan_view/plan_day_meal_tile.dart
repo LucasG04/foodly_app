@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:foodly/services/authentication_service.dart';
 import 'package:foodly/services/shopping_list_service.dart';
 import 'package:foodly/widgets/small_circular_progress_indicator.dart';
 
+import '../../../app_router.gr.dart';
 import '../../../constants.dart';
 import '../../../models/meal.dart';
 import '../../../models/plan_meal.dart';
@@ -42,7 +44,11 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final meal = snapshot.data;
-                  return _buildDataRow(context, meal: meal);
+                  return GestureDetector(
+                    onTap: () => ExtendedNavigator.root
+                        .push(Routes.mealScreen(id: meal.id)),
+                    child: _buildDataRow(context, meal: meal),
+                  );
                 } else {
                   // TODO: Skeleton loading
                   return CircularProgressIndicator();
@@ -203,7 +209,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
 
   void _onMenuSelected(String value, String planId) async {
     if (value == 'delete') {
-      PlanService.deletePlanMealFromPlan(planId, widget.planMeal);
+      PlanService.deletePlanMealFromPlan(planId, widget.planMeal.id);
     } else if (value == 'tolist') {
       final meal = await MealService.getMealById(widget.planMeal.meal);
       final listId =

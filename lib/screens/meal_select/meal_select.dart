@@ -216,7 +216,8 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
   }
 
   Future _createNewMeal() async {
-    final meal = await ExtendedNavigator.root.push(Routes.mealCreateScreen);
+    final meal =
+        await ExtendedNavigator.root.push(Routes.mealCreateScreen(id: ''));
 
     if (meal != null && meal is Meal) {
       await _addMealToPlan(meal.id, context.read(planProvider).state.id);

@@ -7,7 +7,11 @@ class MarkdownEditor extends StatefulWidget {
   final String initialValue;
   final void Function(String) onChange;
 
-  MarkdownEditor({this.initialValue = '', this.onChange});
+  MarkdownEditor({
+    Key key,
+    this.initialValue = '',
+    this.onChange,
+  }) : super(key: key);
 
   @override
   _MarkdownEditorState createState() => _MarkdownEditorState();
@@ -22,7 +26,6 @@ class _MarkdownEditorState extends State<MarkdownEditor>
   void initState() {
     super.initState();
     _tabController = new TabController(vsync: this, length: 2);
-    _content = widget.initialValue ?? '';
   }
 
   @override
@@ -33,6 +36,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
 
   @override
   Widget build(BuildContext context) {
+    _content = widget.initialValue ?? '';
     final textColor = Theme.of(context).textTheme.bodyText1.color;
     return Container(
       width: MediaQuery.of(context).size.width > 599

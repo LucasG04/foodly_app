@@ -19,7 +19,8 @@ class Routes {
   static const String homeScreen = '/';
   static const String authenticationScreen = '/authentication-screen';
   static const String mealSelectScreen = '/meal-select-screen';
-  static const String mealCreateScreen = '/meal-create-screen';
+  static const String _mealCreateScreen = '/meal-create/:id';
+  static String mealCreateScreen({@required dynamic id}) => '/meal-create/$id';
   static const String _mealScreen = '/meal/:id';
   static String mealScreen({@required dynamic id}) => '/meal/$id';
   static const String unknownRouteScreen = '*';
@@ -27,7 +28,7 @@ class Routes {
     homeScreen,
     authenticationScreen,
     mealSelectScreen,
-    mealCreateScreen,
+    _mealCreateScreen,
     _mealScreen,
     unknownRouteScreen,
   };
@@ -40,7 +41,7 @@ class AppRouter extends RouterBase {
     RouteDef(Routes.homeScreen, page: HomeScreen),
     RouteDef(Routes.authenticationScreen, page: AuthenticationScreen),
     RouteDef(Routes.mealSelectScreen, page: MealSelectScreen),
-    RouteDef(Routes.mealCreateScreen, page: MealCreateScreen),
+    RouteDef(Routes._mealCreateScreen, page: MealCreateScreen),
     RouteDef(Routes._mealScreen, page: MealScreen),
     RouteDef(Routes.unknownRouteScreen, page: UnknownRouteScreen),
   ];
@@ -70,7 +71,8 @@ class AppRouter extends RouterBase {
     },
     MealCreateScreen: (data) {
       return buildAdaptivePageRoute<dynamic>(
-        builder: (context) => MealCreateScreen(),
+        builder: (context) =>
+            MealCreateScreen(id: data.pathParams['id'].stringValue),
         settings: data,
       );
     },

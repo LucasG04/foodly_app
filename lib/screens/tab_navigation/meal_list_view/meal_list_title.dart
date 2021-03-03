@@ -48,7 +48,7 @@ class _MealListTitleState extends State<MealListTitle> {
                   ? IconButton(
                       icon: Icon(EvaIcons.plusCircleOutline),
                       onPressed: () => ExtendedNavigator.root.push(
-                        Routes.mealCreateScreen,
+                        Routes.mealCreateScreen(id: ''),
                       ),
                       splashRadius: 25.0,
                     )

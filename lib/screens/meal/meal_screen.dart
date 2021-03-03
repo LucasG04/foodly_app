@@ -1,9 +1,12 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:auto_route/auto_route_annotations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:foodly/app_router.gr.dart';
 
 import '../../constants.dart';
 import '../../models/meal.dart';
@@ -12,7 +15,7 @@ import '../../utils/no_glowing_overscroll_indicator_behavior.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import 'border_icon.dart';
 
-class MealScreen extends StatelessWidget {
+class MealScreen extends StatefulWidget {
   final String id;
 
   const MealScreen({
@@ -20,24 +23,29 @@ class MealScreen extends StatelessWidget {
   });
 
   @override
+  _MealScreenState createState() => _MealScreenState();
+}
+
+class _MealScreenState extends State<MealScreen> {
+  @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     final sidePadding = const EdgeInsets.symmetric(horizontal: kPadding);
 
     return Scaffold(
       body: FutureBuilder<Meal>(
-        future: MealService.getMealById(id),
+        future: MealService.getMealById(widget.id),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final meal = snapshot.data;
-            return Stack(
-              children: [
-                ScrollConfiguration(
-                  behavior: NoGlowingOverscrollIndicatorBehavior(),
-                  child: SingleChildScrollView(
-                    physics: ClampingScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            return ScrollConfiguration(
+              behavior: NoGlowingOverscrollIndicatorBehavior(),
+              child: SingleChildScrollView(
+                physics: ClampingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Stack(
                       children: [
                         meal.imageUrl != null && meal.imageUrl.isNotEmpty
                             ? CachedNetworkImage(
@@ -46,130 +54,146 @@ class MealScreen extends StatelessWidget {
                             : Image.asset(
                                 'assets/images/food_fallback.png',
                               ),
-                        SizedBox(height: kPadding),
-                        Padding(
-                          padding: sidePadding,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    AutoSizeText(
-                                      meal.name,
-                                      style: TextStyle(
-                                        fontSize: 26.0,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                        Positioned(
+                          width: size.width,
+                          top:
+                              kPadding / 2 + MediaQuery.of(context).padding.top,
+                          child: Padding(
+                            padding: sidePadding,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: BorderIcon(
+                                    height: 50,
+                                    width: 50,
+                                    child: Icon(
+                                      EvaIcons.arrowBackOutline,
+                                      color: Colors.black,
                                     ),
-                                    SizedBox(height: 5.0),
-                                    Text(
-                                      meal.source != null &&
-                                              meal.source.isNotEmpty
-                                          ? 'von ${meal.source}'
-                                          : 'von Unbekannt',
-                                      style: TextStyle(
-                                        fontSize: 16.0,
-                                        fontWeight: FontWeight.bold,
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .bodyText1
-                                            .color
-                                            .withOpacity(0.5),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                              BorderIcon(
-                                child: Text(
-                                  '${meal.duration} Minuten',
+                                InkWell(
+                                  onTap: () async {
+                                    final result =
+                                        await ExtendedNavigator.root.push(
+                                      Routes.mealCreateScreen(id: meal.id),
+                                    );
+
+                                    if (result != null && result is Meal) {
+                                      setState(() {});
+                                    }
+                                  },
+                                  child: BorderIcon(
+                                    height: 50,
+                                    width: 50,
+                                    child: Icon(
+                                      EvaIcons.edit2Outline,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: kPadding),
+                    Padding(
+                      padding: sidePadding,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                AutoSizeText(
+                                  meal.name,
                                   style: TextStyle(
-                                    fontSize: 20.0,
+                                    fontSize: 26.0,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 15,
-                                  horizontal: 15,
+                                SizedBox(height: 5.0),
+                                Text(
+                                  meal.source != null && meal.source.isNotEmpty
+                                      ? 'von ${meal.source}'
+                                      : 'von Unbekannt',
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1
+                                        .color
+                                        .withOpacity(0.5),
+                                  ),
                                 ),
-                              )
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: kPadding),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          physics: BouncingScrollPhysics(),
-                          child: Row(
-                            children: meal.tags.map((e) => TagTile(e)).toList(),
-                          ),
-                        ),
-                        SizedBox(height: kPadding),
-                        ..._buildSection(
-                          'Zutaten',
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: Column(
-                              children: meal.ingredients
-                                  .map(
-                                    (text) => Text(
-                                      '• $text',
-                                      textAlign: TextAlign.justify,
-                                      style: TextStyle(fontSize: 18.0),
-                                    ),
-                                  )
-                                  .toList(),
+                              ],
                             ),
                           ),
-                        ),
-                        SizedBox(height: kPadding),
-                        ..._buildSection(
-                          'Anleitung',
-                          MarkdownBody(data: meal.instruction ?? ''),
-                        ),
-                        SizedBox(height: kPadding),
-                        SizedBox(height: 100.0),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  width: size.width,
-                  top: kPadding / 2 + MediaQuery.of(context).padding.top,
-                  child: Padding(
-                    padding: sidePadding,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: BorderIcon(
-                            height: 50,
-                            width: 50,
-                            child: Icon(
-                              Icons.keyboard_backspace,
-                              color: Colors.black,
+                          BorderIcon(
+                            child: Text(
+                              '${meal.duration} Minuten',
+                              style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 15,
+                              horizontal: 15,
                             ),
                           ),
-                        ),
-                        // BorderIcon(
-                        //   height: 50,
-                        //   width: 50,
-                        //   child: Icon(
-                        //     Icons.delete_forever_outlined,
-                        //     color: Colors.black,
-                        //   ),
-                        // ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+                    SizedBox(height: kPadding),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: BouncingScrollPhysics(),
+                      child: Row(
+                        children: meal.tags.map((e) => TagTile(e)).toList(),
+                      ),
+                    ),
+                    SizedBox(height: kPadding),
+                    ..._buildSection(
+                      'Zutaten',
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Container(
+                          width: double.infinity,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: meal.ingredients
+                                .map(
+                                  (text) => Text(
+                                    '• $text',
+                                    textAlign: TextAlign.justify,
+                                    style: TextStyle(fontSize: 18.0),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: kPadding),
+                    ..._buildSection(
+                      'Anleitung',
+                      MarkdownBody(data: meal.instruction ?? ''),
+                    ),
+                    SizedBox(height: kPadding),
+                    SizedBox(height: 100.0),
+                  ],
                 ),
-              ],
+              ),
             );
           } else {
             return Center(child: SmallCircularProgressIndicator());

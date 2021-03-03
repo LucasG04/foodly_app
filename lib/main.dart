@@ -4,6 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
+import 'package:foodly/services/authentication_service.dart';
 import 'package:foodly/services/meal_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:async/async.dart';
@@ -36,27 +37,39 @@ class _FoodlyAppState extends State<FoodlyApp> {
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting();
-    _loadActivePlan(context);
 
-    return Consumer(builder: (context, watch, _) {
-      watch(planProvider);
+    return StreamBuilder(
+      stream: AuthenticationService.authenticationStream(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.active ||
+            snapshot.connectionState == ConnectionState.done) {
+          _loadActivePlan(context);
+          return Consumer(
+            builder: (context, watch, _) {
+              watch(planProvider);
 
-      if (context.read(planProvider).state != null) {
-        _streamMeals();
-      }
-      return MaterialApp(
-        theme: ThemeData(
-          // TODO: Nunito default font?
-          brightness: Brightness.light,
-          // textTheme: MediaQuery.of(context).size.width < 500
-          //     ? kSmallTextTheme
-          //     : kTextTheme,
-        ),
-        builder: ExtendedNavigator<AppRouter>(
-          router: AppRouter(),
-        ),
-      );
-    });
+              if (context.read(planProvider).state != null) {
+                _streamMeals();
+              }
+              return MaterialApp(
+                theme: ThemeData(
+                  // TODO: Nunito default font?
+                  brightness: Brightness.light,
+                  // textTheme: MediaQuery.of(context).size.width < 500
+                  //     ? kSmallTextTheme
+                  //     : kTextTheme,
+                ),
+                builder: ExtendedNavigator<AppRouter>(
+                  router: AppRouter(),
+                ),
+              );
+            },
+          );
+        } else {
+          return Container();
+        }
+      },
+    );
   }
 
   Future _loadActivePlan(BuildContext context) async {

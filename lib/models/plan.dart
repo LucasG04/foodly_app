@@ -21,7 +21,6 @@ class Plan {
     return {
       'name': name,
       'code': code,
-      'meals': meals?.map((x) => x?.toMap())?.toList(),
       'users': users,
       'hourDiffToUtc': hourDiffToUtc,
     };
@@ -34,8 +33,6 @@ class Plan {
       id: id,
       name: map['name'],
       code: map['code'],
-      meals: List<PlanMeal>.from(
-          (map['meals'] ?? []).map((x) => PlanMeal.fromMap(x))),
       users: List<String>.from(map['users'] ?? []),
       hourDiffToUtc: map['hourDiffToUtc'],
     );

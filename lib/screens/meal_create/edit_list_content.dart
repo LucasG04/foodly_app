@@ -9,10 +9,11 @@ class EditListContent extends StatefulWidget {
   final String title;
 
   EditListContent({
+    Key key,
     @required this.content,
     @required this.onChanged,
     @required this.title,
-  });
+  }) : super(key: key);
 
   @override
   _EditListContentState createState() => _EditListContentState();
@@ -45,13 +46,14 @@ class _EditListContentState extends State<EditListContent> {
                 child: _buildTextField(value, _content.indexOf(value), context),
               ),
               IconButton(
-                  icon: Icon(EvaIcons.minusCircleOutline),
-                  onPressed: () {
-                    setState(() {
-                      _content.remove(value);
-                      widget.onChanged(_content);
-                    });
-                  }),
+                icon: Icon(EvaIcons.minusCircleOutline),
+                onPressed: () {
+                  setState(() {
+                    _content.remove(value);
+                    widget.onChanged(_content);
+                  });
+                },
+              ),
             ],
           );
         }).toList(),

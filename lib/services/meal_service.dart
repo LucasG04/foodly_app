@@ -97,6 +97,16 @@ class MealService {
     }
   }
 
+  static Future<Meal> updateMeal(Meal meal) async {
+    try {
+      await _firestore.collection('meals').doc(meal.id).update(meal.toMap());
+      return meal;
+    } catch (e) {
+      print(e);
+      return null;
+    }
+  }
+
   static Future<List<String>> _getMealPhotos(String mealName) async {
     List<String> urls = [];
     Dio dio = new Dio();
