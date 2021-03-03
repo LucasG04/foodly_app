@@ -130,9 +130,12 @@ class PlanService {
 
   static Future<void> voteForPlanMeal(
       String planId, PlanMeal planMeal, String userId) {
-    if (planMeal.upvotes.contains(userId)) return null;
+    if (planMeal.upvotes.contains(userId)) {
+      planMeal.upvotes.remove(userId);
+    } else {
+      planMeal.upvotes.add(userId);
+    }
 
-    planMeal.upvotes.add(userId);
     return _firestore
         .collection('plans')
         .doc(planId)
