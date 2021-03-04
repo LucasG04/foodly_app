@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route_annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodly/providers/state_providers.dart';
+import 'package:foodly/services/authentication_service.dart';
 import 'package:foodly/widgets/full_screen_loader.dart';
 
 import '../../constants.dart';
@@ -185,6 +186,9 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     _meal.imageUrl = _urlController.text;
     _meal.source = _sourceController.text;
     _meal.duration = int.tryParse(_titleController.text) ?? 0;
+    _meal.createdBy = widget.id.isEmpty
+        ? AuthenticationService.currentUser.uid
+        : _meal.createdBy;
 
     if (_formIsValid()) {
       try {

@@ -8,6 +8,7 @@ class Meal {
   List<String> tags;
   String imageUrl;
   String planId;
+  String createdBy;
   bool isPublic;
 
   Meal({
@@ -20,6 +21,7 @@ class Meal {
     this.tags,
     this.imageUrl,
     this.planId,
+    this.createdBy,
     this.isPublic,
   });
 
@@ -33,6 +35,7 @@ class Meal {
       'tags': tags,
       'imageUrl': imageUrl,
       'planId': planId,
+      'createdBy': createdBy,
       'isPublic': isPublic ?? false,
     };
   }
@@ -50,6 +53,7 @@ class Meal {
       ingredients: List<String>.from(map['ingredients'] ?? []),
       tags: List<String>.from(map['tags'] ?? []),
       planId: map['planId'],
+      createdBy: map['createdBy'],
       isPublic: map['isPublic'] ?? false,
     );
   }

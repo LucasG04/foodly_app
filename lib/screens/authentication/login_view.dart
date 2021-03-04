@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:foodly/services/foodly_user_service.dart';
 import 'package:foodly/widgets/toggle_tab/flutter_toggle_tab.dart';
 
 import '../../app_router.gr.dart';
@@ -212,6 +213,9 @@ class _LoginViewState extends State<LoginView> {
 
         plan.users.add(userId);
         await PlanService.updatePlan(plan);
+
+        await FoodlyUserService.createUserWithId(userId);
+        await FoodlyUserService.addOldPlanIdToUser(userId, plan.id);
 
         ExtendedNavigator.root.replace(Routes.homeScreen);
 

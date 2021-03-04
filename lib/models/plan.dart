@@ -7,6 +7,7 @@ class Plan {
   List<PlanMeal> meals;
   List<String> users;
   int hourDiffToUtc;
+  bool adFree;
 
   Plan({
     this.id,
@@ -15,6 +16,7 @@ class Plan {
     this.meals,
     this.users,
     this.hourDiffToUtc,
+    this.adFree,
   });
 
   Map<String, dynamic> toMap() {
@@ -23,6 +25,7 @@ class Plan {
       'code': code,
       'users': users,
       'hourDiffToUtc': hourDiffToUtc,
+      'adFree': adFree ?? false,
     };
   }
 
@@ -35,11 +38,12 @@ class Plan {
       code: map['code'],
       users: List<String>.from(map['users'] ?? []),
       hourDiffToUtc: map['hourDiffToUtc'],
+      adFree: map['adFree'] ?? false,
     );
   }
 
   @override
   String toString() {
-    return 'Plan(id: $id, name: $name, meals: $meals, users: $users)';
+    return 'Plan(id: $id, name: $name, meals: $meals, users: $users, adFree: $adFree)';
   }
 }
