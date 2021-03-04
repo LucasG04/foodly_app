@@ -1,3 +1,4 @@
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import '../../services/plan_service.dart';
 import '../../widgets/main_button.dart';
@@ -121,28 +122,7 @@ class _CodeInputViewState extends State<CodeInputView> {
       maxLines: 1,
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.go,
-      onChanged: (text) async {
-        _errorText = null;
-        if (text.length == 8) {
-          setState(() {
-            _loadingCode = true;
-          });
-
-          // Check code
-          try {
-            final plan = await PlanService.getPlanByCode(text);
-            widget.onPageChange(plan.id);
-          } catch (e) {
-            setState(() {
-              _errorText = 'Der Code ist leider nicht vergeben.';
-            });
-          }
-
-          setState(() {
-            _loadingCode = false;
-          });
-        }
-      },
+      onChanged: _validateCode,
       style: TextStyle(
         fontSize: 42.0,
         fontWeight: FontWeight.w700,
@@ -150,9 +130,44 @@ class _CodeInputViewState extends State<CodeInputView> {
       ),
       decoration: InputDecoration(
         hintText: '81726354',
-        suffix: _loadingCode ? SmallCircularProgressIndicator() : null,
+        suffix: _loadingCode
+            ? Padding(
+                padding: const EdgeInsets.only(right: 10.0),
+                child: SmallCircularProgressIndicator(),
+              )
+            : IconButton(
+                icon: Icon(
+                  EvaIcons.checkmark,
+                  color: Theme.of(context).accentColor,
+                ),
+                onPressed: () => _validateCode(_codeController.text),
+              ),
         errorText: _errorText,
       ),
     );
+  }
+
+  _validateCode(String text) async {
+    _errorText = null;
+    if (text.length == 8) {
+      setState(() {
+        _loadingCode = true;
+      });
+
+      // Check code
+      try {
+        final plan = await PlanService.getPlanByCode(text);
+        widget.onPageChange(plan.id);
+      } catch (e) {
+        print(e);
+        setState(() {
+          _errorText = 'Der Code ist leider nicht vergeben.';
+        });
+      }
+
+      setState(() {
+        _loadingCode = false;
+      });
+    }
   }
 }

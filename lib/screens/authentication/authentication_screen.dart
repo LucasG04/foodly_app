@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:foodly/models/plan.dart';
+import 'package:foodly/screens/authentication/plan_settings_view.dart';
 import 'code_input_view.dart';
 import 'login_view.dart';
 
@@ -9,11 +11,13 @@ class AuthenticationScreen extends StatefulWidget {
 
 class _AuthenticationScreenState extends State<AuthenticationScreen> {
   PageController _pageController;
-  String planId;
+  Plan _plan;
+  bool _isCreatingPlan;
 
   @override
   void initState() {
     _pageController = new PageController();
+    _isCreatingPlan = false;
     super.initState();
   }
 
@@ -33,9 +37,10 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
           child: PageView(
             controller: _pageController,
             children: [
-              CodeInputView((enteredValue) {
+              CodeInputView((planId) {
                 setState(() {
-                  planId = enteredValue;
+                  _isCreatingPlan = planId == null;
+                  _plan = planId != null ? new Plan(id: planId) : null;
                 });
                 _pageController.animateToPage(
                   1,
@@ -43,22 +48,47 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                   curve: Curves.easeIn,
                 );
               }),
-              LoginView(
-                planId: planId,
-                navigateBack: () {
-                  setState(() {
-                    _pageController.animateToPage(
-                      0,
-                      duration: const Duration(milliseconds: 250),
-                      curve: Curves.easeIn,
-                    );
-                  });
-                },
-              ),
+              _isCreatingPlan ? _buildPlanSettingsView() : _buildLoginView(),
+              _isCreatingPlan ? _buildLoginView() : SizedBox()
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPlanSettingsView() {
+    return PlanSettingsView(
+      plan: _plan,
+      navigateBack: () {
+        _pageController.previousPage(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeIn,
+        );
+      },
+      navigateForward: (plan) {
+        setState(() {
+          _plan = plan;
+        });
+        _pageController.animateToPage(
+          2,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeIn,
+        );
+      },
+    );
+  }
+
+  Widget _buildLoginView() {
+    return LoginView(
+      isCreatingPlan: _isCreatingPlan,
+      plan: _plan,
+      navigateBack: () {
+        _pageController.previousPage(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeIn,
+        );
+      },
     );
   }
 }

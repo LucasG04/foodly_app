@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:foodly/models/plan.dart';
 import 'package:foodly/services/foodly_user_service.dart';
 import 'package:foodly/widgets/toggle_tab/flutter_toggle_tab.dart';
 
@@ -14,10 +15,15 @@ import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
 
 class LoginView extends StatefulWidget {
-  final String planId;
+  final bool isCreatingPlan;
+  final Plan plan;
   final void Function() navigateBack;
 
-  LoginView({this.planId, this.navigateBack});
+  LoginView({
+    @required this.isCreatingPlan,
+    @required this.plan,
+    @required this.navigateBack,
+  });
 
   @override
   _LoginViewState createState() => _LoginViewState();
@@ -26,7 +32,6 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   ButtonState _buttonState;
   bool _isRegistering;
-  bool _isCreatingPlan;
 
   TextEditingController _nameController;
   TextEditingController _passwordController;
@@ -38,7 +43,6 @@ class _LoginViewState extends State<LoginView> {
   void initState() {
     _buttonState = ButtonState.normal;
     _isRegistering = true;
-    _isCreatingPlan = widget.planId == null || widget.planId.isEmpty;
 
     _nameController = new TextEditingController();
     _passwordController = new TextEditingController();
@@ -72,7 +76,7 @@ class _LoginViewState extends State<LoginView> {
               fontSize: 14,
               fontWeight: FontWeight.w400,
             ),
-            labels: _isCreatingPlan
+            labels: widget.isCreatingPlan
                 ? ['Registrieren']
                 : ['Registrieren', 'Anmelden'],
             // icons: [Icons.person,Icons.pregnant_woman],
@@ -102,7 +106,7 @@ class _LoginViewState extends State<LoginView> {
                           ),
                   ),
                   Text(
-                    _isCreatingPlan
+                    widget.isCreatingPlan
                         ? 'um den Plan zu erstellen'
                         : 'um dem Plan beizuteten',
                     style: _titleTextStyle.copyWith(
@@ -198,9 +202,9 @@ class _LoginViewState extends State<LoginView> {
       });
 
       String userId;
-      final plan = _isCreatingPlan
+      final plan = widget.isCreatingPlan
           ? await PlanService.createPlan()
-          : await PlanService.getPlanById(widget.planId);
+          : await PlanService.getPlanById(widget.plan.id);
 
       try {
         if (_isRegistering) {

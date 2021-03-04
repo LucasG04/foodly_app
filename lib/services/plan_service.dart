@@ -82,8 +82,9 @@ class PlanService {
         .doc(plan.id)
         .collection('meals')
         .get();
-    plan.meals =
-        snapMeals.docs.map((doc) => PlanMeal.fromMap(doc.id, doc.data()));
+    plan.meals = snapMeals.docs
+        .map((doc) => PlanMeal.fromMap(doc.id, doc.data()))
+        .toList();
 
     return plan;
   }
