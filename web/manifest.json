@@ -1,12 +1,12 @@
 {
-    "name": "foodly",
-    "short_name": "foodly",
+    "name": "Foodly - Meal Planning",
+    "short_name": "Foodly",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
+    "background_color": "#FFF",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "description": "Best app for planning your meals for the week.",
+    "orientation": "portrait",
     "prefer_related_applications": false,
     "icons": [
         {
