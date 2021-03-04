@@ -9,9 +9,9 @@ import '../models/plan.dart';
 import '../models/plan_meal.dart';
 
 class PlanService {
-  PlanService._();
-
   static FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  PlanService._();
 
   static Future<String> getCurrentPlanId() async {
     // return ProviderContainer().read(planProvider).state.id;
@@ -37,16 +37,6 @@ class PlanService {
         .doc(id)
         .snapshots()
         .map((snap) => Plan.fromMap(snap.id, snap.data()));
-  }
-
-  static Stream<List<PlanMeal>> streamPlanMealsByPlanId(String id) {
-    return _firestore
-        .collection('plans')
-        .doc(id)
-        .collection('meals')
-        .snapshots()
-        .map((snap) =>
-            snap.docs.map((e) => PlanMeal.fromMap(e.id, e.data())).toList());
   }
 
   static Future<Plan> createPlan() async {
@@ -100,6 +90,16 @@ class PlanService {
 
   static Future<void> updatePlan(Plan plan) {
     return _firestore.collection('plans').doc(plan.id).update(plan.toMap());
+  }
+
+  static Stream<List<PlanMeal>> streamPlanMealsByPlanId(String id) {
+    return _firestore
+        .collection('plans')
+        .doc(id)
+        .collection('meals')
+        .snapshots()
+        .map((snap) =>
+            snap.docs.map((e) => PlanMeal.fromMap(e.id, e.data())).toList());
   }
 
   static Future<void> addPlanMealToPlan(String planId, PlanMeal planMeal) {
