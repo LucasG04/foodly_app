@@ -26,6 +26,7 @@ dependencies:
   firebase_core: ^0.7.0
   cloud_firestore: ^0.16.0+1
   firebase_auth: ^0.20.1
+  firebase_auth_web: ^0.3.3
 
   # Widgets
   flutter_snake_navigationbar: ^0.4.2
