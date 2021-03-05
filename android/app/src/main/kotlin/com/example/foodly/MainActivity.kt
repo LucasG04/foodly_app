@@ -1,4 +1,4 @@
-package com.example.foodly
+package io.golenia.foodly
 
 import io.flutter.embedding.android.FlutterActivity
 

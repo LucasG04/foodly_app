@@ -1,5 +1,6 @@
 secrets.dart
 GoogleService-Info.plist
+google-services.json
 
 # Miscellaneous
 *.class
