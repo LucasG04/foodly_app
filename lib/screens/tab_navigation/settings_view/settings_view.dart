@@ -41,7 +41,7 @@ class SettingsView extends ConsumerWidget {
               color: Colors.red,
             ),
           ], context),
-          foodlyUser != null ? _buildSectionTitle('Plan') : SizedBox(),
+          foodlyUser != null ? _buildSectionTitle('Gerichte') : SizedBox(),
           foodlyUser != null
               ? _buildSection([
                   SettingsTile(
