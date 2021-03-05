@@ -107,10 +107,20 @@ class MealService {
     }
   }
 
+  static Future<void> addMeals(String planId, List<Meal> meals) async {
+    try {
+      meals.forEach((meal) => meal.planId = planId);
+      await Future.wait(
+        meals.map((meal) => _firestore.collection('meals').add(meal.toMap())),
+      );
+    } catch (e) {
+      print(e);
+    }
+  }
+
   static Future<List<String>> _getMealPhotos(String mealName) async {
     List<String> urls = [];
-    Dio dio = new Dio();
-    final response = await dio.get(
+    final response = await Dio().get(
       'https://pixabay.com/api/',
       queryParameters: {
         'key': secretPixabay,

@@ -4,7 +4,9 @@ import 'package:auto_route/auto_route.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
+import 'package:foodly/models/foodly_user.dart';
 import 'package:foodly/services/authentication_service.dart';
+import 'package:foodly/services/foodly_user_service.dart';
 import 'package:foodly/services/meal_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:async/async.dart';
@@ -44,6 +46,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
         if (snapshot.connectionState == ConnectionState.active ||
             snapshot.connectionState == ConnectionState.done) {
           _loadActivePlan(context);
+          _loadActiveUser(context);
           return Consumer(
             builder: (context, watch, _) {
               watch(planProvider);
@@ -76,9 +79,19 @@ class _FoodlyAppState extends State<FoodlyApp> {
     final currentPlan = context.read(planProvider).state;
     if (currentPlan == null) {
       String planId = await PlanService.getCurrentPlanId();
-      Plan newPlan = await PlanService.getPlanById(planId);
 
-      context.read(planProvider).state = newPlan;
+      if (planId != null && planId.isNotEmpty) {
+        Plan newPlan = await PlanService.getPlanById(planId);
+        context.read(planProvider).state = newPlan;
+      }
+    }
+  }
+
+  Future _loadActiveUser(BuildContext context) async {
+    final firebaseUser = AuthenticationService.currentUser;
+    if (firebaseUser != null) {
+      FoodlyUser user = await FoodlyUserService.getUserById(firebaseUser.uid);
+      context.read(userProvider).state = user;
     }
   }
 

@@ -2,6 +2,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodly/providers/state_providers.dart';
+import 'package:foodly/screens/tab_navigation/settings_view/import_meals_modal.dart';
 import 'package:foodly/screens/tab_navigation/settings_view/settings_tile.dart';
 import 'package:foodly/services/authentication_service.dart';
 import 'package:foodly/services/plan_service.dart';
@@ -14,6 +15,7 @@ class SettingsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, watch) {
     final plan = watch(planProvider).state;
+    final foodlyUser = watch(userProvider).state;
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -39,6 +41,20 @@ class SettingsView extends ConsumerWidget {
               color: Colors.red,
             ),
           ], context),
+          foodlyUser != null ? _buildSectionTitle('Plan') : SizedBox(),
+          foodlyUser != null
+              ? _buildSection([
+                  SettingsTile(
+                    onTap: () => _importMeals(
+                      foodlyUser.oldPlans.where((id) => id != plan.id).toList(),
+                      context,
+                    ),
+                    leadingIcon: EvaIcons.downloadOutline,
+                    text: 'Alte Gerichte importieren',
+                    trailing: Icon(EvaIcons.arrowIosForwardOutline),
+                  ),
+                ], context)
+              : SizedBox(),
         ],
       ),
     );
@@ -89,5 +105,18 @@ class SettingsView extends ConsumerWidget {
     String userId = AuthenticationService.currentUser.uid;
     await PlanService.leavePlan(planId, userId);
     AuthenticationService.signOut();
+  }
+
+  void _importMeals(List<String> planIds, context) async {
+    showModalBottomSheet(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(10.0),
+        ),
+      ),
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => ImportMealsModal(planIds),
+    );
   }
 }

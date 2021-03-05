@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:foodly/services/authentication_service.dart';
+import 'package:foodly/utils/convert_util.dart';
 import 'shopping_list_service.dart';
 import 'package:hive/hive.dart';
 
@@ -15,6 +16,8 @@ class PlanService {
 
   static Future<String> getCurrentPlanId() async {
     // return ProviderContainer().read(planProvider).state.id;
+    if (AuthenticationService.currentUser == null) return '';
+
     final currentUserId = AuthenticationService.currentUser.uid;
     final querySnaps = await _firestore
         .collection('plans')
@@ -29,6 +32,20 @@ class PlanService {
     final doc = await _firestore.collection('plans').doc(id).get();
 
     return Plan.fromMap(id, doc.data());
+  }
+
+  static Future<List<Plan>> getPlansByIds(List<String> ids) async {
+    final List<DocumentSnapshot> documents = [];
+
+    for (var idList in ConvertUtil.splitArray(ids)) {
+      final results = await _firestore
+          .collection('plans')
+          .where(FieldPath.documentId, whereIn: idList)
+          .get();
+      documents.addAll(results.docs);
+    }
+
+    return documents.map((e) => Plan.fromMap(e.id, e.data())).toList();
   }
 
   static Stream<Plan> streamPlanById(String id) {
