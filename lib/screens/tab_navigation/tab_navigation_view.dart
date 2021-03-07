@@ -20,6 +20,7 @@ class _TabNavigationViewState extends State<TabNavigationView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: PageView(
           controller: _pageController,

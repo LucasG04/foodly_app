@@ -15,23 +15,23 @@ dependencies:
     sdk: flutter
   flutter_riverpod: ^0.12.1
   auto_route: ^0.6.9
-  intl: ^0.16.1
+  intl: ^0.17.0
   hive: ^1.4.4+1
-  dio: ^3.0.10
+  dio: ^4.0.0-beta5
   url_launcher:
   flushbar:
   share: ^0.6.5+4
 
   # Firebase
-  firebase_core: ^0.7.0
-  cloud_firestore: ^0.16.0+1
-  firebase_auth: ^0.20.1
-  firebase_auth_web: ^0.3.3
+  firebase_core: ^1.0.0
+  cloud_firestore: ^1.0.0
+  firebase_auth: ^1.0.0
+  firebase_auth_web: ^1.0.0
 
   # Widgets
   flutter_snake_navigationbar: ^0.4.2
   eva_icons_flutter: ^2.0.1
-  cached_network_image: ^2.5.0
+  cached_network_image: ^3.0.0-nullsafety
   group_list_view: ^1.0.6
   adaptive_dialog: ^0.9.3
   flutter_markdown:
@@ -48,18 +48,18 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  integration_test:
-    sdk: flutter
+  # integration_test:
+  #   sdk: flutter
   auto_route_generator: ^0.6.10
   build_runner:
-  flutter_launcher_icons: "^0.8.0"
+  # flutter_launcher_icons: ^0.8.0
 
-flutter_icons:
-  android: true
-  ios: true
-  image_path: "assets/icon/icon.png"
-  adaptive_icon_background: "#ffffff"
-  adaptive_icon_foreground: "assets/icon/icon.png"
+# flutter_icons:
+#   android: true
+#   ios: true
+#   image_path: "assets/icon/icon.png"
+#   adaptive_icon_background: "#ffffff"
+#   adaptive_icon_foreground: "assets/icon/icon.png"
 
 flutter:
 

@@ -62,8 +62,11 @@ class _FoodlyAppState extends State<FoodlyApp> {
                   //     ? kSmallTextTheme
                   //     : kTextTheme,
                 ),
-                builder: ExtendedNavigator<AppRouter>(
-                  router: AppRouter(),
+                builder: (_, __) => ScrollConfiguration(
+                  behavior: ScrollBehaviorModified(),
+                  child: ExtendedNavigator<AppRouter>(
+                    router: AppRouter(),
+                  ),
                 ),
               );
             },

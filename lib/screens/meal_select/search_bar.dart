@@ -91,7 +91,8 @@ class _SearchBarState extends State<SearchBar> {
       onTap: () {
         if (_focusNode.hasFocus) {
           _focusNode.unfocus();
-          // _textEditingController.clear();
+          _textEditingController.clear();
+          widget.onSearch('');
         }
       },
       controller: _closeIconController,

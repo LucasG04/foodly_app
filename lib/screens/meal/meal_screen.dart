@@ -50,6 +50,9 @@ class _MealScreenState extends State<MealScreen> {
                         meal.imageUrl != null && meal.imageUrl.isNotEmpty
                             ? CachedNetworkImage(
                                 imageUrl: meal.imageUrl,
+                                errorWidget: (_, __, ___) => Image.asset(
+                                  'assets/images/food_fallback.png',
+                                ),
                               )
                             : Image.asset(
                                 'assets/images/food_fallback.png',

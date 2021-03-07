@@ -60,6 +60,8 @@ class _MealListTitleState extends State<MealListTitle> {
                     ? IconButton(
                         icon: Icon(EvaIcons.closeOutline),
                         onPressed: () {
+                          _textEditingController.clear();
+                          widget.onInputChanged('');
                           setState(() {
                             _searchActive = !_searchActive;
                           });

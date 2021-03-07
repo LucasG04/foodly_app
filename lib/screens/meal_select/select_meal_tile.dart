@@ -36,6 +36,9 @@ class _SelectMealTileState extends State<SelectMealTile> {
               ? CachedNetworkImage(
                   imageUrl: widget.meal.imageUrl,
                   fit: BoxFit.cover,
+                  errorWidget: (_, __, ___) => Image.asset(
+                    'assets/images/food_fallback.png',
+                  ),
                 )
               : Image.asset(
                   'assets/images/food_fallback.png',

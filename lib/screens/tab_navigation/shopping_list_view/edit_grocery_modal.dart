@@ -74,7 +74,9 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
               placeholder: '2 Packungen',
             ),
           ),
-          SizedBox(height: kPadding * 2),
+          SizedBox(
+            height: kPadding * 2,
+          ),
           Center(
             child: MainButton(
               text: 'Speichern',
@@ -83,9 +85,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
               onTap: _saveGrocery,
             ),
           ),
-          SizedBox(
-            height: kPadding * 2 + MediaQuery.of(context).viewInsets.bottom,
-          ),
+          SizedBox(height: kPadding * 2),
         ],
       ),
     );
