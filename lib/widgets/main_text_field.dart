@@ -5,6 +5,7 @@ import '../constants.dart';
 
 class MainTextField extends StatefulWidget {
   final TextEditingController controller;
+  final FocusNode focusNode;
   final String title;
   final String placeholder;
   final bool isMultiline;
@@ -14,6 +15,7 @@ class MainTextField extends StatefulWidget {
   final void Function(String) onChange;
   final bool isDense;
   final bool obscureText;
+  final bool autofocus;
   final TextAlign textAlign;
   final Widget suffix;
   final String errorText;
@@ -21,6 +23,7 @@ class MainTextField extends StatefulWidget {
 
   const MainTextField({
     @required this.controller,
+    this.focusNode,
     this.title,
     this.placeholder,
     this.isMultiline = false,
@@ -30,6 +33,7 @@ class MainTextField extends StatefulWidget {
     this.onChange,
     this.isDense = true,
     this.obscureText = false,
+    this.autofocus = false,
     this.textAlign = TextAlign.start,
     this.suffix,
     this.errorText,
@@ -43,10 +47,12 @@ class MainTextField extends StatefulWidget {
 class _MainTextFieldState extends State<MainTextField> {
   bool _hasFocus = false;
   bool _obscureText;
+  FocusNode _focusNode;
 
   @override
   void initState() {
     _obscureText = widget.obscureText;
+    _focusNode = widget.focusNode ?? FocusNode();
     super.initState();
   }
 
@@ -81,6 +87,8 @@ class _MainTextFieldState extends State<MainTextField> {
     return Focus(
       child: TextFormField(
         controller: widget.controller,
+        autofocus: widget.autofocus,
+        focusNode: _focusNode,
         decoration: InputDecoration(
           hintText: widget.placeholder,
           border: OutlineInputBorder(

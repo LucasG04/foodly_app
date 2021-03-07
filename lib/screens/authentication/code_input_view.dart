@@ -87,13 +87,14 @@ class _CodeInputViewState extends State<CodeInputView> {
               ),
               SizedBox(height: kPadding),
               _buildCodeInput(),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: kPadding * 2,
-                  horizontal: kPadding,
-                ),
-                child: Center(child: Text('oder')),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(
+              //     vertical: kPadding * 2,
+              //     horizontal: kPadding,
+              //   ),
+              //   child: Center(child: Text('oder')),
+              // ),
+              SizedBox(height: size.height * 0.1),
               SizedBox(
                 width: contentWidth * 0.7,
                 child: Text(

@@ -95,7 +95,8 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
             errorText: _nameErrorText,
           ),
           Container(
-            height: size.height * 0.1,
+            height: size.height * 0.1 +
+                MediaQuery.of(context).viewInsets.bottom / 4,
             child: _unknownErrorText != null
                 ? Row(
                     children: [

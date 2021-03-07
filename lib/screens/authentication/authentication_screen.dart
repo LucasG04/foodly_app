@@ -37,6 +37,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
           },
           child: PageView(
             controller: _pageController,
+            physics: NeverScrollableScrollPhysics(),
             children: [
               CodeInputView((planId) {
                 setState(() {

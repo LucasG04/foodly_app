@@ -35,6 +35,7 @@ class _LoginViewState extends State<LoginView> {
 
   TextEditingController _nameController;
   TextEditingController _passwordController;
+  FocusNode _passwordFocusNode;
   String _nameErrorText;
   String _passwordErrorText;
   String _unknownErrorText;
@@ -46,6 +47,8 @@ class _LoginViewState extends State<LoginView> {
 
     _nameController = new TextEditingController();
     _passwordController = new TextEditingController();
+    _passwordFocusNode = new FocusNode();
+
     super.initState();
   }
 
@@ -123,6 +126,8 @@ class _LoginViewState extends State<LoginView> {
             title: 'Benutzername',
             textInputAction: TextInputAction.next,
             errorText: _nameErrorText,
+            autofocus: true,
+            onSubmit: () => (_passwordFocusNode.requestFocus()),
           ),
           MainTextField(
             controller: _passwordController,
@@ -130,9 +135,12 @@ class _LoginViewState extends State<LoginView> {
             textInputAction: TextInputAction.go,
             obscureText: true,
             errorText: _passwordErrorText,
+            focusNode: _passwordFocusNode,
+            onSubmit: _authenticateUser,
           ),
           Container(
-            height: size.height * 0.1,
+            height: size.height * 0.1 +
+                MediaQuery.of(context).viewInsets.bottom / 4,
             child: _unknownErrorText != null
                 ? Row(
                     children: [
