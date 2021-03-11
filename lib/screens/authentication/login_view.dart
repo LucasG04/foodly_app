@@ -1,8 +1,10 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:foodly/models/plan.dart';
+import 'package:foodly/screens/authentication/reset_password_modal.dart';
 import 'package:foodly/services/foodly_user_service.dart';
 import 'package:foodly/widgets/toggle_tab/flutter_toggle_tab.dart';
 
@@ -33,10 +35,10 @@ class _LoginViewState extends State<LoginView> {
   ButtonState _buttonState;
   bool _isRegistering;
 
-  TextEditingController _nameController;
+  TextEditingController _emailController;
   TextEditingController _passwordController;
   FocusNode _passwordFocusNode;
-  String _nameErrorText;
+  String _emailErrorText;
   String _passwordErrorText;
   String _unknownErrorText;
 
@@ -45,7 +47,7 @@ class _LoginViewState extends State<LoginView> {
     _buttonState = ButtonState.normal;
     _isRegistering = true;
 
-    _nameController = new TextEditingController();
+    _emailController = new TextEditingController();
     _passwordController = new TextEditingController();
     _passwordFocusNode = new FocusNode();
 
@@ -122,10 +124,10 @@ class _LoginViewState extends State<LoginView> {
           ),
           SizedBox(height: kPadding),
           MainTextField(
-            controller: _nameController,
-            title: 'Benutzername',
+            controller: _emailController,
+            title: 'E-Mail-Adresse',
             textInputAction: TextInputAction.next,
-            errorText: _nameErrorText,
+            errorText: _emailErrorText,
             autofocus: true,
             onSubmit: () => (_passwordFocusNode.requestFocus()),
           ),
@@ -137,6 +139,24 @@ class _LoginViewState extends State<LoginView> {
             errorText: _passwordErrorText,
             focusNode: _passwordFocusNode,
             onSubmit: _authenticateUser,
+          ),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 250),
+            child: !_isRegistering
+                ? Container(
+                    width: double.infinity,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        child: Text('Passwort vergessen?'),
+                        onPressed: _showPasswordReset,
+                      ),
+                    ),
+                  )
+                : TextButton(
+                    child: Text(''),
+                    onPressed: null,
+                  ),
           ),
           Container(
             height: size.height * 0.1 +
@@ -179,10 +199,11 @@ class _LoginViewState extends State<LoginView> {
         fontWeight: FontWeight.w700,
       );
 
-  bool _validateName() {
-    if (_nameController.text.isEmpty || _nameController.text.length < 3) {
+  bool _validateEmail() {
+    if (_emailController.text == null ||
+        !EmailValidator.validate(_emailController.text)) {
       setState(() {
-        _nameErrorText = 'Dein Name muss mindestens 3 Zeichen enthalten';
+        _emailErrorText = 'Bitte gib eine richtige E-Mail ein.';
       });
       return false;
     }
@@ -204,7 +225,7 @@ class _LoginViewState extends State<LoginView> {
   void _authenticateUser() async {
     _resetErrors();
 
-    if (_validateName() && _validatePassword()) {
+    if (_validateEmail() && _validatePassword()) {
       setState(() {
         _buttonState = ButtonState.inProgress;
       });
@@ -217,10 +238,10 @@ class _LoginViewState extends State<LoginView> {
       try {
         if (_isRegistering) {
           userId = await AuthenticationService.registerUser(
-              _nameController.text, _passwordController.text, plan.code);
+              _emailController.text, _passwordController.text);
         } else {
           userId = await AuthenticationService.signInUser(
-              _nameController.text, _passwordController.text, plan.code);
+              _emailController.text, _passwordController.text);
         }
 
         plan.users.add(userId);
@@ -246,7 +267,7 @@ class _LoginViewState extends State<LoginView> {
 
   void _resetErrors() {
     setState(() {
-      _nameErrorText = null;
+      _emailErrorText = null;
       _passwordErrorText = null;
       _unknownErrorText = null;
       _buttonState = ButtonState.normal;
@@ -256,11 +277,10 @@ class _LoginViewState extends State<LoginView> {
   void _handleAuthException(dynamic exception) {
     if (exception is FirebaseAuthException) {
       if (exception.code == 'weak-password') {
-        print('The password provided is too weak.');
         _passwordErrorText =
-            'Daas Passwort ist zu leicht. Es muss mindestens 6 Zeichen lang sein.';
+            'Das Passwort ist zu leicht. Es muss mindestens 6 Zeichen lang sein.';
       } else if (exception.code == 'email-already-in-use') {
-        _nameErrorText = 'Der Name ist bereits vergeben.';
+        _emailErrorText = 'Es gibt bereits ein Konto mit dieser E-Mail.';
       } else {
         _unknownErrorText =
             'Anmeldung nicht möglich. Bitte versuche es später erneut.';
@@ -272,5 +292,18 @@ class _LoginViewState extends State<LoginView> {
     setState(() {
       _buttonState = ButtonState.error;
     });
+  }
+
+  void _showPasswordReset() {
+    showModalBottomSheet(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(10.0),
+        ),
+      ),
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => ResetPasswordModal(_emailController.text),
+    );
   }
 }
