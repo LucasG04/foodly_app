@@ -49,6 +49,20 @@ class ImportMealsModal extends StatelessWidget {
                   itemBuilder: (context, index) =>
                       CopyPlanMealsTile(snapshot.data[index]),
                 );
+              } else if (snapshot.connectionState == ConnectionState.done) {
+                return SizedBox(
+                  height: 200,
+                  child: Center(
+                    child: Text(
+                      'Du warst bis jetzt nur in einem Plan. Daher kannst du noch keine Gerichte von einem anderen Plan importieren.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize:
+                            Theme.of(context).textTheme.bodyText1.fontSize + 2,
+                      ),
+                    ),
+                  ),
+                );
               } else {
                 return SizedBox(
                   height: 200,

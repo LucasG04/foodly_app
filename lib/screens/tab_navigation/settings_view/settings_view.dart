@@ -41,8 +41,10 @@ class SettingsView extends ConsumerWidget {
               color: Colors.red,
             ),
           ], context),
-          foodlyUser != null ? _buildSectionTitle('Gerichte') : SizedBox(),
-          foodlyUser != null
+          foodlyUser != null && foodlyUser.oldPlans.length > 1
+              ? _buildSectionTitle('Gerichte')
+              : SizedBox(),
+          foodlyUser != null && foodlyUser.oldPlans.length > 1
               ? _buildSection([
                   SettingsTile(
                     onTap: () => _importMeals(
