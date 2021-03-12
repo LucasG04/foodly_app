@@ -65,9 +65,13 @@ class _ShoppingListViewState extends State<ShoppingListView>
                           AnimatedShoppingList(
                             groceries: todoItems,
                             onEdit: (e) => _editGrocery(listId, e),
-                            onRemove: (item) {
+                            onTap: (item) {
                               item.bought = true;
                               ShoppingListService.updateGrocery(listId, item);
+                            },
+                            onDelete: (item) {
+                              ShoppingListService.deleteGrocery(
+                                  listId, item.id);
                             },
                           ),
                           SizedBox(height: kPadding),
@@ -83,12 +87,42 @@ class _ShoppingListViewState extends State<ShoppingListView>
                               AnimatedShoppingList(
                                 groceries: boughtItems,
                                 onEdit: (e) => _editGrocery(listId, e),
-                                onRemove: (item) {
+                                onTap: (item) {
                                   item.bought = false;
                                   ShoppingListService.updateGrocery(
                                       listId, item);
                                 },
+                                onDelete: (item) {
+                                  ShoppingListService.deleteGrocery(
+                                      listId, item.id);
+                                },
                               ),
+                              boughtItems.length > 0
+                                  ? Center(
+                                      child: TextButton(
+                                        onPressed: () => ShoppingListService
+                                            .deleteAllBoughtGrocery(listId),
+                                        child: Text(
+                                          'Alle entfernen',
+                                          style: TextStyle(
+                                            color: Theme.of(context).errorColor,
+                                          ),
+                                        ),
+                                        style: ButtonStyle(
+                                          shadowColor:
+                                              MaterialStateProperty.all<Color>(
+                                            Theme.of(context).errorColor,
+                                          ),
+                                          overlayColor:
+                                              MaterialStateProperty.all<Color>(
+                                            Theme.of(context)
+                                                .errorColor
+                                                .withOpacity(0.1),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : SizedBox(),
                             ],
                           ),
                         ],

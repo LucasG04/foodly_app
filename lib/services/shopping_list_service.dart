@@ -49,4 +49,25 @@ class ShoppingListService {
         .collection('groceries')
         .add(grocery.toMap());
   }
+
+  static Future<void> deleteGrocery(String listId, String groceryId) async {
+    return _firestore
+        .collection('shoppinglists')
+        .doc(listId)
+        .collection('groceries')
+        .doc(groceryId)
+        .delete();
+  }
+
+  static Future<void> deleteAllBoughtGrocery(String listId) async {
+    final snaps = await _firestore
+        .collection('shoppinglists')
+        .doc(listId)
+        .collection('groceries')
+        .where('bought', isEqualTo: true)
+        .get();
+
+    return Future.wait(
+        snaps.docs.map((e) => deleteGrocery(listId, e.id)).toList());
+  }
 }

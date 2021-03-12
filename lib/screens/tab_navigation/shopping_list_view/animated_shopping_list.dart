@@ -1,18 +1,21 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '../../../models/grocery.dart';
 
 class AnimatedShoppingList extends StatelessWidget {
   final List<Grocery> groceries;
-  final void Function(Grocery) onRemove;
+  final void Function(Grocery) onTap;
+  final void Function(Grocery) onDelete;
   final void Function(Grocery) onEdit;
 
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
 
   AnimatedShoppingList({
     @required this.groceries,
-    @required this.onRemove,
+    @required this.onTap,
+    @required this.onDelete,
     @required this.onEdit,
   });
 
@@ -24,12 +27,12 @@ class AnimatedShoppingList extends StatelessWidget {
       physics: NeverScrollableScrollPhysics(),
       initialItemCount: groceries.length,
       itemBuilder: (context, index, animation) {
-        return _buildSlideTile(index, animation);
+        return _buildSlideTile(index, animation, context);
       },
     );
   }
 
-  Widget _buildSlideTile(int index, animation) {
+  Widget _buildSlideTile(int index, animation, context) {
     Grocery grocery = groceries[index];
 
     return SlideTransition(
@@ -38,41 +41,53 @@ class AnimatedShoppingList extends StatelessWidget {
         end: Offset(0, 0),
       ).animate(animation),
       child: InkWell(
-        onTap: () => _removeItem(index),
-        child: ListTile(
-          title: Text(grocery.name, style: TextStyle(fontSize: 20.0)),
-          subtitle: grocery.amount != null && grocery.amount.isNotEmpty
-              ? Text(grocery.amount)
-              : null,
-          trailing: IconButton(
-            icon: Icon(EvaIcons.moreHorizotnalOutline),
-            onPressed: () => onEdit(grocery),
+        onTap: () => _tapItem(index),
+        child: Slidable(
+          actionPane: SlidableDrawerActionPane(),
+          child: ListTile(
+            title: Text(grocery.name, style: TextStyle(fontSize: 20.0)),
+            subtitle: grocery.amount != null && grocery.amount.isNotEmpty
+                ? Text(grocery.amount)
+                : null,
+            trailing: IconButton(
+              icon: Icon(EvaIcons.moreHorizotnalOutline),
+              onPressed: () => onEdit(grocery),
+            ),
           ),
+          secondaryActions: [
+            IconSlideAction(
+              caption: 'Löschen',
+              color: Theme.of(context).errorColor,
+              icon: EvaIcons.closeCircleOutline,
+              onTap: () => _deleteItem(index),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  // void _addItem(Grocery item) {
-  //   listKey.currentState.insertItem(
-  //     groceries.length + 1,
-  //     duration: const Duration(milliseconds: 250),
-  //   );
-  //   final existingGroceries = groceries;
-  //   groceries.clear();
-  //   groceries.addAll(existingGroceries);
-  //   groceries.add(item);
-  // }
-
-  void _removeItem(int index) {
+  void _tapItem(int index) {
     listKey.currentState.removeItem(
       index,
-      (_, animation) => _buildSlideTile(index, animation),
+      (ctx, animation) => _buildSlideTile(index, animation, ctx),
       duration: const Duration(milliseconds: 250),
     );
 
     Future.delayed(
       const Duration(milliseconds: 250),
-    ).then((_) => onRemove(groceries.removeAt(index)));
+    ).then((_) => onTap(groceries.removeAt(index)));
+  }
+
+  void _deleteItem(int index) {
+    listKey.currentState.removeItem(
+      index,
+      (ctx, animation) => _buildSlideTile(index, animation, ctx),
+      duration: const Duration(milliseconds: 250),
+    );
+
+    Future.delayed(
+      const Duration(milliseconds: 250),
+    ).then((_) => onDelete(groceries.removeAt(index)));
   }
 }
