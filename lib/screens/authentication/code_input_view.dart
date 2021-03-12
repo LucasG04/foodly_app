@@ -35,6 +35,49 @@ class _CodeInputViewState extends State<CodeInputView> {
     return Container(
       child: Stack(
         children: <Widget>[
+          ListView(
+            padding: EdgeInsets.symmetric(
+              horizontal:
+                  (MediaQuery.of(context).size.width - contentWidth) / 2,
+            ),
+            children: [
+              SizedBox(
+                  height: size.height * 0.45 -
+                      MediaQuery.of(context).viewInsets.bottom / 6),
+              SizedBox(
+                width: contentWidth * 0.7,
+                child: Text(
+                  'Gib den Code von einem Plan ein, um ihm beizutreten:',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+              SizedBox(height: kPadding),
+              _buildCodeInput(),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(
+              //     vertical: kPadding * 2,
+              //     horizontal: kPadding,
+              //   ),
+              //   child: Center(child: Text('oder')),
+              // ),
+              SizedBox(height: size.height * 0.1),
+              SizedBox(
+                width: contentWidth * 0.7,
+                child: Text(
+                  'Hast du noch keinen Plan? Dann erstell einfach einen.',
+                  style: TextStyle(fontSize: 18),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              SizedBox(height: kPadding * 2),
+              Center(
+                child: MainButton(
+                  text: 'Plan erstellen',
+                  onTap: () => widget.onPageChange(null),
+                ),
+              ),
+            ],
+          ),
           ClipShadowPath(
             clipper: LoginDesignClipper(),
             shadow: Shadow(
@@ -70,47 +113,6 @@ class _CodeInputViewState extends State<CodeInputView> {
                 ),
               ),
             ),
-          ),
-          ListView(
-            padding: EdgeInsets.symmetric(
-              horizontal:
-                  (MediaQuery.of(context).size.width - contentWidth) / 2,
-            ),
-            children: [
-              SizedBox(height: size.height * 0.45),
-              SizedBox(
-                width: contentWidth * 0.7,
-                child: Text(
-                  'Gib den Code von einem Plan ein, um ihm beizutreten:',
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-              SizedBox(height: kPadding),
-              _buildCodeInput(),
-              // Padding(
-              //   padding: const EdgeInsets.symmetric(
-              //     vertical: kPadding * 2,
-              //     horizontal: kPadding,
-              //   ),
-              //   child: Center(child: Text('oder')),
-              // ),
-              SizedBox(height: size.height * 0.1),
-              SizedBox(
-                width: contentWidth * 0.7,
-                child: Text(
-                  'Hast du noch keinen Plan? Dann erstell einfach einen.',
-                  style: TextStyle(fontSize: 18),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              SizedBox(height: kPadding * 2),
-              Center(
-                child: MainButton(
-                  text: 'Plan erstellen',
-                  onTap: () => widget.onPageChange(null),
-                ),
-              ),
-            ],
           ),
         ],
       ),
