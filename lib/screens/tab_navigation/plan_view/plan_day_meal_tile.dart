@@ -160,17 +160,6 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
               ),
             ],
           ),
-          // SizedBox(width: kPadding / 4),
-          // Column(
-          //   children: [
-          //     IconButton(
-          //       icon: Icon(EvaIcons.arrowIosDownwardOutline),
-          //       onPressed: () => print('downvote'),
-          //       splashRadius: 15.0,
-          //     ),
-          //     Text(planMeal.downvotes.length.toString()),
-          //   ],
-          // ),
           SizedBox(width: kPadding / 2),
         ],
         PopupMenuButton(
@@ -178,22 +167,32 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
               _onMenuSelected(val, context.read(planProvider).state.id),
           icon: Icon(EvaIcons.moreVerticalOutline),
           itemBuilder: (BuildContext context) {
-            return [
-              PopupMenuItem(
-                value: 'tolist',
-                child: ListTile(
-                  title: Text('Zutaten auf Einkaufsliste'),
-                  leading: Icon(EvaIcons.fileAddOutline),
-                ),
-              ),
-              PopupMenuItem(
-                value: 'delete',
-                child: ListTile(
-                  title: Text('Löschen'),
-                  leading: Icon(EvaIcons.minusCircleOutline),
-                ),
-              ),
-            ];
+            return widget.planMeal.meal.startsWith(kPlaceholderSymbol)
+                ? [
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: ListTile(
+                        title: Text('Löschen'),
+                        leading: Icon(EvaIcons.minusCircleOutline),
+                      ),
+                    ),
+                  ]
+                : [
+                    PopupMenuItem(
+                      value: 'tolist',
+                      child: ListTile(
+                        title: Text('Zutaten auf Einkaufsliste'),
+                        leading: Icon(EvaIcons.fileAddOutline),
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: ListTile(
+                        title: Text('Löschen'),
+                        leading: Icon(EvaIcons.minusCircleOutline),
+                      ),
+                    ),
+                  ];
           },
         ),
       ],
