@@ -44,8 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('home User');
-    print(_currentUser);
     if (_isLoading) {
       return Scaffold(
         body: Center(child: SmallCircularProgressIndicator()),

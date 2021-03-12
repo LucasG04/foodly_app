@@ -41,7 +41,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
 
   @override
   void initState() {
-    if (widget.id.isEmpty) {
+    if (widget.id == 'create') {
       _isLoadingMeal = false;
       _titleController = new TextEditingController();
       _urlController = new TextEditingController();

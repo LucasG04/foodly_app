@@ -58,7 +58,7 @@ class PageTitle extends StatelessWidget {
     return AutoSizeText(
       text,
       style: TextStyle(
-        fontSize: 32.0,
+        fontSize: 30.0,
         fontWeight: FontWeight.w700,
         fontFamily: 'Poppins',
       ),
