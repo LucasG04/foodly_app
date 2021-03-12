@@ -52,7 +52,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
         child: Column(
           children: [
             SizedBox(height: kPadding * 2),
-            PageTitle(text: 'Gerichtauswahl', showBackButton: true),
+            PageTitle(text: 'Hinzufügen', showBackButton: true),
             SearchBar(
               onSearch: (String query) async {
                 if (query.isNotEmpty && query.length > 1) {

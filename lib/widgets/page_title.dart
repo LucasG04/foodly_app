@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -53,8 +54,8 @@ class PageTitle extends StatelessWidget {
     ExtendedNavigator.root.maybePop();
   }
 
-  Text _buildTitle() {
-    return Text(
+  AutoSizeText _buildTitle() {
+    return AutoSizeText(
       text,
       style: TextStyle(
         fontSize: 32.0,

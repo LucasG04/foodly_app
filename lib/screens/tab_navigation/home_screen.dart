@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,22 +15,46 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  StreamSubscription<User> authStream;
+
+  bool _isLoading;
+  User _currentUser;
+
+  @override
+  void initState() {
+    _isLoading = true;
+    authStream = AuthenticationService.authenticationStream().listen((user) {
+      setStateIfMounted(() {
+        _currentUser = user;
+        _isLoading = false;
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    authStream.cancel();
+    super.dispose();
+  }
+
+  void setStateIfMounted(f) {
+    if (mounted) setState(f);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User>(
-      stream: AuthenticationService.authenticationStream(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            body: Center(child: SmallCircularProgressIndicator()),
-          );
-        } else if (snapshot.hasData) {
-          return TabNavigationView();
-        } else {
-          ExtendedNavigator.root.replace(Routes.authenticationScreen);
-          return Scaffold();
-        }
-      },
-    );
+    print('home User');
+    print(_currentUser);
+    if (_isLoading) {
+      return Scaffold(
+        body: Center(child: SmallCircularProgressIndicator()),
+      );
+    } else if (_currentUser != null) {
+      return TabNavigationView();
+    } else {
+      ExtendedNavigator.root.replace(Routes.authenticationScreen);
+      return Scaffold();
+    }
   }
 }

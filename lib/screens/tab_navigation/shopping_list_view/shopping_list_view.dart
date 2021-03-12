@@ -119,9 +119,15 @@ class _ShoppingListViewState extends State<ShoppingListView>
           top: Radius.circular(10.0),
         ),
       ),
-      context: context,
       isScrollControlled: true,
-      builder: (context) => EditGroceryModal(listId, grocery),
+      context: context,
+      builder: (modalContext) => EditGroceryModal(
+        shoppingListId: listId,
+        grocery: grocery,
+      ),
+      // builder: (modalContext) => TextButton(
+      //     onPressed: () => Navigator.of(modalContext).pop(),
+      //     child: Text('close')),
     );
   }
 }

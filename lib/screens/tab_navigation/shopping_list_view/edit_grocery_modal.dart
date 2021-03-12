@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
 import '../../../constants.dart';
@@ -11,7 +12,10 @@ class EditGroceryModal extends StatefulWidget {
   final String shoppingListId;
   final Grocery grocery;
 
-  EditGroceryModal(this.shoppingListId, [this.grocery]);
+  EditGroceryModal({
+    @required this.shoppingListId,
+    this.grocery,
+  });
 
   @override
   _EditGroceryModalState createState() => _EditGroceryModalState();
@@ -62,7 +66,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
           ),
           MainTextField(
             controller: _nameController,
-            title: 'Name',
+            title: 'Bezeichnung',
             placeholder: 'Brötchen',
             errorText: _errorText,
           ),
@@ -111,10 +115,10 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
       setState(() {
         _buttonState = ButtonState.normal;
       });
-      Navigator.maybePop(context);
+      Navigator.pop(context);
     } else {
       setState(() {
-        _errorText = 'Bitte trag einen Namen ein.';
+        _errorText = 'Bitte trag eine Bezeichnung ein.';
         _buttonState = ButtonState.error;
       });
     }

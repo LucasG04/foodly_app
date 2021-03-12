@@ -81,9 +81,7 @@ class _LoginViewState extends State<LoginView> {
               fontSize: 14,
               fontWeight: FontWeight.w400,
             ),
-            labels: widget.isCreatingPlan
-                ? ['Registrieren']
-                : ['Registrieren', 'Anmelden'],
+            labels: ['Registrieren', 'Anmelden'],
             // icons: [Icons.person,Icons.pregnant_woman],
             selectedLabelIndex: (index) {
               setState(() {
@@ -129,6 +127,7 @@ class _LoginViewState extends State<LoginView> {
             textInputAction: TextInputAction.next,
             errorText: _emailErrorText,
             autofocus: true,
+            keyboardType: TextInputType.emailAddress,
             onSubmit: () => (_passwordFocusNode.requestFocus()),
           ),
           MainTextField(
@@ -160,7 +159,7 @@ class _LoginViewState extends State<LoginView> {
           ),
           Container(
             height: size.height * 0.1 +
-                MediaQuery.of(context).viewInsets.bottom / 4,
+                MediaQuery.of(context).viewInsets.bottom / 6,
             child: _unknownErrorText != null
                 ? Row(
                     children: [
@@ -236,25 +235,26 @@ class _LoginViewState extends State<LoginView> {
           : await PlanService.getPlanById(widget.plan.id);
 
       try {
-        if (_isRegistering) {
-          userId = await AuthenticationService.registerUser(
-              _emailController.text, _passwordController.text);
-        } else {
-          userId = await AuthenticationService.signInUser(
-              _emailController.text, _passwordController.text);
-        }
+        userId = _isRegistering
+            ? await AuthenticationService.registerUser(
+                _emailController.text, _passwordController.text)
+            : await AuthenticationService.signInUser(
+                _emailController.text, _passwordController.text);
 
         plan.users.add(userId);
         await PlanService.updatePlan(plan);
 
-        await FoodlyUserService.createUserWithId(userId);
-        await FoodlyUserService.addOldPlanIdToUser(userId, plan.id);
+        if (_isRegistering) {
+          await FoodlyUserService.createUserWithId(userId);
+        }
 
-        ExtendedNavigator.root.replace(Routes.homeScreen);
+        await FoodlyUserService.addOldPlanIdToUser(userId, plan.id);
 
         setState(() {
           _buttonState = ButtonState.normal;
         });
+
+        ExtendedNavigator.root.replace(Routes.homeScreen);
       } catch (exception) {
         _handleAuthException(exception);
       }
