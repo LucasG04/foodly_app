@@ -41,6 +41,7 @@ class _EditIngredientsState extends State<EditIngredients> {
         ),
         ListView.builder(
           shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
           itemCount: _content.length,
           itemBuilder: (context, index) => ListTile(
             title: Text(_content[index].name),

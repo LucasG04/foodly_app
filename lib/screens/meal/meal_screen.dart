@@ -14,6 +14,7 @@ import '../../services/meal_service.dart';
 import '../../utils/no_glowing_overscroll_indicator_behavior.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import 'border_icon.dart';
+import 'package:foodly/models/ingredient.dart';
 
 class MealScreen extends StatefulWidget {
   final String id;
@@ -143,7 +144,7 @@ class _MealScreenState extends State<MealScreen> {
                           ),
                           BorderIcon(
                             child: Text(
-                              '${meal.duration} Minuten',
+                              '${meal.duration.toString()} Minuten',
                               style: TextStyle(
                                 fontSize: 20.0,
                                 fontWeight: FontWeight.bold,
@@ -168,29 +169,33 @@ class _MealScreenState extends State<MealScreen> {
                     SizedBox(height: kPadding),
                     ..._buildSection(
                       'Zutaten',
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Container(
-                          width: double.infinity,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: meal.ingredients
-                                .map(
-                                  (text) => Text(
-                                    '• $text',
-                                    textAlign: TextAlign.justify,
-                                    style: TextStyle(fontSize: 18.0),
-                                  ),
-                                )
-                                .toList(),
+                      Container(
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: meal.ingredients.length,
+                          separatorBuilder: (context, index) => Divider(),
+                          itemBuilder: (context, index) => _buildIngredientTile(
+                            meal.ingredients[index],
                           ),
+                          padding: const EdgeInsets.all(0),
                         ),
                       ),
                     ),
                     SizedBox(height: kPadding),
                     ..._buildSection(
                       'Anleitung',
-                      MarkdownBody(data: meal.instruction ?? ''),
+                      MarkdownBody(
+                        data: meal.instruction ?? '',
+                        styleSheet: MarkdownStyleSheet.fromTheme(
+                          ThemeData(
+                            textTheme: TextTheme(
+                              bodyText1: TextStyle(fontSize: 16),
+                              bodyText2: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                     SizedBox(height: kPadding),
                     SizedBox(height: 100.0),
@@ -202,6 +207,36 @@ class _MealScreenState extends State<MealScreen> {
             return Center(child: SmallCircularProgressIndicator());
           }
         },
+      ),
+    );
+  }
+
+  Widget _buildIngredientTile(Ingredient ingredient) {
+    final amountWidth = MediaQuery.of(context).size.width * 0.3 - kPadding;
+    final nameWidth = MediaQuery.of(context).size.width * 0.5 - kPadding;
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: kPadding / 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          SizedBox(
+            width: amountWidth,
+            child: Text(
+              '${ingredient.amount} ${ingredient.unit}',
+              textAlign: TextAlign.end,
+              style: TextStyle(fontSize: 18.0),
+            ),
+          ),
+          SizedBox(
+            width: nameWidth,
+            child: Text(
+              '${ingredient.name}',
+              textAlign: TextAlign.start,
+              style: TextStyle(fontSize: 18.0),
+            ),
+          ),
+        ],
       ),
     );
   }

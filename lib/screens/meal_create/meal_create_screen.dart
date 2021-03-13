@@ -87,7 +87,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
 
     return Scaffold(
       appBar: MainAppBar(
-        text: 'Gericht erstellen',
+        text: _isCreatingMeal ? 'Gericht erstellen' : 'Gericht bearbeiten',
         scrollController: _scrollController,
         actions: [
           IconButton(

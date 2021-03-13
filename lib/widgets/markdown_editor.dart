@@ -127,8 +127,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
               ),
             ),
             child: GestureDetector(
-              onTap: () => linkOnTapHandler(
-                  'https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet'),
+              onTap: () => linkOnTapHandler('https://commonmark.org/help/'),
               child: Padding(
                 padding: EdgeInsets.all(10.0),
                 child: Row(
