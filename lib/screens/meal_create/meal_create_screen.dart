@@ -6,6 +6,7 @@ import 'package:foodly/providers/state_providers.dart';
 import 'package:foodly/screens/meal_create/edit_ingredients.dart';
 import 'package:foodly/services/authentication_service.dart';
 import 'package:foodly/widgets/full_screen_loader.dart';
+import 'package:foodly/widgets/main_appbar.dart';
 
 import '../../constants.dart';
 import '../../models/meal.dart';
@@ -41,6 +42,8 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
 
   ButtonState _buttonState;
 
+  ScrollController _scrollController;
+
   @override
   void initState() {
     if (widget.id == 'create') {
@@ -70,6 +73,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     }
 
     _buttonState = ButtonState.normal;
+    _scrollController = new ScrollController();
     super.initState();
   }
 
@@ -81,22 +85,22 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         : MediaQuery.of(context).size.width * 0.8;
 
     return Scaffold(
+      appBar: MainAppBar(
+        text: 'Gericht erstellen',
+        scrollController: _scrollController,
+      ),
       body: Stack(
         children: [
           SafeArea(
             bottom: false,
             child: SingleChildScrollView(
+              controller: _scrollController,
               child: Center(
                 child: Container(
                   width: fullWidth,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      SizedBox(height: kPadding),
-                      PageTitle(
-                        text: 'Gericht erstellen',
-                        showBackButton: true,
-                      ),
                       MainTextField(
                         controller: _titleController,
                         title: 'Name',

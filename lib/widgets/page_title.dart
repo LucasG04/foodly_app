@@ -1,19 +1,16 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
 import '../constants.dart';
 
 class PageTitle extends StatelessWidget {
   final String text;
-  final bool showBackButton;
   final List<Widget> actions;
 
   const PageTitle({
     Key key,
     @required this.text,
-    this.showBackButton = false,
     this.actions,
   }) : super(key: key);
 
@@ -29,14 +26,6 @@ class PageTitle extends StatelessWidget {
               : MediaQuery.of(context).size.width * 0.9,
           child: Row(
             children: [
-              if (showBackButton) ...[
-                IconButton(
-                  icon: Icon(EvaIcons.arrowBackOutline),
-                  onPressed: _navigateBack,
-                  splashRadius: 25.0,
-                ),
-                SizedBox(width: kPadding),
-              ],
               _buildTitle(),
               if (actions != null && actions.isNotEmpty) ...[
                 SizedBox(width: kPadding),
@@ -48,10 +37,6 @@ class PageTitle extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void _navigateBack() {
-    ExtendedNavigator.root.maybePop();
   }
 
   AutoSizeText _buildTitle() {

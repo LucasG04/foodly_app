@@ -8,13 +8,13 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:foodly/app_router.gr.dart';
 import 'package:foodly/screens/meal_select/search_bar.dart';
 import 'package:foodly/screens/meal_select/select_meal_tile.dart';
+import 'package:foodly/widgets/main_appbar.dart';
 import 'package:foodly/widgets/user_information.dart';
 import '../../constants.dart';
 import '../../models/meal.dart';
 import '../../models/plan_meal.dart';
 import '../../providers/state_providers.dart';
 import '../../services/plan_service.dart';
-import '../../widgets/page_title.dart';
 
 class MealSelectScreen extends StatefulWidget {
   /// both are strings because the need to be extracted from the url
@@ -36,10 +36,13 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
   List<Meal> searchedMeals;
   bool _isSearching;
 
+  ScrollController _scrollController;
+
   @override
   void initState() {
     searchedMeals = [];
     _isSearching = false;
+    _scrollController = new ScrollController();
     super.initState();
   }
 
@@ -48,11 +51,11 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     final activePlan = context.read(planProvider).state;
 
     return Scaffold(
+      appBar: MainAppBar(text: 'Hinzufügen'),
       body: SingleChildScrollView(
+        controller: _scrollController,
         child: Column(
           children: [
-            SizedBox(height: kPadding * 2),
-            PageTitle(text: 'Hinzufügen', showBackButton: true),
             SearchBar(
               onSearch: (String query) async {
                 if (query.isNotEmpty && query.length > 1) {
