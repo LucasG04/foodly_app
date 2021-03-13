@@ -159,9 +159,6 @@ class _ShoppingListViewState extends State<ShoppingListView>
         shoppingListId: listId,
         grocery: grocery,
       ),
-      // builder: (modalContext) => TextButton(
-      //     onPressed: () => Navigator.of(modalContext).pop(),
-      //     child: Text('close')),
     );
   }
 }

@@ -1,0 +1,144 @@
+import 'package:flutter/material.dart';
+import 'package:foodly/models/ingredient.dart';
+import 'package:foodly/widgets/main_button.dart';
+import 'package:foodly/widgets/main_text_field.dart';
+
+import '../../constants.dart';
+
+class EditIngredientModal extends StatefulWidget {
+  final Ingredient ingredient;
+
+  EditIngredientModal({this.ingredient});
+
+  @override
+  _EditIngredientModalState createState() => _EditIngredientModalState();
+}
+
+class _EditIngredientModalState extends State<EditIngredientModal> {
+  bool _isCreating;
+  TextEditingController _nameController;
+  TextEditingController _amountController;
+  TextEditingController _unitController;
+
+  String _nameErrorText;
+  String _amountErrorText;
+  String _unitErrorText;
+
+  @override
+  void initState() {
+    _isCreating = widget.ingredient == null;
+    _nameController = new TextEditingController(text: widget.ingredient?.name);
+    _amountController = new TextEditingController(
+        text: widget.ingredient?.amount == null
+            ? ''
+            : widget.ingredient?.amount.toString());
+    _unitController = new TextEditingController(text: widget.ingredient?.unit);
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width > 599
+        ? 580.0
+        : MediaQuery.of(context).size.width * 0.8;
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: (MediaQuery.of(context).size.width - width) / 2,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: kPadding),
+              child: Text(
+                _isCreating ? 'HINZUFÜGEN' : 'BEARBEITEN',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          MainTextField(
+            controller: _nameController,
+            title: 'Bezeichnung',
+            placeholder: 'Salz',
+            errorText: _nameErrorText,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: width * 0.4,
+                child: MainTextField(
+                  controller: _amountController,
+                  title: 'Menge',
+                  placeholder: '1',
+                  keyboardType: TextInputType.number,
+                  errorText: _amountErrorText,
+                ),
+              ),
+              SizedBox(
+                width: width * 0.5,
+                child: MainTextField(
+                  controller: _unitController,
+                  title: 'Einheit',
+                  placeholder: 'Prise',
+                  errorText: _unitErrorText,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: kPadding * 2),
+          Center(
+            child: MainButton(
+              text: 'Speichern',
+              onTap: _saveIngredient,
+            ),
+          ),
+          SizedBox(height: kPadding * 2),
+        ],
+      ),
+    );
+  }
+
+  void _saveIngredient() async {
+    final ingredient = _isCreating ? Ingredient() : widget.ingredient;
+    ingredient.name = _nameController.text.trim();
+    ingredient.amount = double.tryParse(_amountController.text.trim());
+    ingredient.unit = _unitController.text.trim();
+
+    if (ingredient.name.isEmpty) {
+      setState(() {
+        _nameErrorText = 'Bitte trag eine Bezeichnung ein.';
+      });
+      return;
+    }
+
+    if (ingredient.amount == null) {
+      setState(() {
+        _amountErrorText = 'Menge eintragen.';
+      });
+      return;
+    }
+
+    if (ingredient.name.isEmpty) {
+      setState(() {
+        _unitErrorText = 'Maßeinheit eintragen.';
+      });
+      return;
+    }
+
+    setState(() {
+      _nameErrorText = null;
+      _amountErrorText = null;
+      _unitErrorText = null;
+    });
+
+    FocusScope.of(context).unfocus();
+
+    Navigator.pop(context, ingredient);
+  }
+}

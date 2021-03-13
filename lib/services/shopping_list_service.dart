@@ -1,19 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:logging/logging.dart';
 
 import '../models/grocery.dart';
 import '../models/shopping_list.dart';
 
 class ShoppingListService {
-  ShoppingListService._();
+  static final log = Logger('ShoppingListService');
 
   static FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  static Future<void> createShoppingListWithPlanId(String planId) async {
+  ShoppingListService._();
+
+  static Future<ShoppingList> createShoppingListWithPlanId(
+      String planId) async {
+    log.finer('Call createShoppingListWithPlanId with $planId');
     final list = new ShoppingList(meals: [], planId: planId);
-    await _firestore.collection('shoppinglists').add(list.toMap());
+
+    final id = new DateTime.now().microsecondsSinceEpoch.toString();
+    await _firestore.collection('plans').doc(id).set(list.toMap());
+    list.id = id;
+
+    return list;
   }
 
   static Future<ShoppingList> getShoppingListByPlanId(String planId) async {
+    log.finer('Call getShoppingListByPlanId with $planId');
     final snaps = await _firestore
         .collection('shoppinglists')
         .where('planId', isEqualTo: planId)
@@ -24,6 +35,7 @@ class ShoppingListService {
   }
 
   static Stream<List<Grocery>> streamShoppingList(String listId) {
+    log.finer('Call streamShoppingList with $listId');
     return _firestore
         .collection('shoppinglists')
         .doc(listId)
@@ -34,6 +46,8 @@ class ShoppingListService {
   }
 
   static Future<void> updateGrocery(String listId, Grocery grocery) async {
+    log.finer(
+        'Call updateGrocery with listId: $listId | Grocery: ${grocery.toMap()}');
     return _firestore
         .collection('shoppinglists')
         .doc(listId)
@@ -43,6 +57,8 @@ class ShoppingListService {
   }
 
   static Future<void> addGrocery(String listId, Grocery grocery) async {
+    log.finer(
+        'Call addGrocery with listId: $listId | Grocery: ${grocery.toMap()}');
     return _firestore
         .collection('shoppinglists')
         .doc(listId)
@@ -51,6 +67,8 @@ class ShoppingListService {
   }
 
   static Future<void> deleteGrocery(String listId, String groceryId) async {
+    log.finer(
+        'Call deleteGrocery with listId: $listId | groceryId: $groceryId');
     return _firestore
         .collection('shoppinglists')
         .doc(listId)
@@ -60,12 +78,16 @@ class ShoppingListService {
   }
 
   static Future<void> deleteAllBoughtGrocery(String listId) async {
+    log.finer('Call deleteAllBoughtGrocery with $listId');
     final snaps = await _firestore
         .collection('shoppinglists')
         .doc(listId)
         .collection('groceries')
         .where('bought', isEqualTo: true)
         .get();
+
+    log.finest(
+        'deleteAllBoughtGrocery: Query results: ${snaps.docs.toString()}');
 
     return Future.wait(
         snaps.docs.map((e) => deleteGrocery(listId, e.id)).toList());

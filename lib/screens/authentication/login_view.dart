@@ -229,20 +229,21 @@ class _LoginViewState extends State<LoginView> {
         _buttonState = ButtonState.inProgress;
       });
 
-      String userId;
-      final plan = widget.isCreatingPlan
-          ? await PlanService.createPlan()
-          : await PlanService.getPlanById(widget.plan.id);
-
       try {
-        userId = _isRegistering
+        final String userId = _isRegistering
             ? await AuthenticationService.registerUser(
                 _emailController.text, _passwordController.text)
             : await AuthenticationService.signInUser(
                 _emailController.text, _passwordController.text);
 
-        plan.users.add(userId);
-        await PlanService.updatePlan(plan);
+        final Plan plan = widget.isCreatingPlan
+            ? await PlanService.createPlan()
+            : await PlanService.getPlanById(widget.plan.id);
+
+        if (!plan.users.contains(userId)) {
+          plan.users.add(userId);
+          await PlanService.updatePlan(plan);
+        }
 
         if (_isRegistering) {
           await FoodlyUserService.createUserWithId(userId);

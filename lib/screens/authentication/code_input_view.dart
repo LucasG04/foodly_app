@@ -159,7 +159,7 @@ class _CodeInputViewState extends State<CodeInputView> {
 
       // Check code
       try {
-        final plan = await PlanService.getPlanByCode(text);
+        final plan = await PlanService.getPlanByCode(text, withMeals: false);
         widget.onPageChange(plan.id);
       } catch (e) {
         print(e);

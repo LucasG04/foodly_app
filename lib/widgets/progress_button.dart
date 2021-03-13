@@ -217,7 +217,7 @@ class _ProgressButtonState extends State<ProgressButton>
       builder: (context, child) {
         return InkWell(
           onTap: widget.buttonState == ButtonState.inProgress
-              ? () {}
+              ? null
               : widget.onPressed,
           borderRadius: borderRadius,
           child: Ink(

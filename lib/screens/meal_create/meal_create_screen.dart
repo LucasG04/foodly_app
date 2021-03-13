@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route_annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodly/providers/state_providers.dart';
+import 'package:foodly/screens/meal_create/edit_ingredients.dart';
 import 'package:foodly/services/authentication_service.dart';
 import 'package:foodly/widgets/full_screen_loader.dart';
 
@@ -30,6 +31,7 @@ class MealCreateScreen extends StatefulWidget {
 
 class _MealCreateScreenState extends State<MealCreateScreen> {
   bool _isLoadingMeal;
+  bool _isCreatingMeal;
 
   Meal _meal = new Meal();
   TextEditingController _titleController;
@@ -43,12 +45,15 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   void initState() {
     if (widget.id == 'create') {
       _isLoadingMeal = false;
+      _isCreatingMeal = true;
       _titleController = new TextEditingController();
       _urlController = new TextEditingController();
       _sourceController = new TextEditingController();
       _durationController = new TextEditingController();
+      _meal.ingredients = [];
     } else {
       _isLoadingMeal = true;
+      _isCreatingMeal = false;
       MealService.getMealById(widget.id).then((meal) {
         _meal = meal;
         _titleController = new TextEditingController(text: meal.name);
@@ -56,6 +61,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         _sourceController = new TextEditingController(text: meal.source);
         _durationController =
             new TextEditingController(text: meal.duration.toString());
+        _meal.ingredients = _meal.ingredients ?? [];
 
         setState(() {
           _isLoadingMeal = false;
@@ -97,15 +103,17 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                       ),
                       Divider(),
                       _isLoadingMeal
-                          ? EditListContent(
+                          ? EditIngredients(
                               key: UniqueKey(),
                               content: [],
                               onChanged: null,
                               title: 'Zutaten:',
                             )
-                          : EditListContent(
+                          : EditIngredients(
                               content: _meal.ingredients ?? [],
-                              onChanged: (list) => _meal.ingredients = list,
+                              onChanged: (results) {
+                                _meal.ingredients = results;
+                              },
                               title: 'Zutaten:',
                             ),
                       Divider(),
@@ -150,12 +158,12 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                           ),
                         ],
                       ),
-                      // Divider(),
-                      // EditListContent(
-                      //   content: _meal.ingredients,
-                      //   onChanged: (list) => _meal.ingredients = list,
-                      //   title: 'Tags:',
-                      // ),
+                      Divider(),
+                      EditListContent(
+                        content: _meal.tags,
+                        onChanged: (list) => _meal.tags = list,
+                        title: 'Kategorien:',
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: kPadding),
                         child: MainButton(
@@ -185,14 +193,14 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     _meal.name = _titleController.text;
     _meal.imageUrl = _urlController.text;
     _meal.source = _sourceController.text;
-    _meal.duration = int.tryParse(_titleController.text) ?? 0;
-    _meal.createdBy = widget.id.isEmpty
+    _meal.duration = double.tryParse(_durationController.text) ?? 0;
+    _meal.createdBy = _isCreatingMeal
         ? AuthenticationService.currentUser.uid
         : _meal.createdBy;
 
     if (_formIsValid()) {
       try {
-        final newMeal = widget.id.isEmpty
+        final newMeal = _isCreatingMeal
             ? await MealService.createMeal(_meal)
             : await MealService.updateMeal(_meal);
         _buttonState = ButtonState.normal;
@@ -207,7 +215,6 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         _buttonState = ButtonState.error;
       }
     } else {
-      print('Form invalid');
       MainSnackbar(
         message: 'Bitte vergib einen Namen und mindestens eine Zutat.',
         isError: true,

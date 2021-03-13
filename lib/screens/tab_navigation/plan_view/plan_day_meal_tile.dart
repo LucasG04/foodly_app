@@ -217,7 +217,13 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
       final listId =
           (await ShoppingListService.getShoppingListByPlanId(planId)).id;
       for (var ingredient in meal.ingredients) {
-        ShoppingListService.addGrocery(listId, new Grocery(name: ingredient));
+        ShoppingListService.addGrocery(
+          listId,
+          new Grocery(
+            name: ingredient.name,
+            amount: '${ingredient.amount} ${ingredient.unit}',
+          ),
+        );
       }
     }
   }

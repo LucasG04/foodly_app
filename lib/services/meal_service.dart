@@ -1,15 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
+import 'package:logging/logging.dart';
 
 import '../models/meal.dart';
 import '../utils/secrets.dart';
 
 class MealService {
-  MealService._();
+  static final log = Logger('MealService');
 
   static FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  MealService._();
+
   static Future<List<Meal>> getMeals([int count = 10]) async {
+    log.finer('Call getMeals with $count');
     final docs = await _firestore.collection('meals').limit(count).get();
 
     List<Meal> meals = [];
@@ -20,17 +24,19 @@ class MealService {
   }
 
   static Future<Meal> getMealById(String mealId) async {
+    log.finer('Call getMeals with $mealId');
     try {
       final doc = await _firestore.collection('meals').doc(mealId).get();
 
       return Meal.fromMap(doc.id, doc.data());
     } catch (e) {
-      print(e);
+      log.severe('ERR: getMeals with $mealId', e);
       return null;
     }
   }
 
   static Future<List<Meal>> getAllMeals(String planId) async {
+    log.finer('Call getAllMeals with $planId');
     List<Meal> meals = [];
     try {
       final snapsInPlan = await _firestore
@@ -52,13 +58,14 @@ class MealService {
         meals.add(Meal.fromMap(snap.id, snap.data()));
       }
     } catch (e) {
-      print(e);
+      log.severe('ERR: getAllMeals with $planId', e);
     }
 
     return meals;
   }
 
   static Stream<List<Meal>> streamPlanMeals(String planId) {
+    log.finer('Call streamPlanMeals with $planId');
     return _firestore
         .collection('meals')
         .where('planId', isEqualTo: planId)
@@ -68,6 +75,7 @@ class MealService {
   }
 
   static Stream<List<Meal>> streamPublicMeals() {
+    log.finer('Call streamPublicMeals');
     return _firestore
         .collection('meals')
         .where('isPublic', isEqualTo: true)
@@ -77,44 +85,53 @@ class MealService {
   }
 
   static Future<Meal> createMeal(Meal meal) async {
+    log.finer('Call createMeal with ${meal.toMap()}');
     if (meal.imageUrl == null || meal.imageUrl.isEmpty) {
       try {
         meal.imageUrl = (await _getMealPhotos(meal.name))[0] ?? '';
+        log.finest('createMeal: Generated image: ${meal.imageUrl}');
       } catch (e) {
-        print('Failed to create image:');
-        print(e);
+        log.severe('ERR: _getMealPhotos in createMeal with ${meal.name}', e);
       }
     }
 
     try {
-      final doc = await _firestore.collection('meals').add(meal.toMap());
-      meal.id = doc.id;
+      final id = new DateTime.now().microsecondsSinceEpoch.toString();
+      await _firestore.collection('meals').doc(id).set(meal.toMap());
+      meal.id = id;
 
       return meal;
     } catch (e) {
-      print(e);
+      log.severe('ERR: createMeal with ${meal.toMap()}', e);
       return null;
     }
   }
 
   static Future<Meal> updateMeal(Meal meal) async {
+    log.finer('Call updateMeal with ${meal.toMap()}');
     try {
       await _firestore.collection('meals').doc(meal.id).update(meal.toMap());
       return meal;
     } catch (e) {
-      print(e);
+      log.severe('ERR: updateMeal with ${meal.toMap()}', e);
       return null;
     }
   }
 
   static Future<void> addMeals(String planId, List<Meal> meals) async {
+    log.finer(
+        'Call addMeals with PlanId: $planId | Meals: ${meals.toString()}');
     try {
       meals.forEach((meal) => meal.planId = planId);
       await Future.wait(
-        meals.map((meal) => _firestore.collection('meals').add(meal.toMap())),
+        meals.map((meal) {
+          final id = new DateTime.now().microsecondsSinceEpoch.toString();
+          return _firestore.collection('meals').doc(id).set(meal.toMap());
+        }),
       );
     } catch (e) {
-      print(e);
+      log.severe(
+          'ERR: addMeals with PlanId: $planId | Meals: ${meals.toString()}', e);
     }
   }
 

@@ -10,6 +10,7 @@ import 'package:foodly/services/foodly_user_service.dart';
 import 'package:foodly/services/meal_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:async/async.dart';
+import 'package:logging/logging.dart';
 import 'app_router.gr.dart';
 import 'models/meal.dart';
 import 'models/plan.dart';
@@ -28,18 +29,29 @@ class FoodlyApp extends StatefulWidget {
 }
 
 class _FoodlyAppState extends State<FoodlyApp> {
-  StreamSubscription<List<List<Meal>>> mealsStream;
+  StreamSubscription<List<List<Meal>>> _mealsStream;
+  StreamSubscription<LogRecord> _logStream;
+
+  @override
+  void initState() {
+    initializeDateFormatting();
+    Logger.root.level = Level.ALL; // defaults to Level.INFO
+    Logger.root.onRecord.listen((record) {
+      print('${record.level.name}: ${record.loggerName}: ${record.message}');
+    });
+
+    super.initState();
+  }
 
   @override
   void dispose() {
-    mealsStream.cancel();
+    _mealsStream.cancel();
+    _logStream.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    initializeDateFormatting();
-
     return StreamBuilder(
       stream: AuthenticationService.authenticationStream(),
       builder: (context, snapshot) {
@@ -99,8 +111,8 @@ class _FoodlyAppState extends State<FoodlyApp> {
   }
 
   void _streamMeals() {
-    if (mealsStream == null) {
-      mealsStream = StreamZip([
+    if (_mealsStream == null) {
+      _mealsStream = StreamZip([
         MealService.streamPlanMeals(context.read(planProvider).state.id),
         MealService.streamPublicMeals()
       ]).listen((lists) {

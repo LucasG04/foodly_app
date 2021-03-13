@@ -1,10 +1,12 @@
+import 'package:foodly/models/ingredient.dart';
+
 class Meal {
   String id;
   String name;
   String source;
   String instruction;
   int duration;
-  List<String> ingredients;
+  List<Ingredient> ingredients;
   List<String> tags;
   String imageUrl;
   String planId;
@@ -31,7 +33,7 @@ class Meal {
       'source': source,
       'instruction': instruction,
       'duration': duration,
-      'ingredients': ingredients,
+      'ingredients': ingredients?.map((x) => x.toMap())?.toList(),
       'tags': tags,
       'imageUrl': imageUrl,
       'planId': planId,
@@ -43,6 +45,8 @@ class Meal {
   factory Meal.fromMap(String id, Map<String, dynamic> map) {
     if (map == null) return null;
 
+    print('map ${id} ${map.toString()}');
+
     return Meal(
       id: id,
       name: map['name'],
@@ -50,7 +54,8 @@ class Meal {
       instruction: map['instruction'],
       imageUrl: map['imageUrl'],
       duration: int.tryParse(map['duration'].toString()) ?? 0,
-      ingredients: List<String>.from(map['ingredients'] ?? []),
+      ingredients: List<Ingredient>.from(
+          map['ingredients']?.map((x) => Ingredient.fromMap(x))),
       tags: List<String>.from(map['tags'] ?? []),
       planId: map['planId'],
       createdBy: map['createdBy'],
