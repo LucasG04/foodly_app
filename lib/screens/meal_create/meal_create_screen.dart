@@ -1,8 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:auto_route/auto_route_annotations.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodly/providers/state_providers.dart';
+import 'package:foodly/screens/meal_create/chefkoch_import_modal.dart';
 import 'package:foodly/screens/meal_create/edit_ingredients.dart';
 import 'package:foodly/services/authentication_service.dart';
 import 'package:foodly/widgets/full_screen_loader.dart';
@@ -15,7 +17,6 @@ import '../../utils/main_snackbar.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/markdown_editor.dart';
-import '../../widgets/page_title.dart';
 import '../../widgets/progress_button.dart';
 import 'edit_list_content.dart';
 
@@ -88,6 +89,15 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
       appBar: MainAppBar(
         text: 'Gericht erstellen',
         scrollController: _scrollController,
+        actions: [
+          IconButton(
+            icon: Icon(
+              EvaIcons.downloadOutline,
+              color: Theme.of(context).textTheme.bodyText1.color,
+            ),
+            onPressed: () => _openChefkochImport(),
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -197,7 +207,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     _meal.name = _titleController.text;
     _meal.imageUrl = _urlController.text;
     _meal.source = _sourceController.text;
-    _meal.duration = double.tryParse(_durationController.text) ?? 0;
+    _meal.duration = int.tryParse(_durationController.text) ?? 0;
     _meal.createdBy = _isCreatingMeal
         ? AuthenticationService.currentUser.uid
         : _meal.createdBy;
@@ -232,5 +242,33 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
 
   bool _formIsValid() {
     return _titleController.text.isNotEmpty && _meal.ingredients.isNotEmpty;
+  }
+
+  void _openChefkochImport() async {
+    final result = await showModalBottomSheet<Meal>(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(10.0),
+        ),
+      ),
+      isScrollControlled: true,
+      context: context,
+      builder: (_) => ChefkochImportModal(),
+    );
+
+    if (result != null) {
+      print(result.ingredients);
+      print(result.toMap());
+      print(result.instruction);
+      setState(() {
+        _titleController.text = result.name;
+        _urlController.text = result.imageUrl;
+        _sourceController.text = result.source;
+        _durationController.text = result.duration.toString();
+        _meal.ingredients = result.ingredients ?? [];
+        _meal.instruction = result.instruction;
+        _meal.tags = result.tags;
+      });
+    }
   }
 }

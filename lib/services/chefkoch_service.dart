@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:foodly/models/ingredient.dart';
 import 'package:foodly/models/meal.dart';
 
-class MealService {
-  MealService._();
+class ChefkochService {
+  ChefkochService._();
 
   static String _chefkochRecipeEndpoint = 'https://api.chefkoch.de/v2/recipes';
   static Dio _dio = new Dio();
@@ -16,13 +16,13 @@ class MealService {
       Meal meal = Meal();
       meal.name = response.data['title'];
       meal.source = 'Chefkoch';
-      meal.instruction = response.data['instructions'];
-      meal.tags = (response.data['tags'] as List<String>)
-          .where((tag) => tag.isNotEmpty)
-          .toList();
+      meal.instruction = response.data['instructions'].replaceAll('\n', ' ');
+      // meal.tags = (response.data['tags'] as List<String>)
+      //     .where((tag) => tag.isNotEmpty)
+      //     .toList();
       meal.duration = response.data['totalTime'];
       meal.ingredients = _filterIngredientsFromChefkochIngredientGroups(
-          response.data['ingredientGroups']);
+          response.data['ingredientGroups'][0]);
       meal.imageUrl = await _getImageUrlByRecipeId(recipeId);
 
       return meal;
@@ -39,8 +39,8 @@ class MealService {
 
   static List<Ingredient> _filterIngredientsFromChefkochIngredientGroups(
       Map<String, dynamic> ingredientGroups) {
-    return (ingredientGroups['ingredients'] as List<Map<String, dynamic>>)
-        .map((e) => Ingredient(
+    return List<Map<String, dynamic>>.from(ingredientGroups['ingredients'])
+        .map((Map<String, dynamic> e) => Ingredient(
               name: e['name'],
               amount: e['amount'],
               unit: e['unit'],

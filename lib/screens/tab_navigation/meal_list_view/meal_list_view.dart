@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodly/providers/state_providers.dart';
-import 'package:foodly/widgets/small_circular_progress_indicator.dart';
 import 'package:group_list_view/group_list_view.dart';
 
 import '../../../constants.dart';
 import '../../../models/meal.dart';
-import '../../../services/meal_service.dart';
 import 'meal_list_tile.dart';
 import 'meal_list_title.dart';
 

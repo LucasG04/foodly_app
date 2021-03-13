@@ -116,6 +116,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
         MealService.streamPlanMeals(context.read(planProvider).state.id),
         MealService.streamPublicMeals()
       ]).listen((lists) {
+        print('lists update');
         var allSnaps = [...lists[0], ...lists[1]];
         allSnaps = [
           ...{...allSnaps}

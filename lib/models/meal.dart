@@ -45,8 +45,6 @@ class Meal {
   factory Meal.fromMap(String id, Map<String, dynamic> map) {
     if (map == null) return null;
 
-    print('map ${id} ${map.toString()}');
-
     return Meal(
       id: id,
       name: map['name'],
