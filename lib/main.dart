@@ -71,6 +71,8 @@ class _FoodlyAppState extends State<FoodlyApp> {
           return Consumer(
             builder: (context, watch, _) {
               watch(planProvider);
+              _log.finer(
+                  'PlanProvider Update', context.read(planProvider).state?.id);
 
               if (context.read(planProvider).state != null) {
                 _streamMeals();
@@ -99,7 +101,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
     );
   }
 
-  Future _loadActivePlan(BuildContext context) async {
+  Future<void> _loadActivePlan(BuildContext context) async {
     final currentPlan = context.read(planProvider).state;
     if (currentPlan == null) {
       String planId = await PlanService.getCurrentPlanId();
@@ -111,7 +113,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
     }
   }
 
-  Future _loadActiveUser(BuildContext context) async {
+  Future<void> _loadActiveUser(BuildContext context) async {
     final firebaseUser = AuthenticationService.currentUser;
     if (firebaseUser != null) {
       FoodlyUser user = await FoodlyUserService.getUserById(firebaseUser.uid);

@@ -9,10 +9,11 @@ class FoodlyUserService {
 
   FoodlyUserService._();
 
-  static Future<void> createUserWithId(String userId) {
+  static Future<FoodlyUser> createUserWithId(String userId) async {
     log.finer('Call createUserWithId with $userId');
     final user = new FoodlyUser(id: userId, oldPlans: []);
-    return _firestore.collection('users').doc(userId).set(user.toMap());
+    await _firestore.collection('users').doc(userId).set(user.toMap());
+    return user;
   }
 
   static Future<FoodlyUser> getUserById(String userId) async {

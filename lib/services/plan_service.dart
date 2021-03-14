@@ -18,7 +18,6 @@ class PlanService {
   PlanService._();
 
   static Future<String> getCurrentPlanId() async {
-    // return ProviderContainer().read(planProvider).state.id;
     log.finer(
         'Call getCurrentPlanId for User: ${AuthenticationService.currentUser}');
     if (AuthenticationService.currentUser == null) return '';
@@ -64,7 +63,7 @@ class PlanService {
         .map((snap) => Plan.fromMap(snap.id, snap.data()));
   }
 
-  static Future<Plan> createPlan() async {
+  static Future<Plan> createPlan(String name) async {
     log.finer('Call createPlan');
     String code = _generateCode().toString();
     while ((await getPlanById(code)) != null) {
@@ -76,7 +75,7 @@ class PlanService {
     final plan = new Plan(
       code: code,
       hourDiffToUtc: now.differenceTimeZoneOffset(now.toUtc()).inHours,
-      name: '',
+      name: name,
       users: [],
     );
     log.finest('createPlan: Plan is: ${plan.toMap()}');

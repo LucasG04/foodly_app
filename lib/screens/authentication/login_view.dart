@@ -3,9 +3,13 @@ import 'package:email_validator/email_validator.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodly/models/foodly_user.dart';
 import 'package:foodly/models/plan.dart';
+import 'package:foodly/providers/state_providers.dart';
 import 'package:foodly/screens/authentication/reset_password_modal.dart';
 import 'package:foodly/services/foodly_user_service.dart';
+import 'package:foodly/utils/basic_utils.dart';
 import 'package:foodly/widgets/toggle_tab/flutter_toggle_tab.dart';
 
 import '../../app_router.gr.dart';
@@ -68,7 +72,6 @@ class _LoginViewState extends State<LoginView> {
           SizedBox(height: kPadding + MediaQuery.of(context).padding.top),
           FlutterToggleTab(
             width: 80,
-            // width: contentWidth * 0.6 > 250 ? 250 : contentWidth * 0.6,
             borderRadius: 15,
             initialIndex: 0,
             selectedTextStyle: TextStyle(
@@ -82,7 +85,6 @@ class _LoginViewState extends State<LoginView> {
               fontWeight: FontWeight.w400,
             ),
             labels: ['Registrieren', 'Anmelden'],
-            // icons: [Icons.person,Icons.pregnant_woman],
             selectedLabelIndex: (index) {
               setState(() {
                 _isRegistering = index == 0;
@@ -230,6 +232,8 @@ class _LoginViewState extends State<LoginView> {
       });
 
       try {
+        BasicUtils.clearAllProvider(context);
+
         final String userId = _isRegistering
             ? await AuthenticationService.registerUser(
                 _emailController.text, _passwordController.text)
@@ -237,7 +241,7 @@ class _LoginViewState extends State<LoginView> {
                 _emailController.text, _passwordController.text);
 
         final Plan plan = widget.isCreatingPlan
-            ? await PlanService.createPlan()
+            ? await PlanService.createPlan(widget.plan.name)
             : await PlanService.getPlanById(widget.plan.id);
 
         if (!plan.users.contains(userId)) {
@@ -245,11 +249,18 @@ class _LoginViewState extends State<LoginView> {
           await PlanService.updatePlan(plan);
         }
 
+        FoodlyUser foodlyUser;
         if (_isRegistering) {
-          await FoodlyUserService.createUserWithId(userId);
+          foodlyUser = await FoodlyUserService.createUserWithId(userId);
+        } else {
+          foodlyUser = await FoodlyUserService.getUserById(userId);
         }
 
+        foodlyUser.oldPlans.add(plan.id);
         await FoodlyUserService.addOldPlanIdToUser(userId, plan.id);
+
+        context.read(planProvider).state = plan;
+        context.read(userProvider).state = foodlyUser;
 
         setState(() {
           _buttonState = ButtonState.normal;

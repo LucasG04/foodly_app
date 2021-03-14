@@ -17,7 +17,6 @@ class EditIngredients extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(content.length);
     return Column(
       children: [
         Container(

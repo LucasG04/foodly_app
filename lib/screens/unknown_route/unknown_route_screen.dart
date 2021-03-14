@@ -1,4 +1,6 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:foodly/app_router.gr.dart';
 
 class UnknownRouteScreen extends StatelessWidget {
   @override
@@ -35,6 +37,7 @@ class UnknownRouteScreen extends StatelessWidget {
   }
 
   void _navigateToHome() {
-    print('back');
+    ExtendedNavigator.root
+        .pushAndRemoveUntil(Routes.homeScreen, (route) => route.isFirst);
   }
 }

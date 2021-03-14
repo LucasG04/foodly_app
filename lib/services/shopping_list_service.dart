@@ -17,7 +17,7 @@ class ShoppingListService {
     final list = new ShoppingList(meals: [], planId: planId);
 
     final id = new DateTime.now().microsecondsSinceEpoch.toString();
-    await _firestore.collection('plans').doc(id).set(list.toMap());
+    await _firestore.collection('shoppinglists').doc(id).set(list.toMap());
     list.id = id;
 
     return list;

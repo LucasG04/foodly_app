@@ -30,103 +30,117 @@ class _ShoppingListViewState extends State<ShoppingListView>
     super.build(context);
     return Consumer(
       builder: (context, watch, child) {
-        final planId = watch(planProvider).state.id;
-        return FutureBuilder<ShoppingList>(
-          future: ShoppingListService.getShoppingListByPlanId(planId),
-          builder: (_, shoppingListSnap) {
-            if (shoppingListSnap.hasData) {
-              final listId = shoppingListSnap.data.id;
-              return StreamBuilder<List<Grocery>>(
-                stream: ShoppingListService.streamShoppingList(listId),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    final List<Grocery> todoItems =
-                        snapshot.data.where((e) => !e.bought).toList();
-                    final List<Grocery> boughtItems =
-                        snapshot.data.where((e) => e.bought).toList();
+        final planId = watch(planProvider).state?.id;
+        return planId != null
+            ? FutureBuilder<ShoppingList>(
+                future: ShoppingListService.getShoppingListByPlanId(planId),
+                builder: (_, shoppingListSnap) {
+                  if (shoppingListSnap.hasData) {
+                    final listId = shoppingListSnap.data.id;
+                    return StreamBuilder<List<Grocery>>(
+                      stream: ShoppingListService.streamShoppingList(listId),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          final List<Grocery> todoItems =
+                              snapshot.data.where((e) => !e.bought).toList();
+                          final List<Grocery> boughtItems =
+                              snapshot.data.where((e) => e.bought).toList();
 
-                    return SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          SizedBox(height: kPadding),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 5.0),
-                            child: PageTitle(
-                              text: 'Einkaufsliste',
-                              actions: [
-                                IconButton(
-                                  icon: Icon(EvaIcons.plusCircleOutline),
-                                  onPressed: () => _editGrocery(listId),
-                                  splashRadius: 25.0,
-                                )
+                          return SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                SizedBox(height: kPadding),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 5.0),
+                                  child: PageTitle(
+                                    text: 'Einkaufsliste',
+                                    actions: [
+                                      IconButton(
+                                        icon: Icon(EvaIcons.plusCircleOutline),
+                                        onPressed: () => _editGrocery(listId),
+                                        splashRadius: 25.0,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                AnimatedShoppingList(
+                                  groceries: todoItems,
+                                  onEdit: (e) => _editGrocery(listId, e),
+                                  onTap: (item) {
+                                    item.bought = true;
+                                    ShoppingListService.updateGrocery(
+                                        listId, item);
+                                  },
+                                  onDelete: (item) {
+                                    ShoppingListService.deleteGrocery(
+                                        listId, item.id);
+                                  },
+                                ),
+                                SizedBox(height: kPadding),
+                                ExpansionTile(
+                                  title: Text(
+                                    'BEREITS GEKAUFT',
+                                    style: TextStyle(
+                                      color: Theme.of(context).primaryColor,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  children: [
+                                    AnimatedShoppingList(
+                                      groceries: boughtItems,
+                                      onEdit: (e) => _editGrocery(listId, e),
+                                      onTap: (item) {
+                                        item.bought = false;
+                                        ShoppingListService.updateGrocery(
+                                            listId, item);
+                                      },
+                                      onDelete: (item) {
+                                        ShoppingListService.deleteGrocery(
+                                            listId, item.id);
+                                      },
+                                    ),
+                                    boughtItems.length > 0
+                                        ? Center(
+                                            child: TextButton(
+                                              onPressed: () =>
+                                                  ShoppingListService
+                                                      .deleteAllBoughtGrocery(
+                                                          listId),
+                                              child: Text(
+                                                'Alle entfernen',
+                                                style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .errorColor,
+                                                ),
+                                              ),
+                                              style: ButtonStyle(
+                                                shadowColor:
+                                                    MaterialStateProperty.all<
+                                                        Color>(
+                                                  Theme.of(context).errorColor,
+                                                ),
+                                                overlayColor:
+                                                    MaterialStateProperty.all<
+                                                        Color>(
+                                                  Theme.of(context)
+                                                      .errorColor
+                                                      .withOpacity(0.1),
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        : SizedBox(),
+                                  ],
+                                ),
                               ],
                             ),
-                          ),
-                          AnimatedShoppingList(
-                            groceries: todoItems,
-                            onEdit: (e) => _editGrocery(listId, e),
-                            onTap: (item) {
-                              item.bought = true;
-                              ShoppingListService.updateGrocery(listId, item);
-                            },
-                            onDelete: (item) {
-                              ShoppingListService.deleteGrocery(
-                                  listId, item.id);
-                            },
-                          ),
-                          SizedBox(height: kPadding),
-                          ExpansionTile(
-                            title: Text(
-                              'BEREITS GEKAUFT',
-                              style: TextStyle(
-                                color: Theme.of(context).primaryColor,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            children: [
-                              AnimatedShoppingList(
-                                groceries: boughtItems,
-                                onEdit: (e) => _editGrocery(listId, e),
-                                onTap: (item) {
-                                  item.bought = false;
-                                  ShoppingListService.updateGrocery(
-                                      listId, item);
-                                },
-                                onDelete: (item) {
-                                  ShoppingListService.deleteGrocery(
-                                      listId, item.id);
-                                },
-                              ),
-                              boughtItems.length > 0
-                                  ? Center(
-                                      child: TextButton(
-                                        onPressed: () => ShoppingListService
-                                            .deleteAllBoughtGrocery(listId),
-                                        child: Text(
-                                          'Alle entfernen',
-                                          style: TextStyle(
-                                            color: Theme.of(context).errorColor,
-                                          ),
-                                        ),
-                                        style: ButtonStyle(
-                                          shadowColor:
-                                              MaterialStateProperty.all<Color>(
-                                            Theme.of(context).errorColor,
-                                          ),
-                                          overlayColor:
-                                              MaterialStateProperty.all<Color>(
-                                            Theme.of(context)
-                                                .errorColor
-                                                .withOpacity(0.1),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  : SizedBox(),
-                            ],
-                          ),
-                        ],
-                      ),
+                          );
+                        } else {
+                          return Center(
+                            child: SmallCircularProgressIndicator(),
+                          );
+                        }
+                      },
                     );
                   } else {
                     return Center(
@@ -134,14 +148,8 @@ class _ShoppingListViewState extends State<ShoppingListView>
                     );
                   }
                 },
-              );
-            } else {
-              return Center(
-                child: SmallCircularProgressIndicator(),
-              );
-            }
-          },
-        );
+              )
+            : Center(child: SmallCircularProgressIndicator());
       },
     );
   }

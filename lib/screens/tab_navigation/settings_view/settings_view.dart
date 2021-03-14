@@ -6,7 +6,9 @@ import 'package:foodly/screens/tab_navigation/settings_view/import_meals_modal.d
 import 'package:foodly/screens/tab_navigation/settings_view/settings_tile.dart';
 import 'package:foodly/services/authentication_service.dart';
 import 'package:foodly/services/plan_service.dart';
+import 'package:foodly/utils/basic_utils.dart';
 import 'package:foodly/widgets/page_title.dart';
+import 'package:foodly/widgets/small_circular_progress_indicator.dart';
 import 'package:share/share.dart';
 
 import '../../../constants.dart';
@@ -16,50 +18,54 @@ class SettingsView extends ConsumerWidget {
   Widget build(BuildContext context, watch) {
     final plan = watch(planProvider).state;
     final foodlyUser = watch(userProvider).state;
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(height: kPadding),
-          PageTitle(text: 'Einstellungen'),
-          _buildSectionTitle('Plan'),
-          _buildSection([
-            SettingsTile(
-              onTap: () => _shareCode(plan.code),
-              leadingIcon: EvaIcons.shareOutline,
-              text: 'Plan teilen (${plan.code})',
-              trailing: Icon(EvaIcons.arrowIosForwardOutline),
-            ),
-            SettingsTile(
-              onTap: () => _leavePlan(plan.id),
-              leadingIcon: EvaIcons.closeCircleOutline,
-              text: 'Plan verlassen',
-              trailing: Icon(
-                EvaIcons.arrowIosForwardOutline,
-                color: Colors.red,
-              ),
-              color: Colors.red,
-            ),
-          ], context),
-          foodlyUser != null && foodlyUser.oldPlans.length > 1
-              ? _buildSectionTitle('Gerichte')
-              : SizedBox(),
-          foodlyUser != null && foodlyUser.oldPlans.length > 1
-              ? _buildSection([
+    return plan != null && foodlyUser != null
+        ? SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: kPadding),
+                PageTitle(text: 'Einstellungen'),
+                _buildSectionTitle('Plan'),
+                _buildSection([
                   SettingsTile(
-                    onTap: () => _importMeals(
-                      foodlyUser.oldPlans.where((id) => id != plan.id).toList(),
-                      context,
-                    ),
-                    leadingIcon: EvaIcons.downloadOutline,
-                    text: 'Alte Gerichte importieren',
+                    onTap: () => _shareCode(plan.code),
+                    leadingIcon: EvaIcons.shareOutline,
+                    text: 'Plan teilen (${plan.code})',
                     trailing: Icon(EvaIcons.arrowIosForwardOutline),
                   ),
-                ], context)
-              : SizedBox(),
-        ],
-      ),
-    );
+                  SettingsTile(
+                    onTap: () => _leavePlan(plan.id, context),
+                    leadingIcon: EvaIcons.closeCircleOutline,
+                    text: 'Plan verlassen',
+                    trailing: Icon(
+                      EvaIcons.arrowIosForwardOutline,
+                      color: Colors.red,
+                    ),
+                    color: Colors.red,
+                  ),
+                ], context),
+                foodlyUser != null && foodlyUser.oldPlans.length > 1
+                    ? _buildSectionTitle('Gerichte')
+                    : SizedBox(),
+                foodlyUser != null && foodlyUser.oldPlans.length > 1
+                    ? _buildSection([
+                        SettingsTile(
+                          onTap: () => _importMeals(
+                            foodlyUser.oldPlans
+                                .where((id) => id != plan.id)
+                                .toList(),
+                            context,
+                          ),
+                          leadingIcon: EvaIcons.downloadOutline,
+                          text: 'Alte Gerichte importieren',
+                          trailing: Icon(EvaIcons.arrowIosForwardOutline),
+                        ),
+                      ], context)
+                    : SizedBox(),
+              ],
+            ),
+          )
+        : Center(child: SmallCircularProgressIndicator());
   }
 
   Widget _buildSection(List<Widget> widgets, BuildContext context) {
@@ -103,10 +109,11 @@ class SettingsView extends ConsumerWidget {
     Share.share('Tritt meinem Essensplan bei Foodly mit dem Code "$code" bei.');
   }
 
-  void _leavePlan(String planId) async {
+  void _leavePlan(String planId, context) async {
     String userId = AuthenticationService.currentUser.uid;
     await PlanService.leavePlan(planId, userId);
     AuthenticationService.signOut();
+    BasicUtils.clearAllProvider(context);
   }
 
   void _importMeals(List<String> planIds, context) async {
