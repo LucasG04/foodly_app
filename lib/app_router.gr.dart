@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/cupertino.dart';
 
 import 'screens/authentication/authentication_screen.dart';
 import 'screens/meal/meal_screen.dart';
@@ -49,19 +50,19 @@ class AppRouter extends RouterBase {
   Map<Type, AutoRouteFactory> get pagesMap => _pagesMap;
   final _pagesMap = <Type, AutoRouteFactory>{
     HomeScreen: (data) {
-      return buildAdaptivePageRoute<dynamic>(
+      return CupertinoPageRoute<dynamic>(
         builder: (context) => HomeScreen(),
         settings: data,
       );
     },
     AuthenticationScreen: (data) {
-      return buildAdaptivePageRoute<dynamic>(
+      return CupertinoPageRoute<dynamic>(
         builder: (context) => AuthenticationScreen(),
         settings: data,
       );
     },
     MealSelectScreen: (data) {
-      return buildAdaptivePageRoute<dynamic>(
+      return CupertinoPageRoute<dynamic>(
         builder: (context) => MealSelectScreen(
           dateString: data.queryParams['date'].stringValue,
           isLunchString: data.queryParams['isLunch'].stringValue,
@@ -70,20 +71,20 @@ class AppRouter extends RouterBase {
       );
     },
     MealCreateScreen: (data) {
-      return buildAdaptivePageRoute<dynamic>(
+      return CupertinoPageRoute<dynamic>(
         builder: (context) =>
             MealCreateScreen(id: data.pathParams['id'].stringValue),
         settings: data,
       );
     },
     MealScreen: (data) {
-      return buildAdaptivePageRoute<dynamic>(
+      return CupertinoPageRoute<dynamic>(
         builder: (context) => MealScreen(id: data.pathParams['id'].stringValue),
         settings: data,
       );
     },
     UnknownRouteScreen: (data) {
-      return buildAdaptivePageRoute<dynamic>(
+      return CupertinoPageRoute<dynamic>(
         builder: (context) => UnknownRouteScreen(),
         settings: data,
       );

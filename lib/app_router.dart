@@ -12,12 +12,12 @@ import 'screens/unknown_route/unknown_route_screen.dart';
 
 @MaterialAutoRouter(
   routes: <AutoRoute>[
-    AdaptiveRoute(page: HomeScreen, initial: true),
-    AdaptiveRoute(page: AuthenticationScreen),
-    AdaptiveRoute(page: MealSelectScreen),
-    AdaptiveRoute(path: '/meal-create/:id', page: MealCreateScreen),
-    AdaptiveRoute(path: '/meal/:id', page: MealScreen),
-    AdaptiveRoute(path: '*', page: UnknownRouteScreen),
+    CupertinoRoute(page: HomeScreen, initial: true),
+    CupertinoRoute(page: AuthenticationScreen),
+    CupertinoRoute(page: MealSelectScreen),
+    CupertinoRoute(path: '/meal-create/:id', page: MealCreateScreen),
+    CupertinoRoute(path: '/meal/:id', page: MealScreen),
+    CupertinoRoute(path: '*', page: UnknownRouteScreen),
   ],
 )
 class $AppRouter {}
