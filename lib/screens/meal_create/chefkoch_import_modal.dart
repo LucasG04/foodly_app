@@ -1,7 +1,9 @@
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:foodly/services/chefkoch_service.dart';
 import 'package:foodly/widgets/main_button.dart';
 import 'package:foodly/widgets/main_text_field.dart';
+import 'package:foodly/widgets/progress_button.dart';
 
 import '../../constants.dart';
 
@@ -15,6 +17,18 @@ class ChefkochImportModal extends StatefulWidget {
 class _ChefkochImportModalState extends State<ChefkochImportModal> {
   TextEditingController _linkController = new TextEditingController();
   String _linkErrorText;
+  bool _linkError;
+
+  ButtonState _buttonState;
+
+  @override
+  void initState() {
+    _linkController = new TextEditingController();
+    _linkErrorText = null;
+    _linkError = false;
+    _buttonState = ButtonState.normal;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,11 +61,38 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
                 'https://www.chefkoch.de/rezepte/2280941363879458/Brokkoli-Spaetzle-Pfanne.html',
             errorText: _linkErrorText,
           ),
+          _linkError
+              ? Container(
+                  margin: const EdgeInsets.only(top: kPadding),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: kPadding, vertical: kPadding / 2),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(kRadius),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        EvaIcons.alertCircleOutline,
+                        color: Theme.of(context).errorColor,
+                      ),
+                      SizedBox(width: kPadding),
+                      Expanded(
+                        child: Text(
+                          'Leider konnte für diesen Link kein Gericht auf Chefkoch gefunden werden.',
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              : SizedBox(),
           SizedBox(height: kPadding * 2),
           Center(
             child: MainButton(
               text: 'Importieren',
               onTap: _importMeal,
+              isProgress: true,
+              buttonState: _buttonState,
             ),
           ),
           SizedBox(height: kPadding * 2),
@@ -65,24 +106,27 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
 
     if (link.isEmpty) {
       setState(() {
-        _linkErrorText = 'Bitte trag einen Link ein.';
+        _buttonState = ButtonState.error;
+        _linkErrorText = 'Bitte füg einen Link ein.';
       });
       return;
     }
 
     setState(() {
-      _linkErrorText = null;
+      _linkError = false;
+      _buttonState = ButtonState.inProgress;
     });
 
     try {
       final meal = await ChefkochService.getMealFromChefkochUrl(link);
       FocusScope.of(context).unfocus();
+      _buttonState = ButtonState.normal;
       Navigator.pop(context, meal);
     } catch (e) {
       print(e);
       setState(() {
-        _linkErrorText =
-            'Leider konnte für diesen Link kein Gericht gefunden werden.';
+        _buttonState = ButtonState.error;
+        _linkError = true;
       });
     }
   }
