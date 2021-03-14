@@ -4,7 +4,7 @@ class Meal {
   String id;
   String name;
   String source;
-  String instruction;
+  String instructions;
   int duration;
   List<Ingredient> ingredients;
   List<String> tags;
@@ -17,7 +17,7 @@ class Meal {
     this.id,
     this.name,
     this.source,
-    this.instruction,
+    this.instructions,
     this.duration,
     this.ingredients,
     this.tags,
@@ -31,7 +31,7 @@ class Meal {
     return {
       'name': name,
       'source': source,
-      'instruction': instruction,
+      'instruction': instructions,
       'duration': duration,
       'ingredients': ingredients?.map((x) => x.toMap())?.toList(),
       'tags': tags,
@@ -49,7 +49,7 @@ class Meal {
       id: id,
       name: map['name'],
       source: map['source'],
-      instruction: map['instruction'],
+      instructions: map['instruction'],
       imageUrl: map['imageUrl'],
       duration: int.tryParse(map['duration'].toString()) ?? 0,
       ingredients: List<Ingredient>.from(
@@ -63,6 +63,6 @@ class Meal {
 
   @override
   String toString() {
-    return 'Meal(id: $id, name: $name, source: $source, instruction: $instruction, duration: $duration, ingredients: $ingredients, tags: $tags)';
+    return 'Meal(id: $id, name: $name, source: $source, instruction: $instructions, duration: $duration, ingredients: $ingredients, tags: $tags)';
   }
 }

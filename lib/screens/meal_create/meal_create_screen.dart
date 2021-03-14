@@ -68,7 +68,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         _durationController =
             new TextEditingController(text: meal.duration.toString());
         _instructionsController =
-            new TextEditingController(text: meal.instruction);
+            new TextEditingController(text: meal.instructions);
         _meal.ingredients = _meal.ingredients ?? [];
 
         setState(() {
@@ -217,7 +217,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     _meal.imageUrl = _urlController.text;
     _meal.source = _sourceController.text;
     _meal.duration = int.tryParse(_durationController.text) ?? 0;
-    _meal.instruction = _instructionsController.text;
+    _meal.instructions = _instructionsController.text;
     _meal.createdBy = _isCreatingMeal
         ? AuthenticationService.currentUser.uid
         : _meal.createdBy;
@@ -272,7 +272,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         _urlController.text = result.imageUrl;
         _sourceController.text = result.source;
         _durationController.text = result.duration.toString();
-        _instructionsController.text = result.instruction;
+        _instructionsController.text = result.instructions;
         _meal.ingredients = result.ingredients ?? [];
 
         _meal.tags = result.tags;

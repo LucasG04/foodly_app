@@ -186,7 +186,7 @@ class _MealScreenState extends State<MealScreen> {
                     ..._buildSection(
                       'Anleitung',
                       MarkdownBody(
-                        data: meal.instruction ?? '',
+                        data: meal.instructions ?? '',
                         styleSheet: MarkdownStyleSheet.fromTheme(
                           ThemeData(
                             textTheme: TextTheme(
