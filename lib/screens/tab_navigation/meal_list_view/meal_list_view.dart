@@ -121,7 +121,12 @@ class _MealListViewState extends State<MealListView>
     if (query.isNotEmpty) {
       this._filteredMeals = this
           ._allMeals
-          .where((el) => el.name.toLowerCase().contains(query.toLowerCase()))
+          .where(
+            (el) =>
+                el.name.toLowerCase().contains(query.toLowerCase()) ||
+                el.tags
+                    .any((t) => t.toLowerCase().contains(query.toLowerCase())),
+          )
           .toList();
     } else {
       this._filteredMeals = this._allMeals;

@@ -244,7 +244,12 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
 
   List<Meal> _searchForMeal(List<Meal> meals, String query) {
     return meals
-        .where((meal) => meal.name.toLowerCase().contains(query.toLowerCase()))
+        .where(
+          (meal) =>
+              meal.name.toLowerCase().contains(query.toLowerCase()) ||
+              meal.tags
+                  .any((t) => t.toLowerCase().contains(query.toLowerCase())),
+        )
         .toList();
   }
 }
