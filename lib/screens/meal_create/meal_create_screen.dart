@@ -181,7 +181,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: kPadding),
                         child: MainButton(
-                          text: 'Erstellen',
+                          text: 'Speichern',
                           onTap: _createMeal,
                           isProgress: true,
                           buttonState: _buttonState,

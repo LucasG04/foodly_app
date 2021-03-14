@@ -9,7 +9,6 @@ import 'package:foodly/services/authentication_service.dart';
 import 'package:foodly/services/foodly_user_service.dart';
 import 'package:foodly/services/meal_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:async/async.dart';
 import 'package:logging/logging.dart';
 import 'app_router.gr.dart';
 import 'models/meal.dart';
@@ -29,8 +28,14 @@ class FoodlyApp extends StatefulWidget {
 }
 
 class _FoodlyAppState extends State<FoodlyApp> {
-  StreamSubscription<List<List<Meal>>> _mealsStream;
+  StreamSubscription<List<Meal>> _privateMealsStream;
+  StreamSubscription<List<Meal>> _publicMealsStream;
+  List<Meal> _privateMealsStreamValue;
+  List<Meal> _publicMealsStreamValue;
+
   StreamSubscription<LogRecord> _logStream;
+
+  Logger _log = new Logger('FoodlyApp');
 
   @override
   void initState() {
@@ -45,7 +50,8 @@ class _FoodlyAppState extends State<FoodlyApp> {
 
   @override
   void dispose() {
-    _mealsStream.cancel();
+    _privateMealsStream.cancel();
+    _publicMealsStream.cancel();
     _logStream.cancel();
     super.dispose();
   }
@@ -111,19 +117,31 @@ class _FoodlyAppState extends State<FoodlyApp> {
   }
 
   void _streamMeals() {
-    if (_mealsStream == null) {
-      _mealsStream = StreamZip([
-        MealService.streamPlanMeals(context.read(planProvider).state.id),
-        MealService.streamPublicMeals()
-      ]).listen((lists) {
-        print('lists update');
-        var allSnaps = [...lists[0], ...lists[1]];
-        allSnaps = [
-          ...{...allSnaps}
-        ];
-        context.read(allMealsProvider).state = allSnaps;
+    if (_privateMealsStream == null && _publicMealsStream == null) {
+      _privateMealsStream =
+          MealService.streamPlanMeals(context.read(planProvider).state.id)
+              .listen((meals) {
+        _privateMealsStreamValue = meals;
+        mergeMealsIntoProvider();
+      });
+      _publicMealsStream = MealService.streamPublicMeals().listen((meals) {
+        _publicMealsStreamValue = meals;
+        mergeMealsIntoProvider();
       });
     }
+  }
+
+  void mergeMealsIntoProvider() {
+    _log.finer('Call mergeMealsIntoProvider');
+
+    var updatedMeals = [
+      ..._privateMealsStreamValue,
+      ..._publicMealsStreamValue
+    ];
+    updatedMeals = [
+      ...{...updatedMeals}
+    ];
+    context.read(allMealsProvider).state = updatedMeals;
   }
 }
 

@@ -15,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  StreamSubscription<User> authStream;
+  StreamSubscription<User> _authStream;
 
   bool _isLoading;
   User _currentUser;
@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     _isLoading = true;
-    authStream = AuthenticationService.authenticationStream().listen((user) {
+    _authStream = AuthenticationService.authenticationStream().listen((user) {
       setStateIfMounted(() {
         _currentUser = user;
         _isLoading = false;
@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    authStream.cancel();
+    _authStream.cancel();
     super.dispose();
   }
 
