@@ -31,7 +31,7 @@ class Meal {
     return {
       'name': name,
       'source': source,
-      'instruction': instructions,
+      'instructions': instructions,
       'duration': duration,
       'ingredients': ingredients?.map((x) => x.toMap())?.toList(),
       'tags': tags,
@@ -49,7 +49,7 @@ class Meal {
       id: id,
       name: map['name'],
       source: map['source'],
-      instructions: map['instruction'],
+      instructions: map['instructions'],
       imageUrl: map['imageUrl'],
       duration: int.tryParse(map['duration'].toString()) ?? 0,
       ingredients: List<Ingredient>.from(
