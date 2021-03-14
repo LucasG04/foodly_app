@@ -183,7 +183,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                       ),
                       Divider(),
                       EditListContent(
-                        content: _meal.tags,
+                        content: _meal.tags ?? [],
                         onChanged: (list) => _meal.tags = list,
                         title: 'Kategorien:',
                       ),

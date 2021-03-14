@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../constants.dart';
 
-class EditListContent extends StatefulWidget {
+class EditListContent extends StatelessWidget {
   final List<String> content;
   final void Function(List<String>) onChanged;
   final String title;
@@ -16,42 +16,27 @@ class EditListContent extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _EditListContentState createState() => _EditListContentState();
-}
-
-class _EditListContentState extends State<EditListContent> {
-  List<String> _content;
-
-  @override
-  void initState() {
-    _content = widget.content ?? [''];
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Container(
           width: double.infinity,
           child: Text(
-            widget.title,
+            title,
             style: Theme.of(context).textTheme.bodyText1,
           ),
         ),
-        ..._content.map((value) {
+        ...content.map((value) {
           return Row(
             children: <Widget>[
               Expanded(
-                child: _buildTextField(value, _content.indexOf(value), context),
+                child: _buildTextField(value, content.indexOf(value), context),
               ),
               IconButton(
                 icon: Icon(EvaIcons.minusCircleOutline),
                 onPressed: () {
-                  setState(() {
-                    _content.remove(value);
-                    widget.onChanged(_content);
-                  });
+                  content.remove(value);
+                  onChanged(content);
                 },
               ),
             ],
@@ -74,8 +59,8 @@ class _EditListContentState extends State<EditListContent> {
       String ingredient, int index, BuildContext context) {
     final controller = TextEditingController(text: ingredient);
     controller.addListener(() {
-      _content[index] = controller.text;
-      widget.onChanged(_content);
+      content[index] = controller.text;
+      onChanged(content);
     });
 
     return TextField(
@@ -100,9 +85,7 @@ class _EditListContentState extends State<EditListContent> {
   }
 
   void _addNewLine() {
-    setState(() {
-      _content.add('');
-      widget.onChanged(_content);
-    });
+    content.add('');
+    onChanged(content);
   }
 }

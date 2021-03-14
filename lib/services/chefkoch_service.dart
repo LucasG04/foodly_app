@@ -17,8 +17,8 @@ class ChefkochService {
       Meal meal = Meal();
       meal.name = response.data['title'];
       meal.source = 'Chefkoch';
-      meal.instructions = response.data['instructions'].replaceAll('\n', ' ');
-      meal.tags = (response.data['tags'])
+      meal.instructions = response.data['instructions'];
+      meal.tags = List<String>.from(response.data['tags'])
           .where((tag) => tag.toString().isNotEmpty)
           .toList();
       meal.duration = response.data['totalTime'];

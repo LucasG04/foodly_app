@@ -1,5 +1,6 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:foodly/utils/convert_util.dart';
 
 import '../../models/ingredient.dart';
 import 'edit_ingredient_modal.dart';
@@ -31,19 +32,23 @@ class EditIngredients extends StatelessWidget {
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
           itemCount: content.length,
-          itemBuilder: (context, index) => ListTile(
-            title: Text(content[index].name),
-            subtitle: Text('${content[index].amount} ${content[index].unit}'),
-            trailing: IconButton(
-              icon: Icon(EvaIcons.minusCircleOutline, color: Colors.black),
-              onPressed: () {
-                content.removeAt(index);
-                onChanged(content);
-              },
-            ),
-            onTap: () => _editIngredient(context, content[index], index),
-            dense: true,
-          ),
+          itemBuilder: (context, index) {
+            String amount = ConvertUtil.amountToString(
+                content[index].amount, content[index].unit);
+            return ListTile(
+              title: Text(content[index].name),
+              subtitle: amount.isNotEmpty ? Text(amount) : null,
+              trailing: IconButton(
+                icon: Icon(EvaIcons.minusCircleOutline, color: Colors.black),
+                onPressed: () {
+                  content.removeAt(index);
+                  onChanged(content);
+                },
+              ),
+              onTap: () => _editIngredient(context, content[index], index),
+              dense: true,
+            );
+          },
         ),
         Center(
           child: IconButton(

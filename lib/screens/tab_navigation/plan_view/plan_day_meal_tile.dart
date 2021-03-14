@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
+import 'package:foodly/utils/convert_util.dart';
 
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
@@ -221,7 +222,8 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
           listId,
           new Grocery(
             name: ingredient.name,
-            amount: '${ingredient.amount} ${ingredient.unit}',
+            amount:
+                ConvertUtil.amountToString(ingredient.amount, ingredient.unit),
           ),
         );
       }

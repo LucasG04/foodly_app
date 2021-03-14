@@ -74,7 +74,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
               },
             ),
             AnimationLimiter(
-              key: UniqueKey(),
+              // key: UniqueKey(),
               child: ListView.builder(
                 shrinkWrap: true,
                 padding: const EdgeInsets.symmetric(vertical: kPadding),

@@ -6,6 +6,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:foodly/utils/convert_util.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -224,7 +225,7 @@ class _MealScreenState extends State<MealScreen> {
           SizedBox(
             width: amountWidth,
             child: Text(
-              '${ingredient.amount} ${ingredient.unit}',
+              ConvertUtil.amountToString(ingredient.amount, ingredient.unit),
               textAlign: TextAlign.end,
               style: TextStyle(fontSize: 18.0),
             ),
