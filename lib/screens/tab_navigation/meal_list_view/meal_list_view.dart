@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodly/widgets/user_information.dart';
 import 'package:group_list_view/group_list_view.dart';
 
 import '../../../constants.dart';
@@ -40,20 +41,26 @@ class _MealListViewState extends State<MealListView>
               _allMeals = watch(allMealsProvider).state;
               _filterMeals(_searchInput);
               final tagList = _groupMealsByTags(this._filteredMeals ?? []);
-              return GroupListView(
-                itemBuilder: (_, item) => MealListTile(
-                  tagList[item.section].meals[item.index],
-                ),
-                sectionsCount: tagList.length,
-                groupHeaderBuilder: (_, group) => _buildSubtitle(
-                  context,
-                  tagList[group].tag,
-                ),
-                countOfItemInSection: (section) =>
-                    tagList[section].meals.length,
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-              );
+              return _allMeals != null && _allMeals.isNotEmpty
+                  ? GroupListView(
+                      itemBuilder: (_, item) => MealListTile(
+                        tagList[item.section].meals[item.index],
+                      ),
+                      sectionsCount: tagList.length,
+                      groupHeaderBuilder: (_, group) => _buildSubtitle(
+                        context,
+                        tagList[group].tag,
+                      ),
+                      countOfItemInSection: (section) =>
+                          tagList[section].meals.length,
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                    )
+                  : UserInformation(
+                      'assets/images/undraw_empty.png',
+                      'Keine Gerichte vorhanden',
+                      'In deinem Plan sind noch keine Gerichte angelegt. Klick auf den "Plus"-Button oben rechts und leg los.',
+                    );
             })
           ],
         ),
@@ -123,8 +130,8 @@ class _MealListViewState extends State<MealListView>
 }
 
 class TagGroup {
-  String tag;
   List<Meal> meals;
+  String tag;
 
   TagGroup(this.tag, this.meals);
 }
