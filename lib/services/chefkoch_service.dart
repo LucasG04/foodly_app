@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:foodly/models/ingredient.dart';
-import 'package:foodly/models/meal.dart';
+
+import '../models/ingredient.dart';
+import '../models/meal.dart';
 
 class ChefkochService {
   ChefkochService._();

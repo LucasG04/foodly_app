@@ -4,16 +4,17 @@ import 'package:auto_route/auto_route.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
-import 'package:foodly/models/foodly_user.dart';
-import 'package:foodly/services/authentication_service.dart';
-import 'package:foodly/services/foodly_user_service.dart';
-import 'package:foodly/services/meal_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:logging/logging.dart';
+
 import 'app_router.gr.dart';
+import 'models/foodly_user.dart';
 import 'models/meal.dart';
 import 'models/plan.dart';
 import 'providers/state_providers.dart';
+import 'services/authentication_service.dart';
+import 'services/foodly_user_service.dart';
+import 'services/meal_service.dart';
 import 'services/plan_service.dart';
 
 Future<void> main() async {

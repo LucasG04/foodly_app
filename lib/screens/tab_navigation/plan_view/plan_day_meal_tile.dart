@@ -3,19 +3,19 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
-import 'package:foodly/models/grocery.dart';
-import 'package:foodly/services/authentication_service.dart';
-import 'package:foodly/services/shopping_list_service.dart';
-import 'package:foodly/widgets/small_circular_progress_indicator.dart';
 
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
+import '../../../models/grocery.dart';
 import '../../../models/meal.dart';
 import '../../../models/plan_meal.dart';
 import '../../../providers/state_providers.dart';
+import '../../../services/authentication_service.dart';
 import '../../../services/meal_service.dart';
 import '../../../services/plan_service.dart';
+import '../../../services/shopping_list_service.dart';
 import '../../../widgets/meal_tag.dart';
+import '../../../widgets/small_circular_progress_indicator.dart';
 
 class PlanDayMealTile extends StatefulWidget {
   final bool enableVoting;

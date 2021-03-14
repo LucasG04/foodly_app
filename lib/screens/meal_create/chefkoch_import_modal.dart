@@ -1,11 +1,11 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/services/chefkoch_service.dart';
-import 'package:foodly/widgets/main_button.dart';
-import 'package:foodly/widgets/main_text_field.dart';
-import 'package:foodly/widgets/progress_button.dart';
 
 import '../../constants.dart';
+import '../../services/chefkoch_service.dart';
+import '../../widgets/main_button.dart';
+import '../../widgets/main_text_field.dart';
+import '../../widgets/progress_button.dart';
 
 class ChefkochImportModal extends StatefulWidget {
   ChefkochImportModal();

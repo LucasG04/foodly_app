@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:foodly/models/ingredient.dart';
-import 'package:foodly/widgets/main_button.dart';
-import 'package:foodly/widgets/main_text_field.dart';
 
 import '../../constants.dart';
+import '../../models/ingredient.dart';
+import '../../widgets/main_button.dart';
+import '../../widgets/main_text_field.dart';
 
 class EditIngredientModal extends StatefulWidget {
   final Ingredient ingredient;

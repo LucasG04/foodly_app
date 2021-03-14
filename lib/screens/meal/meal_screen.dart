@@ -6,15 +6,15 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:foodly/app_router.gr.dart';
 
+import '../../app_router.gr.dart';
 import '../../constants.dart';
+import '../../models/ingredient.dart';
 import '../../models/meal.dart';
 import '../../services/meal_service.dart';
 import '../../utils/no_glowing_overscroll_indicator_behavior.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import 'border_icon.dart';
-import 'package:foodly/models/ingredient.dart';
 
 class MealScreen extends StatefulWidget {
   final String id;

@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'tab_navigation_view.dart';
-import '../../services/authentication_service.dart';
-import '../../widgets/small_circular_progress_indicator.dart';
 
 import '../../app_router.gr.dart';
+import '../../services/authentication_service.dart';
+import '../../widgets/small_circular_progress_indicator.dart';
+import 'tab_navigation_view.dart';
 
 class HomeScreen extends StatefulWidget {
   @override

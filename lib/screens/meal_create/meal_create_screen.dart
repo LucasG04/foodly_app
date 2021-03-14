@@ -3,21 +3,21 @@ import 'package:auto_route/auto_route_annotations.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/providers/state_providers.dart';
-import 'package:foodly/screens/meal_create/chefkoch_import_modal.dart';
-import 'package:foodly/screens/meal_create/edit_ingredients.dart';
-import 'package:foodly/services/authentication_service.dart';
-import 'package:foodly/widgets/full_screen_loader.dart';
-import 'package:foodly/widgets/main_appbar.dart';
 
 import '../../constants.dart';
 import '../../models/meal.dart';
+import '../../providers/state_providers.dart';
+import '../../services/authentication_service.dart';
 import '../../services/meal_service.dart';
 import '../../utils/main_snackbar.dart';
+import '../../widgets/full_screen_loader.dart';
+import '../../widgets/main_appbar.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/markdown_editor.dart';
 import '../../widgets/progress_button.dart';
+import 'chefkoch_import_modal.dart';
+import 'edit_ingredients.dart';
 import 'edit_list_content.dart';
 
 class MealCreateScreen extends StatefulWidget {

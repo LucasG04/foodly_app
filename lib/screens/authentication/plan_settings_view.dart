@@ -1,13 +1,13 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/models/plan.dart';
-import 'package:foodly/widgets/toggle_tab/flutter_toggle_tab.dart';
 
 import '../../constants.dart';
+import '../../models/plan.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
+import '../../widgets/toggle_tab/flutter_toggle_tab.dart';
 
 class PlanSettingsView extends StatefulWidget {
   final Plan plan;

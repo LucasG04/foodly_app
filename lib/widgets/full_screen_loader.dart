@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:foodly/widgets/small_circular_progress_indicator.dart';
+
+import 'small_circular_progress_indicator.dart';
 
 class FullScreenLoader extends StatefulWidget {
   /// The background color of the loader. Default is black26.

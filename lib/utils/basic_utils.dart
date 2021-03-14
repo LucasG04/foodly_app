@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/providers/state_providers.dart';
+
+import '../providers/state_providers.dart';
 
 class BasicUtils {
   /// Clears all state providers.

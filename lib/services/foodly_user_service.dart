@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:foodly/models/foodly_user.dart';
 import 'package:logging/logging.dart';
+
+import '../models/foodly_user.dart';
 
 class FoodlyUserService {
   static final log = Logger('FoodlyUserService');

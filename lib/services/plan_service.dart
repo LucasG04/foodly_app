@@ -1,14 +1,14 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:foodly/services/authentication_service.dart';
-import 'package:foodly/utils/convert_util.dart';
-import 'package:logging/logging.dart';
-import 'shopping_list_service.dart';
 import 'package:hive/hive.dart';
+import 'package:logging/logging.dart';
 
 import '../models/plan.dart';
 import '../models/plan_meal.dart';
+import '../utils/convert_util.dart';
+import 'authentication_service.dart';
+import 'shopping_list_service.dart';
 
 class PlanService {
   static final log = Logger('PlanService');

@@ -1,6 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
 /// FROM: https://pub.dev/packages/animate_icons
 class AnimateIcons extends StatefulWidget {

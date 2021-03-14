@@ -1,17 +1,17 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/providers/state_providers.dart';
-import 'package:foodly/screens/tab_navigation/settings_view/import_meals_modal.dart';
-import 'package:foodly/screens/tab_navigation/settings_view/settings_tile.dart';
-import 'package:foodly/services/authentication_service.dart';
-import 'package:foodly/services/plan_service.dart';
-import 'package:foodly/utils/basic_utils.dart';
-import 'package:foodly/widgets/page_title.dart';
-import 'package:foodly/widgets/small_circular_progress_indicator.dart';
 import 'package:share/share.dart';
 
 import '../../../constants.dart';
+import '../../../providers/state_providers.dart';
+import '../../../services/authentication_service.dart';
+import '../../../services/plan_service.dart';
+import '../../../utils/basic_utils.dart';
+import '../../../widgets/page_title.dart';
+import '../../../widgets/small_circular_progress_indicator.dart';
+import 'import_meals_modal.dart';
+import 'settings_tile.dart';
 
 class SettingsView extends ConsumerWidget {
   @override

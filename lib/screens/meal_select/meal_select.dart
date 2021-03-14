@@ -5,16 +5,17 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:foodly/app_router.gr.dart';
-import 'package:foodly/screens/meal_select/search_bar.dart';
-import 'package:foodly/screens/meal_select/select_meal_tile.dart';
-import 'package:foodly/widgets/main_appbar.dart';
-import 'package:foodly/widgets/user_information.dart';
+
+import '../../app_router.gr.dart';
 import '../../constants.dart';
 import '../../models/meal.dart';
 import '../../models/plan_meal.dart';
 import '../../providers/state_providers.dart';
 import '../../services/plan_service.dart';
+import '../../widgets/main_appbar.dart';
+import '../../widgets/user_information.dart';
+import 'search_bar.dart';
+import 'select_meal_tile.dart';
 
 class MealSelectScreen extends StatefulWidget {
   /// both are strings because the need to be extracted from the url

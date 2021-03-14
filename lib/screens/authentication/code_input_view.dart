@@ -1,10 +1,10 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+
+import '../../constants.dart';
 import '../../services/plan_service.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
-
-import '../../constants.dart';
 import 'login_design_clipper.dart';
 
 class CodeInputView extends StatefulWidget {

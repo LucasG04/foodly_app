@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:foodly/models/plan.dart';
-import 'package:foodly/screens/authentication/plan_settings_view.dart';
+
+import '../../models/plan.dart';
 import 'code_input_view.dart';
 import 'login_view.dart';
+import 'plan_settings_view.dart';
 
 class AuthenticationScreen extends StatefulWidget {
   @override

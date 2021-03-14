@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/widgets/animate_icons.dart';
+
+import '../../widgets/animate_icons.dart';
 
 class SearchBar extends StatefulWidget {
   final void Function(String) onSearch;

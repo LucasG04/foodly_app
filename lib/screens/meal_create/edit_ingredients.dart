@@ -1,7 +1,8 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/models/ingredient.dart';
-import 'package:foodly/screens/meal_create/edit_ingredient_modal.dart';
+
+import '../../models/ingredient.dart';
+import 'edit_ingredient_modal.dart';
 
 class EditIngredients extends StatelessWidget {
   final String title;

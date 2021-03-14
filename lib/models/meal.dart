@@ -1,4 +1,4 @@
-import 'package:foodly/models/ingredient.dart';
+import 'ingredient.dart';
 
 class Meal {
   String id;

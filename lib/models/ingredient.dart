@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 class Ingredient {
   String name;
   double amount;

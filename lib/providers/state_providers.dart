@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/models/foodly_user.dart';
-import 'package:foodly/models/meal.dart';
 
+import '../models/foodly_user.dart';
+import '../models/meal.dart';
 import '../models/plan.dart';
 
 /// Provides the active plan object.
