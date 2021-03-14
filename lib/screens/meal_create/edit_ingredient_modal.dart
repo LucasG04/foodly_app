@@ -19,6 +19,8 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
   TextEditingController _nameController;
   TextEditingController _amountController;
   TextEditingController _unitController;
+  FocusNode _amountFocusNode;
+  FocusNode _unitFocusNode;
 
   String _nameErrorText;
   String _amountErrorText;
@@ -33,6 +35,9 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
             ? ''
             : widget.ingredient?.amount.toString());
     _unitController = new TextEditingController(text: widget.ingredient?.unit);
+
+    _amountFocusNode = new FocusNode();
+    _unitFocusNode = new FocusNode();
 
     super.initState();
   }
@@ -66,6 +71,8 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
             title: 'Bezeichnung',
             placeholder: 'Salz',
             errorText: _nameErrorText,
+            textInputAction: TextInputAction.next,
+            onSubmit: () => (_amountFocusNode.requestFocus()),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -74,19 +81,24 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
                 width: width * 0.4,
                 child: MainTextField(
                   controller: _amountController,
+                  focusNode: _amountFocusNode,
                   title: 'Menge',
                   placeholder: '1',
                   keyboardType: TextInputType.number,
                   errorText: _amountErrorText,
+                  textInputAction: TextInputAction.next,
+                  onSubmit: () => (_unitFocusNode.requestFocus()),
                 ),
               ),
               SizedBox(
                 width: width * 0.5,
                 child: MainTextField(
                   controller: _unitController,
+                  focusNode: _unitFocusNode,
                   title: 'Einheit',
                   placeholder: 'Prise',
                   errorText: _unitErrorText,
+                  onSubmit: _saveIngredient,
                 ),
               ),
             ],
@@ -107,7 +119,8 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
   void _saveIngredient() async {
     final ingredient = _isCreating ? Ingredient() : widget.ingredient;
     ingredient.name = _nameController.text.trim();
-    ingredient.amount = double.tryParse(_amountController.text.trim());
+    ingredient.amount =
+        double.tryParse(_amountController.text.trim().replaceAll(',', '.'));
     ingredient.unit = _unitController.text.trim();
 
     if (ingredient.name.isEmpty) {
@@ -119,7 +132,7 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
 
     if (ingredient.amount == null) {
       setState(() {
-        _amountErrorText = 'Menge eintragen.';
+        _amountErrorText = 'Zahl eintragen.';
       });
       return;
     }

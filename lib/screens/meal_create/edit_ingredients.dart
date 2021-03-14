@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:foodly/models/ingredient.dart';
 import 'package:foodly/screens/meal_create/edit_ingredient_modal.dart';
 
-class EditIngredients extends StatefulWidget {
+class EditIngredients extends StatelessWidget {
   final String title;
   final List<Ingredient> content;
   final void Function(List<Ingredient>) onChanged;
@@ -16,60 +16,46 @@ class EditIngredients extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _EditIngredientsState createState() => _EditIngredientsState();
-}
-
-class _EditIngredientsState extends State<EditIngredients> {
-  List<Ingredient> _content;
-
-  @override
-  void initState() {
-    _content = widget.content ?? [];
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    print(content.length);
     return Column(
       children: [
         Container(
           width: double.infinity,
           child: Text(
-            widget.title,
+            title,
             style: Theme.of(context).textTheme.bodyText1,
           ),
         ),
         ListView.builder(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
-          itemCount: _content.length,
+          itemCount: content.length,
           itemBuilder: (context, index) => ListTile(
-            title: Text(_content[index].name),
-            subtitle: Text('${_content[index].amount} ${_content[index].unit}'),
+            title: Text(content[index].name),
+            subtitle: Text('${content[index].amount} ${content[index].unit}'),
             trailing: IconButton(
               icon: Icon(EvaIcons.minusCircleOutline, color: Colors.black),
               onPressed: () {
-                setState(() {
-                  _content.removeAt(index);
-                  widget.onChanged(_content);
-                });
+                content.removeAt(index);
+                onChanged(content);
               },
             ),
-            onTap: () => _editIngredient(_content[index], index),
+            onTap: () => _editIngredient(context, content[index], index),
             dense: true,
           ),
         ),
-        ListTile(
-          trailing: IconButton(
+        Center(
+          child: IconButton(
             icon: Icon(EvaIcons.plusCircleOutline, color: Colors.black),
-            onPressed: () => _editIngredient(),
+            onPressed: () => _editIngredient(context),
           ),
         ),
       ],
     );
   }
 
-  void _editIngredient([Ingredient ingredient, int index]) async {
+  void _editIngredient(context, [Ingredient ingredient, int index]) async {
     final result = await showModalBottomSheet<Ingredient>(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
@@ -83,15 +69,11 @@ class _EditIngredientsState extends State<EditIngredients> {
 
     if (result != null) {
       if (ingredient == null) {
-        setState(() {
-          _content.add(result);
-          widget.onChanged(_content);
-        });
+        content.add(result);
+        onChanged(content);
       } else {
-        setState(() {
-          _content[index] = result;
-          widget.onChanged(_content);
-        });
+        content[index] = result;
+        onChanged(content);
       }
     }
   }

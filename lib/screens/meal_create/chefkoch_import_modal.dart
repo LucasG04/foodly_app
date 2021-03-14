@@ -60,6 +60,7 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
             placeholder:
                 'https://www.chefkoch.de/rezepte/2280941363879458/Brokkoli-Spaetzle-Pfanne.html',
             errorText: _linkErrorText,
+            onSubmit: _importMeal,
           ),
           _linkError
               ? Container(

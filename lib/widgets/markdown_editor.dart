@@ -5,13 +5,17 @@ import 'package:url_launcher/url_launcher.dart';
 
 class MarkdownEditor extends StatefulWidget {
   final String initialValue;
+  final TextEditingController textEditingController;
   final void Function(String) onChange;
 
   MarkdownEditor({
     Key key,
-    this.initialValue = '',
+    this.initialValue,
+    this.textEditingController,
     this.onChange,
-  }) : super(key: key);
+  })  : assert((initialValue != null && textEditingController == null) ||
+            (initialValue == null && textEditingController != null)),
+        super(key: key);
 
   @override
   _MarkdownEditorState createState() => _MarkdownEditorState();
@@ -60,7 +64,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                   children: <Widget>[
                     Icon(EvaIcons.editOutline, color: textColor),
                     SizedBox(width: 8.0),
-                    Text('Edit', style: TextStyle(color: textColor)),
+                    Text('Bearbeiten', style: TextStyle(color: textColor)),
                   ],
                 ),
               ),
@@ -71,7 +75,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                   children: <Widget>[
                     Icon(EvaIcons.eyeOutline, color: textColor),
                     SizedBox(width: 8.0),
-                    Text('Preview', style: TextStyle(color: textColor)),
+                    Text('Vorschau', style: TextStyle(color: textColor)),
                   ],
                 ),
               )
@@ -89,7 +93,11 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                   child: Scrollbar(
                     thickness: 2.5,
                     child: TextFormField(
-                      initialValue: _content,
+                      initialValue:
+                          widget.initialValue != null ? _content : null,
+                      controller: widget.textEditingController != null
+                          ? widget.textEditingController
+                          : null,
                       maxLines: null,
                       onChanged: onContentChanged,
                       decoration: InputDecoration(
@@ -110,7 +118,9 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                     thickness: 2.5,
                     child: SingleChildScrollView(
                       child: MarkdownBody(
-                        data: _content,
+                        data: widget.initialValue != null
+                            ? _content
+                            : widget.textEditingController.text,
                         selectable: true,
                         onTapLink: (_, href, __) => linkOnTapHandler(href),
                       ),
@@ -134,7 +144,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text('Style your text (click for info).'),
+                    Text('Formatiere den Text (klick für mehr Info).'),
                     Image.asset('assets/images/md-icon.png', width: 30.0),
                   ],
                 ),
@@ -147,10 +157,12 @@ class _MarkdownEditorState extends State<MarkdownEditor>
   }
 
   void onContentChanged(String data) {
-    setState(() {
-      _content = data;
-    });
-    widget.onChange(data);
+    if (widget.initialValue != null) {
+      setState(() {
+        _content = data;
+      });
+      widget.onChange(data);
+    }
   }
 
   void linkOnTapHandler(String href) async {

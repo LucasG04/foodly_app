@@ -40,6 +40,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   TextEditingController _urlController;
   TextEditingController _sourceController;
   TextEditingController _durationController;
+  TextEditingController _instructionsController;
 
   ButtonState _buttonState;
 
@@ -54,6 +55,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
       _urlController = new TextEditingController();
       _sourceController = new TextEditingController();
       _durationController = new TextEditingController();
+      _instructionsController = new TextEditingController();
       _meal.ingredients = [];
     } else {
       _isLoadingMeal = true;
@@ -65,6 +67,8 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         _sourceController = new TextEditingController(text: meal.source);
         _durationController =
             new TextEditingController(text: meal.duration.toString());
+        _instructionsController =
+            new TextEditingController(text: meal.instruction);
         _meal.ingredients = _meal.ingredients ?? [];
 
         setState(() {
@@ -126,7 +130,9 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                           : EditIngredients(
                               content: _meal.ingredients ?? [],
                               onChanged: (results) {
-                                _meal.ingredients = results;
+                                setState(() {
+                                  _meal.ingredients = results;
+                                });
                               },
                               title: 'Zutaten:',
                             ),
@@ -139,10 +145,13 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                         ),
                       ),
                       _isLoadingMeal
-                          ? MarkdownEditor(key: UniqueKey(), onChange: null)
+                          ? MarkdownEditor(
+                              key: UniqueKey(),
+                              onChange: null,
+                              initialValue: '',
+                            )
                           : MarkdownEditor(
-                              initialValue: _meal.instruction ?? '',
-                              onChange: (val) => _meal.instruction = val,
+                              textEditingController: _instructionsController,
                             ),
                       Divider(),
                       MainTextField(
@@ -208,6 +217,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     _meal.imageUrl = _urlController.text;
     _meal.source = _sourceController.text;
     _meal.duration = int.tryParse(_durationController.text) ?? 0;
+    _meal.instruction = _instructionsController.text;
     _meal.createdBy = _isCreatingMeal
         ? AuthenticationService.currentUser.uid
         : _meal.createdBy;
@@ -257,16 +267,14 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     );
 
     if (result != null) {
-      print(result.ingredients);
-      print(result.toMap());
-      print(result.instruction);
       setState(() {
         _titleController.text = result.name;
         _urlController.text = result.imageUrl;
         _sourceController.text = result.source;
         _durationController.text = result.duration.toString();
+        _instructionsController.text = result.instruction;
         _meal.ingredients = result.ingredients ?? [];
-        _meal.instruction = result.instruction;
+
         _meal.tags = result.tags;
       });
     }

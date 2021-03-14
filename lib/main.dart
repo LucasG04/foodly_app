@@ -45,6 +45,9 @@ class _FoodlyAppState extends State<FoodlyApp> {
       print('${record.level.name}: ${record.loggerName}: ${record.message}');
     });
 
+    _privateMealsStreamValue = [];
+    _publicMealsStreamValue = [];
+
     super.initState();
   }
 
