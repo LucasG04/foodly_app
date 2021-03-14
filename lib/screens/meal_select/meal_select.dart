@@ -129,7 +129,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
             : _isSearching
                 ? UserInformation(
                     'assets/images/undraw_empty.png',
-                    'Keine Ergebnisse.',
+                    'Keine Ergebnisse',
                     'Wir konnten keine Gerichte für deine Suche finden.',
                   )
                 : SizedBox();

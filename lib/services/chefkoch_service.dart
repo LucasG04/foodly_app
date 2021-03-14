@@ -18,9 +18,9 @@ class ChefkochService {
       meal.name = response.data['title'];
       meal.source = 'Chefkoch';
       meal.instructions = response.data['instructions'].replaceAll('\n', ' ');
-      // meal.tags = (response.data['tags'] as List<String>)
-      //     .where((tag) => tag.isNotEmpty)
-      //     .toList();
+      meal.tags = (response.data['tags'])
+          .where((tag) => tag.toString().isNotEmpty)
+          .toList();
       meal.duration = response.data['totalTime'];
       meal.ingredients = _filterIngredientsFromChefkochIngredientGroups(
           response.data['ingredientGroups'][0]);

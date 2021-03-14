@@ -59,13 +59,6 @@ class _SelectMealTileState extends State<SelectMealTile> {
                 ),
               ),
             ),
-            Container(
-              height: MealTag.tagHeight,
-              child: Wrap(
-                clipBehavior: Clip.hardEdge,
-                children: widget.meal.tags.map((e) => MealTag(e)).toList(),
-              ),
-            ),
           ],
         ),
         trailing: AnimatedSwitcher(

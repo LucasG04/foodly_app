@@ -41,7 +41,7 @@ class _MealListViewState extends State<MealListView>
               _allMeals = watch(allMealsProvider).state;
               _filterMeals(_searchInput);
               final tagList = _groupMealsByTags(this._filteredMeals ?? []);
-              return _allMeals != null && _allMeals.isNotEmpty
+              return tagList != null && tagList.isNotEmpty
                   ? GroupListView(
                       itemBuilder: (_, item) => MealListTile(
                         tagList[item.section].meals[item.index],
