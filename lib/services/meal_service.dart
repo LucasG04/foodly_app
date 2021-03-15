@@ -118,6 +118,15 @@ class MealService {
     }
   }
 
+  static Future<void> deleteMeal(String mealId) async {
+    log.finer('Call deleteMeal with $mealId');
+    try {
+      await _firestore.collection('meals').doc(mealId).delete();
+    } catch (e) {
+      log.severe('ERR: deleteMeal with $mealId', e);
+    }
+  }
+
   static Future<void> addMeals(String planId, List<Meal> meals) async {
     log.finer(
         'Call addMeals with PlanId: $planId | Meals: ${meals.toString()}');

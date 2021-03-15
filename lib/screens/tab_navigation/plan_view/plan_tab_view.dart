@@ -33,6 +33,7 @@ class _PlanTabViewState extends State<PlanTabView>
                 builder: (context, snapshot) {
                   if (snapshot.data != null) {
                     final planMeals = snapshot.data;
+                    context.read(planProvider).state.meals = planMeals;
                     final days = _updateMealsForDays(planMeals);
 
                     return SingleChildScrollView(

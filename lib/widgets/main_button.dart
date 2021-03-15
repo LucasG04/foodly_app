@@ -10,6 +10,7 @@ class MainButton extends StatelessWidget {
   final bool isSecondary;
   final bool isProgress;
   final ButtonState buttonState;
+  final Color color;
 
   final kTextHeadlineColor = Color(0xFF333333);
 
@@ -21,10 +22,12 @@ class MainButton extends StatelessWidget {
     this.isSecondary = false,
     this.isProgress = false,
     this.buttonState,
+    this.color,
   }) : assert(isProgress && buttonState != null || !isProgress);
 
   @override
   Widget build(BuildContext context) {
+    final _color = color ?? Theme.of(context).primaryColor;
     return !isProgress
         ? InkWell(
             onTap: onTap,
@@ -33,13 +36,13 @@ class MainButton extends StatelessWidget {
               height: height,
               decoration: !isSecondary
                   ? BoxDecoration(
-                      color: Theme.of(context).primaryColor,
+                      color: _color,
                       borderRadius: BorderRadius.circular(10),
                     )
                   : BoxDecoration(
                       color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Theme.of(context).primaryColor),
+                      border: Border.all(color: _color),
                     ),
               child: Center(
                 child: Text(
@@ -65,13 +68,13 @@ class MainButton extends StatelessWidget {
               onPressed: onTap,
               decoration: !isSecondary
                   ? BoxDecoration(
-                      color: Theme.of(context).primaryColor,
+                      color: _color,
                       borderRadius: BorderRadius.circular(10),
                     )
                   : BoxDecoration(
                       color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Theme.of(context).primaryColor),
+                      border: Border.all(color: _color),
                     ),
               child: Text(
                 text,
