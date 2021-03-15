@@ -38,12 +38,14 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
   bool _isSearching;
 
   ScrollController _scrollController;
+  Key _animationLimiterKey;
 
   @override
   void initState() {
     searchedMeals = [];
     _isSearching = false;
     _scrollController = new ScrollController();
+    _animationLimiterKey = UniqueKey();
     super.initState();
   }
 
@@ -61,12 +63,16 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
               onSearch: (String query) async {
                 if (query.isNotEmpty && query.length > 1) {
                   setState(() {
+                    _animationLimiterKey = UniqueKey();
                     _isSearching = true;
                     searchedMeals = _searchForMeal(
                         context.read(allMealsProvider).state, query);
                   });
                 } else {
                   setState(() {
+                    if (_isSearching == true) {
+                      _animationLimiterKey = UniqueKey();
+                    }
                     _isSearching = false;
                     searchedMeals = [];
                   });
@@ -74,7 +80,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
               },
             ),
             AnimationLimiter(
-              // key: UniqueKey(),
+              key: _animationLimiterKey,
               child: ListView.builder(
                 shrinkWrap: true,
                 padding: const EdgeInsets.symmetric(vertical: kPadding),
