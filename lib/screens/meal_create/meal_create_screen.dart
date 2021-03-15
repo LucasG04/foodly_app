@@ -8,6 +8,7 @@ import '../../constants.dart';
 import '../../models/meal.dart';
 import '../../providers/state_providers.dart';
 import '../../services/authentication_service.dart';
+import '../../services/chefkoch_service.dart';
 import '../../services/meal_service.dart';
 import '../../utils/main_snackbar.dart';
 import '../../widgets/full_screen_loader.dart';
@@ -32,50 +33,20 @@ class MealCreateScreen extends StatefulWidget {
 }
 
 class _MealCreateScreenState extends State<MealCreateScreen> {
-  bool _isLoadingMeal;
-  bool _isCreatingMeal;
-
-  Meal _meal = new Meal();
-  TextEditingController _titleController;
-  TextEditingController _urlController;
-  TextEditingController _sourceController;
+  ButtonState _buttonState;
   TextEditingController _durationController;
   TextEditingController _instructionsController;
-
-  ButtonState _buttonState;
-
+  bool _isCreatingMeal;
+  bool _isLoadingMeal;
+  Meal _meal = new Meal();
   ScrollController _scrollController;
+  TextEditingController _sourceController;
+  TextEditingController _titleController;
+  TextEditingController _urlController;
 
   @override
   void initState() {
-    if (widget.id == 'create') {
-      _isLoadingMeal = false;
-      _isCreatingMeal = true;
-      _titleController = new TextEditingController();
-      _urlController = new TextEditingController();
-      _sourceController = new TextEditingController();
-      _durationController = new TextEditingController();
-      _instructionsController = new TextEditingController();
-      _meal.ingredients = [];
-    } else {
-      _isLoadingMeal = true;
-      _isCreatingMeal = false;
-      MealService.getMealById(widget.id).then((meal) {
-        _meal = meal;
-        _titleController = new TextEditingController(text: meal.name);
-        _urlController = new TextEditingController(text: meal.imageUrl);
-        _sourceController = new TextEditingController(text: meal.source);
-        _durationController =
-            new TextEditingController(text: meal.duration.toString());
-        _instructionsController =
-            new TextEditingController(text: meal.instructions);
-        _meal.ingredients = _meal.ingredients ?? [];
-
-        setState(() {
-          _isLoadingMeal = false;
-        });
-      });
-    }
+    _initialParseId();
 
     _buttonState = ButtonState.normal;
     _scrollController = new ScrollController();
@@ -210,6 +181,57 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         ],
       ),
     );
+  }
+
+  void _initialParseId() {
+    if (widget.id == 'create') {
+      _isLoadingMeal = false;
+      _isCreatingMeal = true;
+      _titleController = new TextEditingController();
+      _urlController = new TextEditingController();
+      _sourceController = new TextEditingController();
+      _durationController = new TextEditingController();
+      _instructionsController = new TextEditingController();
+      _meal.ingredients = [];
+    } else if (widget.id.startsWith('https') &&
+        Uri.decodeComponent(widget.id).startsWith(kChefkochShareEndpoint)) {
+      _isLoadingMeal = true;
+      _isCreatingMeal = true;
+      ChefkochService.getMealFromChefkochUrl(Uri.decodeComponent(widget.id))
+          .then((meal) {
+        _meal = meal;
+        _titleController = new TextEditingController(text: meal.name);
+        _urlController = new TextEditingController(text: meal.imageUrl);
+        _sourceController = new TextEditingController(text: meal.source);
+        _durationController =
+            new TextEditingController(text: meal.duration.toString());
+        _instructionsController =
+            new TextEditingController(text: meal.instructions);
+        _meal.ingredients = _meal.ingredients ?? [];
+
+        setState(() {
+          _isLoadingMeal = false;
+        });
+      }).catchError((err) => print(err));
+    } else {
+      _isLoadingMeal = true;
+      _isCreatingMeal = false;
+      MealService.getMealById(widget.id).then((meal) {
+        _meal = meal;
+        _titleController = new TextEditingController(text: meal.name);
+        _urlController = new TextEditingController(text: meal.imageUrl);
+        _sourceController = new TextEditingController(text: meal.source);
+        _durationController =
+            new TextEditingController(text: meal.duration.toString());
+        _instructionsController =
+            new TextEditingController(text: meal.instructions);
+        _meal.ingredients = _meal.ingredients ?? [];
+
+        setState(() {
+          _isLoadingMeal = false;
+        });
+      });
+    }
   }
 
   Future<void> _createMeal() async {

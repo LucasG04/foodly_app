@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:logging/logging.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 import 'app_router.gr.dart';
+import 'constants.dart';
 import 'models/foodly_user.dart';
 import 'models/meal.dart';
 import 'models/plan.dart';
@@ -29,14 +31,22 @@ class FoodlyApp extends StatefulWidget {
 }
 
 class _FoodlyAppState extends State<FoodlyApp> {
+  StreamSubscription<String> _intentDataStreamSubscription;
+  Logger _log = new Logger('FoodlyApp');
+  StreamSubscription<LogRecord> _logStream;
   StreamSubscription<List<Meal>> _privateMealsStream;
-  StreamSubscription<List<Meal>> _publicMealsStream;
   List<Meal> _privateMealsStreamValue;
+  StreamSubscription<List<Meal>> _publicMealsStream;
   List<Meal> _publicMealsStreamValue;
 
-  StreamSubscription<LogRecord> _logStream;
-
-  Logger _log = new Logger('FoodlyApp');
+  @override
+  void dispose() {
+    _privateMealsStream.cancel();
+    _publicMealsStream.cancel();
+    _logStream.cancel();
+    _intentDataStreamSubscription.cancel();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -49,15 +59,9 @@ class _FoodlyAppState extends State<FoodlyApp> {
     _privateMealsStreamValue = [];
     _publicMealsStreamValue = [];
 
-    super.initState();
-  }
+    _listenForShareIntent();
 
-  @override
-  void dispose() {
-    _privateMealsStream.cancel();
-    _publicMealsStream.cancel();
-    _logStream.cancel();
-    super.dispose();
+    super.initState();
   }
 
   @override
@@ -148,6 +152,31 @@ class _FoodlyAppState extends State<FoodlyApp> {
       ...{...updatedMeals}
     ];
     context.read(allMealsProvider).state = updatedMeals;
+  }
+
+  void _listenForShareIntent() {
+    // For sharing or opening urls/text coming from outside the app while the app is in the memory
+    _intentDataStreamSubscription =
+        ReceiveSharingIntent.getTextStream().listen((String value) {
+      if (AuthenticationService.currentUser != null &&
+          value != null &&
+          value.startsWith(kChefkochShareEndpoint)) {
+        ExtendedNavigator.root
+            .push(Routes.mealCreateScreen(id: Uri.encodeComponent(value)));
+      }
+    }, onError: (err) {
+      _log.severe('ERR in ReceiveSharingIntent.getTextStream()', err);
+    });
+
+    // For sharing or opening urls/text coming from outside the app while the app is closed
+    ReceiveSharingIntent.getInitialText().then((String value) {
+      if (AuthenticationService.currentUser != null &&
+          value != null &&
+          value.startsWith(kChefkochShareEndpoint)) {
+        ExtendedNavigator.root
+            .push(Routes.mealCreateScreen(id: Uri.encodeComponent(value)));
+      }
+    });
   }
 }
 

@@ -9,6 +9,8 @@ class ChefkochService {
   static String _chefkochRecipeEndpoint = 'https://api.chefkoch.de/v2/recipes';
   static Dio _dio = new Dio();
 
+  static String get chefkochRecipeEndpoint => _chefkochRecipeEndpoint;
+
   static Future<Meal> getMealFromChefkochUrl(String url) async {
     final recipeId = _extractRecipeIdFromChefkochUrl(url);
     final response = await _dio.get('$_chefkochRecipeEndpoint/$recipeId');
@@ -21,6 +23,7 @@ class ChefkochService {
       meal.tags = List<String>.from(response.data['tags'])
           .where((tag) => tag.toString().isNotEmpty)
           .toList();
+      meal.tags = meal.tags.toSet().toList(); // removes duplicates
       meal.duration = response.data['totalTime'];
       meal.ingredients = _filterIngredientsFromChefkochIngredientGroups(
           response.data['ingredientGroups'][0]);

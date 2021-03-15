@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 /// General
 const kAppName = 'Foodly App';
 const kPlaceholderSymbol = 'p--';
+const kChefkochShareEndpoint = 'https://www.chefkoch.de/rezepte';
 
 /// Styling
 const kPadding = 20.0;

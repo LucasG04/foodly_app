@@ -12,6 +12,7 @@ import 'package:foodly/screens/meal/confirm_delete_modal.dart';
 import 'package:foodly/services/plan_service.dart';
 import 'package:foodly/utils/convert_util.dart';
 import 'package:foodly/widgets/full_screen_loader.dart';
+import 'package:foodly/widgets/skeleton_container.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -66,16 +67,28 @@ class _MealScreenState extends State<MealScreen> {
                         Stack(
                           children: [
                             meal.imageUrl != null && meal.imageUrl.isNotEmpty
-                                ? CachedNetworkImage(
-                                    imageUrl: meal.imageUrl,
-                                    placeholder: (_, __) =>
-                                        SizedBox(height: 200),
-                                    errorWidget: (_, __, ___) => Image.asset(
-                                      'assets/images/food_fallback.png',
+                                ? Center(
+                                    child: SizedBox(
+                                      height: 300,
+                                      width: double.infinity,
+                                      child: CachedNetworkImage(
+                                        imageUrl: meal.imageUrl,
+                                        fit: BoxFit.cover,
+                                        placeholder: (_, __) =>
+                                            SkeletonContainer(
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                        ),
+                                        errorWidget: (_, __, ___) =>
+                                            Image.asset(
+                                          'assets/images/food_fallback.png',
+                                        ),
+                                      ),
                                     ),
                                   )
                                 : Image.asset(
                                     'assets/images/food_fallback.png',
+                                    fit: BoxFit.cover,
                                   ),
                             Positioned(
                               width: size.width,
