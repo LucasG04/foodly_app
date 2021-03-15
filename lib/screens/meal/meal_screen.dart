@@ -186,7 +186,7 @@ class _MealScreenState extends State<MealScreen> {
                     ),
                     SizedBox(height: kPadding),
                     ..._buildSection(
-                      'Anleitung',
+                      'Zubereitung',
                       MarkdownBody(
                         data: meal.instructions ?? '',
                         styleSheet: MarkdownStyleSheet.fromTheme(
