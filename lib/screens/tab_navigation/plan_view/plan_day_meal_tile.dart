@@ -4,6 +4,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:foodly/utils/convert_util.dart';
+import 'package:foodly/widgets/skeleton_container.dart';
 
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
@@ -41,21 +42,42 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
               placeholder: widget.planMeal.meal.split(kPlaceholderSymbol)[1],
             )
           : FutureBuilder<Meal>(
-              future: MealService.getMealById(this.widget.planMeal.meal),
+              future: MealService.getMealById(widget.planMeal.meal),
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final meal = snapshot.data;
-                  return GestureDetector(
-                    onTap: () => ExtendedNavigator.root
-                        .push(Routes.mealScreen(id: meal.id)),
-                    child: _buildDataRow(context, meal: meal),
-                  );
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.hasData) {
+                    final meal = snapshot.data;
+                    return GestureDetector(
+                      onTap: () => ExtendedNavigator.root
+                          .push(Routes.mealScreen(id: meal.id)),
+                      child: _buildDataRow(context, meal: meal),
+                    );
+                  } else {
+                    final currentPlanId = context.read(planProvider).state.id;
+                    PlanService.deletePlanMealFromPlan(
+                        currentPlanId, widget.planMeal.id);
+                    return _buildSkeletonLoading();
+                  }
                 } else {
-                  // TODO: Skeleton loading
-                  return CircularProgressIndicator();
+                  return _buildSkeletonLoading();
                 }
               },
             ),
+    );
+  }
+
+  Widget _buildSkeletonLoading() {
+    return ListTile(
+      leading: SkeletonContainer(
+        width: 50.0,
+        height: 50.0,
+        borderRadius: 1000,
+      ),
+      title: SkeletonContainer(
+        width: 150.0,
+        height: 17.0,
+        borderRadius: 1000,
+      ),
     );
   }
 
