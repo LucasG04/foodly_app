@@ -34,35 +34,48 @@ class _PlanTabViewState extends State<PlanTabView>
                   if (snapshot.data != null) {
                     final planMeals = snapshot.data;
                     context.read(planProvider).state.meals = planMeals;
-                    final days = _updateMealsForDays(planMeals);
 
-                    return SingleChildScrollView(
-                      child: AnimationLimiter(
-                        child: Column(
-                          children: AnimationConfiguration.toStaggeredList(
-                            duration: const Duration(milliseconds: 250),
-                            childAnimationBuilder: (widget) => SlideAnimation(
-                              child: FadeInAnimation(child: widget),
-                            ),
-                            children: [
-                              SizedBox(height: kPadding),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 5.0),
-                                child: PageTitle(text: 'Essensplan'),
-                              ),
-                              ...days
-                                  .map(
-                                    (e) => PlanDayCard(
-                                      date: e.date,
-                                      meals: e.meals,
+                    return FutureBuilder<List<PlanDay>>(
+                        future: _updateMealsForDays(planMeals),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            return SingleChildScrollView(
+                              child: AnimationLimiter(
+                                child: Column(
+                                  children:
+                                      AnimationConfiguration.toStaggeredList(
+                                    duration: const Duration(milliseconds: 250),
+                                    childAnimationBuilder: (widget) =>
+                                        SlideAnimation(
+                                      child: FadeInAnimation(child: widget),
                                     ),
-                                  )
-                                  .toList()
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
+                                    children: [
+                                      SizedBox(height: kPadding),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 5.0),
+                                        child: PageTitle(text: 'Essensplan'),
+                                      ),
+                                      ...snapshot.data
+                                          .map(
+                                            (e) => PlanDayCard(
+                                              date: e.date,
+                                              meals: e.meals,
+                                            ),
+                                          )
+                                          .toList()
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          } else {
+                            return Center(
+                              child: SmallCircularProgressIndicator(),
+                            );
+                          }
+                        });
                   } else {
                     return Center(child: SmallCircularProgressIndicator());
                   }
@@ -73,7 +86,7 @@ class _PlanTabViewState extends State<PlanTabView>
     );
   }
 
-  List<PlanDay> _updateMealsForDays(List<PlanMeal> planMeals) {
+  Future<List<PlanDay>> _updateMealsForDays(List<PlanMeal> planMeals) async {
     final List<PlanDay> days = [];
     final updatedMeals = [...planMeals];
 
@@ -87,7 +100,7 @@ class _PlanTabViewState extends State<PlanTabView>
     // remove old plan days
     for (var meal in planMeals) {
       if (meal.date.isBefore(today)) {
-        PlanService.deletePlanMealFromPlan(
+        await PlanService.deletePlanMealFromPlan(
             context.read(planProvider).state.id, meal.id);
         updatedMeals.remove(meal);
       }
