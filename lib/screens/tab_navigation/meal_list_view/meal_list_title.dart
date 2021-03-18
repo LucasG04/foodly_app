@@ -1,17 +1,23 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:badges/badges.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodly/providers/state_providers.dart';
+import 'package:foodly/screens/tab_navigation/meal_list_view/tag_filter_modal.dart';
 
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
 
 class MealListTitle extends StatefulWidget {
-  MealListTitle(this.onInputChanged);
+  MealListTitle({
+    @required this.onSearch,
+  });
 
   @override
   _MealListTitleState createState() => _MealListTitleState();
 
-  final void Function(String) onInputChanged;
+  final void Function(String) onSearch;
 }
 
 class _MealListTitleState extends State<MealListTitle> {
@@ -54,6 +60,30 @@ class _MealListTitleState extends State<MealListTitle> {
                     )
                   : SizedBox(),
               SizedBox(width: kPadding / 2),
+              !_searchActive
+                  ? Consumer(
+                      builder: (context, watch, child) {
+                        final tagFilterLength =
+                            watch(mealTagFilterProvider).state.length;
+                        return Badge(
+                          position: BadgePosition.topEnd(top: 0, end: 3),
+                          animationType: BadgeAnimationType.scale,
+                          badgeColor: Theme.of(context).primaryColor,
+                          badgeContent: Text(
+                            tagFilterLength.toString(),
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          child: child,
+                        );
+                      },
+                      child: IconButton(
+                        icon: Icon(EvaIcons.options2Outline),
+                        onPressed: () => _openTagFilterModal(context),
+                        splashRadius: 25.0,
+                      ),
+                    )
+                  : SizedBox(),
+              SizedBox(width: kPadding / 2),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 250),
                 child: _searchActive
@@ -61,7 +91,7 @@ class _MealListTitleState extends State<MealListTitle> {
                         icon: Icon(EvaIcons.closeOutline),
                         onPressed: () {
                           _textEditingController.clear();
-                          widget.onInputChanged('');
+                          widget.onSearch('');
                           setState(() {
                             _searchActive = !_searchActive;
                           });
@@ -104,7 +134,7 @@ class _MealListTitleState extends State<MealListTitle> {
       controller: _textEditingController,
       autofocus: true,
       maxLines: 1,
-      onChanged: widget.onInputChanged,
+      onChanged: widget.onSearch,
       style: TextStyle(
         fontSize: 32.0,
         fontWeight: FontWeight.w700,
@@ -114,5 +144,22 @@ class _MealListTitleState extends State<MealListTitle> {
         hintText: 'Suchen...',
       ),
     );
+  }
+
+  void _openTagFilterModal(context) async {
+    final result = await showModalBottomSheet<List<String>>(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(10.0),
+        ),
+      ),
+      isScrollControlled: true,
+      context: context,
+      builder: (_) => TagFilterModal(),
+    );
+
+    if (result != null) {
+      // TODO handle result
+    }
   }
 }

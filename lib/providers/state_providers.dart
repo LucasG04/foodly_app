@@ -12,3 +12,6 @@ final userProvider = StateProvider<FoodlyUser>((ref) => null);
 
 /// Provides the active plan object.
 final allMealsProvider = StateProvider<List<Meal>>((ref) => []);
+
+/// Provides the current filter for the meal list.
+final mealTagFilterProvider = StateProvider<List<String>>((ref) => []);

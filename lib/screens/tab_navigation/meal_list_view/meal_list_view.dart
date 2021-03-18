@@ -31,31 +31,29 @@ class _MealListViewState extends State<MealListView>
         child: Column(
           children: [
             SizedBox(height: kPadding),
-            MealListTitle((search) {
-              setState(() {
-                _searchInput = search;
-                _filterMeals(search);
-              });
-            }),
+            MealListTitle(
+              onSearch: (search) {
+                setState(() {
+                  _searchInput = search;
+                  _filterMeals(
+                      search, context.read(mealTagFilterProvider).state);
+                });
+              },
+            ),
             Consumer(builder: (context, watch, _) {
               _allMeals = watch(allMealsProvider).state;
-              _filterMeals(_searchInput);
-              final tagList = _groupMealsByTags(this._filteredMeals ?? []);
-              return tagList != null && tagList.isNotEmpty
-                  ? GroupListView(
-                      itemBuilder: (_, item) => MealListTile(
-                        tagList[item.section].meals[item.index],
-                      ),
-                      sectionsCount: tagList.length,
-                      groupHeaderBuilder: (_, group) => _buildSubtitle(
-                        context,
-                        tagList[group].tag,
-                      ),
-                      countOfItemInSection: (section) =>
-                          tagList[section].meals.length,
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                    )
+              final tagFilter = watch(mealTagFilterProvider).state;
+              _filteredMeals = _filterMeals(_searchInput, tagFilter);
+
+              return _filteredMeals != null && _filteredMeals.isNotEmpty
+                  ? tagFilter.isEmpty
+                      ? _buildRawMealList(_filteredMeals)
+                      : _buildGroupedTagList(
+                          _groupMealsByTags(
+                            this._filteredMeals ?? [],
+                            tagFilter,
+                          ),
+                        )
                   : UserInformation(
                       'assets/images/undraw_empty.png',
                       'Keine Gerichte vorhanden',
@@ -87,50 +85,76 @@ class _MealListViewState extends State<MealListView>
     );
   }
 
-  List<TagGroup> _groupMealsByTags(List<Meal> meals) {
-    final List<TagGroup> tagList = [];
+  Widget _buildRawMealList(List<Meal> meals) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: kPadding / 2),
+      child: ListView.builder(
+        itemCount: meals.length,
+        itemBuilder: (_, index) => MealListTile(meals[index]),
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+      ),
+    );
+  }
 
-    for (var meal in meals) {
-      for (var tag in meal.tags) {
-        if (!tagList.contains(tag)) {
-          tagList.add(TagGroup(tag, []));
-        }
-      }
-    }
+  Widget _buildGroupedTagList(List<TagGroup> groups) {
+    return GroupListView(
+      itemBuilder: (_, item) => MealListTile(
+        groups[item.section].meals[item.index],
+      ),
+      sectionsCount: groups.length,
+      groupHeaderBuilder: (_, group) => _buildSubtitle(
+        context,
+        groups[group].tag,
+      ),
+      countOfItemInSection: (section) => groups[section].meals.length,
+      physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+    );
+  }
+
+  List<TagGroup> _groupMealsByTags(List<Meal> meals, List<String> tags) {
+    final List<TagGroup> tagList =
+        tags.map((tag) => new TagGroup(tag, [])).toList();
 
     for (var group in tagList) {
       group.meals =
           meals.where((element) => element.tags.contains(group.tag)).toList();
     }
 
-    if (meals.any((element) => element.tags == null || element.tags.isEmpty)) {
-      tagList.add(
-        TagGroup(
-          'Ohne Kategorie',
-          meals
-              .where((element) => element.tags == null || element.tags.isEmpty)
-              .toList(),
-        ),
-      );
-    }
+    // if (meals.any((element) => element.tags == null || element.tags.isEmpty)) {
+    //   tagList.add(
+    //     TagGroup(
+    //       'Ohne Kategorie',
+    //       meals
+    //           .where((element) => element.tags == null || element.tags.isEmpty)
+    //           .toList(),
+    //     ),
+    //   );
+    // }
 
     return tagList;
   }
 
-  void _filterMeals(String query) {
+  List<Meal> _filterMeals(String query, List<String> tagList) {
+    final mealsCopy = [..._allMeals];
+    mealsCopy.sort((m1, m2) => m1.name.compareTo(m2.name));
+
     if (query.isNotEmpty) {
-      this._filteredMeals = this
-          ._allMeals
-          .where(
-            (el) =>
-                el.name.toLowerCase().contains(query.toLowerCase()) ||
-                el.tags
-                    .any((t) => t.toLowerCase().contains(query.toLowerCase())),
-          )
-          .toList();
-    } else {
-      this._filteredMeals = this._allMeals;
+      return [
+        ...mealsCopy
+            .where((el) => el.name.toLowerCase().contains(query.toLowerCase()))
+            .toList(),
+        ...mealsCopy
+            .where((el) => el.tags
+                .any((t) => t.toLowerCase().contains(query.toLowerCase())))
+            .toList(),
+        ...mealsCopy
+            .where((el) => el.tags.any((tag) => tagList.contains(tag)))
+            .toList()
+      ].toSet().toList();
     }
+    return mealsCopy;
   }
 }
 
