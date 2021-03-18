@@ -148,6 +148,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                               title: 'Dauer (min)',
                               placeholder: '10',
                               textAlign: TextAlign.end,
+                              keyboardType: TextInputType.number,
                             ),
                           ),
                         ],
