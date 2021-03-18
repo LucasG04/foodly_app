@@ -66,6 +66,7 @@ class _MealListTitleState extends State<MealListTitle> {
                         final tagFilterLength =
                             watch(mealTagFilterProvider).state.length;
                         return Badge(
+                          animationDuration: const Duration(milliseconds: 250),
                           position: BadgePosition.topEnd(top: 0, end: 3),
                           animationType: BadgeAnimationType.scale,
                           badgeColor: Theme.of(context).primaryColor,
@@ -146,8 +147,8 @@ class _MealListTitleState extends State<MealListTitle> {
     );
   }
 
-  void _openTagFilterModal(context) async {
-    final result = await showModalBottomSheet<List<String>>(
+  void _openTagFilterModal(context) {
+    showModalBottomSheet<List<String>>(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
@@ -157,9 +158,5 @@ class _MealListTitleState extends State<MealListTitle> {
       context: context,
       builder: (_) => TagFilterModal(),
     );
-
-    if (result != null) {
-      // TODO handle result
-    }
   }
 }

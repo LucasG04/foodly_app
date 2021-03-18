@@ -39,9 +39,9 @@ class _TagFilterModalState extends State<TagFilterModal> {
   Widget build(BuildContext context) {
     final allTags = _getAllTagsFromMeals(context.read(allMealsProvider).state);
 
-    final width = MediaQuery.of(context).size.width > 599
-        ? 580.0
-        : MediaQuery.of(context).size.width * 0.8;
+    final width = MediaQuery.of(context).size.width > 700
+        ? 700.0
+        : MediaQuery.of(context).size.width * 0.9;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
