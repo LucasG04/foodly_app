@@ -131,10 +131,11 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
     }
 
     if (ingredient.amount == null) {
-      setState(() {
-        _amountErrorText = 'Zahl eintragen.';
-      });
-      return;
+      ingredient.amount = 0;
+      // setState(() {
+      //   _amountErrorText = 'Zahl eintragen.';
+      // });
+      // return;
     }
 
     if (ingredient.name.isEmpty) {
