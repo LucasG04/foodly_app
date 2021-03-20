@@ -44,7 +44,8 @@ class _PlanTabViewState extends State<PlanTabView>
               .listen(_updatePlanMeals);
         }
 
-        return (activePlan != null || !_planMealsStream.isPaused)
+        return (activePlan != null ||
+                (_planMealsStream != null && !_planMealsStream.isPaused))
             ? SingleChildScrollView(
                 child: AnimationLimiter(
                   child: Column(

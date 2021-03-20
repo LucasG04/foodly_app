@@ -10,4 +10,9 @@ class BasicUtils {
     context.read(userProvider).state = null;
     context.read(allMealsProvider).state = [];
   }
+
+  /// Clears all state providers.
+  static bool isStorageImage(String image) {
+    return Uri.tryParse(image) == null;
+  }
 }

@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route_annotations.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodly/widgets/wrapped_image_picker/wrapped_image_picker.dart';
 
 import '../../constants.dart';
 import '../../models/meal.dart';
@@ -125,10 +126,13 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                               textEditingController: _instructionsController,
                             ),
                       Divider(),
-                      MainTextField(
-                        controller: _urlController,
-                        title: 'Link zum Bild',
-                        placeholder: 'https://image.food.com/cake.jpg',
+                      // MainTextField(
+                      //   controller: _urlController,
+                      //   title: 'Link zum Bild',
+                      //   placeholder: 'https://image.food.com/cake.jpg',
+                      // ),
+                      WrappedImagePicker(
+                        onPick: (value) => _urlController.text = value,
                       ),
                       Row(
                         children: [
