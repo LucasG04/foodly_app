@@ -1,8 +1,13 @@
+# Secrets
 secrets.dart
 GoogleService-Info.plist
 google-services.json
 key.jks
+service_account_key.json
 android_keys.zip
+
+# Builds
+android/fastlane/report.xml
 
 # Miscellaneous
 *.class
