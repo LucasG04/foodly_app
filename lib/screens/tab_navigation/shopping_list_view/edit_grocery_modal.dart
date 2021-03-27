@@ -41,6 +41,8 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
     _unitController = new TextEditingController(text: widget.grocery?.unit);
 
     _buttonState = ButtonState.normal;
+    _amountFocusNode = new FocusNode();
+    _unitFocusNode = new FocusNode();
 
     super.initState();
   }
@@ -74,6 +76,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
             title: 'Bezeichnung',
             placeholder: 'Brötchen',
             errorText: _errorText,
+            textInputAction: TextInputAction.next,
             onSubmit: () => (_amountFocusNode.requestFocus()),
           ),
           Row(
@@ -97,7 +100,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
                   controller: _unitController,
                   focusNode: _unitFocusNode,
                   title: 'Einheit',
-                  placeholder: 'Prise',
+                  placeholder: 'Stück',
                   onSubmit: _saveGrocery,
                 ),
               ),
