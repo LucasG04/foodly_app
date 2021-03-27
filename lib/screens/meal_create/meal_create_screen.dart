@@ -134,6 +134,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                       WrappedImagePicker(
                         onPick: (value) => _urlController.text = value,
                       ),
+                      Divider(),
                       Row(
                         children: [
                           Flexible(

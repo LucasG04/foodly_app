@@ -4,6 +4,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:foodly/services/storage_service.dart';
 import 'package:foodly/utils/basic_utils.dart';
+import 'package:foodly/widgets/foodly_network_image.dart';
 import 'package:foodly/widgets/wrapped_image_picker/select_picker_dialog.dart';
 
 import '../../constants.dart';
@@ -21,7 +22,7 @@ class WrappedImagePicker extends StatefulWidget {
 
   WrappedImagePicker({
     @required this.onPick,
-    this.edgeLength = 250.0,
+    this.edgeLength = 200.0,
     this.imageUrl,
   });
 
@@ -52,12 +53,7 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
         child: _imageUrl != null
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(kRadius),
-                child: CachedNetworkImage(
-                  imageUrl: _imageUrl,
-                  progressIndicatorBuilder: (context, url, progress) => Center(
-                    child: SmallCircularProgressIndicator(),
-                  ),
-                ),
+                child: FoodlyNetworkImage(_imageUrl),
               )
             : Center(
                 child: Icon(
@@ -82,7 +78,7 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
           _imageUrl = storageUrl;
         });
         widget.onPick(result);
-      } else if (Uri.tryParse(result) != null) {
+      } else if (Uri.tryParse(result).isAbsolute) {
         setState(() {
           _imageUrl = result;
         });

@@ -66,6 +66,7 @@ class _MainTextFieldState extends State<MainTextField> {
               vertical: kPadding / 2,
             ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: widget.title != null
             ? [

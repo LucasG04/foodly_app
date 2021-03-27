@@ -11,6 +11,7 @@ import 'package:foodly/providers/state_providers.dart';
 import 'package:foodly/screens/meal/confirm_delete_modal.dart';
 import 'package:foodly/services/plan_service.dart';
 import 'package:foodly/utils/convert_util.dart';
+import 'package:foodly/widgets/foodly_network_image.dart';
 import 'package:foodly/widgets/full_screen_loader.dart';
 import 'package:foodly/widgets/skeleton_container.dart';
 
@@ -71,19 +72,7 @@ class _MealScreenState extends State<MealScreen> {
                                     child: SizedBox(
                                       height: 300,
                                       width: double.infinity,
-                                      child: CachedNetworkImage(
-                                        imageUrl: meal.imageUrl,
-                                        fit: BoxFit.cover,
-                                        placeholder: (_, __) =>
-                                            SkeletonContainer(
-                                          width: double.infinity,
-                                          height: double.infinity,
-                                        ),
-                                        errorWidget: (_, __, ___) =>
-                                            Image.asset(
-                                          'assets/images/food_fallback.png',
-                                        ),
-                                      ),
+                                      child: FoodlyNetworkImage(meal.imageUrl),
                                     ),
                                   )
                                 : Image.asset(

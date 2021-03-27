@@ -13,6 +13,6 @@ class BasicUtils {
 
   /// Clears all state providers.
   static bool isStorageImage(String image) {
-    return Uri.tryParse(image) == null;
+    return !Uri.tryParse(image).isAbsolute;
   }
 }

@@ -40,7 +40,7 @@ class StorageService {
     Reference ref = FirebaseStorage.instance
         .ref()
         .child(_storageMealImageFolder)
-        .child('$fileName.jpg');
+        .child(fileName);
 
     return ref.getDownloadURL();
   }

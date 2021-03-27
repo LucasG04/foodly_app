@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:foodly/widgets/foodly_network_image.dart';
 
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
@@ -41,13 +42,7 @@ class MealListTile extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(kRadius),
                   child: meal.imageUrl != null && meal.imageUrl.isNotEmpty
-                      ? CachedNetworkImage(
-                          imageUrl: meal.imageUrl,
-                          fit: BoxFit.cover,
-                          errorWidget: (_, __, ___) => Image.asset(
-                            'assets/images/food_fallback.png',
-                          ),
-                        )
+                      ? FoodlyNetworkImage(meal.imageUrl)
                       : Image.asset(
                           'assets/images/food_fallback.png',
                           fit: BoxFit.cover,

@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:foodly/widgets/foodly_network_image.dart';
 
 import '../../constants.dart';
 import '../../models/meal.dart';
@@ -33,13 +34,7 @@ class _SelectMealTileState extends State<SelectMealTile> {
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(kRadius),
           child: widget.meal.imageUrl != null && widget.meal.imageUrl.isNotEmpty
-              ? CachedNetworkImage(
-                  imageUrl: widget.meal.imageUrl,
-                  fit: BoxFit.cover,
-                  errorWidget: (_, __, ___) => Image.asset(
-                    'assets/images/food_fallback.png',
-                  ),
-                )
+              ? FoodlyNetworkImage(widget.meal.imageUrl)
               : Image.asset(
                   'assets/images/food_fallback.png',
                   fit: BoxFit.cover,

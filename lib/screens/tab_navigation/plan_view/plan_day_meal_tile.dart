@@ -4,6 +4,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:foodly/utils/convert_util.dart';
+import 'package:foodly/widgets/foodly_network_image.dart';
 import 'package:foodly/widgets/skeleton_container.dart';
 
 import '../../../app_router.gr.dart';
@@ -104,13 +105,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                     ),
                   )
                 : meal.imageUrl != null && meal.imageUrl.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: meal.imageUrl,
-                        fit: BoxFit.cover,
-                        errorWidget: (_, __, ___) => Image.asset(
-                          'assets/images/food_fallback.png',
-                        ),
-                      )
+                    ? FoodlyNetworkImage(meal.imageUrl)
                     : Image.asset(
                         'assets/images/food_fallback.png',
                         fit: BoxFit.cover,

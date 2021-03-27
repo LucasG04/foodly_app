@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:foodly/constants.dart';
 import 'package:foodly/services/storage_service.dart';
 import 'package:foodly/utils/main_snackbar.dart';
+import 'package:foodly/widgets/full_screen_loader.dart';
 import 'package:foodly/widgets/main_text_field.dart';
+import 'package:foodly/widgets/small_circular_progress_indicator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logging/logging.dart';
 
@@ -15,6 +17,7 @@ class SelectPickerDialog extends StatefulWidget {
 class _SelectPickerDialogState extends State<SelectPickerDialog> {
   Logger _log;
 
+  bool _isLoading;
   ImagePicker _imagePicker;
   bool _showUrlInput;
   TextEditingController _linkController;
@@ -23,6 +26,7 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
   @override
   void initState() {
     _log = new Logger('SelectPickerDialog');
+    _isLoading = false;
     _imagePicker = ImagePicker();
     _showUrlInput = false;
     _linkController = new TextEditingController();
@@ -36,47 +40,57 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
       margin: const EdgeInsets.all(kPadding),
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
-        child: !_showUrlInput
-            ? Wrap(
-                alignment: WrapAlignment.center,
-                spacing: kPadding / 2,
-                children: [
-                  _buildPickerTypeTile(
-                    EvaIcons.cameraOutline,
-                    'Kamera',
-                    () => _uploadLocalImage(ImageSource.camera),
-                  ),
-                  _buildPickerTypeTile(
-                    EvaIcons.imageOutline,
-                    'Gallerie',
-                    () => _uploadLocalImage(ImageSource.gallery),
-                  ),
-                  _buildPickerTypeTile(
-                    EvaIcons.globe2Outline,
-                    'Web',
-                    () => setState(() => (_showUrlInput = true)),
-                  ),
-                ],
+        child: _isLoading
+            ? SizedBox(
+                height: MediaQuery.of(context).size.width * 0.35,
+                width: MediaQuery.of(context).size.width * 0.7,
+                child: Center(child: SmallCircularProgressIndicator()),
               )
-            : Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            : !_showUrlInput
+                ? Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: kPadding / 2,
                     children: [
-                      IconButton(
-                        icon: Icon(EvaIcons.arrowBackOutline),
-                        onPressed: () => setState(
-                          () => (_showUrlInput = false),
-                        ),
+                      _buildPickerTypeTile(
+                        EvaIcons.cameraOutline,
+                        'Kamera',
+                        () => _uploadLocalImage(ImageSource.camera),
                       ),
-                      IconButton(
-                        icon: Icon(EvaIcons.checkmarkOutline),
-                        onPressed: _setWebImageUrl,
+                      _buildPickerTypeTile(
+                        EvaIcons.imageOutline,
+                        'Gallerie',
+                        () => _uploadLocalImage(ImageSource.gallery),
+                      ),
+                      _buildPickerTypeTile(
+                        EvaIcons.globe2Outline,
+                        'Web',
+                        () => setState(() => (_showUrlInput = true)),
+                      ),
+                    ],
+                  )
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            icon: Icon(EvaIcons.arrowBackOutline),
+                            onPressed: () => setState(
+                              () => (_showUrlInput = false),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(EvaIcons.checkmarkOutline),
+                            onPressed: _setWebImageUrl,
+                          ),
+                        ],
                       ),
                       SizedBox(height: kPadding / 2),
                       MainTextField(
                         controller: _linkController,
                         onSubmit: _setWebImageUrl,
+                        placeholder: 'http://food.com/images/23342',
                       ),
                       SizedBox(height: kPadding / 2),
                       _showLinkError
@@ -86,15 +100,17 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
                                   EvaIcons.alertCircleOutline,
                                   color: Theme.of(context).errorColor,
                                 ),
-                                Text(
-                                    'Der Link konnte nicht aufgerufen werden. Bitte überprüfe ihn oder verwende die "Gallerie"-Funktion.'),
+                                SizedBox(height: kPadding / 2),
+                                Expanded(
+                                  child: Text(
+                                    'Der Link konnte nicht aufgerufen werden. Bitte überprüfe ihn oder verwende die "Gallerie"-Funktion.',
+                                  ),
+                                ),
                               ],
                             )
                           : SizedBox(),
                     ],
                   ),
-                ],
-              ),
       ),
     );
   }
@@ -102,9 +118,12 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
   Widget _buildPickerTypeTile(
       IconData iconData, String text, Function() onTap) {
     return Container(
+      height: 80.0,
+      width: 80.0,
       margin: const EdgeInsets.all(kPadding / 2),
       decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor, width: 1.0),
+        color: Theme.of(context).scaffoldBackgroundColor,
+        boxShadow: [kSmallShadow],
         borderRadius: BorderRadius.circular(kRadius),
       ),
       child: InkWell(
@@ -126,7 +145,11 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
     final upload = await StorageService.uploadFile(image);
 
     try {
+      setState(() {
+        _isLoading = true;
+      });
       final result = await upload;
+      _isLoading = false;
       Navigator.pop(context, result.ref.name);
     } catch (e) {
       _log.severe('ERR: StorageService.uploadFile', image);
@@ -142,7 +165,7 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
     _showLinkError = false;
 
     final String url = _linkController.text.trim();
-    if (Uri.tryParse(url) != null) {
+    if (Uri.tryParse(url).isAbsolute) {
       Navigator.pop(context, url);
     } else {
       setState(() {
