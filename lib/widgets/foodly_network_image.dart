@@ -11,7 +11,7 @@ class FoodlyNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BasicUtils.isStorageImage(imageUrl)
+    return BasicUtils.isStorageMealImage(imageUrl)
         ? FutureBuilder(
             future: StorageService.getMealImageUrl(imageUrl),
             builder: (context, snapshot) {

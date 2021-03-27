@@ -83,7 +83,7 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
     );
 
     if (result != null) {
-      if (BasicUtils.isStorageImage(result)) {
+      if (BasicUtils.isStorageMealImage(result)) {
         final storageUrl = await StorageService.getMealImageUrl(result);
         setState(() {
           _imageUrl = storageUrl;

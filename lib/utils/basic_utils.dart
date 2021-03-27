@@ -12,7 +12,13 @@ class BasicUtils {
   }
 
   /// Clears all state providers.
-  static bool isStorageImage(String image) {
-    return !Uri.tryParse(image).isAbsolute;
+  static bool isStorageMealImage(String image) {
+    try {
+      final date = new DateTime.fromMicrosecondsSinceEpoch(
+          int.parse(image.split('.').first));
+      return !Uri.tryParse(image).isAbsolute && date.microsecondsSinceEpoch > 0;
+    } catch (e) {
+      return false;
+    }
   }
 }

@@ -62,7 +62,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   void dispose() {
     if (_updatedImage != null &&
         !_mealSaved &&
-        BasicUtils.isStorageImage(_updatedImage)) {
+        BasicUtils.isStorageMealImage(_updatedImage)) {
       StorageService.removeFile(_updatedImage);
     }
     super.dispose();
