@@ -239,8 +239,9 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
           listId,
           new Grocery(
             name: ingredient.name,
-            amount:
-                ConvertUtil.amountToString(ingredient.amount, ingredient.unit),
+            amount: ingredient.amount,
+            unit: ingredient.unit,
+            productGroup: ingredient.productGroup,
           ),
         );
       }

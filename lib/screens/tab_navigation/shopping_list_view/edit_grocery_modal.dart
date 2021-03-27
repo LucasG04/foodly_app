@@ -25,6 +25,9 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
   bool _isCreating;
   TextEditingController _nameController;
   TextEditingController _amountController;
+  TextEditingController _unitController;
+  FocusNode _amountFocusNode;
+  FocusNode _unitFocusNode;
 
   ButtonState _buttonState;
   String _errorText;
@@ -33,7 +36,9 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
   void initState() {
     _isCreating = widget.grocery == null;
     _nameController = new TextEditingController(text: widget.grocery?.name);
-    _amountController = new TextEditingController(text: widget.grocery?.amount);
+    _amountController =
+        new TextEditingController(text: widget.grocery?.amount?.toString());
+    _unitController = new TextEditingController(text: widget.grocery?.unit);
 
     _buttonState = ButtonState.normal;
 
@@ -69,18 +74,36 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
             title: 'Bezeichnung',
             placeholder: 'Brötchen',
             errorText: _errorText,
+            onSubmit: () => (_amountFocusNode.requestFocus()),
           ),
-          SizedBox(
-            width: width * 0.4,
-            child: MainTextField(
-              controller: _amountController,
-              title: 'Menge',
-              placeholder: '2 Packungen',
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: width * 0.4,
+                child: MainTextField(
+                  controller: _amountController,
+                  focusNode: _amountFocusNode,
+                  title: 'Menge',
+                  placeholder: '1',
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                  onSubmit: () => (_unitFocusNode.requestFocus()),
+                ),
+              ),
+              SizedBox(
+                width: width * 0.5,
+                child: MainTextField(
+                  controller: _unitController,
+                  focusNode: _unitFocusNode,
+                  title: 'Einheit',
+                  placeholder: 'Prise',
+                  onSubmit: _saveGrocery,
+                ),
+              ),
+            ],
           ),
-          SizedBox(
-            height: kPadding * 2,
-          ),
+          SizedBox(height: kPadding * 2),
           Center(
             child: MainButton(
               text: 'Speichern',
@@ -98,7 +121,9 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
   void _saveGrocery() async {
     final grocery = _isCreating ? Grocery() : widget.grocery;
     grocery.name = _nameController.text.trim();
-    grocery.amount = _amountController.text.trim();
+    grocery.amount =
+        double.tryParse(_amountController.text.trim().replaceAll(',', '.'));
+    grocery.unit = _unitController.text.trim();
     grocery.bought = _isCreating ? false : grocery.bought;
 
     if (grocery.name.isNotEmpty) {

@@ -1,20 +1,26 @@
 class Grocery {
   String id;
   String name;
-  String amount;
+  double amount;
+  String unit;
+  String productGroup;
   bool bought;
 
   Grocery({
     this.id,
     this.name,
-    this.amount,
+    this.amount = 0.0,
+    this.unit = '',
+    this.productGroup = '',
     this.bought,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'name': name,
-      'amount': amount ?? '',
+      'amount': amount,
+      'unit': unit,
+      'productGroup': productGroup,
       'bought': bought ?? false,
     };
   }
@@ -25,7 +31,9 @@ class Grocery {
     return Grocery(
       id: id,
       name: map['name'],
-      amount: map['amount'] ?? '',
+      amount: map['amount'],
+      unit: map['unit'],
+      productGroup: map['productGroup'],
       bought: map['bought'],
     );
   }

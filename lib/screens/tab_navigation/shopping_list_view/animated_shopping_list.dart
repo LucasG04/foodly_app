@@ -1,6 +1,8 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:foodly/utils/basic_utils.dart';
+import 'package:foodly/utils/convert_util.dart';
 
 import '../../../models/grocery.dart';
 
@@ -46,8 +48,8 @@ class AnimatedShoppingList extends StatelessWidget {
           actionPane: SlidableDrawerActionPane(),
           child: ListTile(
             title: Text(grocery.name, style: TextStyle(fontSize: 20.0)),
-            subtitle: grocery.amount != null && grocery.amount.isNotEmpty
-                ? Text(grocery.amount)
+            subtitle: grocery.amount != null && grocery.amount != 0
+                ? Text(ConvertUtil.amountToString(grocery.amount, grocery.unit))
                 : null,
             trailing: IconButton(
               icon: Icon(EvaIcons.moreHorizotnalOutline),
