@@ -35,7 +35,7 @@ class SkeletonContainer extends StatelessWidget {
           height: height,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(borderRadius),
-            color: backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
+            color: backgroundColor ?? Colors.black12,
           ),
         ),
       ),

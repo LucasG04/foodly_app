@@ -219,6 +219,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
       _isCreatingMeal = true;
       ChefkochService.getMealFromChefkochUrl(Uri.decodeComponent(widget.id))
           .then((meal) {
+        meal.imageUrl = meal.imageUrl.replaceFirst('http:', 'https:');
         _meal = meal;
         _titleController = new TextEditingController(text: meal.name);
         _sourceController = new TextEditingController(text: meal.source);
