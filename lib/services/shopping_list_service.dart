@@ -46,7 +46,7 @@ class ShoppingListService {
             event.docs.map((e) => Grocery.fromMap(e.id, e.data())).toList());
   }
 
-  static Future<void> updateGrocery(String listId, Grocery grocery) async {
+  static Future<void> updateGrocery(String listId, Grocery grocery) {
     log.finer(
         'Call updateGrocery with listId: $listId | Grocery: ${grocery.toMap()}');
     return _firestore
@@ -60,6 +60,11 @@ class ShoppingListService {
   static Future<void> addGrocery(String listId, Grocery grocery) async {
     log.finer(
         'Call addGrocery with listId: $listId | Grocery: ${grocery.toMap()}');
+
+    if (await _checkForDuplicateGrocery(listId, grocery)) {
+      log.finest('addGrocery: adding prevented and existing one updated');
+      return;
+    }
     return _firestore
         .collection('shoppinglists')
         .doc(listId)
@@ -67,7 +72,7 @@ class ShoppingListService {
         .add(grocery.toMap());
   }
 
-  static Future<void> deleteGrocery(String listId, String groceryId) async {
+  static Future<void> deleteGrocery(String listId, String groceryId) {
     log.finer(
         'Call deleteGrocery with listId: $listId | groceryId: $groceryId');
     return _firestore
@@ -92,5 +97,31 @@ class ShoppingListService {
 
     return Future.wait(
         snaps.docs.map((e) => deleteGrocery(listId, e.id)).toList());
+  }
+
+  /// Checks current groceries for an already existing one.
+  /// If one exists then no new one will be created, but the existing one will be updated.
+  ///
+  /// Returns `true` if one was updated, false otherwise.
+  static Future<bool> _checkForDuplicateGrocery(
+      String listId, Grocery grocery) async {
+    final groceriesSnap = await _firestore
+        .collection('shoppinglists')
+        .doc(listId)
+        .collection('groceries')
+        .where('name', isEqualTo: grocery.name)
+        .where('unit', isEqualTo: grocery.unit)
+        .where('productGroup', isEqualTo: grocery.productGroup)
+        .where('bought', isEqualTo: false)
+        .get();
+
+    if (groceriesSnap.size != 0) {
+      final existingGrocery = Grocery.fromMap(
+          groceriesSnap.docs.first.id, groceriesSnap.docs.first.data());
+      existingGrocery.amount += grocery.amount;
+      await updateGrocery(listId, existingGrocery);
+      return true;
+    }
+    return false;
   }
 }
