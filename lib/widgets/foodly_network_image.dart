@@ -27,6 +27,7 @@ class FoodlyNetworkImage extends StatelessWidget {
   }
 
   CachedNetworkImage _buildCachedNetworkImage(String url) {
+    url = url.replaceFirst('http://', 'https://');
     return CachedNetworkImage(
       imageUrl: url,
       fit: BoxFit.cover,

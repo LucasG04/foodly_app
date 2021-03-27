@@ -1,6 +1,8 @@
 secrets.dart
 GoogleService-Info.plist
 google-services.json
+key.jks
+android_keys.zip
 
 # Miscellaneous
 *.class
