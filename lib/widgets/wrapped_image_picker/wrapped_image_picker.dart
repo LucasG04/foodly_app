@@ -1,5 +1,3 @@
-import 'package:adaptive_dialog/adaptive_dialog.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:foodly/services/storage_service.dart';
@@ -8,7 +6,6 @@ import 'package:foodly/widgets/foodly_network_image.dart';
 import 'package:foodly/widgets/wrapped_image_picker/select_picker_dialog.dart';
 
 import '../../constants.dart';
-import '../small_circular_progress_indicator.dart';
 
 class WrappedImagePicker extends StatefulWidget {
   /// Returns the new image url
@@ -21,10 +18,11 @@ class WrappedImagePicker extends StatefulWidget {
   final String imageUrl;
 
   WrappedImagePicker({
+    Key key,
     @required this.onPick,
     this.edgeLength = 200.0,
     this.imageUrl,
-  });
+  }) : super(key: key);
 
   @override
   _WrappedImagePickerState createState() => _WrappedImagePickerState();
@@ -35,7 +33,10 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
 
   @override
   void initState() {
-    _imageUrl = widget.imageUrl;
+    _imageUrl = widget.imageUrl != null && widget.imageUrl.isNotEmpty
+        ? widget.imageUrl
+        : null;
+
     super.initState();
   }
 
@@ -45,7 +46,7 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
       width: widget.edgeLength,
       height: widget.edgeLength,
       decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor, width: 1.0),
+        border: Border.all(color: Colors.black, width: 1.0),
         borderRadius: BorderRadius.circular(kRadius),
       ),
       child: InkWell(
@@ -56,9 +57,19 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
                 child: FoodlyNetworkImage(_imageUrl),
               )
             : Center(
-                child: Icon(
-                  EvaIcons.image2,
-                  color: Theme.of(context).primaryColor,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      EvaIcons.plus,
+                      color: Theme.of(context).primaryColor,
+                      size: 12.0,
+                    ),
+                    Icon(
+                      EvaIcons.image2,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ],
                 ),
               ),
       ),

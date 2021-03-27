@@ -44,4 +44,18 @@ class StorageService {
 
     return ref.getDownloadURL();
   }
+
+  static Future<void> removeFile(String fileName) {
+    if (fileName == null || fileName.isEmpty) {
+      return null;
+    }
+
+    // Create a Reference to the file
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child(_storageMealImageFolder)
+        .child(fileName);
+
+    return ref.delete();
+  }
 }

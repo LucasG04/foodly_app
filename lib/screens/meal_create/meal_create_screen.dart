@@ -3,6 +3,8 @@ import 'package:auto_route/auto_route_annotations.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodly/services/storage_service.dart';
+import 'package:foodly/utils/basic_utils.dart';
 import 'package:foodly/widgets/wrapped_image_picker/wrapped_image_picker.dart';
 
 import '../../constants.dart';
@@ -39,11 +41,12 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   TextEditingController _instructionsController;
   bool _isCreatingMeal;
   bool _isLoadingMeal;
+  bool _mealSaved;
   Meal _meal = new Meal();
   ScrollController _scrollController;
   TextEditingController _sourceController;
   TextEditingController _titleController;
-  TextEditingController _urlController;
+  String _updatedImage;
 
   @override
   void initState() {
@@ -51,7 +54,18 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
 
     _buttonState = ButtonState.normal;
     _scrollController = new ScrollController();
+    _mealSaved = false;
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    if (_updatedImage != null &&
+        !_mealSaved &&
+        BasicUtils.isStorageImage(_updatedImage)) {
+      StorageService.removeFile(_updatedImage);
+    }
+    super.dispose();
   }
 
   @override
@@ -126,14 +140,15 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                               textEditingController: _instructionsController,
                             ),
                       Divider(),
-                      // MainTextField(
-                      //   controller: _urlController,
-                      //   title: 'Link zum Bild',
-                      //   placeholder: 'https://image.food.com/cake.jpg',
-                      // ),
-                      WrappedImagePicker(
-                        onPick: (value) => _urlController.text = value,
-                      ),
+                      _isLoadingMeal
+                          ? WrappedImagePicker(
+                              key: UniqueKey(),
+                              onPick: null,
+                            )
+                          : WrappedImagePicker(
+                              imageUrl: _meal.imageUrl,
+                              onPick: (value) => _updatedImage = value,
+                            ),
                       Divider(),
                       Row(
                         children: [
@@ -172,7 +187,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                         padding: const EdgeInsets.symmetric(vertical: kPadding),
                         child: MainButton(
                           text: 'Speichern',
-                          onTap: _createMeal,
+                          onTap: _saveMeal,
                           isProgress: true,
                           buttonState: _buttonState,
                         ),
@@ -194,7 +209,6 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
       _isLoadingMeal = false;
       _isCreatingMeal = true;
       _titleController = new TextEditingController();
-      _urlController = new TextEditingController();
       _sourceController = new TextEditingController();
       _durationController = new TextEditingController();
       _instructionsController = new TextEditingController();
@@ -207,7 +221,6 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
           .then((meal) {
         _meal = meal;
         _titleController = new TextEditingController(text: meal.name);
-        _urlController = new TextEditingController(text: meal.imageUrl);
         _sourceController = new TextEditingController(text: meal.source);
         _durationController =
             new TextEditingController(text: meal.duration.toString());
@@ -225,7 +238,6 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
       MealService.getMealById(widget.id).then((meal) {
         _meal = meal;
         _titleController = new TextEditingController(text: meal.name);
-        _urlController = new TextEditingController(text: meal.imageUrl);
         _sourceController = new TextEditingController(text: meal.source);
         _durationController =
             new TextEditingController(text: meal.duration.toString());
@@ -240,19 +252,19 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     }
   }
 
-  Future<void> _createMeal() async {
+  Future<void> _saveMeal() async {
     setState(() {
       _buttonState = ButtonState.inProgress;
     });
 
     _meal.name = _titleController.text;
-    _meal.imageUrl = _urlController.text;
     _meal.source = _sourceController.text;
     _meal.duration = int.tryParse(_durationController.text) ?? 0;
     _meal.instructions = _instructionsController.text;
     _meal.createdBy = _isCreatingMeal
         ? AuthenticationService.currentUser.uid
         : _meal.createdBy;
+    _meal.imageUrl = _updatedImage ?? _meal.imageUrl;
 
     if (_formIsValid()) {
       try {
@@ -260,6 +272,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
             ? await MealService.createMeal(_meal)
             : await MealService.updateMeal(_meal);
         _buttonState = ButtonState.normal;
+        _mealSaved = true;
         ExtendedNavigator.root.pop(newMeal);
       } catch (e) {
         print(e);
@@ -301,7 +314,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     if (result != null) {
       setState(() {
         _titleController.text = result.name;
-        _urlController.text = result.imageUrl;
+        _meal.imageUrl = result.imageUrl;
         _sourceController.text = result.source;
         _durationController.text = result.duration.toString();
         _instructionsController.text = result.instructions;
