@@ -29,7 +29,7 @@ class PlanService {
         .limit(1)
         .get();
 
-    return querySnaps.docs.first.id;
+    return querySnaps.docs.isEmpty ? null : querySnaps.docs.first.id;
   }
 
   static Future<Plan> getPlanById(String id) async {

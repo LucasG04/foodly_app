@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 import 'helper.dart';
@@ -89,8 +90,9 @@ class _ButtonsTabState extends State<ButtonsTab> {
                 width: 4,
               ),
             ),
-            Text(
+            AutoSizeText(
               widget.title,
+              maxLines: 1,
               style: widget.isSelected
                   ? widget.selectedTextStyle
                   : widget.unSelectedTextStyle,

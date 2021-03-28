@@ -76,12 +76,10 @@ class _LoginViewState extends State<LoginView> {
             initialIndex: 0,
             selectedTextStyle: TextStyle(
               color: Colors.white,
-              fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
             unSelectedTextStyle: TextStyle(
               color: Colors.grey,
-              fontSize: 14,
               fontWeight: FontWeight.w400,
             ),
             labels: ['Registrieren', 'Anmelden'],
