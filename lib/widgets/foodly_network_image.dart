@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:foodly/services/image_cache_service.dart';
 
 import '../services/storage_service.dart';
 import '../utils/basic_utils.dart';
@@ -39,6 +40,7 @@ class FoodlyNetworkImage extends StatelessWidget {
       errorWidget: (_, __, ___) => Image.asset(
         'assets/images/food_fallback.png',
       ),
+      // cacheManager: HiveCacheManager(box: ImageCacheService.box)
     );
   }
 }
