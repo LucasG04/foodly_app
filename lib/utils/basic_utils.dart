@@ -21,4 +21,13 @@ class BasicUtils {
       return false;
     }
   }
+
+  static double contentWidth(
+    BuildContext context, {
+    double smallMultiplier = 0.9,
+  }) {
+    return MediaQuery.of(context).size.width > 599
+        ? 600
+        : MediaQuery.of(context).size.width * smallMultiplier;
+  }
 }

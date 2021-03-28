@@ -61,7 +61,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final contentWidth = size.width > 599 ? 600 : size.width * 0.9;
+    final contentWidth = BasicUtils.contentWidth(context);
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: (MediaQuery.of(context).size.width - contentWidth) / 2,
@@ -71,7 +71,7 @@ class _LoginViewState extends State<LoginView> {
         children: [
           SizedBox(height: kPadding + MediaQuery.of(context).padding.top),
           FlutterToggleTab(
-            width: 80,
+            width: 50,
             borderRadius: 15,
             initialIndex: 0,
             selectedTextStyle: TextStyle(

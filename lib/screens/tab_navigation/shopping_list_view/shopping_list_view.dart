@@ -1,6 +1,7 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
+import 'package:foodly/utils/basic_utils.dart';
 
 import '../../../constants.dart';
 import '../../../models/grocery.dart';
@@ -63,74 +64,87 @@ class _ShoppingListViewState extends State<ShoppingListView>
                                     ],
                                   ),
                                 ),
-                                AnimatedShoppingList(
-                                  groceries: todoItems,
-                                  onEdit: (e) => _editGrocery(listId, e),
-                                  onTap: (item) {
-                                    item.bought = true;
-                                    ShoppingListService.updateGrocery(
-                                        listId, item);
-                                  },
-                                  onDelete: (item) {
-                                    ShoppingListService.deleteGrocery(
-                                        listId, item.id);
-                                  },
+                                SizedBox(
+                                  width: BasicUtils.contentWidth(
+                                    context,
+                                    smallMultiplier: 1,
+                                  ),
+                                  child: AnimatedShoppingList(
+                                    groceries: todoItems,
+                                    onEdit: (e) => _editGrocery(listId, e),
+                                    onTap: (item) {
+                                      item.bought = true;
+                                      ShoppingListService.updateGrocery(
+                                          listId, item);
+                                    },
+                                    onDelete: (item) {
+                                      ShoppingListService.deleteGrocery(
+                                          listId, item.id);
+                                    },
+                                  ),
                                 ),
                                 SizedBox(height: kPadding),
-                                ExpansionTile(
-                                  title: Text(
-                                    'BEREITS GEKAUFT',
-                                    style: TextStyle(
-                                      color: Theme.of(context).primaryColor,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                SizedBox(
+                                  width: BasicUtils.contentWidth(
+                                    context,
+                                    smallMultiplier: 1,
                                   ),
-                                  children: [
-                                    AnimatedShoppingList(
-                                      groceries: boughtItems,
-                                      onEdit: (e) => _editGrocery(listId, e),
-                                      onTap: (item) {
-                                        item.bought = false;
-                                        ShoppingListService.updateGrocery(
-                                            listId, item);
-                                      },
-                                      onDelete: (item) {
-                                        ShoppingListService.deleteGrocery(
-                                            listId, item.id);
-                                      },
+                                  child: ExpansionTile(
+                                    title: Text(
+                                      'BEREITS GEKAUFT',
+                                      style: TextStyle(
+                                        color: Theme.of(context).primaryColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                    boughtItems.length > 0
-                                        ? Center(
-                                            child: TextButton(
-                                              onPressed: () =>
-                                                  ShoppingListService
-                                                      .deleteAllBoughtGrocery(
-                                                          listId),
-                                              child: Text(
-                                                'Alle entfernen',
-                                                style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .errorColor,
+                                    children: [
+                                      AnimatedShoppingList(
+                                        groceries: boughtItems,
+                                        onEdit: (e) => _editGrocery(listId, e),
+                                        onTap: (item) {
+                                          item.bought = false;
+                                          ShoppingListService.updateGrocery(
+                                              listId, item);
+                                        },
+                                        onDelete: (item) {
+                                          ShoppingListService.deleteGrocery(
+                                              listId, item.id);
+                                        },
+                                      ),
+                                      boughtItems.length > 0
+                                          ? Center(
+                                              child: TextButton(
+                                                onPressed: () =>
+                                                    ShoppingListService
+                                                        .deleteAllBoughtGrocery(
+                                                            listId),
+                                                child: Text(
+                                                  'Alle entfernen',
+                                                  style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .errorColor,
+                                                  ),
+                                                ),
+                                                style: ButtonStyle(
+                                                  shadowColor:
+                                                      MaterialStateProperty.all<
+                                                          Color>(
+                                                    Theme.of(context)
+                                                        .errorColor,
+                                                  ),
+                                                  overlayColor:
+                                                      MaterialStateProperty.all<
+                                                          Color>(
+                                                    Theme.of(context)
+                                                        .errorColor
+                                                        .withOpacity(0.1),
+                                                  ),
                                                 ),
                                               ),
-                                              style: ButtonStyle(
-                                                shadowColor:
-                                                    MaterialStateProperty.all<
-                                                        Color>(
-                                                  Theme.of(context).errorColor,
-                                                ),
-                                                overlayColor:
-                                                    MaterialStateProperty.all<
-                                                        Color>(
-                                                  Theme.of(context)
-                                                      .errorColor
-                                                      .withOpacity(0.1),
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                        : SizedBox(),
-                                  ],
+                                            )
+                                          : SizedBox(),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
