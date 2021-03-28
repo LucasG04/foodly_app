@@ -13,7 +13,13 @@ class ChefkochService {
 
   static Future<Meal> getMealFromChefkochUrl(String url) async {
     final recipeId = _extractRecipeIdFromChefkochUrl(url);
-    final response = await _dio.get('$_chefkochRecipeEndpoint/$recipeId');
+    Response<dynamic> response;
+
+    try {
+      response = await _dio.get('$_chefkochRecipeEndpoint/$recipeId');
+    } catch (e) {
+      print(e);
+    }
 
     if (response.data != null) {
       Meal meal = Meal();
@@ -26,7 +32,7 @@ class ChefkochService {
       meal.tags = meal.tags.toSet().toList(); // removes duplicates
       meal.duration = response.data['totalTime'];
       meal.ingredients = _filterIngredientsFromChefkochIngredientGroups(
-          response.data['ingredientGroups'][0]);
+          List<Map<String, dynamic>>.from(response.data['ingredientGroups']));
       meal.imageUrl = await _getImageUrlByRecipeId(recipeId);
 
       return meal;
@@ -42,14 +48,18 @@ class ChefkochService {
   }
 
   static List<Ingredient> _filterIngredientsFromChefkochIngredientGroups(
-      Map<String, dynamic> ingredientGroups) {
-    return List<Map<String, dynamic>>.from(ingredientGroups['ingredients'])
-        .map((Map<String, dynamic> e) => Ingredient(
-              name: e['name'],
-              amount: e['amount'],
-              unit: e['unit'],
-              productGroup: e['productGroup'],
-            ))
+      List<Map<String, dynamic>> ingredientGroups) {
+    return ingredientGroups
+        .map((group) => List<Map<String, dynamic>>.from(group['ingredients'])
+            .map((Map<String, dynamic> e) => Ingredient(
+                  name: e['name'],
+                  amount: e['amount'],
+                  unit: e['unit'],
+                  productGroup: e['productGroup'],
+                ))
+            .toList())
+        .toList()
+        .expand((i) => i)
         .toList();
   }
 
