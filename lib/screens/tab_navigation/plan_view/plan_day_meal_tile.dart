@@ -1,9 +1,7 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
-import 'package:foodly/utils/convert_util.dart';
 import 'package:foodly/widgets/foodly_network_image.dart';
 import 'package:foodly/widgets/skeleton_container.dart';
 
@@ -68,17 +66,20 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
   }
 
   Widget _buildSkeletonLoading() {
-    return ListTile(
-      leading: SkeletonContainer(
-        width: 50.0,
-        height: 50.0,
-        borderRadius: 1000,
-      ),
-      title: SkeletonContainer(
-        width: 150.0,
-        height: 17.0,
-        borderRadius: 1000,
-      ),
+    return Row(
+      children: [
+        SkeletonContainer(
+          width: 50.0,
+          height: 50.0,
+          borderRadius: 1000,
+        ),
+        SizedBox(width: 10.0),
+        SkeletonContainer(
+          width: 150.0,
+          height: 17.0,
+          borderRadius: 1000,
+        ),
+      ],
     );
   }
 

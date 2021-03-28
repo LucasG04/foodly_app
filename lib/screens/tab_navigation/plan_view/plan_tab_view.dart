@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:foodly/models/plan.dart';
+import 'package:foodly/utils/basic_utils.dart';
 
 import '../../../constants.dart';
 import '../../../models/plan_meal.dart';
@@ -20,17 +21,8 @@ class PlanTabView extends StatefulWidget {
 
 class _PlanTabViewState extends State<PlanTabView>
     with AutomaticKeepAliveClientMixin {
-  List<PlanDay> _planDays = [];
-  StreamSubscription<List<PlanMeal>> _planMealsStream;
-
   @override
   bool get wantKeepAlive => true;
-
-  @override
-  void dispose() {
-    _planMealsStream.cancel();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,37 +31,49 @@ class _PlanTabViewState extends State<PlanTabView>
       builder: (context, watch, _) {
         final activePlan = watch(planProvider).state;
 
-        if (_planMealsStream == null && activePlan != null) {
-          _planMealsStream = PlanService.streamPlanMealsByPlanId(activePlan.id)
-              .listen(_updatePlanMeals);
-        }
-
-        return (activePlan != null ||
-                (_planMealsStream != null && !_planMealsStream.isPaused))
+        return activePlan != null
             ? SingleChildScrollView(
                 child: AnimationLimiter(
                   child: Column(
-                    children: AnimationConfiguration.toStaggeredList(
-                      duration: const Duration(milliseconds: 250),
-                      childAnimationBuilder: (widget) => SlideAnimation(
-                        child: FadeInAnimation(child: widget),
+                    children: [
+                      SizedBox(height: kPadding),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 5.0),
+                        child: PageTitle(text: 'Essensplan'),
                       ),
-                      children: [
-                        SizedBox(height: kPadding),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 5.0),
-                          child: PageTitle(text: 'Essensplan'),
+                      SizedBox(
+                        width: BasicUtils.contentWidth(context),
+                        child: StreamBuilder<List<PlanMeal>>(
+                          stream: PlanService.streamPlanMealsByPlanId(
+                            activePlan.id,
+                          ),
+                          builder: (context, snapshot) {
+                            print("------------");
+                            print(snapshot.connectionState);
+                            print(snapshot.hasData);
+                            print("------------");
+                            if (snapshot.hasData) {
+                              return ListView(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                children: _getDaysByMeals(snapshot.data)
+                                    .map(
+                                      (e) => PlanDayCard(
+                                        date: e.date,
+                                        meals: e.meals,
+                                      ),
+                                    )
+                                    .toList(),
+                              );
+                            } else {
+                              return Center(
+                                child: SmallCircularProgressIndicator(),
+                              );
+                            }
+                          },
                         ),
-                        ..._planDays
-                            .map(
-                              (e) => PlanDayCard(
-                                date: e.date,
-                                meals: e.meals,
-                              ),
-                            )
-                            .toList()
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               )
@@ -78,17 +82,12 @@ class _PlanTabViewState extends State<PlanTabView>
     );
   }
 
-  void _updatePlanMeals(List<PlanMeal> meals) async {
-    _planMealsStream.pause();
-    _planDays = await _updateMealsForDays(meals);
-    _planMealsStream.resume();
-
-    final currentPlan = context.read(planProvider).state;
-    currentPlan.meals = meals;
-    context.read(planProvider).state = currentPlan;
+  List<PlanDay> _getDaysByMeals(List<PlanMeal> meals) {
+    context.read(planProvider).state.meals = meals;
+    return _updateMealsForDays(meals);
   }
 
-  Future<List<PlanDay>> _updateMealsForDays(List<PlanMeal> planMeals) async {
+  List<PlanDay> _updateMealsForDays(List<PlanMeal> planMeals) {
     final Plan plan = context.read(planProvider).state;
     final List<PlanDay> days = [];
     final List<PlanMeal> updatedMeals = [...planMeals];
@@ -99,7 +98,7 @@ class _PlanTabViewState extends State<PlanTabView>
 
     // remove old plan days
     final oldMeals = planMeals.where((meal) => meal.date.isBefore(today));
-    await Future.wait(
+    Future.wait(
       oldMeals.map(
         (meal) => PlanService.deletePlanMealFromPlan(plan.id, meal.id),
       ),
@@ -121,7 +120,7 @@ class _PlanTabViewState extends State<PlanTabView>
     // apply updates to firebase collection
     // TODO: does this really check deep equality?
     if (planMeals != updatedMeals) {
-      await Future.wait(
+      Future.wait(
         updatedMeals.map((e) => PlanService.updatePlanMealFromPlan(plan.id, e)),
       );
     }
