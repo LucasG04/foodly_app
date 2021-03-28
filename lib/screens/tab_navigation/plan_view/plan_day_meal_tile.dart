@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
@@ -117,8 +118,10 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: isPlaceholder || (meal.tags == null || meal.tags.isEmpty)
-                ? Text(
+                ? AutoSizeText(
                     isPlaceholder ? placeholder : meal.name,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.w600,
@@ -130,8 +133,10 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        child: Text(
+                        child: AutoSizeText(
                           meal.name,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w600,
