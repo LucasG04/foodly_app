@@ -1,16 +1,20 @@
-# foodly
+# Foodly - Meal Planning
 
-A new Flutter project.
+**Meal planning with calendar, shopping list and cookbook.**
 
-## Getting Started
+With Foodly, you can easily plan your food for the upcoming week with your family, friends and roommates. It's a perfect synergy of planning, cookbook and shopping list.
 
-This project is a starting point for a Flutter application.
+## Availability 
 
-A few resources to get you started if this is your first Flutter project:
+- Android: _coming soon_
+- iOS: _coming soon_
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## Screenshots
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Join plan|Weekly plan|Shopping list
+:-:|:-:|:-:
+![foodly-auth](https://user-images.githubusercontent.com/42368417/112768098-8df31680-901a-11eb-97e2-c6f008fd1efb.png)|![foodly-week](https://user-images.githubusercontent.com/42368417/112768108-a105e680-901a-11eb-96bc-f4813e554c1d.png)|![foodly-shop](https://user-images.githubusercontent.com/42368417/112768116-a9f6b800-901a-11eb-8dbc-ebbf8e51f372.png)
+
+Cook book|Meal view|Settings
+:-:|:-:|:-:
+![foodly-book](https://user-images.githubusercontent.com/42368417/112768150-d3afdf00-901a-11eb-9564-c2d9fdff4131.png)|![foodly-meal](https://user-images.githubusercontent.com/42368417/112768158-da3e5680-901a-11eb-9edd-0058db46249e.png)|![foodly-settings](https://user-images.githubusercontent.com/42368417/112768228-47ea8280-901b-11eb-9fc4-c0b69644b0d2.png)

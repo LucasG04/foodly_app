@@ -1,94 +1,127 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:foodly/constants.dart';
-import 'package:foodly/models/plan.dart';
-import 'package:foodly/models/plan_meal.dart';
-import 'package:foodly/providers/state_providers.dart';
-import 'package:foodly/screens/tab_navigation/plan_view/plan_day_card.dart';
-import 'package:foodly/services/plan_service.dart';
-import 'package:foodly/widgets/page_title.dart';
 
-class PlanTabView extends ConsumerWidget {
+import '../../../constants.dart';
+import '../../../models/plan.dart';
+import '../../../models/plan_meal.dart';
+import '../../../providers/state_providers.dart';
+import '../../../services/plan_service.dart';
+import '../../../utils/basic_utils.dart';
+import '../../../widgets/page_title.dart';
+import '../../../widgets/small_circular_progress_indicator.dart';
+import 'plan_day_card.dart';
+
+class PlanTabView extends StatefulWidget {
   @override
-  Widget build(BuildContext context, ScopedReader watch) {
-    final activePlan = watch(planProvider).state;
+  _PlanTabViewState createState() => _PlanTabViewState();
+}
 
-    return activePlan != null
-        ? StreamBuilder(
-            stream: PlanService.streamPlanById(activePlan.id),
-            initialData: activePlan,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                final plan = snapshot.data as Plan;
-                final days = _getMealsForDays(plan);
+class _PlanTabViewState extends State<PlanTabView>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
 
-                return SingleChildScrollView(
-                  child: AnimationLimiter(
-                    child: Column(
-                      children: AnimationConfiguration.toStaggeredList(
-                        duration: const Duration(milliseconds: 250),
-                        childAnimationBuilder: (widget) => SlideAnimation(
-                          child: FadeInAnimation(child: widget),
-                        ),
-                        children: [
-                          SizedBox(height: kPadding),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 5.0),
-                            child: PageTitle(text: 'Essensplan'),
-                          ),
-                          ...days
-                              .map(
-                                (e) => PlanDayCard(
-                                  date: e.date,
-                                  meals: e.meals,
-                                ),
-                              )
-                              .toList()
-                        ],
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Consumer(
+      builder: (context, watch, _) {
+        final activePlan = watch(planProvider).state;
+
+        return activePlan != null
+            ? SingleChildScrollView(
+                child: AnimationLimiter(
+                  child: Column(
+                    children: [
+                      SizedBox(height: kPadding),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 5.0),
+                        child: PageTitle(text: 'Essensplan'),
                       ),
-                    ),
+                      SizedBox(
+                        width: BasicUtils.contentWidth(context),
+                        child: StreamBuilder<List<PlanMeal>>(
+                          stream: PlanService.streamPlanMealsByPlanId(
+                            activePlan.id,
+                          ),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return ListView(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                children: _getDaysByMeals(snapshot.data)
+                                    .map(
+                                      (e) => PlanDayCard(
+                                        date: e.date,
+                                        meals: e.meals,
+                                      ),
+                                    )
+                                    .toList(),
+                              );
+                            } else {
+                              return Center(
+                                child: SmallCircularProgressIndicator(),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              } else {
-                return Center(child: CircularProgressIndicator());
-              }
-            },
-          )
-        : Center(child: CircularProgressIndicator());
+                ),
+              )
+            : Center(child: SmallCircularProgressIndicator());
+      },
+    );
   }
 
-  List<PlanDay> _getMealsForDays(Plan plan) {
-    final List<PlanDay> result = [];
-    final meals = plan.meals;
+  List<PlanDay> _getDaysByMeals(List<PlanMeal> meals) {
+    context.read(planProvider).state.meals = meals;
+    return _updateMealsForDays(meals);
+  }
+
+  List<PlanDay> _updateMealsForDays(List<PlanMeal> planMeals) {
+    final Plan plan = context.read(planProvider).state;
+    final List<PlanDay> days = [];
+    final List<PlanMeal> updatedMeals = [...planMeals];
 
     final now =
         new DateTime.now().toUtc().add(Duration(days: plan.hourDiffToUtc));
     final today = new DateTime(now.year, now.month, now.day - 1);
 
-    // DateTime firstDate = meals.first.date;
-
     // remove old plan days
-    bool mealsChanged = false;
-    for (var meal in meals) {
-      if (meal.date.isBefore(today)) {
-        meals.remove(meal);
-        mealsChanged = true;
-      }
-    }
+    final oldMeals = planMeals.where((meal) => meal.date.isBefore(today));
+    Future.wait(
+      oldMeals.map(
+        (meal) => PlanService.deletePlanMealFromPlan(plan.id, meal.id),
+      ),
+    );
+    oldMeals.forEach(updatedMeals.remove);
 
-    if (mealsChanged) {
-      plan.meals = meals;
-      PlanService.updatePlan(plan);
-    }
-
+    // update days for the meals
     for (var i = 0; i < 8; i++) {
       final date = today.add(Duration(days: i));
-      result.add(PlanDay(
-          date, [...meals.where((element) => element.date == date).toList()]));
+      days.add(
+        new PlanDay(date,
+            updatedMeals.where((element) => element.date == date).toList()),
+      );
+      updatedMeals.where((element) => element.date == date).forEach((element) {
+        element.date = date;
+      });
     }
 
-    return result;
+    // apply updates to firebase collection
+    // TODO: does this really check deep equality?
+    if (planMeals != updatedMeals) {
+      Future.wait(
+        updatedMeals.map((e) => PlanService.updatePlanMealFromPlan(plan.id, e)),
+      );
+    }
+
+    return days;
   }
 }
 

@@ -5,7 +5,7 @@ description: An allrounder meal planning app.
 # pub.dev using `pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+1
+version: 1.1.0+4
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -13,34 +13,68 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  # Util
   flutter_riverpod: ^0.12.1
   auto_route: ^0.6.9
-  intl: ^0.16.1
+  intl: ^0.17.0
   hive: ^1.4.4+1
-  dio: ^3.0.10
+  # flutter_cache_manager_hive:
+  #   git:
+  #     url: https://github.com/X-Wei/flutter_cache_manager_hive.git
+  #     ref: master
+  dio: ^4.0.0-beta5
+  url_launcher:
+  flushbar:
+  share: ^0.6.5+4
+  email_validator: ^1.0.6
+  logging: ^1.0.0
+  receive_sharing_intent: ^1.4.5
+  image_picker: ^0.7.3
 
   # Firebase
-  firebase_core: ^0.5.3
-  cloud_firestore: ^0.14.4
+  firebase_core: ^1.0.0
+  cloud_firestore: ^1.0.0
+  firebase_auth: ^1.0.0
+  firebase_auth_web: ^1.0.0
+  firebase_storage: ^8.0.0
 
   # Widgets
   flutter_snake_navigationbar: ^0.4.2
   eva_icons_flutter: ^2.0.1
-  cached_network_image: ^2.5.0
+  cached_network_image: ^3.0.0-nullsafety
   group_list_view: ^1.0.6
   adaptive_dialog: ^0.9.3
+  flutter_markdown:
+  auto_size_text:
+  flutter_slidable: ^0.6.0-nullsafety.0
+  # flutter_toggle_tab: ^0.0.5+4
+  badges: ^2.0.0-nullsafety.1
 
   # Icons/Styles/Animations
   cupertino_icons: ^1.0.1
-  flutter_staggered_animations: ^0.1.2
+  flutter_staggered_animations:
+    git:
+      url: https://github.com/josh-burton/flutter_staggered_animations.git
+      ref: findAncestorWidgetOfExactType
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  integration_test:
-    sdk: flutter
+  # integration_test:
+  #   sdk: flutter
   auto_route_generator: ^0.6.10
   build_runner:
+  flutter_launcher_icons: ^0.9.0
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path_android: "assets/icon/icon-android.png"
+  image_path_ios: "assets/icon/icon-ios.png"
+  adaptive_icon_background: "assets/icon/icon-android-back.png"
+  adaptive_icon_foreground: "assets/icon/icon-android-fore.png"
+  # run with: flutter pub run flutter_launcher_icons:main
 
 flutter:
 

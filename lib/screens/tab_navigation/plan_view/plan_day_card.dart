@@ -1,10 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/app_router.gr.dart';
-import 'package:foodly/constants.dart';
-import 'package:foodly/models/plan_meal.dart';
-import 'package:foodly/screens/tab_navigation/plan_view/plan_day_meal_tile.dart';
 import 'package:intl/intl.dart';
+
+import '../../../app_router.gr.dart';
+import '../../../constants.dart';
+import '../../../models/plan_meal.dart';
+import 'plan_day_meal_tile.dart';
 
 class PlanDayCard extends StatelessWidget {
   final DateTime date;
@@ -72,7 +73,7 @@ class PlanDayCard extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: OutlineButton(
+        child: OutlinedButton(
           onPressed: () => ExtendedNavigator.root.push(
             Routes.mealSelectScreen,
             queryParams: {
@@ -86,11 +87,21 @@ class PlanDayCard extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
-          padding: const EdgeInsets.all(15.0),
-          borderSide: BorderSide(width: 0.0),
-          color: Theme.of(context).primaryColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(kRadius / 2),
+          style: ButtonStyle(
+            padding: MaterialStateProperty.resolveWith(
+              (_) => const EdgeInsets.all(15.0),
+            ),
+            side: MaterialStateProperty.resolveWith(
+              (_) => BorderSide(width: 0.0),
+            ),
+            foregroundColor: MaterialStateProperty.resolveWith(
+              (_) => Theme.of(context).primaryColor,
+            ),
+            shape: MaterialStateProperty.resolveWith(
+              (_) => RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(kRadius / 2),
+              ),
+            ),
           ),
         ),
       ),

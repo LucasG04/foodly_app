@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 /// General
 const kAppName = 'Foodly App';
 const kPlaceholderSymbol = 'p--';
+const kChefkochShareEndpoint = 'https://www.chefkoch.de/rezepte';
 
 /// Styling
 const kPadding = 20.0;
@@ -13,7 +14,7 @@ const kIconHeight = 24.0; // default icon height in flutter
 const kBackgroundColor = Color(0xFFFAFAFA);
 const kPrimaryColor = Color(0xFF161616);
 const kAccentColor = Color(0xFFF9A826);
-const kApprovedColor = Color.fromRGBO(67, 222, 12, 0.4);
+const kSuccessColor = Color.fromRGBO(67, 222, 12, 0.4);
 const kWarningColor = Color.fromRGBO(222, 12, 12, 0.4);
 
 const kWhiteColor = Color.fromRGBO(255, 255, 255, 0.5);

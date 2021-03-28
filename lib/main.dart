@@ -1,44 +1,182 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
-import 'package:foodly/app_router.gr.dart';
-import 'package:foodly/models/plan.dart';
-import 'package:foodly/providers/state_providers.dart';
-import 'package:foodly/services/plan_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:logging/logging.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
-void main() {
+import 'app_router.gr.dart';
+import 'constants.dart';
+import 'models/foodly_user.dart';
+import 'models/meal.dart';
+import 'models/plan.dart';
+import 'providers/state_providers.dart';
+import 'services/authentication_service.dart';
+import 'services/foodly_user_service.dart';
+import 'services/meal_service.dart';
+import 'services/plan_service.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(ProviderScope(child: FoodlyApp()));
 }
 
-class FoodlyApp extends ConsumerWidget {
+class FoodlyApp extends StatefulWidget {
   @override
-  Widget build(BuildContext context, ScopedReader watch) {
-    initializeDateFormatting();
-    _loadActivePlan(watch(planProvider).state, context);
+  _FoodlyAppState createState() => _FoodlyAppState();
+}
 
-    // TODO: Nunito default font?
-    return MaterialApp(
-      builder: ExtendedNavigator<AppRouter>(
-        router: AppRouter(),
-        // builder: (context, extendedNav) => Theme(
-        //   data: ThemeData(brightness: Brightness.dark),
-        //   child: ScrollConfiguration(
-        //     behavior: ScrollBehaviorModified(),
-        //     child: extendedNav,
-        //   ),
-        // ),
-      ),
+class _FoodlyAppState extends State<FoodlyApp> {
+  StreamSubscription<String> _intentDataStreamSubscription;
+  Logger _log = new Logger('FoodlyApp');
+  StreamSubscription<LogRecord> _logStream;
+  StreamSubscription<List<Meal>> _privateMealsStream;
+  List<Meal> _privateMealsStreamValue;
+  StreamSubscription<List<Meal>> _publicMealsStream;
+  List<Meal> _publicMealsStreamValue;
+
+  @override
+  void dispose() {
+    _privateMealsStream.cancel();
+    _publicMealsStream.cancel();
+    _logStream.cancel();
+    _intentDataStreamSubscription.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    initializeDateFormatting();
+    Logger.root.level = Level.ALL; // defaults to Level.INFO
+    Logger.root.onRecord.listen((record) {
+      print('${record.level.name}: ${record.loggerName}: ${record.message}');
+    });
+
+    _privateMealsStreamValue = [];
+    _publicMealsStreamValue = [];
+
+    _listenForShareIntent();
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: AuthenticationService.authenticationStream(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.active ||
+            snapshot.connectionState == ConnectionState.done) {
+          _loadActivePlan(context);
+          _loadActiveUser(context);
+          return Consumer(
+            builder: (context, watch, _) {
+              watch(planProvider);
+              _log.finer(
+                  'PlanProvider Update', context.read(planProvider).state?.id);
+
+              if (context.read(planProvider).state != null) {
+                _streamMeals();
+              }
+              return MaterialApp(
+                theme: ThemeData(
+                  // TODO: Nunito default font?
+                  brightness: Brightness.light,
+                  // textTheme: MediaQuery.of(context).size.width < 500
+                  //     ? kSmallTextTheme
+                  //     : kTextTheme,
+                ),
+                builder: (_, __) => ScrollConfiguration(
+                  behavior: ScrollBehaviorModified(),
+                  child: ExtendedNavigator<AppRouter>(
+                    router: AppRouter(),
+                  ),
+                ),
+              );
+            },
+          );
+        } else {
+          return Container();
+        }
+      },
     );
   }
 
-  Future _loadActivePlan(Plan currentPlan, BuildContext context) async {
+  Future<void> _loadActivePlan(BuildContext context) async {
+    final currentPlan = context.read(planProvider).state;
     if (currentPlan == null) {
       String planId = await PlanService.getCurrentPlanId();
-      Plan newPlan = await PlanService.getPlanById(planId);
 
-      context.read(planProvider).state = newPlan;
+      if (planId != null && planId.isNotEmpty) {
+        Plan newPlan = await PlanService.getPlanById(planId);
+        context.read(planProvider).state = newPlan;
+      }
     }
+  }
+
+  Future<void> _loadActiveUser(BuildContext context) async {
+    final firebaseUser = AuthenticationService.currentUser;
+    if (firebaseUser != null) {
+      FoodlyUser user = await FoodlyUserService.getUserById(firebaseUser.uid);
+      context.read(userProvider).state = user;
+    }
+  }
+
+  void _streamMeals() {
+    if (_privateMealsStream == null && _publicMealsStream == null) {
+      _privateMealsStream =
+          MealService.streamPlanMeals(context.read(planProvider).state.id)
+              .listen((meals) {
+        _privateMealsStreamValue = meals;
+        mergeMealsIntoProvider();
+      });
+      _publicMealsStream = MealService.streamPublicMeals().listen((meals) {
+        _publicMealsStreamValue = meals;
+        mergeMealsIntoProvider();
+      });
+    }
+  }
+
+  void mergeMealsIntoProvider() {
+    _log.finer('Call mergeMealsIntoProvider');
+
+    var updatedMeals = [
+      ..._privateMealsStreamValue,
+      ..._publicMealsStreamValue
+    ];
+    updatedMeals = [
+      ...{...updatedMeals}
+    ];
+    context.read(allMealsProvider).state = updatedMeals;
+  }
+
+  void _listenForShareIntent() {
+    // For sharing or opening urls/text coming from outside the app while the app is in the memory
+    _intentDataStreamSubscription =
+        ReceiveSharingIntent.getTextStream().listen((String value) {
+      if (AuthenticationService.currentUser != null &&
+          value != null &&
+          value.startsWith(kChefkochShareEndpoint)) {
+        ExtendedNavigator.root
+            .push(Routes.mealCreateScreen(id: Uri.encodeComponent(value)));
+      }
+    }, onError: (err) {
+      _log.severe('ERR in ReceiveSharingIntent.getTextStream()', err);
+    });
+
+    // For sharing or opening urls/text coming from outside the app while the app is closed
+    ReceiveSharingIntent.getInitialText().then((String value) {
+      if (AuthenticationService.currentUser != null &&
+          value != null &&
+          value.startsWith(kChefkochShareEndpoint)) {
+        ExtendedNavigator.root
+            .push(Routes.mealCreateScreen(id: Uri.encodeComponent(value)));
+      }
+    });
   }
 }
 
@@ -57,6 +195,6 @@ class ScrollBehaviorModified extends ScrollBehavior {
       case TargetPlatform.windows:
         return const ClampingScrollPhysics();
     }
-    return null;
+    return const ClampingScrollPhysics();
   }
 }

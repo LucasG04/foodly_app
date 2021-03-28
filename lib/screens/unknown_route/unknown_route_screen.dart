@@ -1,4 +1,7 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+
+import '../../app_router.gr.dart';
 
 class UnknownRouteScreen extends StatelessWidget {
   @override
@@ -24,7 +27,7 @@ class UnknownRouteScreen extends StatelessWidget {
               style: TextStyle(fontSize: 30),
             ),
             SizedBox(height: 40.0),
-            FlatButton(
+            TextButton(
               onPressed: _navigateToHome,
               child: Text('Back to Home'),
             ),
@@ -35,6 +38,7 @@ class UnknownRouteScreen extends StatelessWidget {
   }
 
   void _navigateToHome() {
-    print('back');
+    ExtendedNavigator.root
+        .pushAndRemoveUntil(Routes.homeScreen, (route) => route.isFirst);
   }
 }
