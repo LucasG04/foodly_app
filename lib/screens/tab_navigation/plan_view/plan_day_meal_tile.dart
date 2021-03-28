@@ -2,8 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
-import 'package:foodly/widgets/foodly_network_image.dart';
-import 'package:foodly/widgets/skeleton_container.dart';
 
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
@@ -15,7 +13,9 @@ import '../../../services/authentication_service.dart';
 import '../../../services/meal_service.dart';
 import '../../../services/plan_service.dart';
 import '../../../services/shopping_list_service.dart';
+import '../../../widgets/foodly_network_image.dart';
 import '../../../widgets/meal_tag.dart';
+import '../../../widgets/skeleton_container.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 
 class PlanDayMealTile extends StatefulWidget {

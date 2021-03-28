@@ -1,11 +1,11 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/services/storage_service.dart';
-import 'package:foodly/utils/basic_utils.dart';
-import 'package:foodly/widgets/foodly_network_image.dart';
-import 'package:foodly/widgets/wrapped_image_picker/select_picker_dialog.dart';
 
 import '../../constants.dart';
+import '../../services/storage_service.dart';
+import '../../utils/basic_utils.dart';
+import '../foodly_network_image.dart';
+import 'select_picker_dialog.dart';
 
 class WrappedImagePicker extends StatefulWidget {
   /// Returns the new image url

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:foodly/models/grocery.dart';
 import 'package:logging/logging.dart';
 
 import '../models/grocery.dart';

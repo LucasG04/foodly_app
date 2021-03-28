@@ -1,13 +1,13 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/constants.dart';
-import 'package:foodly/services/storage_service.dart';
-import 'package:foodly/utils/main_snackbar.dart';
-import 'package:foodly/widgets/full_screen_loader.dart';
-import 'package:foodly/widgets/main_text_field.dart';
-import 'package:foodly/widgets/small_circular_progress_indicator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logging/logging.dart';
+
+import '../../constants.dart';
+import '../../services/storage_service.dart';
+import '../../utils/main_snackbar.dart';
+import '../main_text_field.dart';
+import '../small_circular_progress_indicator.dart';
 
 class SelectPickerDialog extends StatefulWidget {
   @override

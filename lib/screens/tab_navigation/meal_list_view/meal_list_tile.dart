@@ -1,12 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/widgets/foodly_network_image.dart';
 
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
 import '../../../models/meal.dart';
+import '../../../widgets/foodly_network_image.dart';
 import '../../../widgets/meal_tag.dart';
 
 class MealListTile extends StatelessWidget {

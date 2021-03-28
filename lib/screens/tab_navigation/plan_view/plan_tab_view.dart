@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:foodly/models/plan.dart';
-import 'package:foodly/utils/basic_utils.dart';
 
 import '../../../constants.dart';
+import '../../../models/plan.dart';
 import '../../../models/plan_meal.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/plan_service.dart';
+import '../../../utils/basic_utils.dart';
 import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import 'plan_day_card.dart';
@@ -48,10 +48,6 @@ class _PlanTabViewState extends State<PlanTabView>
                             activePlan.id,
                           ),
                           builder: (context, snapshot) {
-                            print("------------");
-                            print(snapshot.connectionState);
-                            print(snapshot.hasData);
-                            print("------------");
                             if (snapshot.hasData) {
                               return ListView(
                                 shrinkWrap: true,

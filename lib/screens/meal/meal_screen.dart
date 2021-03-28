@@ -1,28 +1,26 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:auto_route/auto_route_annotations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/providers/state_providers.dart';
-import 'package:foodly/screens/meal/confirm_delete_modal.dart';
-import 'package:foodly/services/plan_service.dart';
-import 'package:foodly/utils/convert_util.dart';
-import 'package:foodly/widgets/foodly_network_image.dart';
-import 'package:foodly/widgets/full_screen_loader.dart';
-import 'package:foodly/widgets/skeleton_container.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
 import '../../models/ingredient.dart';
 import '../../models/meal.dart';
+import '../../providers/state_providers.dart';
 import '../../services/meal_service.dart';
+import '../../services/plan_service.dart';
+import '../../utils/convert_util.dart';
 import '../../utils/no_glowing_overscroll_indicator_behavior.dart';
+import '../../widgets/foodly_network_image.dart';
+import '../../widgets/full_screen_loader.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import 'border_icon.dart';
+import 'confirm_delete_modal.dart';
 
 class MealScreen extends StatefulWidget {
   final String id;

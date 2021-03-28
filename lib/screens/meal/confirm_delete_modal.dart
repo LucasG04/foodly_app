@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:foodly/models/meal.dart';
 
 import '../../constants.dart';
+import '../../models/meal.dart';
 import '../../widgets/main_button.dart';
 
 class ConfirmDeleteModal extends StatelessWidget {

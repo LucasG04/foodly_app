@@ -1,13 +1,13 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
-import 'package:foodly/utils/basic_utils.dart';
 
 import '../../../constants.dart';
 import '../../../models/grocery.dart';
 import '../../../models/shopping_list.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/shopping_list_service.dart';
+import '../../../utils/basic_utils.dart';
 import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import 'animated_shopping_list.dart';

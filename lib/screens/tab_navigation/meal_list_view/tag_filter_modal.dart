@@ -1,10 +1,10 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
-import 'package:foodly/models/meal.dart';
-import 'package:foodly/providers/state_providers.dart';
 
 import '../../../constants.dart';
+import '../../../models/meal.dart';
+import '../../../providers/state_providers.dart';
 
 class TagFilterModal extends StatefulWidget {
   @override

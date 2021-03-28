@@ -1,8 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/services/storage_service.dart';
-import 'package:foodly/utils/basic_utils.dart';
-import 'package:foodly/widgets/skeleton_container.dart';
+
+import '../services/storage_service.dart';
+import '../utils/basic_utils.dart';
+import 'skeleton_container.dart';
 
 class FoodlyNetworkImage extends StatelessWidget {
   final String imageUrl;

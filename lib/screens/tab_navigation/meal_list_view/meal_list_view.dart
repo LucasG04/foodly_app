@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/widgets/user_information.dart';
 import 'package:group_list_view/group_list_view.dart';
 
 import '../../../constants.dart';
 import '../../../models/meal.dart';
 import '../../../providers/state_providers.dart';
+import '../../../widgets/user_information.dart';
 import 'meal_list_tile.dart';
 import 'meal_list_title.dart';
 

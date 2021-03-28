@@ -3,11 +3,11 @@ import 'package:badges/badges.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/providers/state_providers.dart';
-import 'package:foodly/screens/tab_navigation/meal_list_view/tag_filter_modal.dart';
 
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
+import '../../../providers/state_providers.dart';
+import 'tag_filter_modal.dart';
 
 class MealListTitle extends StatefulWidget {
   MealListTitle({
