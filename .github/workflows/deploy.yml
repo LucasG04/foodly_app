@@ -19,6 +19,10 @@ jobs:
         uses: subosito/flutter-action@v1
         with:
           channel: 'beta'
+      - name: Decrypt general secrets
+        run: sh ./.github/scripts/decrypt_general_secrets.sh
+        env:
+          ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.ANDROID_KEYS_SECRET_PASSPHRASE }}
       - name: Decrypt Android keys
         run: sh ./.github/scripts/decrypt_android_keys.sh
         env:
