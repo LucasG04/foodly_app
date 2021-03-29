@@ -33,6 +33,8 @@ jobs:
         run: bash ./.github/scripts/update_version.sh "${{ github.event.head_commit.message }}" ${{ toJson(github.run_number) }}
       - name: Build the AAB
         run: flutter build appbundle
+      - name: Navigate to android directory
+        run: cd android
       - name: Get all bundles
         run: sudo gem install bundler:1.17.3 && bundle install
       - name: Run Fastlane
