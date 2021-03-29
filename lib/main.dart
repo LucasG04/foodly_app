@@ -4,6 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:logging/logging.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
@@ -60,6 +61,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
     _publicMealsStreamValue = [];
 
     _listenForShareIntent();
+    _checkForUpdate();
 
     super.initState();
   }
@@ -177,6 +179,22 @@ class _FoodlyAppState extends State<FoodlyApp> {
             .push(Routes.mealCreateScreen(id: Uri.encodeComponent(value)));
       }
     });
+  }
+
+  void _checkForUpdate() async {
+    final updateInfo = await InAppUpdate.checkForUpdate().catchError((err) {
+      _log.severe('ERR in InAppUpdate.checkForUpdate()', err);
+    });
+
+    if (updateInfo?.updateAvailability == UpdateAvailability.updateAvailable) {
+      InAppUpdate.startFlexibleUpdate().then((_) {
+        InAppUpdate.completeFlexibleUpdate().catchError((err) {
+          _log.severe('ERR in InAppUpdate.completeFlexibleUpdate()', err);
+        });
+      }).catchError((err) {
+        _log.severe('ERR in InAppUpdate.startFlexibleUpdate()', err);
+      });
+    }
   }
 }
 

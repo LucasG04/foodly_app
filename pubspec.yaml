@@ -31,6 +31,7 @@ dependencies:
   logging: ^1.0.0
   receive_sharing_intent: ^1.4.5
   image_picker: ^0.7.3
+  in_app_update: ^2.0.0
 
   # Firebase
   firebase_core: ^1.0.0
