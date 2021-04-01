@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route_annotations.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../constants.dart';
 import '../../models/meal.dart';
@@ -301,13 +302,12 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   }
 
   void _openChefkochImport() async {
-    final result = await showModalBottomSheet<Meal>(
+    final result = await showBarModalBottomSheet<Meal>(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
         ),
       ),
-      isScrollControlled: true,
       context: context,
       builder: (_) => ChefkochImportModal(),
     );
