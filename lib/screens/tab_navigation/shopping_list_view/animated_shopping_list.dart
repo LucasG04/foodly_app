@@ -46,7 +46,7 @@ class AnimatedShoppingList extends StatelessWidget {
         child: Slidable(
           actionPane: SlidableDrawerActionPane(),
           child: ListTile(
-            title: Text(grocery.name, style: TextStyle(fontSize: 20.0)),
+            title: Text(grocery.name, style: TextStyle(fontSize: 18.0)),
             subtitle: grocery.amount != null && grocery.amount != 0
                 ? Text(ConvertUtil.amountToString(grocery.amount, grocery.unit))
                 : null,
@@ -54,6 +54,7 @@ class AnimatedShoppingList extends StatelessWidget {
               icon: Icon(EvaIcons.moreHorizotnalOutline),
               onPressed: () => onEdit(grocery),
             ),
+            dense: true,
           ),
           secondaryActions: [
             IconSlideAction(

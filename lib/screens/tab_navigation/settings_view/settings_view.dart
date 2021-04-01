@@ -1,6 +1,7 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share/share.dart';
 
 import '../../../constants.dart';
@@ -20,49 +21,56 @@ class SettingsView extends ConsumerWidget {
     final foodlyUser = watch(userProvider).state;
     return plan != null && foodlyUser != null
         ? SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: kPadding),
-                PageTitle(text: 'Einstellungen'),
-                _buildSectionTitle('Plan'),
-                _buildSection([
-                  SettingsTile(
-                    onTap: () => _shareCode(plan.code),
-                    leadingIcon: EvaIcons.shareOutline,
-                    text: 'Plan teilen (${plan.code})',
-                    trailing: Icon(EvaIcons.arrowIosForwardOutline),
-                  ),
-                  SettingsTile(
-                    onTap: () => _leavePlan(plan.id, context),
-                    leadingIcon: EvaIcons.closeCircleOutline,
-                    text: 'Plan verlassen',
-                    trailing: Icon(
-                      EvaIcons.arrowIosForwardOutline,
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: (MediaQuery.of(context).size.width -
+                        BasicUtils.contentWidth(context)) /
+                    2,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: kPadding),
+                  PageTitle(text: 'Einstellungen'),
+                  _buildSectionTitle('Plan'),
+                  _buildSection([
+                    SettingsTile(
+                      onTap: () => _shareCode(plan.code),
+                      leadingIcon: EvaIcons.shareOutline,
+                      text: 'Plan teilen (${plan.code})',
+                      trailing: Icon(EvaIcons.arrowIosForwardOutline),
+                    ),
+                    SettingsTile(
+                      onTap: () => _leavePlan(plan.id, context),
+                      leadingIcon: EvaIcons.closeCircleOutline,
+                      text: 'Plan verlassen',
+                      trailing: Icon(
+                        EvaIcons.arrowIosForwardOutline,
+                        color: Colors.red,
+                      ),
                       color: Colors.red,
                     ),
-                    color: Colors.red,
-                  ),
-                ], context),
-                foodlyUser != null && foodlyUser.oldPlans.length > 1
-                    ? _buildSectionTitle('Gerichte')
-                    : SizedBox(),
-                foodlyUser != null && foodlyUser.oldPlans.length > 1
-                    ? _buildSection([
-                        SettingsTile(
-                          onTap: () => _importMeals(
-                            foodlyUser.oldPlans
-                                .where((id) => id != plan.id)
-                                .toList(),
-                            context,
+                  ], context),
+                  foodlyUser != null && foodlyUser.oldPlans.length > 1
+                      ? _buildSectionTitle('Gerichte')
+                      : SizedBox(),
+                  foodlyUser != null && foodlyUser.oldPlans.length > 1
+                      ? _buildSection([
+                          SettingsTile(
+                            onTap: () => _importMeals(
+                              foodlyUser.oldPlans
+                                  .where((id) => id != plan.id)
+                                  .toList(),
+                              context,
+                            ),
+                            leadingIcon: EvaIcons.downloadOutline,
+                            text: 'Alte Gerichte importieren',
+                            trailing: Icon(EvaIcons.arrowIosForwardOutline),
                           ),
-                          leadingIcon: EvaIcons.downloadOutline,
-                          text: 'Alte Gerichte importieren',
-                          trailing: Icon(EvaIcons.arrowIosForwardOutline),
-                        ),
-                      ], context)
-                    : SizedBox(),
-              ],
+                        ], context)
+                      : SizedBox(),
+                ],
+              ),
             ),
           )
         : Center(child: SmallCircularProgressIndicator());
@@ -88,7 +96,7 @@ class SettingsView extends ConsumerWidget {
       width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
-          kPadding,
+          0,
           kPadding / 4,
           kPadding,
           kPadding / 2,
@@ -117,14 +125,13 @@ class SettingsView extends ConsumerWidget {
   }
 
   void _importMeals(List<String> planIds, context) async {
-    showModalBottomSheet(
+    showBarModalBottomSheet(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
         ),
       ),
       context: context,
-      isScrollControlled: true,
       builder: (context) => ImportMealsModal(planIds),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../models/ingredient.dart';
 import '../../utils/convert_util.dart';
@@ -61,13 +62,12 @@ class EditIngredients extends StatelessWidget {
   }
 
   void _editIngredient(context, [Ingredient ingredient, int index]) async {
-    final result = await showModalBottomSheet<Ingredient>(
+    final result = await showBarModalBottomSheet<Ingredient>(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
         ),
       ),
-      isScrollControlled: true,
       context: context,
       builder: (_) => EditIngredientModal(ingredient: ingredient),
     );
