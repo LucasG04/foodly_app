@@ -176,7 +176,6 @@ class _ShoppingListViewState extends State<ShoppingListView>
           top: Radius.circular(10.0),
         ),
       ),
-      // isScrollControlled: true,
       context: context,
       builder: (modalContext) => EditGroceryModal(
         shoppingListId: listId,
