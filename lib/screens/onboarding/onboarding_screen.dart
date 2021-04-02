@@ -1,6 +1,11 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:concentric_transition/concentric_transition.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:foodly/screens/tab_navigation/home_screen.dart';
+import 'package:foodly/services/authentication_service.dart';
+import 'package:foodly/services/settings_service.dart';
 
 import '../authentication/authentication_screen.dart';
 import 'page_card.dart';
@@ -60,13 +65,22 @@ class OnboardingScreen extends StatelessWidget {
           duration: Duration(seconds: 1),
           verticalPosition: heightMultiplier,
           onFinish: () {
-            print('set firsttime usage');
-            // ExtendedNavigator.root.replace(Routes.authenticationScreen);
-            Navigator.pushReplacement(
-              context,
-              ConcentricPageRoute(builder: (_) => AuthenticationScreen()),
-            );
+            SettingsService.setFirstUsageFalse();
+            if (AuthenticationService.currentUser == null) {
+              Navigator.pushReplacement(
+                context,
+                ConcentricPageRoute(builder: (_) => AuthenticationScreen()),
+              );
+            } else {
+              ExtendedNavigator.root.pop();
+            }
           },
+          buttonChild: Center(
+            child: Icon(
+              EvaIcons.arrowForwardOutline,
+              color: Colors.white,
+            ),
+          ),
           itemCount: pages.length,
           itemBuilder: (index, value) {
             return PageCard(

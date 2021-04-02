@@ -27,8 +27,8 @@ class PageCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           SizedBox(
-            height: height * 0.4,
-            child: Center(child: _buildPicture(context, height * 0.38)),
+            height: height * 0.5,
+            child: Center(child: _buildPicture(context, height * 0.5)),
           ),
           SizedBox(height: height * 0.05),
           _buildTitle(context),
