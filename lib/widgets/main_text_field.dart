@@ -133,7 +133,9 @@ class _MainTextFieldState extends State<MainTextField> {
             FocusScope.of(context).unfocus();
           }
 
-          widget.onSubmit();
+          if (widget.onSubmit != null) {
+            widget.onSubmit();
+          }
         },
         onChanged: widget.onChange,
         validator: widget.validator,
