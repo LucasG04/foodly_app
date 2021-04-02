@@ -64,17 +64,7 @@ class OnboardingScreen extends StatelessWidget {
           curve: Curves.ease,
           duration: Duration(seconds: 1),
           verticalPosition: heightMultiplier,
-          onFinish: () {
-            SettingsService.setFirstUsageFalse();
-            if (AuthenticationService.currentUser == null) {
-              Navigator.pushReplacement(
-                context,
-                ConcentricPageRoute(builder: (_) => AuthenticationScreen()),
-              );
-            } else {
-              ExtendedNavigator.root.pop();
-            }
-          },
+          onFinish: () => _finishOnboarding(context),
           buttonChild: Center(
             child: Icon(
               EvaIcons.arrowForwardOutline,
@@ -91,5 +81,20 @@ class OnboardingScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _finishOnboarding(context) {
+    if (SettingsService.isFirstUsage) {
+      SettingsService.setFirstUsageFalse();
+    }
+
+    if (AuthenticationService.currentUser == null) {
+      Navigator.pushReplacement(
+        context,
+        ConcentricPageRoute(builder: (_) => AuthenticationScreen()),
+      );
+    } else {
+      ExtendedNavigator.root.pop();
+    }
   }
 }
