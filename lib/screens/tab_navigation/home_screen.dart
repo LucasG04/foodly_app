@@ -49,11 +49,11 @@ class _HomeScreenState extends State<HomeScreen> {
       return Scaffold(
         body: Center(child: SmallCircularProgressIndicator()),
       );
+    } else if (_currentUser != null) {
+      return TabNavigationView();
     } else if (SettingsService.isFirstUsage) {
       ExtendedNavigator.root.replace(Routes.onboardingScreen);
       return Scaffold();
-    } else if (_currentUser != null) {
-      return TabNavigationView();
     } else {
       ExtendedNavigator.root.replace(Routes.authenticationScreen);
       return Scaffold();
