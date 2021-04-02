@@ -218,6 +218,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.15.0"
+  concentric_transition:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: b9a0d2fba764fb3023cb8e39101024e2d5c21ba5
+      url: "https://github.com/LucasG04/flutter-concentric-transition.git"
+    source: git
+    version: "0.1.2"
   convert:
     dependency: transitive
     description:
@@ -642,7 +651,7 @@ packages:
     source: hosted
     version: "1.8.0"
   path_provider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path_provider
       url: "https://pub.dartlang.org"

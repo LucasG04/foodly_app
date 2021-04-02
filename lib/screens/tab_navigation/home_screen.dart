@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../app_router.gr.dart';
 import '../../services/authentication_service.dart';
+import '../../services/settings_service.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import 'tab_navigation_view.dart';
 
@@ -48,6 +49,9 @@ class _HomeScreenState extends State<HomeScreen> {
       return Scaffold(
         body: Center(child: SmallCircularProgressIndicator()),
       );
+    } else if (SettingsService.isFirstUsage) {
+      ExtendedNavigator.root.replace(Routes.onboardingScreen);
+      return Scaffold();
     } else if (_currentUser != null) {
       return TabNavigationView();
     } else {

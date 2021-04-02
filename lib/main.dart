@@ -19,10 +19,12 @@ import 'services/authentication_service.dart';
 import 'services/foodly_user_service.dart';
 import 'services/meal_service.dart';
 import 'services/plan_service.dart';
+import 'services/settings_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await SettingsService.initialize();
   runApp(ProviderScope(child: FoodlyApp()));
 }
 
@@ -102,7 +104,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
             },
           );
         } else {
-          return Container();
+          return MaterialApp(home: Scaffold());
         }
       },
     );
