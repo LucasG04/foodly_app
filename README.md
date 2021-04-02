@@ -6,7 +6,7 @@ With Foodly, you can easily plan your food for the upcoming week with your famil
 
 ## Availability 
 
-- Android: _coming soon_
+- Android: [Get it on **Google Play**](https://play.google.com/store/apps/details?id=io.golenia.foodly)
 - iOS: _coming soon_
 
 ## Screenshots
