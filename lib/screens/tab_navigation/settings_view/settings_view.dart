@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodly/app_router.gr.dart';
 import 'package:foodly/screens/onboarding/onboarding_screen.dart';
+import 'package:foodly/screens/tab_navigation/settings_view/help_slides/help_slide_share_import.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share/share.dart';
 
@@ -82,6 +83,17 @@ class SettingsView extends ConsumerWidget {
                       ),
                       leadingIcon: EvaIcons.questionMarkCircleOutline,
                       text: 'Einführung anzeigen',
+                      trailing: Icon(EvaIcons.arrowIosForwardOutline),
+                    ),
+                    SettingsTile(
+                      onTap: () => Navigator.push(
+                        context,
+                        ConcentricPageRoute(
+                          builder: (_) => HelpSlideShareImport(),
+                        ),
+                      ),
+                      leadingIcon: EvaIcons.questionMarkCircleOutline,
+                      text: 'Rezepte importieren',
                       trailing: Icon(EvaIcons.arrowIosForwardOutline),
                     ),
                   ], context),

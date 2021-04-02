@@ -3,13 +3,12 @@ import 'package:concentric_transition/concentric_transition.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/screens/tab_navigation/home_screen.dart';
 import 'package:foodly/services/authentication_service.dart';
 import 'package:foodly/services/settings_service.dart';
 
 import '../authentication/authentication_screen.dart';
-import 'page_card.dart';
-import 'page_data.dart';
+import '../../widgets/page_card.dart';
+import '../../models/page_data.dart';
 
 class OnboardingScreen extends StatelessWidget {
   final List<PageData> pages = [
@@ -55,30 +54,27 @@ class OnboardingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final heightMultiplier = 0.75;
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: ConcentricPageView(
-          colors: _colors,
-          radius: 30,
-          curve: Curves.ease,
-          duration: Duration(seconds: 1),
-          verticalPosition: heightMultiplier,
-          onFinish: () => _finishOnboarding(context),
-          buttonChild: Center(
-            child: Icon(
-              EvaIcons.arrowForwardOutline,
-              color: Colors.white,
-            ),
+    return Scaffold(
+      body: ConcentricPageView(
+        colors: _colors,
+        radius: 30,
+        curve: Curves.ease,
+        duration: Duration(seconds: 1),
+        verticalPosition: heightMultiplier,
+        onFinish: () => _finishOnboarding(context),
+        buttonChild: Center(
+          child: Icon(
+            EvaIcons.arrowForwardOutline,
+            color: Colors.white,
           ),
-          itemCount: pages.length,
-          itemBuilder: (index, value) {
-            return PageCard(
-              page: pages[index],
-              height: MediaQuery.of(context).size.height * heightMultiplier,
-            );
-          },
         ),
+        itemCount: pages.length,
+        itemBuilder: (index, value) {
+          return PageCard(
+            page: pages[index],
+            height: MediaQuery.of(context).size.height * heightMultiplier,
+          );
+        },
       ),
     );
   }

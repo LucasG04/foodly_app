@@ -1,8 +1,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
-import '../../utils/basic_utils.dart';
-import 'page_data.dart';
+import '../utils/basic_utils.dart';
+import '../models/page_data.dart';
 
 class PageCard extends StatelessWidget {
   final PageData page;
