@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:badges/badges.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -119,7 +120,7 @@ class _MealListTitleState extends State<MealListTitle> {
   Widget _buildTitle() {
     return Container(
       width: double.infinity,
-      child: Text(
+      child: AutoSizeText(
         'Gerichte',
         style: TextStyle(
           fontSize: 32.0,

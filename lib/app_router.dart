@@ -4,6 +4,7 @@ import 'screens/authentication/authentication_screen.dart';
 import 'screens/meal/meal_screen.dart';
 import 'screens/meal_create/meal_create_screen.dart';
 import 'screens/meal_select/meal_select.dart';
+import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/tab_navigation/home_screen.dart';
 import 'screens/unknown_route/unknown_route_screen.dart';
 
@@ -15,6 +16,7 @@ import 'screens/unknown_route/unknown_route_screen.dart';
     CupertinoRoute(page: HomeScreen, initial: true),
     CupertinoRoute(page: AuthenticationScreen),
     CupertinoRoute(page: MealSelectScreen),
+    CupertinoRoute(page: OnboardingScreen),
     CupertinoRoute(path: '/meal-create/:id', page: MealCreateScreen),
     CupertinoRoute(path: '/meal/:id', page: MealScreen),
     CupertinoRoute(path: '*', page: UnknownRouteScreen),

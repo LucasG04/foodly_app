@@ -122,17 +122,6 @@ class _MealListViewState extends State<MealListView>
           meals.where((element) => element.tags.contains(group.tag)).toList();
     }
 
-    // if (meals.any((element) => element.tags == null || element.tags.isEmpty)) {
-    //   tagList.add(
-    //     TagGroup(
-    //       'Ohne Kategorie',
-    //       meals
-    //           .where((element) => element.tags == null || element.tags.isEmpty)
-    //           .toList(),
-    //     ),
-    //   );
-    // }
-
     return tagList;
   }
 

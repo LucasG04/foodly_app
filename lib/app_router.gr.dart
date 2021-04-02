@@ -13,6 +13,7 @@ import 'screens/authentication/authentication_screen.dart';
 import 'screens/meal/meal_screen.dart';
 import 'screens/meal_create/meal_create_screen.dart';
 import 'screens/meal_select/meal_select.dart';
+import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/tab_navigation/home_screen.dart';
 import 'screens/unknown_route/unknown_route_screen.dart';
 
@@ -20,6 +21,7 @@ class Routes {
   static const String homeScreen = '/';
   static const String authenticationScreen = '/authentication-screen';
   static const String mealSelectScreen = '/meal-select-screen';
+  static const String onboardingScreen = '/onboarding-screen';
   static const String _mealCreateScreen = '/meal-create/:id';
   static String mealCreateScreen({@required dynamic id}) => '/meal-create/$id';
   static const String _mealScreen = '/meal/:id';
@@ -29,6 +31,7 @@ class Routes {
     homeScreen,
     authenticationScreen,
     mealSelectScreen,
+    onboardingScreen,
     _mealCreateScreen,
     _mealScreen,
     unknownRouteScreen,
@@ -42,6 +45,7 @@ class AppRouter extends RouterBase {
     RouteDef(Routes.homeScreen, page: HomeScreen),
     RouteDef(Routes.authenticationScreen, page: AuthenticationScreen),
     RouteDef(Routes.mealSelectScreen, page: MealSelectScreen),
+    RouteDef(Routes.onboardingScreen, page: OnboardingScreen),
     RouteDef(Routes._mealCreateScreen, page: MealCreateScreen),
     RouteDef(Routes._mealScreen, page: MealScreen),
     RouteDef(Routes.unknownRouteScreen, page: UnknownRouteScreen),
@@ -67,6 +71,12 @@ class AppRouter extends RouterBase {
           dateString: data.queryParams['date'].stringValue,
           isLunchString: data.queryParams['isLunch'].stringValue,
         ),
+        settings: data,
+      );
+    },
+    OnboardingScreen: (data) {
+      return CupertinoPageRoute<dynamic>(
+        builder: (context) => OnboardingScreen(),
         settings: data,
       );
     },
