@@ -1,5 +1,7 @@
 # Foodly - Meal Planning
 
+[![CodeFactor](https://www.codefactor.io/repository/github/lucasg04/foodly_app/badge)](https://www.codefactor.io/repository/github/lucasg04/foodly_app)
+
 **Meal planning with calendar, shopping list and cookbook.**
 
 With Foodly, you can easily plan your food for the upcoming week with your family, friends and roommates. It's a perfect synergy of planning, cookbook and shopping list.
