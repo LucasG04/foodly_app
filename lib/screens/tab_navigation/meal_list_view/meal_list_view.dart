@@ -2,13 +2,13 @@ import 'package:concentric_transition/concentric_transition.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/screens/tab_navigation/settings_view/help_slides/help_slide_share_import.dart';
 import 'package:group_list_view/group_list_view.dart';
 
 import '../../../constants.dart';
 import '../../../models/meal.dart';
 import '../../../providers/state_providers.dart';
 import '../../../widgets/user_information.dart';
+import '../settings_view/help_slides/help_slide_share_import.dart';
 import 'meal_list_tile.dart';
 import 'meal_list_title.dart';
 

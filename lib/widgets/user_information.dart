@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:foodly/utils/basic_utils.dart';
 
 import '../constants.dart';
+import '../utils/basic_utils.dart';
 
 class UserInformation extends StatelessWidget {
   final String _assetPath;

@@ -3,8 +3,9 @@ import 'package:concentric_transition/concentric_transition.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/models/page_data.dart';
-import 'package:foodly/widgets/page_card.dart';
+
+import '../../../../models/page_data.dart';
+import '../../../../widgets/page_card.dart';
 
 class HelpSlideShareImport extends StatelessWidget {
   final List<PageData> pages = [
