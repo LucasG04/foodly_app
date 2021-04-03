@@ -89,7 +89,7 @@ class _MealListViewState extends State<MealListView>
     return Center(
       child: Container(
         width: MediaQuery.of(context).size.width > 599
-            ? 600
+            ? 600.0
             : MediaQuery.of(context).size.width * 0.9,
         margin: const EdgeInsets.only(top: kPadding),
         child: Text(

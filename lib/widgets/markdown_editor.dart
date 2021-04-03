@@ -44,12 +44,12 @@ class _MarkdownEditorState extends State<MarkdownEditor>
     final textColor = Theme.of(context).textTheme.bodyText1.color;
     return Container(
       width: MediaQuery.of(context).size.width > 599
-          ? 600
+          ? 600.0
           : MediaQuery.of(context).size.width * 0.9,
       height: MediaQuery.of(context).size.height < 500
-          ? 250
+          ? 250.0
           : MediaQuery.of(context).size.height > 1000
-              ? 600
+              ? 600.0
               : MediaQuery.of(context).size.height * 0.5,
       child: Column(
         children: [

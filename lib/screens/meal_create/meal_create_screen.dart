@@ -73,7 +73,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   Widget build(BuildContext context) {
     _meal.planId = context.read(planProvider).state.id;
     final fullWidth = MediaQuery.of(context).size.width > 699
-        ? 700
+        ? 700.0
         : MediaQuery.of(context).size.width * 0.8;
 
     return Scaffold(
