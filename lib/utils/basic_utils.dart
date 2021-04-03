@@ -27,7 +27,7 @@ class BasicUtils {
     double smallMultiplier = 0.9,
   }) {
     return MediaQuery.of(context).size.width > 599
-        ? 600
+        ? 600.0
         : MediaQuery.of(context).size.width * smallMultiplier;
   }
 }

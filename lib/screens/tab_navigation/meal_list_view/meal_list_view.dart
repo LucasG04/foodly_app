@@ -1,5 +1,8 @@
+import 'package:concentric_transition/concentric_transition.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodly/screens/tab_navigation/settings_view/help_slides/help_slide_share_import.dart';
 import 'package:group_list_view/group_list_view.dart';
 
 import '../../../constants.dart';
@@ -54,10 +57,26 @@ class _MealListViewState extends State<MealListView>
                             tagFilter,
                           ),
                         )
-                  : UserInformation(
-                      'assets/images/undraw_empty.png',
-                      'Keine Gerichte vorhanden',
-                      'In deinem Plan sind noch keine Gerichte angelegt. Klick auf den "Plus"-Button oben rechts und leg los.',
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        UserInformation(
+                          'assets/images/undraw_empty.png',
+                          'Keine Gerichte vorhanden',
+                          'In deinem Plan sind noch keine Gerichte angelegt. Klick auf den "Plus"-Button oben rechts und leg los.',
+                        ),
+                        SizedBox(height: kPadding),
+                        TextButton.icon(
+                          onPressed: () => Navigator.push(
+                            context,
+                            ConcentricPageRoute(
+                              builder: (_) => HelpSlideShareImport(),
+                            ),
+                          ),
+                          icon: Icon(EvaIcons.questionMarkCircleOutline),
+                          label: Text('Rezepte importieren'),
+                        ),
+                      ],
                     );
             })
           ],
@@ -70,7 +89,7 @@ class _MealListViewState extends State<MealListView>
     return Center(
       child: Container(
         width: MediaQuery.of(context).size.width > 599
-            ? 600
+            ? 600.0
             : MediaQuery.of(context).size.width * 0.9,
         margin: const EdgeInsets.only(top: kPadding),
         child: Text(

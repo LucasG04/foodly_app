@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foodly/utils/basic_utils.dart';
 
 import '../constants.dart';
 
@@ -12,41 +13,45 @@ class UserInformation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Padding(
-          padding: EdgeInsets.all(size.width * 0.1),
-          child: Image.asset(
-            _assetPath,
-            alignment: Alignment.center,
-            height: size.height * 0.2,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(kPadding),
-          child: Text(
-            _title,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            kPadding,
-            0,
-            kPadding,
-            kPadding,
-          ),
-          child: Text(
-            _message,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
+    return SizedBox(
+      width: BasicUtils.contentWidth(context),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(size.width * 0.1),
+            child: Image.asset(
+              _assetPath,
+              alignment: Alignment.center,
+              height: size.height * 0.2,
             ),
           ),
-        ),
-      ],
+          Padding(
+            padding: const EdgeInsets.all(kPadding),
+            child: Text(
+              _title,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              kPadding,
+              0,
+              kPadding,
+              kPadding,
+            ),
+            child: Text(
+              _message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

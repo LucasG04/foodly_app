@@ -49,7 +49,7 @@ class _SearchBarState extends State<SearchBar> {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width > 649
-          ? 650
+          ? 650.0
           : MediaQuery.of(context).size.width * 0.95,
       child: Card(
         child: Column(

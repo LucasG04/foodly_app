@@ -22,7 +22,7 @@ class PageTitle extends StatelessWidget {
         child: Container(
           height: 50.0,
           width: MediaQuery.of(context).size.width > 599
-              ? 600
+              ? 600.0
               : MediaQuery.of(context).size.width * 0.9,
           child: Row(
             children: [
