@@ -85,7 +85,9 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                 shrinkWrap: true,
                 padding: const EdgeInsets.symmetric(vertical: kPadding),
                 physics: NeverScrollableScrollPhysics(),
-                itemCount: searchedMeals.length == 0 ? 3 : searchedMeals.length,
+                itemCount: searchedMeals.isEmpty
+                    ? 3 // there could be a max amount of 3 items if none is found
+                    : searchedMeals.length,
                 itemBuilder: (context, index) {
                   return AnimationConfiguration.staggeredList(
                     position: index,
@@ -93,7 +95,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                     child: SlideAnimation(
                       verticalOffset: 50.0,
                       child: FadeInAnimation(
-                        child: (searchedMeals.length == 0)
+                        child: searchedMeals.isEmpty
                             ? _buildNoResultsForIndex(index)
                             : SelectMealTile(
                                 meal: searchedMeals[index],

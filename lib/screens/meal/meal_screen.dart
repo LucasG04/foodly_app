@@ -273,7 +273,7 @@ class _MealScreenState extends State<MealScreen> {
           SizedBox(
             width: nameWidth,
             child: Text(
-              '${ingredient.name}',
+              ingredient.name.toString(),
               textAlign: TextAlign.start,
               style: TextStyle(fontSize: 18.0),
             ),

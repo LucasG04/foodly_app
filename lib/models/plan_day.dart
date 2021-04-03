@@ -29,17 +29,4 @@ class PlanDay {
 
   @override
   String toString() => 'PlanDay(date: $date, lunch: $lunch, dinner: $dinner)';
-
-  @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) return true;
-
-    return o is PlanDay &&
-        o.date == date &&
-        o.lunch == lunch &&
-        o.dinner == dinner;
-  }
-
-  @override
-  int get hashCode => date.hashCode ^ lunch.hashCode ^ dinner.hashCode;
 }
