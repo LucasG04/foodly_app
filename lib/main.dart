@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:in_app_update/in_app_update.dart';
@@ -54,10 +55,8 @@ class _FoodlyAppState extends State<FoodlyApp> {
   @override
   void initState() {
     initializeDateFormatting();
-    Logger.root.level = Level.ALL; // defaults to Level.INFO
-    Logger.root.onRecord.listen((record) {
-      print('${record.level.name}: ${record.loggerName}: ${record.message}');
-    });
+
+    _initializeLogger();
 
     _privateMealsStreamValue = [];
     _publicMealsStreamValue = [];
@@ -127,6 +126,17 @@ class _FoodlyAppState extends State<FoodlyApp> {
     if (firebaseUser != null) {
       FoodlyUser user = await FoodlyUserService.getUserById(firebaseUser.uid);
       context.read(userProvider).state = user;
+    }
+  }
+
+  void _initializeLogger() {
+    if (Foundation.kDebugMode) {
+      Logger.root.level = Level.ALL;
+      Logger.root.onRecord.listen((record) {
+        print('${record.level.name}: ${record.loggerName}: ${record.message}');
+      });
+    } else {
+      Logger.root.level = Level.OFF;
     }
   }
 
