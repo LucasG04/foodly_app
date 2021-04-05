@@ -1,7 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:foodly/constants.dart';
+
+import '../../constants.dart';
 
 class BorderIcon extends StatelessWidget {
   final Widget child;

@@ -15,7 +15,6 @@ import '../../providers/state_providers.dart';
 import '../../services/meal_service.dart';
 import '../../services/plan_service.dart';
 import '../../utils/convert_util.dart';
-import '../../utils/no_glowing_overscroll_indicator_behavior.dart';
 import '../../widgets/foodly_network_image.dart';
 import '../../widgets/full_screen_loader.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
@@ -150,6 +149,7 @@ class _MealScreenState extends State<MealScreen> {
                     ),
                     SliverToBoxAdapter(
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Padding(
