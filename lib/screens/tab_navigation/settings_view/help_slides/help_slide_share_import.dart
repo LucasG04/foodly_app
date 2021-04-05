@@ -20,7 +20,7 @@ class HelpSlideShareImport extends StatelessWidget {
       assetPath: 'assets/help_slide/share-button.png',
       title: 'Über Chefkoch',
       subtitle:
-          'Öffne Chefkoch und wähle das Rezept aus, das du importieren möchtest. Klicken dann auf das "Teilen" Icon.',
+          'Öffne Chefkoch und wähle das Rezept aus, das du importieren möchtest. Klicke dann auf das "Teilen" Icon.',
       background: Color(0xFF5eaaa8),
     ),
     PageData(
