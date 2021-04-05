@@ -31,7 +31,7 @@ class PlanDayCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(kRadius),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(kPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -49,7 +49,8 @@ class PlanDayCard extends StatelessWidget {
                   style: kCardSubtitle,
                 ),
               ),
-              SizedBox(height: 20.0),
+              SizedBox(height: kPadding),
+              _buildSubtitle('Mittag'),
               ...lunchList
                   .map((e) => PlanDayMealTile(e, lunchList.length > 1))
                   .toList(),
@@ -58,6 +59,7 @@ class PlanDayCard extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Divider(),
               ),
+              _buildSubtitle('Abend'),
               ...dinnerList
                   .map((e) => PlanDayMealTile(e, dinnerList.length > 1))
                   .toList(),
@@ -103,6 +105,19 @@ class PlanDayCard extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubtitle(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 5.0, left: kPadding / 2),
+      child: Text(
+        text.toString().toUpperCase(),
+        style: TextStyle(
+          fontSize: 14.0,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );

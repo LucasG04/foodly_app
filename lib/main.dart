@@ -86,6 +86,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
                 _streamMeals();
               }
               return MaterialApp(
+                debugShowCheckedModeBanner: false,
                 theme: ThemeData(
                   // TODO: Nunito default font?
                   brightness: Brightness.light,

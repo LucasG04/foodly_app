@@ -1,7 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:foodly/constants.dart';
+
+import '../../constants.dart';
 
 class BorderIcon extends StatelessWidget {
   final Widget child;
@@ -20,7 +21,8 @@ class BorderIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new ClipRect(
+    return new ClipRRect(
+      borderRadius: BorderRadius.circular(kRadius * 2),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
         child: Container(
