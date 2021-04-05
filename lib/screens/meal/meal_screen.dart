@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodly/utils/basic_utils.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -58,7 +59,7 @@ class _MealScreenState extends State<MealScreen> {
                 return CustomScrollView(
                   slivers: [
                     SliverAppBar(
-                      expandedHeight: 250.0,
+                      expandedHeight: size.width > 700.0 ? 400.0 : 250.0,
                       backgroundColor:
                           Theme.of(context).scaffoldBackgroundColor,
                       elevation: 4,
@@ -148,110 +149,124 @@ class _MealScreenState extends State<MealScreen> {
                       child: SizedBox(height: kPadding),
                     ),
                     SliverToBoxAdapter(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Padding(
-                            padding: sidePadding,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      AutoSizeText(
-                                        meal.name,
-                                        style: TextStyle(
-                                          fontSize: 26.0,
-                                          fontWeight: FontWeight.bold,
+                      child: Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
+                              padding: sidePadding,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        AutoSizeText(
+                                          meal.name,
+                                          style: TextStyle(
+                                            fontSize: 26.0,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(height: 5.0),
-                                      Text(
-                                        meal.source != null &&
-                                                meal.source.isNotEmpty
-                                            ? 'von ${meal.source}'
-                                            : 'von Unbekannt',
-                                        style: TextStyle(
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .bodyText1
-                                              .color
-                                              .withOpacity(0.5),
+                                        SizedBox(height: 5.0),
+                                        Text(
+                                          meal.source != null &&
+                                                  meal.source.isNotEmpty
+                                              ? 'von ${meal.source}'
+                                              : 'von Unbekannt',
+                                          style: TextStyle(
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .bodyText1
+                                                .color
+                                                .withOpacity(0.5),
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                BorderIcon(
-                                  child: Text(
-                                    '${meal.duration.toString()} Minuten',
-                                    style: TextStyle(
-                                      fontSize: 20.0,
-                                      fontWeight: FontWeight.bold,
+                                      ],
                                     ),
                                   ),
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 15,
-                                    horizontal: 15,
+                                  BorderIcon(
+                                    child: Text(
+                                      '${meal.duration.toString()} Minuten',
+                                      style: TextStyle(
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 15,
+                                      horizontal: 15,
+                                    ),
+                                    withBorder: true,
                                   ),
-                                  withBorder: true,
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: kPadding),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            physics: BouncingScrollPhysics(),
-                            child: Row(
-                              children: [
-                                ...meal.tags.map((e) => TagTile(e)).toList(),
-                                SizedBox(width: kPadding),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: kPadding),
-                          ..._buildSection(
-                            'Zutaten',
-                            Container(
-                              child: ListView.separated(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: meal.ingredients.length,
-                                separatorBuilder: (context, index) => Divider(),
-                                itemBuilder: (context, index) =>
-                                    _buildIngredientTile(
-                                  meal.ingredients[index],
-                                ),
-                                padding: const EdgeInsets.all(0),
+                                ],
                               ),
                             ),
-                          ),
-                          SizedBox(height: kPadding),
-                          ..._buildSection(
-                            'Zubereitung',
-                            MarkdownBody(
-                              data: meal.instructions ?? '',
-                              styleSheet: MarkdownStyleSheet.fromTheme(
-                                ThemeData(
-                                  textTheme: TextTheme(
-                                    bodyText1: TextStyle(fontSize: 16),
-                                    bodyText2: TextStyle(fontSize: 16),
+                            SizedBox(height: kPadding),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              physics: BouncingScrollPhysics(),
+                              child: Row(
+                                children: [
+                                  ...meal.tags.map((e) => TagTile(e)).toList(),
+                                  SizedBox(width: kPadding),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: kPadding),
+                            ..._buildSection(
+                              'Zutaten',
+                              Container(
+                                child: ListView.separated(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: meal.ingredients.length,
+                                  separatorBuilder: (context, index) =>
+                                      Divider(),
+                                  itemBuilder: (context, index) =>
+                                      _buildIngredientTile(
+                                    meal.ingredients[index],
                                   ),
+                                  padding: const EdgeInsets.all(0),
                                 ),
                               ),
                             ),
-                          ),
-                          SizedBox(height: kPadding),
-                          SizedBox(height: 100.0),
-                        ],
+                            SizedBox(height: kPadding),
+                            ..._buildSection(
+                              'Zubereitung',
+                              MarkdownBody(
+                                data: meal.instructions ?? '',
+                                styleSheet: MarkdownStyleSheet.fromTheme(
+                                  ThemeData(
+                                    textTheme: TextTheme(
+                                      bodyText1: TextStyle(fontSize: 16),
+                                      bodyText2: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: kPadding),
+                            SizedBox(height: 100.0),
+                          ]
+                              .map(
+                                (child) => SizedBox(
+                                  width: BasicUtils.contentWidth(
+                                    context,
+                                    smallMultiplier: 1,
+                                  ),
+                                  child: child,
+                                ),
+                              )
+                              .toList(),
+                        ),
                       ),
                     ),
                   ],
@@ -272,32 +287,32 @@ class _MealScreenState extends State<MealScreen> {
   }
 
   Widget _buildIngredientTile(Ingredient ingredient) {
-    final amountWidth = MediaQuery.of(context).size.width * 0.3 - kPadding;
-    final nameWidth = MediaQuery.of(context).size.width * 0.5 - kPadding;
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: kPadding / 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          SizedBox(
-            width: amountWidth,
-            child: Text(
-              ConvertUtil.amountToString(ingredient.amount, ingredient.unit),
-              textAlign: TextAlign.end,
-              style: TextStyle(fontSize: 18.0),
+      child: LayoutBuilder(builder: (context, constraints) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            SizedBox(
+              width: constraints.maxWidth * 0.3 - kPadding / 2,
+              child: Text(
+                ConvertUtil.amountToString(ingredient.amount, ingredient.unit),
+                textAlign: TextAlign.end,
+                style: TextStyle(fontSize: 18.0),
+              ),
             ),
-          ),
-          SizedBox(
-            width: nameWidth,
-            child: Text(
-              ingredient.name.toString(),
-              textAlign: TextAlign.start,
-              style: TextStyle(fontSize: 18.0),
+            SizedBox(
+              width: constraints.maxWidth * 0.5 - kPadding / 2,
+              child: Text(
+                ingredient.name.toString(),
+                textAlign: TextAlign.start,
+                style: TextStyle(fontSize: 18.0),
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
     );
   }
 
