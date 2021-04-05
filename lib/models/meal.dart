@@ -35,7 +35,7 @@ class Meal {
       'duration': duration,
       'ingredients': ingredients?.map((x) => x.toMap())?.toList(),
       'tags': tags,
-      'imageUrl': imageUrl,
+      'imageUrl': imageUrl ?? '',
       'planId': planId,
       'createdBy': createdBy,
       'isPublic': isPublic ?? false,
@@ -50,7 +50,7 @@ class Meal {
       name: map['name'],
       source: map['source'],
       instructions: map['instructions'],
-      imageUrl: map['imageUrl'],
+      imageUrl: map['imageUrl'] ?? '',
       duration: int.tryParse(map['duration'].toString()) ?? 0,
       ingredients: List<Ingredient>.from(
           map['ingredients']?.map((x) => Ingredient.fromMap(x))),

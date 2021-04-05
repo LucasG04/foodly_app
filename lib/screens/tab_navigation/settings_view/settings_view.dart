@@ -1,11 +1,7 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:concentric_transition/page_route.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/app_router.gr.dart';
-import 'package:foodly/screens/onboarding/onboarding_screen.dart';
-import 'package:foodly/screens/tab_navigation/settings_view/help_slides/help_slide_share_import.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share/share.dart';
 
@@ -16,6 +12,8 @@ import '../../../services/plan_service.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
+import '../../onboarding/onboarding_screen.dart';
+import 'help_slides/help_slide_share_import.dart';
 import 'import_meals_modal.dart';
 import 'settings_tile.dart';
 

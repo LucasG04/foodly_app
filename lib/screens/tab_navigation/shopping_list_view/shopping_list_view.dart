@@ -112,7 +112,7 @@ class _ShoppingListViewState extends State<ShoppingListView>
                                               listId, item.id);
                                         },
                                       ),
-                                      boughtItems.length > 0
+                                      boughtItems.isNotEmpty
                                           ? Center(
                                               child: TextButton(
                                                 onPressed: () =>

@@ -204,12 +204,6 @@ class PlanService {
       _firestore.collection('plans').doc(planId).update({'users': plan.users});
     }
   }
-
-  static Future<Box> _getFoodlyBox() async {
-    return await Hive.boxExists('foodly')
-        ? Hive.box('foodly')
-        : await Hive.openBox('foodly');
-  }
 }
 
 extension DateTimeExtensions on DateTime {

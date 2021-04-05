@@ -31,9 +31,9 @@ class StorageService {
     return Future.value(uploadTask);
   }
 
-  static Future<String> getMealImageUrl(String fileName) {
+  static Future<String> getMealImageUrl(String fileName) async {
     if (fileName == null || fileName.isEmpty) {
-      return null;
+      return '';
     }
 
     // Create a Reference to the file
@@ -45,9 +45,9 @@ class StorageService {
     return ref.getDownloadURL();
   }
 
-  static Future<void> removeFile(String fileName) {
+  static Future<void> removeFile(String fileName) async {
     if (fileName == null || fileName.isEmpty) {
-      return null;
+      return;
     }
 
     // Create a Reference to the file
@@ -56,6 +56,6 @@ class StorageService {
         .child(_storageMealImageFolder)
         .child(fileName);
 
-    return ref.delete();
+    await ref.delete();
   }
 }
