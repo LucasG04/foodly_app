@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/utils/basic_utils.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -15,6 +14,7 @@ import '../../models/meal.dart';
 import '../../providers/state_providers.dart';
 import '../../services/meal_service.dart';
 import '../../services/plan_service.dart';
+import '../../utils/basic_utils.dart';
 import '../../utils/convert_util.dart';
 import '../../widgets/foodly_network_image.dart';
 import '../../widgets/full_screen_loader.dart';

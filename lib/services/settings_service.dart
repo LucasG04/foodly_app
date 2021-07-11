@@ -21,4 +21,12 @@ class SettingsService {
   static Future<void> setFirstUsageFalse() async {
     await _settingsBox.put('firstUsage', false);
   }
+
+  static bool get multipleMealsPerTime =>
+      _settingsBox.get('multipleMealsPerTime') ?? true;
+
+  static Future<void> setMultipleMealsPerTime(bool value) async {
+    print(value);
+    await _settingsBox.put('multipleMealsPerTime', value);
+  }
 }
