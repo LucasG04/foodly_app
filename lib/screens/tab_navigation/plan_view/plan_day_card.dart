@@ -79,7 +79,7 @@ class PlanDayCard extends StatelessWidget {
   }
 
   bool _showAddButton(BuildContext context, Iterable<dynamic> meals) {
-    return meals.length == 0 || SettingsService.multipleMealsPerTime;
+    return meals.isEmpty || SettingsService.multipleMealsPerTime;
   }
 
   Widget _buildAddButton(context, {bool isLunch}) {
