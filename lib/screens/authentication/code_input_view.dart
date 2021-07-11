@@ -141,7 +141,7 @@ class _CodeInputViewState extends State<CodeInputView> {
             : IconButton(
                 icon: Icon(
                   EvaIcons.checkmark,
-                  color: Theme.of(context).accentColor,
+                  color: Theme.of(context).colorScheme.secondary,
                 ),
                 onPressed: () => _validateCode(_codeController.text),
               ),

@@ -2,7 +2,6 @@ import 'package:concentric_transition/page_route.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/services/settings_service.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share/share.dart';
 
@@ -10,6 +9,7 @@ import '../../../constants.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/authentication_service.dart';
 import '../../../services/plan_service.dart';
+import '../../../services/settings_service.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';

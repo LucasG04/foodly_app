@@ -1,13 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/providers/state_providers.dart';
-import 'package:foodly/services/settings_service.dart';
 import 'package:intl/intl.dart';
 
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
 import '../../../models/plan_meal.dart';
+import '../../../services/settings_service.dart';
 import 'plan_day_meal_tile.dart';
 
 class PlanDayCard extends StatelessWidget {
