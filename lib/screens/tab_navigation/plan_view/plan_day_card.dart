@@ -1,5 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodly/providers/state_providers.dart';
+import 'package:foodly/services/settings_service.dart';
 import 'package:intl/intl.dart';
 
 import '../../../app_router.gr.dart';
@@ -54,7 +57,9 @@ class PlanDayCard extends StatelessWidget {
               ...lunchList
                   .map((e) => PlanDayMealTile(e, lunchList.length > 1))
                   .toList(),
-              _buildAddButton(context, isLunch: true),
+              _showAddButton(context, lunchList)
+                  ? _buildAddButton(context, isLunch: true)
+                  : SizedBox(),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Divider(),
@@ -63,12 +68,18 @@ class PlanDayCard extends StatelessWidget {
               ...dinnerList
                   .map((e) => PlanDayMealTile(e, dinnerList.length > 1))
                   .toList(),
-              _buildAddButton(context, isLunch: false)
+              _showAddButton(context, dinnerList)
+                  ? _buildAddButton(context, isLunch: false)
+                  : SizedBox(),
             ],
           ),
         ),
       ),
     );
+  }
+
+  bool _showAddButton(BuildContext context, Iterable<dynamic> meals) {
+    return meals.length == 0 || SettingsService.multipleMealsPerTime;
   }
 
   Widget _buildAddButton(context, {bool isLunch}) {
