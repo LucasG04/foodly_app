@@ -103,18 +103,18 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
               ),
             ],
           ),
-          SizedBox(
-            height: MediaQuery.of(context).viewInsets.bottom == 0
-                ? kPadding * 2
-                : MediaQuery.of(context).viewInsets.bottom,
-          ),
+          SizedBox(height: kPadding * 2),
           Center(
             child: MainButton(
               text: 'Speichern',
               onTap: _saveIngredient,
             ),
           ),
-          SizedBox(height: kPadding * 2),
+          SizedBox(
+            height: MediaQuery.of(context).viewInsets.bottom == 0
+                ? kPadding * 2
+                : MediaQuery.of(context).viewInsets.bottom,
+          ),
         ],
       ),
     );
