@@ -56,13 +56,6 @@ class _ShoppingListViewState extends State<ShoppingListView>
                                   padding: const EdgeInsets.only(left: 5.0),
                                   child: PageTitle(
                                     text: 'Einkaufsliste',
-                                    actions: [
-                                      IconButton(
-                                        icon: Icon(EvaIcons.plusCircleOutline),
-                                        onPressed: () => _editGrocery(listId),
-                                        splashRadius: 25.0,
-                                      )
-                                    ],
                                   ),
                                 ),
                                 SizedBox(
