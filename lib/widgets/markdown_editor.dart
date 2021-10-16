@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -144,7 +145,12 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text('Formatiere den Text (klick für mehr Info).'),
+                    Flexible(
+                      child: AutoSizeText(
+                        'Formatiere den Text (klick für mehr Info).',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                     Image.asset('assets/images/md-icon.png', width: 30.0),
                   ],
                 ),
