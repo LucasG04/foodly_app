@@ -1,5 +1,6 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:foodly/utils/basic_utils.dart';
 
 import '../../constants.dart';
 import '../../services/chefkoch_service.dart';
@@ -107,7 +108,8 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
   }
 
   void _importMeal() async {
-    final String link = _linkController.text.trim();
+    final String link =
+        BasicUtils.getUrlFromString(_linkController.text.trim());
 
     if (link.isEmpty) {
       setState(() {
