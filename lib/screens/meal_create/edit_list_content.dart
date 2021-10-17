@@ -19,11 +19,12 @@ class EditListContent extends StatefulWidget {
 }
 
 class _EditListContentState extends State<EditListContent> {
-  List<String> _questions = [];
+  List<String> _content = [];
 
   @override
   void initState() {
-    _questions = widget.content;
+    _content = widget.content;
+
     super.initState();
   }
 
@@ -38,19 +39,18 @@ class _EditListContentState extends State<EditListContent> {
             style: Theme.of(context).textTheme.bodyText1,
           ),
         ),
-        ..._questions.map((feedbackquestion) {
+        ..._content.map((item) {
           return Row(
             children: <Widget>[
               Expanded(
-                child: _buildTextField(feedbackquestion,
-                    _questions.indexOf(feedbackquestion), context),
+                child: _buildTextField(item, _content.indexOf(item), context),
               ),
               IconButton(
                   icon: Icon(EvaIcons.minusCircleOutline),
                   onPressed: () {
                     setState(() {
-                      _questions.remove(feedbackquestion);
-                      widget.onChanged(_questions);
+                      _content.remove(item);
+                      widget.onChanged(_content);
                     });
                   }),
             ],
@@ -63,8 +63,8 @@ class _EditListContentState extends State<EditListContent> {
               icon: Icon(EvaIcons.plusCircleOutline),
               onPressed: () {
                 setState(() {
-                  _questions.add('');
-                  widget.onChanged(_questions);
+                  _content.add('');
+                  widget.onChanged(_content);
                 });
               },
             ),
@@ -74,12 +74,11 @@ class _EditListContentState extends State<EditListContent> {
     );
   }
 
-  TextField _buildTextField(
-      String feedbackquestion, int index, BuildContext context) {
-    final controller = TextEditingController(text: feedbackquestion);
+  TextField _buildTextField(String item, int index, BuildContext context) {
+    final controller = TextEditingController(text: item);
     controller.addListener(() {
-      _questions[index] = controller.text;
-      widget.onChanged(_questions);
+      _content[index] = controller.text;
+      widget.onChanged(_content);
     });
 
     return TextField(
