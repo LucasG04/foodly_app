@@ -8,6 +8,7 @@ android_keys.zip
 
 # Builds
 android/fastlane/report.xml
+ios/build
 
 # Miscellaneous
 *.class

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:io' show Platform;
 
 /// General
-const kAppName = 'Foodly App';
+final kAppName = Platform.isIOS ? 'Foodster' : 'Foodly';
 const kPlaceholderSymbol = 'p--';
 const kChefkochShareEndpoint = 'https://www.chefkoch.de/rezepte';
 
