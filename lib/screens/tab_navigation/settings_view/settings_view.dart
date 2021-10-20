@@ -171,7 +171,8 @@ class _SettingsViewState extends State<SettingsView> {
   }
 
   void _shareCode(String code) {
-    Share.share('Tritt meinem Essensplan bei Foodly mit dem Code "$code" bei.');
+    Share.share(
+        'Tritt meinem Essensplan bei $kAppName mit dem Code "$code" bei.');
   }
 
   void _leavePlan(String planId, context) async {

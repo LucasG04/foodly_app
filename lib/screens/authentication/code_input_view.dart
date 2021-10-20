@@ -102,7 +102,7 @@ class _CodeInputViewState extends State<CodeInputView> {
                       ),
                     ),
                     Text(
-                      'Foodly',
+                      kAppName,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 38.0,
