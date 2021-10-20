@@ -4,6 +4,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -137,7 +138,7 @@ class _LoginViewState extends State<LoginView> {
             obscureText: true,
             errorText: _passwordErrorText,
             focusNode: _passwordFocusNode,
-            onSubmit: _authenticateUser,
+            onSubmit: _authWithEmail,
           ),
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 250),
@@ -157,6 +158,7 @@ class _LoginViewState extends State<LoginView> {
                     onPressed: null,
                   ),
           ),
+          SignInWithAppleButton(onPressed: _authWithApple),
           Container(
             height: size.height * 0.1 +
                 MediaQuery.of(context).viewInsets.bottom / 6,
@@ -177,7 +179,7 @@ class _LoginViewState extends State<LoginView> {
           ),
           MainButton(
             text: 'Beitreten',
-            onTap: _authenticateUser,
+            onTap: _authWithEmail,
             isProgress: true,
             buttonState: _buttonState,
           ),
@@ -221,58 +223,75 @@ class _LoginViewState extends State<LoginView> {
     return true;
   }
 
-  void _authenticateUser() async {
-    _resetErrors();
-
-    if (_validateEmail() && _validatePassword()) {
-      setState(() {
-        _buttonState = ButtonState.inProgress;
-      });
-
-      try {
-        BasicUtils.clearAllProvider(context);
-
-        final String userId = _isRegistering
-            ? await AuthenticationService.registerUser(
-                _emailController.text, _passwordController.text)
-            : await AuthenticationService.signInUser(
-                _emailController.text, _passwordController.text);
-
-        final Plan plan = widget.isCreatingPlan
-            ? await PlanService.createPlan(widget.plan.name)
-            : await PlanService.getPlanById(widget.plan.id);
-
-        if (!plan.users.contains(userId)) {
-          plan.users.add(userId);
-          await PlanService.updatePlan(plan);
-        }
-
-        FoodlyUser foodlyUser;
-        if (_isRegistering) {
-          foodlyUser = await FoodlyUserService.createUserWithId(userId);
-        } else {
-          foodlyUser = await FoodlyUserService.getUserById(userId);
-        }
-
-        foodlyUser.oldPlans.add(plan.id);
-        await FoodlyUserService.addOldPlanIdToUser(userId, plan.id);
-
-        context.read(planProvider).state = plan;
-        context.read(userProvider).state = foodlyUser;
-
-        setState(() {
-          _buttonState = ButtonState.normal;
-        });
-
-        ExtendedNavigator.root.replace(Routes.homeScreen);
-      } catch (exception) {
-        _handleAuthException(exception);
-      }
-    } else {
+  Future<void> _authWithEmail() async {
+    _startAuthentication();
+    if (!_validateEmail() || !_validatePassword()) {
       setState(() {
         _buttonState = ButtonState.error;
       });
+      return;
     }
+
+    try {
+      final userId = await (_isRegistering
+          ? AuthenticationService.registerUser(
+              _emailController.text, _passwordController.text)
+          : AuthenticationService.signInUser(
+              _emailController.text, _passwordController.text));
+      await _processAuthentication(userId);
+    } catch (e) {
+      _handleAuthException(e);
+    }
+  }
+
+  Future<void> _authWithApple() async {
+    _startAuthentication();
+
+    try {
+      final userId = await AuthenticationService.signInWithApple();
+      await _processAuthentication(userId);
+    } catch (e) {
+      _handleAuthException(e);
+    }
+  }
+
+  void _startAuthentication() {
+    _resetErrors();
+    setState(() {
+      _buttonState = ButtonState.inProgress;
+    });
+    BasicUtils.clearAllProvider(context);
+  }
+
+  Future<void> _processAuthentication(String userId) async {
+    // TODO catch empty userId
+    final Plan plan = widget.isCreatingPlan
+        ? await PlanService.createPlan(widget.plan.name)
+        : await PlanService.getPlanById(widget.plan.id);
+
+    if (!plan.users.contains(userId)) {
+      plan.users.add(userId);
+      await PlanService.updatePlan(plan);
+    }
+
+    FoodlyUser foodlyUser;
+    if (_isRegistering) {
+      foodlyUser = await FoodlyUserService.createUserWithId(userId);
+    } else {
+      foodlyUser = await FoodlyUserService.getUserById(userId);
+    }
+
+    foodlyUser.oldPlans.add(plan.id);
+    await FoodlyUserService.addOldPlanIdToUser(userId, plan.id);
+
+    context.read(planProvider).state = plan;
+    context.read(userProvider).state = foodlyUser;
+
+    setState(() {
+      _buttonState = ButtonState.normal;
+    });
+
+    ExtendedNavigator.root.replace(Routes.homeScreen);
   }
 
   void _resetErrors() {
