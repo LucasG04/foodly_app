@@ -8,7 +8,7 @@ import '../../widgets/small_circular_progress_indicator.dart';
 import 'login_design_clipper.dart';
 
 class CodeInputView extends StatefulWidget {
-  final void Function(String) onPageChange;
+  final void Function(CodeInputResult, [String]) onPageChange;
 
   CodeInputView(this.onPageChange);
 
@@ -42,7 +42,7 @@ class _CodeInputViewState extends State<CodeInputView> {
             ),
             children: [
               SizedBox(
-                  height: size.height * 0.45 -
+                  height: size.height * 0.41 -
                       MediaQuery.of(context).viewInsets.bottom / 6),
               SizedBox(
                 width: contentWidth * 0.7,
@@ -53,13 +53,17 @@ class _CodeInputViewState extends State<CodeInputView> {
               ),
               SizedBox(height: kPadding),
               _buildCodeInput(),
-              // Padding(
-              //   padding: const EdgeInsets.symmetric(
-              //     vertical: kPadding * 2,
-              //     horizontal: kPadding,
-              //   ),
-              //   child: Center(child: Text('oder')),
-              // ),
+              Container(
+                width: double.infinity,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    child: Text('Code vergessen?'),
+                    onPressed: () =>
+                        widget.onPageChange(CodeInputResult.FORGOT),
+                  ),
+                ),
+              ),
               SizedBox(height: size.height * 0.1),
               SizedBox(
                 width: contentWidth * 0.7,
@@ -73,7 +77,7 @@ class _CodeInputViewState extends State<CodeInputView> {
               Center(
                 child: MainButton(
                   text: 'Plan erstellen',
-                  onTap: () => widget.onPageChange(null),
+                  onTap: () => widget.onPageChange(CodeInputResult.NEW),
                 ),
               ),
             ],
@@ -160,7 +164,7 @@ class _CodeInputViewState extends State<CodeInputView> {
       // Check code
       try {
         final plan = await PlanService.getPlanByCode(text, withMeals: false);
-        widget.onPageChange(plan.id);
+        widget.onPageChange(CodeInputResult.JOIN, plan.id);
       } catch (e) {
         print(e);
         setState(() {
@@ -174,3 +178,5 @@ class _CodeInputViewState extends State<CodeInputView> {
     }
   }
 }
+
+enum CodeInputResult { JOIN, NEW, FORGOT }
