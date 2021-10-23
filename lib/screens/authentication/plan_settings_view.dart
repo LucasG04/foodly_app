@@ -77,12 +77,6 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
                     'Wie soll der Plan heißen?',
                     style: _titleTextStyle,
                   ),
-                  // Text(
-                  //   'um dem Plan beizuteten',
-                  //   style: _titleTextStyle.copyWith(
-                  //     fontWeight: FontWeight.w400,
-                  //   ),
-                  // ),
                 ],
               ),
             ),
@@ -95,7 +89,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
             errorText: _nameErrorText,
           ),
           Container(
-            height: size.height * 0.1 +
+            height: size.height * 0.2 +
                 MediaQuery.of(context).viewInsets.bottom / 4,
             child: _unknownErrorText != null
                 ? Row(
@@ -112,18 +106,26 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
                   )
                 : SizedBox(),
           ),
-          MainButton(
-            text: 'Weiter',
-            onTap: _updatePlanSettings,
-            isProgress: true,
-            buttonState: _buttonState,
-          ),
-          SizedBox(height: kPadding),
-          MainButton(
-            text: 'Zurück',
-            onTap: widget.navigateBack,
-            isSecondary: true,
-          ),
+          LayoutBuilder(builder: (context, constraints) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                MainButton(
+                  iconData: Icons.arrow_back_ios_new_rounded,
+                  width: constraints.maxWidth * 0.25,
+                  onTap: widget.navigateBack,
+                  isSecondary: true,
+                ),
+                MainButton(
+                  text: 'Weiter',
+                  width: constraints.maxWidth * 0.65,
+                  onTap: _updatePlanSettings,
+                  isProgress: true,
+                  buttonState: _buttonState,
+                ),
+              ],
+            );
+          }),
           SizedBox(height: kPadding * 2),
         ],
       ),

@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'progress_button.dart';
 
 class MainButton extends StatelessWidget {
-  final String text;
   final void Function() onTap;
+  final String text;
+  final IconData iconData;
   final double width;
   final double height;
   final bool isSecondary;
@@ -15,15 +16,17 @@ class MainButton extends StatelessWidget {
   final kTextHeadlineColor = Color(0xFF333333);
 
   MainButton({
-    @required this.text,
     @required this.onTap,
+    this.text,
+    this.iconData,
     this.width = 300,
     this.height = 60,
     this.isSecondary = false,
     this.isProgress = false,
     this.buttonState,
     this.color,
-  }) : assert(isProgress && buttonState != null || !isProgress);
+  })  : assert(isProgress && buttonState != null || !isProgress),
+        assert(text != null || iconData != null);
 
   @override
   Widget build(BuildContext context) {
@@ -45,18 +48,23 @@ class MainButton extends StatelessWidget {
                       border: Border.all(color: _color),
                     ),
               child: Center(
-                child: Text(
-                  text,
-                  style: !isSecondary
-                      ? Theme.of(context)
-                          .textTheme
-                          .button
-                          .copyWith(color: Colors.white)
-                      : Theme.of(context).textTheme.bodyText1.copyWith(
-                            color: kTextHeadlineColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                ),
+                child: text != null
+                    ? Text(
+                        text,
+                        style: !isSecondary
+                            ? Theme.of(context)
+                                .textTheme
+                                .button
+                                .copyWith(color: Colors.white)
+                            : Theme.of(context).textTheme.bodyText1.copyWith(
+                                  color: kTextHeadlineColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                      )
+                    : Icon(
+                        this.iconData,
+                        color: isSecondary ? kTextHeadlineColor : Colors.white,
+                      ),
               ),
             ),
           )
