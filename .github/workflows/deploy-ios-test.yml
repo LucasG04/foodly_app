@@ -7,17 +7,25 @@ on:
 
 jobs:
   deploy_ios:
-    name: Deploy beta build to TestFlight
+    name: Deploy iOS beta build to TestFlight
     runs-on: macOS-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Run Flutter tasks
+      - name: Install Flutter
         uses: subosito/flutter-action@v1
         with:
           channel: 'beta'
-      - run: flutter pub get
-      - run: flutter build ios --release --no-codesign
+      - name: Get Flutter packages
+        run: flutter pub get
+      - name: Decrypt general secrets
+        run: sh ./.github/scripts/decrypt_general_secrets.sh
+        env:
+          ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.ANDROID_KEYS_SECRET_PASSPHRASE }}
+      - name: Set version to version in commit
+        run: bash ./.github/scripts/update_version.sh "${{ github.event.head_commit.message }}" ${{ toJson(github.run_number) }}
+      - name: Build app
+        run: flutter build ios --release --no-codesign
       - name: Deploy iOS Beta to TestFlight via Fastlane
         uses: maierj/fastlane-action@v1.4.0
         with:
