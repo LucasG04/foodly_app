@@ -3,45 +3,9 @@ name: Deploy Google Play Store
 on:
   push:
     branches:
-      - master
+      - actions-ios-deployment
 
 jobs:
-  deploy_android:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: 12.x
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v1
-        with:
-          channel: 'beta'
-      - name: Decrypt general secrets
-        run: sh ./.github/scripts/decrypt_general_secrets.sh
-        env:
-          ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.ANDROID_KEYS_SECRET_PASSPHRASE }}
-      - name: Decrypt Android keys
-        run: sh ./.github/scripts/decrypt_android_keys.sh
-        env:
-          ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.ANDROID_KEYS_SECRET_PASSPHRASE }}
-      - name: Install Flutter dependencies
-        run: flutter pub get
-      - name: Set version to version in commit
-        run: bash ./.github/scripts/update_version.sh "${{ github.event.head_commit.message }}" ${{ toJson(github.run_number) }}
-      - name: Build the AAB
-        run: flutter build appbundle
-      - name: Navigate to android directory
-        run: cd android
-      - name: Get all bundles
-        run: sudo gem install bundler:1.17.3 && bundle install
-      - name: Run Fastlane
-        uses: maierj/fastlane-action@v1.4.0
-        with:
-          lane: internal
-          subdirectory: android
   deploy_ios:
     name: Deploy beta build to TestFlight
     runs-on: macOS-latest
