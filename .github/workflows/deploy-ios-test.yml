@@ -22,6 +22,10 @@ jobs:
         run: sh ./.github/scripts/decrypt_general_secrets.sh
         env:
           ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.ANDROID_KEYS_SECRET_PASSPHRASE }}
+      - name: Create ios secrets
+        run: sh ./.github/scripts/create_secret_files.sh
+        env:
+          GOOGLE_SERVICES_IOS: ${{ secrets.GOOGLE_SERVICES_IOS }}
       - name: Set version to version in commit
         run: bash ./.github/scripts/update_version.sh "${{ github.event.head_commit.message }}" ${{ toJson(github.run_number) }}
       - name: Build app
