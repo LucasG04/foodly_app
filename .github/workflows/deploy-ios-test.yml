@@ -18,7 +18,7 @@ jobs:
           channel: 'beta'
       - name: Get Flutter packages
         run: flutter pub get
-      - name: Install GNU sed on Mac
+      - name: Install GNU sed
         run: |
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           brew update
