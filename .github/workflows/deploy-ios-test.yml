@@ -18,6 +18,15 @@ jobs:
           channel: 'beta'
       - name: Get Flutter packages
         run: flutter pub get
+      - name: Install GNU sed on Mac
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew update
+
+          brew install gnu-sed
+
+          echo "/usr/local/bin" >> $GITHUB_PATH
+          echo "$(brew --prefix)/opt/gnu-sed/libexec/gnubin" >> $GITHUB_PATH
       - name: Decrypt general secrets
         run: sh ./.github/scripts/decrypt_general_secrets.sh
         env:
