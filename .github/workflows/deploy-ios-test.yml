@@ -8,7 +8,7 @@ on:
 jobs:
   deploy_ios:
     name: Deploy iOS beta build to TestFlight
-    runs-on: macOS-latest
+    runs-on: macos-11
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -20,13 +20,7 @@ jobs:
         run: flutter pub get
       - name: Install GNU sed
         run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          brew update
-
           brew install gnu-sed
-
-          echo "/usr/local/bin" >> $GITHUB_PATH
-          echo "$(brew --prefix)/opt/gnu-sed/libexec/gnubin" >> $GITHUB_PATH
       - name: Decrypt general secrets
         run: sh ./.github/scripts/decrypt_general_secrets.sh
         env:
@@ -36,7 +30,7 @@ jobs:
         env:
           GOOGLE_SERVICES_IOS: ${{ secrets.GOOGLE_SERVICES_IOS }}
       - name: Set version to version in commit
-        run: bash ./.github/scripts/update_version.sh "${{ github.event.head_commit.message }}" ${{ toJson(github.run_number) }}
+        run: bash ./.github/scripts/update_version_ios.sh "${{ github.event.head_commit.message }}" ${{ toJson(github.run_number) }}
       - name: Build app
         run: flutter build ios --release --no-codesign
       - name: Deploy iOS Beta to TestFlight via Fastlane
