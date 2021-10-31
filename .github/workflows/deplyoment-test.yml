@@ -1,0 +1,52 @@
+name: Deploy fix/apple-sign-in App
+
+on:
+  push:
+    branches:
+      - fix/apple-sign-in
+
+jobs:
+  deploy_ios:
+    name: Deploy iOS beta build to TestFlight
+    runs-on: macos-11
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          channel: 'beta'
+      - name: Get Flutter packages
+        run: flutter pub get
+      - name: Install GNU sed
+        run: |
+          brew install gnu-sed
+      - name: Decrypt general secrets
+        run: sh ./.github/scripts/decrypt_general_secrets.sh
+        env:
+          ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.ANDROID_KEYS_SECRET_PASSPHRASE }}
+      - name: Create ios secrets
+        run: sh ./.github/scripts/create_secret_files.sh
+        env:
+          GOOGLE_SERVICES_IOS: ${{ secrets.GOOGLE_SERVICES_IOS }}
+      - name: Set version to version in commit
+        run: bash ./.github/scripts/update_version_ios.sh "${{ github.event.head_commit.message }}" ${{ toJson(github.run_number) }}
+      - name: Build app
+        run: flutter build ios --release --no-codesign
+      - name: Deploy iOS Beta to TestFlight via Fastlane
+        uses: maierj/fastlane-action@v1.4.0
+        with:
+          lane: closed_beta
+          subdirectory: ios
+        env:
+          APP_STORE_CONNECT_TEAM_ID: '${{ secrets.APP_STORE_CONNECT_TEAM_ID }}'
+          DEVELOPER_APP_ID: '${{ secrets.DEVELOPER_APP_ID }}'
+          DEVELOPER_APP_IDENTIFIER: '${{ secrets.DEVELOPER_APP_IDENTIFIER }}'
+          DEVELOPER_PORTAL_TEAM_ID: '${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}'
+          FASTLANE_APPLE_ID: '${{ secrets.FASTLANE_APPLE_ID }}'
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: '${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}'
+          MATCH_PASSWORD: '${{ secrets.MATCH_PASSWORD }}'
+          GIT_AUTHORIZATION: '${{ secrets.GIT_AUTHORIZATION }}'
+          PROVISIONING_PROFILE_SPECIFIER: '${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}'
+          FASTLANE_PASSWORD: '${{ secrets.TEMP_KEYCHAIN_PASSWORD }}'
+          TEMP_KEYCHAIN_USER: '${{ secrets.TEMP_KEYCHAIN_USER }}'
