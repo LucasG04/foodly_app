@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 import '../../../constants.dart';
@@ -30,8 +31,14 @@ class SettingsTile extends StatelessWidget {
           children: [
             Icon(leadingIcon, color: _color),
             SizedBox(width: kPadding),
-            Text(text, style: TextStyle(color: _color)),
-            Spacer(),
+            Expanded(
+              child: AutoSizeText(
+                text,
+                style: TextStyle(color: _color),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
             trailing ?? Container(),
           ],
         ),

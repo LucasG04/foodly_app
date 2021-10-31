@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/src/provider.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
 import 'package:foodly/providers/state_providers.dart';
@@ -23,6 +22,7 @@ class TabNavigationView extends StatefulWidget {
 class _TabNavigationViewState extends State<TabNavigationView> {
   PageController _pageController = new PageController(initialPage: 1);
   int _currentIndex = 1;
+  bool _navbarAnimating = false;
 
   String _activeListId;
 
@@ -32,7 +32,14 @@ class _TabNavigationViewState extends State<TabNavigationView> {
       body: SafeArea(
         child: PageView(
           controller: _pageController,
-          physics: NeverScrollableScrollPhysics(),
+          physics: BouncingScrollPhysics(),
+          onPageChanged: (value) {
+            if (!_navbarAnimating) {
+              setState(() {
+                _currentIndex = value;
+              });
+            }
+          },
           children: [
             ShoppingListView(),
             PlanTabView(),
@@ -60,16 +67,18 @@ class _TabNavigationViewState extends State<TabNavigationView> {
           : null,
       bottomNavigationBar: SnakeNavigationBar.color(
         currentIndex: _currentIndex,
-        onTap: (value) {
+        onTap: (value) async {
           setState(() {
             _currentIndex = value;
+            _navbarAnimating = true;
           });
 
-          _pageController.animateToPage(
+          await _pageController.animateToPage(
             value,
             duration: const Duration(milliseconds: 250),
             curve: Curves.easeIn,
           );
+          _navbarAnimating = false;
         },
         items: [
           BottomNavigationBarItem(
