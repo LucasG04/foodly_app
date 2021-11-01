@@ -3,6 +3,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodly/screens/tab_navigation/settings_view/loading_logout.dart';
+import 'package:foodly/utils/main_snackbar.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share/share.dart';
 
@@ -29,6 +30,7 @@ class _SettingsViewState extends State<SettingsView> {
     return Consumer(builder: (context, watch, _) {
       final plan = watch(planProvider).state;
       final foodlyUser = watch(userProvider).state;
+      final firebaseUser = AuthenticationService.currentUser;
       return plan != null && foodlyUser != null
           ? SingleChildScrollView(
               child: Padding(
@@ -125,6 +127,47 @@ class _SettingsViewState extends State<SettingsView> {
                         trailing: Icon(EvaIcons.arrowIosForwardOutline),
                       ),
                     ], context),
+                    _buildSectionTitle('Account'),
+                    _buildSection([
+                      SettingsTile(
+                        onTap: () async {
+                          await AuthenticationService.resetPassword(
+                              firebaseUser.email);
+                          MainSnackbar(
+                            message:
+                                'Wir haben dir eine E-Mail zum Zurücksetzen von deinem Passwort geschickt.',
+                            isSuccess: true,
+                          ).show(context);
+                        },
+                        leadingIcon: EvaIcons.lockOutline,
+                        text: 'Passwort zurücksetzen',
+                        trailing: Icon(EvaIcons.arrowIosForwardOutline),
+                      ),
+                      SettingsTile(
+                        onTap: () => AuthenticationService.signOut(),
+                        leadingIcon: EvaIcons.logOutOutline,
+                        text: 'Abmelden',
+                        trailing: Icon(
+                          EvaIcons.arrowIosForwardOutline,
+                          color: Colors.red,
+                        ),
+                        color: Colors.red,
+                      ),
+                    ], context),
+                    RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        style: Theme.of(context).textTheme.bodyText1,
+                        children: <TextSpan>[
+                          TextSpan(text: 'Angemeldet als\n'),
+                          TextSpan(
+                            text: firebaseUser.email,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: kPadding),
                   ],
                 ),
               ),
