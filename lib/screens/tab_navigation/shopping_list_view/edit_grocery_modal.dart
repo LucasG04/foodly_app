@@ -36,8 +36,11 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
   void initState() {
     _isCreating = widget.grocery == null;
     _nameController = new TextEditingController(text: widget.grocery?.name);
-    _amountController =
-        new TextEditingController(text: widget.grocery?.amount?.toString());
+    String amountString = widget.grocery?.amount?.toString();
+    amountString = amountString.endsWith('.0')
+        ? amountString.substring(0, amountString.length - 2)
+        : amountString;
+    _amountController = new TextEditingController(text: amountString);
     _unitController = new TextEditingController(text: widget.grocery?.unit);
 
     _buttonState = ButtonState.normal;
