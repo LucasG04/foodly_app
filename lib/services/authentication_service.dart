@@ -73,7 +73,6 @@ class AuthenticationService {
     final appleCredential = await SignInWithApple.getAppleIDCredential(
       scopes: [
         AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
       ],
       nonce: nonce,
     );
