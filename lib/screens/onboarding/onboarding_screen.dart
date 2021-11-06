@@ -4,6 +4,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../constants.dart';
 import '../../models/page_data.dart';
 import '../../services/authentication_service.dart';
 import '../../services/settings_service.dart';
@@ -14,9 +15,9 @@ class OnboardingScreen extends StatelessWidget {
   final List<PageData> pages = [
     PageData(
       assetPath: 'assets/onboarding/welcome.png',
-      title: 'Danke, dass du Foodly verwendest.',
+      title: 'Danke, dass du $kAppName verwendest.',
       subtitle:
-          'Foodly verbindet für dich deinen Essensplan, Einkaufsliste und Kochbuch.',
+          '$kAppName verbindet für dich deinen Essensplan, Einkaufsliste und Kochbuch.',
       background: Color(0xFFeb3b5a),
     ),
     PageData(
@@ -44,7 +45,7 @@ class OnboardingScreen extends StatelessWidget {
       assetPath: 'assets/onboarding/rocket.png',
       title: 'Zu guter Letzt',
       subtitle:
-          'Um Foodly zu verwenden, musst du dich registrieren, um einen Plan zu erstellen oder einem beizutreten. Deine E-Mail wird hierbei nur verwendet, um deine Einstellungen zu speichern.',
+          'Um $kAppName zu verwenden, musst du dich registrieren, um einen Plan zu erstellen oder einem beizutreten. Deine E-Mail wird hierbei nur verwendet, um deine Einstellungen zu speichern.',
       background: Color(0xFF20bf6b),
     ),
   ];

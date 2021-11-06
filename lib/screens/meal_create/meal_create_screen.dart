@@ -76,6 +76,9 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         ? 700.0
         : MediaQuery.of(context).size.width * 0.8;
 
+    print(_meal?.name);
+    print(_meal?.tags);
+
     return Scaffold(
       appBar: MainAppBar(
         text: _isCreatingMeal ? 'Gericht erstellen' : 'Gericht bearbeiten',
@@ -175,15 +178,13 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                         ],
                       ),
                       Divider(),
-                      EditListContent(
-                        content: _meal.tags ?? [],
-                        onChanged: (list) {
-                          setState(() {
-                            _meal.tags = list;
-                          });
-                        },
-                        title: 'Kategorien:',
-                      ),
+                      !_isLoadingMeal
+                          ? EditListContent(
+                              content: _meal.tags,
+                              onChanged: (list) => _meal.tags = list,
+                              title: 'Kategorien:',
+                            )
+                          : SizedBox(),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: kPadding),
                         child: MainButton(
@@ -214,6 +215,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
       _durationController = new TextEditingController();
       _instructionsController = new TextEditingController();
       _meal.ingredients = [];
+      _meal.tags = [];
     } else if (widget.id.startsWith('https') &&
         Uri.decodeComponent(widget.id).startsWith(kChefkochShareEndpoint)) {
       _isLoadingMeal = true;
@@ -229,6 +231,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         _instructionsController =
             new TextEditingController(text: meal.instructions);
         _meal.ingredients = _meal.ingredients ?? [];
+        _meal.tags = _meal.tags ?? [];
 
         setState(() {
           _isLoadingMeal = false;
@@ -246,6 +249,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         _instructionsController =
             new TextEditingController(text: meal.instructions);
         _meal.ingredients = _meal.ingredients ?? [];
+        _meal.tags = _meal.tags ?? [];
 
         setState(() {
           _isLoadingMeal = false;

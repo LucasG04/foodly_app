@@ -51,15 +51,6 @@ class _MealListTitleState extends State<MealListTitle> {
                 ),
               ),
               SizedBox(width: kPadding),
-              !_searchActive
-                  ? IconButton(
-                      icon: Icon(EvaIcons.plusCircleOutline),
-                      onPressed: () => ExtendedNavigator.root.push(
-                        Routes.mealCreateScreen(id: 'create'),
-                      ),
-                      splashRadius: 25.0,
-                    )
-                  : SizedBox(),
               SizedBox(width: kPadding / 2),
               !_searchActive
                   ? Consumer(

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -195,6 +196,10 @@ class _FoodlyAppState extends State<FoodlyApp> {
   }
 
   void _checkForUpdate() async {
+    if (!Platform.isAndroid) {
+      return;
+    }
+
     final updateInfo = await InAppUpdate.checkForUpdate().catchError((err) {
       _log.severe('ERR in InAppUpdate.checkForUpdate()', err);
     });

@@ -1,4 +1,4 @@
-# Foodly - Meal Planning
+# Foodly/Foodster - Meal Planning
 
 [![CodeFactor](https://www.codefactor.io/repository/github/lucasg04/foodly_app/badge)](https://www.codefactor.io/repository/github/lucasg04/foodly_app)
 
@@ -9,7 +9,7 @@ With Foodly, you can easily plan your food for the upcoming week with your famil
 ## Availability 
 
 - Android: [Get it on **Google Play**](https://play.google.com/store/apps/details?id=io.golenia.foodly)
-- iOS: _coming soon_
+- iOS: [Download on the **AppStore**](https://apps.apple.com/de/app/foodster-planen-einkaufen/id1590739803)
 
 ## Screenshots
 

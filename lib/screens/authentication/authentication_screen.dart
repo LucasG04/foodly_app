@@ -40,10 +40,12 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
             controller: _pageController,
             physics: NeverScrollableScrollPhysics(),
             children: [
-              CodeInputView((planId) {
+              CodeInputView((result, [planId]) {
                 setState(() {
-                  _isCreatingPlan = planId == null;
-                  _plan = planId != null ? new Plan(id: planId) : null;
+                  _isCreatingPlan = result == CodeInputResult.NEW;
+                  _plan = result == CodeInputResult.JOIN
+                      ? new Plan(id: planId)
+                      : null;
                 });
                 _pageController.animateToPage(
                   1,

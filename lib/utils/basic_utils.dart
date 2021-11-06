@@ -30,4 +30,11 @@ class BasicUtils {
         ? 600.0
         : MediaQuery.of(context).size.width * smallMultiplier;
   }
+
+  static String getUrlFromString(String input) {
+    RegExp exp =
+        new RegExp(r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+');
+    final match = exp.firstMatch(input);
+    return input.substring(match.start, match.end);
+  }
 }

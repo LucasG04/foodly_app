@@ -8,18 +8,26 @@ class EditListContent extends StatefulWidget {
   final void Function(List<String>) onChanged;
   final String title;
 
-  EditListContent({
-    Key key,
-    @required this.content,
-    @required this.onChanged,
-    @required this.title,
-  }) : super(key: key);
+  const EditListContent({
+    this.content,
+    this.onChanged,
+    this.title,
+  });
 
   @override
   _EditListContentState createState() => _EditListContentState();
 }
 
 class _EditListContentState extends State<EditListContent> {
+  List<String> _content = [];
+
+  @override
+  void initState() {
+    _content = widget.content;
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -31,42 +39,34 @@ class _EditListContentState extends State<EditListContent> {
             style: Theme.of(context).textTheme.bodyText1,
           ),
         ),
-        ...widget.content
-            .asMap()
-            .map((index, value) {
-              return MapEntry(
-                index,
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: _ListInput(
-                        initialValue: value,
-                        onChanged: (newValue) {
-                          widget.content[index] = newValue;
-                          widget.onChanged(widget.content);
-                        },
-                        onAdd: _addNewLine,
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(EvaIcons.minusCircleOutline),
-                      onPressed: () {
-                        widget.content.removeAt(index);
-                        widget.onChanged(widget.content);
-                      },
-                    ),
-                  ],
-                ),
-              );
-            })
-            .values
-            .toList(),
+        ..._content.map((item) {
+          return Row(
+            children: <Widget>[
+              Expanded(
+                child: _buildTextField(item, _content.indexOf(item), context),
+              ),
+              IconButton(
+                  icon: Icon(EvaIcons.minusCircleOutline),
+                  onPressed: () {
+                    setState(() {
+                      _content.remove(item);
+                      widget.onChanged(_content);
+                    });
+                  }),
+            ],
+          );
+        }).toList(),
         Row(
           children: <Widget>[
             Spacer(),
             IconButton(
               icon: Icon(EvaIcons.plusCircleOutline),
-              onPressed: () => _addNewLine(),
+              onPressed: () {
+                setState(() {
+                  _content.add('');
+                  widget.onChanged(_content);
+                });
+              },
             ),
           ],
         ),
@@ -74,43 +74,15 @@ class _EditListContentState extends State<EditListContent> {
     );
   }
 
-  void _addNewLine() {
-    widget.content.add('');
-    widget.onChanged(widget.content);
-  }
-}
-
-class _ListInput extends StatefulWidget {
-  final String initialValue;
-  final Function(String) onChanged;
-  final Function() onAdd;
-
-  _ListInput({
-    this.initialValue,
-    this.onChanged,
-    this.onAdd,
-  });
-
-  @override
-  _ListInputState createState() => _ListInputState();
-}
-
-class _ListInputState extends State<_ListInput> {
-  TextEditingController _controller;
-
-  @override
-  void initState() {
-    _controller = new TextEditingController(text: widget.initialValue);
-    _controller.addListener(() {
-      widget.onChanged(_controller.text);
+  TextField _buildTextField(String item, int index, BuildContext context) {
+    final controller = TextEditingController(text: item);
+    controller.addListener(() {
+      _content[index] = controller.text;
+      widget.onChanged(_content);
     });
-    super.initState();
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return TextField(
-      controller: _controller,
+      controller: controller,
       decoration: new InputDecoration(
         border: InputBorder.none,
         focusedBorder: InputBorder.none,
@@ -126,7 +98,6 @@ class _ListInputState extends State<_ListInput> {
         hintText: '...',
       ),
       style: Theme.of(context).textTheme.bodyText2,
-      onSubmitted: (_) => widget.onAdd,
     );
   }
 }
