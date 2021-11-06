@@ -63,7 +63,7 @@ class _MealListViewState extends State<MealListView>
                         UserInformation(
                           'assets/images/undraw_empty.png',
                           'Keine Gerichte vorhanden',
-                          'In deinem Plan sind noch keine Gerichte angelegt. Klick auf den "Plus"-Button oben rechts und leg los.',
+                          'In deinem Plan sind noch keine Gerichte angelegt. Klick auf den "Plus"-Button und leg los.',
                         ),
                         SizedBox(height: kPadding),
                         TextButton.icon(
