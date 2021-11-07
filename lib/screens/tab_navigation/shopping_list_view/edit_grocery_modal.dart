@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
 import '../../../constants.dart';
@@ -36,7 +35,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
   void initState() {
     _isCreating = widget.grocery == null;
     _nameController = new TextEditingController(text: widget.grocery?.name);
-    String amountString = widget.grocery?.amount?.toString();
+    String amountString = widget.grocery?.amount?.toString() ?? '';
     amountString = amountString.endsWith('.0')
         ? amountString.substring(0, amountString.length - 2)
         : amountString;
