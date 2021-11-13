@@ -93,41 +93,6 @@ class MealStatService {
     }
   }
 
-  static Future<void> updateStat(
-    String planId,
-    String mealId,
-    MealStat stat,
-  ) async {
-    log.finer('Call updateStat for plan $planId');
-    try {
-      final querySnapshot = await _firestore
-          .collection('plans')
-          .doc(planId)
-          .collection('stats')
-          .where('mealId', isEqualTo: mealId)
-          .get();
-
-      if (querySnapshot.docs.isEmpty) {
-        await _firestore
-            .collection('plans')
-            .doc(planId)
-            .collection('stats')
-            .add(stat.toMap());
-      } else {
-        final statId = querySnapshot.docs.first.id;
-        await _firestore
-            .collection('plans')
-            .doc(planId)
-            .collection('stats')
-            .doc(statId)
-            .update(stat.toMap());
-      }
-    } catch (e) {
-      log.severe('ERR: updateStat for plan $planId with ${stat.toMap()}', e);
-      return null;
-    }
-  }
-
   static Future<void> deleteStat(String planId, String statId) async {
     log.finer('Call deleteStat for plan $planId with stat $statId');
     try {
