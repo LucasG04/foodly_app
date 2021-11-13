@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:foodly/services/meal_stat_service.dart';
 import 'package:logging/logging.dart';
 
 import '../models/plan.dart';
@@ -142,9 +143,12 @@ class PlanService {
             snap.docs.map((e) => PlanMeal.fromMap(e.id, e.data())).toList());
   }
 
-  static Future<void> addPlanMealToPlan(String planId, PlanMeal planMeal) {
+  static Future<void> addPlanMealToPlan(
+      String planId, PlanMeal planMeal) async {
     log.finer(
         'Call addPlanMealToPlan with planId: $planId | planMeal: ${planMeal.toMap()}');
+    await MealStatService.bumpStat(planId, planMeal.meal,
+        bumpCount: true, bumpLastPlanned: true);
     return _firestore
         .collection('plans')
         .doc(planId)
