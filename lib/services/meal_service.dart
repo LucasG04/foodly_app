@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
+import 'package:foodly/services/meal_stat_service.dart';
 import 'package:logging/logging.dart';
 
 import '../models/meal.dart';
@@ -99,6 +100,7 @@ class MealService {
       final id = new DateTime.now().microsecondsSinceEpoch.toString();
       await _firestore.collection('meals').doc(id).set(meal.toMap());
       meal.id = id;
+      await MealStatService.bumpStat(meal.planId, meal.id);
 
       return meal;
     } catch (e) {

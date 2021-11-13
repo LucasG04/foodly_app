@@ -5,6 +5,9 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:foodly/models/meal_stat.dart';
+import 'package:foodly/services/meal_service.dart';
+import 'package:foodly/services/meal_stat_service.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -96,7 +99,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                       verticalOffset: 50.0,
                       child: FadeInAnimation(
                         child: searchedMeals.isEmpty
-                            ? _buildNoResultsForIndex(index)
+                            ? _buildNoResultsForIndex(index, activePlan.id)
                             : SelectMealTile(
                                 meal: searchedMeals[index],
                                 onAddMeal: () => _addMealToPlan(
@@ -121,7 +124,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
 
   bool get isLunch => widget.isLunchString == 'true';
 
-  Widget _buildNoResultsForIndex(int index) {
+  Widget _buildNoResultsForIndex(int index, String planId) {
     return (index == 0)
         ? _buildContainer(
             EvaIcons.codeOutline,
@@ -140,7 +143,72 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                     'Keine Ergebnisse',
                     'Wir konnten keine Gerichte für deine Suche finden.',
                   )
-                : SizedBox();
+                : _buildPreviewMeals(planId);
+  }
+
+  Widget _buildPreviewMeals(String planId) {
+    return FutureBuilder<List<List<MealStat>>>(
+      future: Future.wait<List<MealStat>>([
+        MealStatService.getLeastPlanned(planId),
+        MealStatService.getLongestNotPlanned(planId),
+      ]),
+      builder: (context, statSnapshots) {
+        List<String> mealIds = statSnapshots.hasData
+            ? statSnapshots.data.expand((i) => i).map((i) => i.mealId).toList()
+            : [];
+        mealIds = [
+          ...{...mealIds}
+        ];
+
+        return AnimationLimiter(
+          key: _animationLimiterKey,
+          child: ListView.builder(
+            shrinkWrap: true,
+            padding: const EdgeInsets.symmetric(vertical: kPadding),
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: mealIds.length,
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: kPadding,
+                    vertical: kPadding / 4,
+                  ),
+                  child: Text(
+                    'Vorschläge',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.start,
+                  ),
+                );
+              }
+              index--;
+              return AnimationConfiguration.staggeredList(
+                position: index,
+                duration: const Duration(milliseconds: 375),
+                child: SlideAnimation(
+                  verticalOffset: 50.0,
+                  child: FadeInAnimation(
+                    child: FutureBuilder<Meal>(
+                      future: MealService.getMealById(mealIds[index]),
+                      builder: (context, snapshot) => snapshot.hasData
+                          ? SelectMealTile(
+                              meal: snapshot.data,
+                              onAddMeal: () =>
+                                  _addMealToPlan(snapshot.data.id, planId),
+                            )
+                          : SelectMealTile(isLoading: true),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildContainer(IconData iconData, String text, Function action) {
