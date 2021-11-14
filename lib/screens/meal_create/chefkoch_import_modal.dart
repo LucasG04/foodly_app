@@ -50,7 +50,7 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: kPadding),
               child: Text(
-                'import_modal_title'.toUpperCase(),
+                'import_modal_title'.tr().toUpperCase(),
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ).tr(),

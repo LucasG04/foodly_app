@@ -206,7 +206,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                     PopupMenuItem(
                       value: 'tolist',
                       child: ListTile(
-                        title: Text('plan_ingredients_to_list').tr(),
+                        title: Text('plan_ingredients_to_list'.tr()),
                         leading: Icon(EvaIcons.fileAddOutline),
                       ),
                     ),

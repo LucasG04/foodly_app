@@ -105,7 +105,7 @@ class _SettingsViewState extends State<SettingsView> {
                             ),
                           ], context)
                         : SizedBox(),
-                    _buildSectionTitle('settings_section_help'),
+                    _buildSectionTitle('settings_section_help'.tr()),
                     _buildSection([
                       SettingsTile(
                         onTap: () => Navigator.push(
@@ -147,7 +147,7 @@ class _SettingsViewState extends State<SettingsView> {
                       SettingsTile(
                         onTap: () => AuthenticationService.signOut(),
                         leadingIcon: EvaIcons.logOutOutline,
-                        text: 'settings_section_account_logout',
+                        text: 'settings_section_account_logout'.tr(),
                         trailing: Icon(
                           EvaIcons.arrowIosForwardOutline,
                           color: Colors.red,

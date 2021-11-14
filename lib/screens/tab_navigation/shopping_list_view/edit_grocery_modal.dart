@@ -104,8 +104,8 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
                 child: MainTextField(
                   controller: _unitController,
                   focusNode: _unitFocusNode,
-                  title: 'Einheit'.tr(),
-                  placeholder: 'Stück'.tr(),
+                  title: 'edit_grocery_modal_ctrl_unit_title'.tr(),
+                  placeholder: 'edit_grocery_modal_ctrl_unit_placeholder'.tr(),
                   onSubmit: _saveGrocery,
                 ),
               ),

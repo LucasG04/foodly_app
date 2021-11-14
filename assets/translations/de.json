@@ -11,6 +11,7 @@
     "edit_grocery_modal_ctrl_name_placeholder": "Brötchen",
     "edit_grocery_modal_ctrl_unit_title": "Einheit",
     "edit_grocery_modal_ctrl_unit_placeholder": "Stück",
+    "edit_grocery_modal_ctrl_amount_title": "Menge",
     "edit_grocery_modal_error": "Bitte trag eine Bezeichnung ein.",
     "settings_title": "Einstellungen",
     "settings_section_general": "Allgemein",

@@ -8,7 +8,6 @@ import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:in_app_update/in_app_update.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:logging/logging.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
@@ -29,12 +28,13 @@ Future<void> main() async {
   await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp();
   await SettingsService.initialize();
+
   runApp(
-    EasyLocalization(
-      supportedLocales: [Locale('en'), Locale('de')],
-      path: 'assets/translations',
-      fallbackLocale: Locale('en'),
-      child: ProviderScope(
+    ProviderScope(
+      child: EasyLocalization(
+        supportedLocales: [Locale('en'), Locale('de')],
+        path: 'assets/translations',
+        fallbackLocale: Locale('en'),
         child: FoodlyApp(),
       ),
     ),
@@ -66,8 +66,6 @@ class _FoodlyAppState extends State<FoodlyApp> {
 
   @override
   void initState() {
-    initializeDateFormatting();
-
     _initializeLogger();
 
     _privateMealsStreamValue = [];
@@ -97,6 +95,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
               if (context.read(planProvider).state != null) {
                 _streamMeals();
               }
+
               return MaterialApp(
                 debugShowCheckedModeBanner: false,
                 theme: ThemeData(
