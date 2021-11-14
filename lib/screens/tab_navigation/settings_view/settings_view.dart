@@ -2,6 +2,7 @@ import 'package:concentric_transition/page_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodly/screens/tab_navigation/settings_view/loading_logout.dart';
 import 'package:foodly/utils/main_snackbar.dart';
@@ -65,6 +66,25 @@ class _SettingsViewState extends State<SettingsView> {
                             },
                           );
                         }),
+                      ),
+                      SettingsTile(
+                        leadingIcon: EvaIcons.globe2Outline,
+                        text: 'settings_section_general_language'.tr(),
+                        trailing: DropdownButton<Locale>(
+                          value: context.locale,
+                          items: context.supportedLocales
+                              .map((locale) => DropdownMenuItem<Locale>(
+                                    value: locale,
+                                    child: Text(
+                                      LocaleNames.of(context)
+                                          .nameOf(locale.languageCode),
+                                    ),
+                                  ))
+                              .toList(),
+                          onChanged: (Locale locale) async {
+                            await context.setLocale(locale);
+                          },
+                        ),
                       ),
                     ], context),
                     _buildSectionTitle('settings_section_plan'.tr()),

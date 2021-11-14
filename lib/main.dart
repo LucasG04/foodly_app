@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
+import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:logging/logging.dart';
@@ -105,7 +106,10 @@ class _FoodlyAppState extends State<FoodlyApp> {
                   //     ? kSmallTextTheme
                   //     : kTextTheme,
                 ),
-                localizationsDelegates: context.localizationDelegates,
+                localizationsDelegates: [
+                  ...context.localizationDelegates,
+                  LocaleNamesLocalizationsDelegate(),
+                ],
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
                 builder: (_, __) => ScrollConfiguration(
