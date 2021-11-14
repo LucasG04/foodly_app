@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -39,7 +40,7 @@ class _PlanTabViewState extends State<PlanTabView>
                       SizedBox(height: kPadding),
                       Padding(
                         padding: const EdgeInsets.only(left: 5.0),
-                        child: PageTitle(text: 'Essensplan'),
+                        child: PageTitle(text: 'plan_title'.tr()),
                       ),
                       SizedBox(
                         width: BasicUtils.contentWidth(context),

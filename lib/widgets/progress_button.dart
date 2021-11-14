@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import '../constants.dart';
 import 'small_circular_progress_indicator.dart';

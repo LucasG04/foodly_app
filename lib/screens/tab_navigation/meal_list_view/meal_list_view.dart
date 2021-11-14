@@ -1,4 +1,5 @@
 import 'package:concentric_transition/concentric_transition.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -62,8 +63,8 @@ class _MealListViewState extends State<MealListView>
                       children: [
                         UserInformation(
                           'assets/images/undraw_empty.png',
-                          'Keine Gerichte vorhanden',
-                          'In deinem Plan sind noch keine Gerichte angelegt. Klick auf den "Plus"-Button und leg los.',
+                          'meal_list_empty_title'.tr(),
+                          'meal_list_empty_subtitle'.tr(),
                         ),
                         SizedBox(height: kPadding),
                         TextButton.icon(
@@ -74,7 +75,7 @@ class _MealListViewState extends State<MealListView>
                             ),
                           ),
                           icon: Icon(EvaIcons.questionMarkCircleOutline),
-                          label: Text('Rezepte importieren'),
+                          label: Text('meal_list_help_import').tr(),
                         ),
                       ],
                     );

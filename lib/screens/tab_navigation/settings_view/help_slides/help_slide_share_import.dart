@@ -1,8 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:concentric_transition/concentric_transition.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:foodly/constants.dart';
 
 import '../../../../models/page_data.dart';
 import '../../../../widgets/page_card.dart';
@@ -11,22 +12,20 @@ class HelpSlideShareImport extends StatelessWidget {
   final List<PageData> pages = [
     PageData(
       assetPath: 'assets/onboarding/welcome.png',
-      title: 'Rezepte importieren.',
-      subtitle:
-          'Du musst zum Glück nicht all deine Rezepte per Hand eintippen. In diesem kurzen Guide wird dir gezeigt wie!',
+      title: 'settings_help_share_one_title'.tr(),
+      subtitle: 'settings_help_share_one_subtitle'.tr(),
       background: Color(0xFFf05945),
     ),
     PageData(
       assetPath: 'assets/help_slide/share-button.png',
-      title: 'Über Chefkoch',
-      subtitle:
-          'Öffne Chefkoch und wähle das Rezept aus, das du importieren möchtest. Klicke dann auf das "Teilen" Icon.',
+      title: 'settings_help_share_two_title'.tr(),
+      subtitle: 'settings_help_share_two_subtitle'.tr(),
       background: Color(0xFF5eaaa8),
     ),
     PageData(
       assetPath: 'assets/help_slide/share-app.png',
-      title: 'Über Chefkoch',
-      subtitle: 'Wähle danach aus der Liste die "Foodly" App aus.',
+      title: 'settings_help_share_three_title'.tr(),
+      subtitle: 'settings_help_share_three_subtitle'.tr(args: [kAppName]),
       background: Color(0xFFffb037),
     ),
   ];

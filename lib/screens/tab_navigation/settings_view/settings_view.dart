@@ -1,6 +1,8 @@
 import 'package:concentric_transition/page_route.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodly/screens/tab_navigation/settings_view/loading_logout.dart';
 import 'package:foodly/utils/main_snackbar.dart';
@@ -43,8 +45,8 @@ class _SettingsViewState extends State<SettingsView> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(height: kPadding),
-                    PageTitle(text: 'Einstellungen'),
-                    _buildSectionTitle('Allgemein'),
+                    PageTitle(text: 'settings_title'.tr()),
+                    _buildSectionTitle('settings_section_general'.tr()),
                     _buildSection([
                       SettingsTile(
                         onTap: () => Navigator.push(
@@ -53,7 +55,7 @@ class _SettingsViewState extends State<SettingsView> {
                               builder: (_) => OnboardingScreen()),
                         ),
                         leadingIcon: EvaIcons.listOutline,
-                        text: 'Mehrere Gerichte pro Mahlzeit',
+                        text: 'settings_section_general_multiple_meals'.tr(),
                         trailing: Consumer(builder: (context, watch, _) {
                           return Switch.adaptive(
                             value: SettingsService.multipleMealsPerTime,
@@ -65,19 +67,39 @@ class _SettingsViewState extends State<SettingsView> {
                           );
                         }),
                       ),
+                      SettingsTile(
+                        leadingIcon: EvaIcons.globe2Outline,
+                        text: 'settings_section_general_language'.tr(),
+                        trailing: DropdownButton<Locale>(
+                          value: context.locale,
+                          items: context.supportedLocales
+                              .map((locale) => DropdownMenuItem<Locale>(
+                                    value: locale,
+                                    child: Text(
+                                      LocaleNames.of(context)
+                                          .nameOf(locale.languageCode),
+                                    ),
+                                  ))
+                              .toList(),
+                          onChanged: (Locale locale) async {
+                            await context.setLocale(locale);
+                          },
+                        ),
+                      ),
                     ], context),
-                    _buildSectionTitle('Plan'),
+                    _buildSectionTitle('settings_section_plan'.tr()),
                     _buildSection([
                       SettingsTile(
                         onTap: () => _shareCode(plan.code),
                         leadingIcon: EvaIcons.shareOutline,
-                        text: 'Plan teilen (${plan.code})',
+                        text:
+                            'settings_section_plan_share'.tr(args: [plan.code]),
                         trailing: Icon(EvaIcons.arrowIosForwardOutline),
                       ),
                       SettingsTile(
                         onTap: () => _leavePlan(plan.id, context),
                         leadingIcon: EvaIcons.closeCircleOutline,
-                        text: 'Plan verlassen',
+                        text: 'settings_section_plan_leave'.tr(),
                         trailing: Icon(
                           EvaIcons.arrowIosForwardOutline,
                           color: Colors.red,
@@ -86,7 +108,7 @@ class _SettingsViewState extends State<SettingsView> {
                       ),
                     ], context),
                     foodlyUser != null && foodlyUser.oldPlans.length > 1
-                        ? _buildSectionTitle('Gerichte')
+                        ? _buildSectionTitle('settings_section_meals'.tr())
                         : SizedBox(),
                     foodlyUser != null && foodlyUser.oldPlans.length > 1
                         ? _buildSection([
@@ -98,12 +120,12 @@ class _SettingsViewState extends State<SettingsView> {
                                 context,
                               ),
                               leadingIcon: EvaIcons.downloadOutline,
-                              text: 'Alte Gerichte importieren',
+                              text: 'settings_section_meals_import'.tr(),
                               trailing: Icon(EvaIcons.arrowIosForwardOutline),
                             ),
                           ], context)
                         : SizedBox(),
-                    _buildSectionTitle('Hilfe'),
+                    _buildSectionTitle('settings_section_help'.tr()),
                     _buildSection([
                       SettingsTile(
                         onTap: () => Navigator.push(
@@ -112,7 +134,7 @@ class _SettingsViewState extends State<SettingsView> {
                               builder: (_) => OnboardingScreen()),
                         ),
                         leadingIcon: EvaIcons.questionMarkCircleOutline,
-                        text: 'Einführung anzeigen',
+                        text: 'settings_section_help_intro'.tr(),
                         trailing: Icon(EvaIcons.arrowIosForwardOutline),
                       ),
                       SettingsTile(
@@ -123,30 +145,29 @@ class _SettingsViewState extends State<SettingsView> {
                           ),
                         ),
                         leadingIcon: EvaIcons.questionMarkCircleOutline,
-                        text: 'Rezepte importieren',
+                        text: 'settings_section_help_import'.tr(),
                         trailing: Icon(EvaIcons.arrowIosForwardOutline),
                       ),
                     ], context),
-                    _buildSectionTitle('Account'),
+                    _buildSectionTitle('settings_section_account'.tr()),
                     _buildSection([
                       SettingsTile(
                         onTap: () async {
                           await AuthenticationService.resetPassword(
                               firebaseUser.email);
                           MainSnackbar(
-                            message:
-                                'Wir haben dir eine E-Mail zum Zurücksetzen von deinem Passwort geschickt.',
+                            message: 'settings_section_account_reset_msg'.tr(),
                             isSuccess: true,
                           ).show(context);
                         },
                         leadingIcon: EvaIcons.lockOutline,
-                        text: 'Passwort zurücksetzen',
+                        text: 'settings_section_account_reset'.tr(),
                         trailing: Icon(EvaIcons.arrowIosForwardOutline),
                       ),
                       SettingsTile(
                         onTap: () => AuthenticationService.signOut(),
                         leadingIcon: EvaIcons.logOutOutline,
-                        text: 'Abmelden',
+                        text: 'settings_section_account_logout'.tr(),
                         trailing: Icon(
                           EvaIcons.arrowIosForwardOutline,
                           color: Colors.red,
@@ -159,9 +180,9 @@ class _SettingsViewState extends State<SettingsView> {
                       text: TextSpan(
                         style: Theme.of(context).textTheme.bodyText1,
                         children: <TextSpan>[
-                          TextSpan(text: 'Angemeldet als\n'),
+                          TextSpan(text: 'settings_sign_in_as'.tr()),
                           TextSpan(
-                            text: firebaseUser.email,
+                            text: '\n' + firebaseUser.email,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
@@ -214,8 +235,7 @@ class _SettingsViewState extends State<SettingsView> {
   }
 
   void _shareCode(String code) {
-    Share.share(
-        'Tritt meinem Essensplan bei $kAppName mit dem Code "$code" bei.');
+    Share.share('settings_share_msg'.tr(args: [kAppName, code]));
   }
 
   void _leavePlan(String planId, context) async {

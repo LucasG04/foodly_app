@@ -2,12 +2,13 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:auto_route/auto_route.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
+import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:in_app_update/in_app_update.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:logging/logging.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
@@ -25,9 +26,20 @@ import 'services/settings_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp();
   await SettingsService.initialize();
-  runApp(ProviderScope(child: FoodlyApp()));
+
+  runApp(
+    ProviderScope(
+      child: EasyLocalization(
+        supportedLocales: [Locale('en'), Locale('de')],
+        path: 'assets/translations',
+        fallbackLocale: Locale('en'),
+        child: FoodlyApp(),
+      ),
+    ),
+  );
 }
 
 class FoodlyApp extends StatefulWidget {
@@ -55,8 +67,6 @@ class _FoodlyAppState extends State<FoodlyApp> {
 
   @override
   void initState() {
-    initializeDateFormatting();
-
     _initializeLogger();
 
     _privateMealsStreamValue = [];
@@ -86,6 +96,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
               if (context.read(planProvider).state != null) {
                 _streamMeals();
               }
+
               return MaterialApp(
                 debugShowCheckedModeBanner: false,
                 theme: ThemeData(
@@ -95,6 +106,12 @@ class _FoodlyAppState extends State<FoodlyApp> {
                   //     ? kSmallTextTheme
                   //     : kTextTheme,
                 ),
+                localizationsDelegates: [
+                  ...context.localizationDelegates,
+                  LocaleNamesLocalizationsDelegate(),
+                ],
+                supportedLocales: context.supportedLocales,
+                locale: context.locale,
                 builder: (_, __) => ScrollConfiguration(
                   behavior: ScrollBehaviorModified(),
                   child: ExtendedNavigator<AppRouter>(
