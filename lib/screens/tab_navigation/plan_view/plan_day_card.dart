@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
@@ -39,19 +39,21 @@ class PlanDayCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Text(
-                  DateFormat('EEEE', 'de_DE').format(date),
+                  DateFormat('EEEE', context.locale.toLanguageTag())
+                      .format(date),
                   style: kCardTitle,
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Text(
-                  DateFormat('d. MMMM y', 'de_DE').format(date),
+                  DateFormat('d. MMMM y', context.locale.toLanguageTag())
+                      .format(date),
                   style: kCardSubtitle,
                 ),
               ),
               SizedBox(height: kPadding),
-              _buildSubtitle('Mittag'),
+              _buildSubtitle('plan_day_lunch'.tr()),
               ...lunchList
                   .map((e) => PlanDayMealTile(e, lunchList.length > 1))
                   .toList(),
@@ -62,7 +64,7 @@ class PlanDayCard extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Divider(),
               ),
-              _buildSubtitle('Abend'),
+              _buildSubtitle('plan_day_dinner'.tr()),
               ...dinnerList
                   .map((e) => PlanDayMealTile(e, dinnerList.length > 1))
                   .toList(),
@@ -93,11 +95,11 @@ class PlanDayCard extends StatelessWidget {
             },
           ),
           child: Text(
-            'Hinzufügen',
+            'add',
             style: TextStyle(
               fontWeight: FontWeight.w500,
             ),
-          ),
+          ).tr(),
           style: ButtonStyle(
             padding: MaterialStateProperty.resolveWith(
               (_) => const EdgeInsets.all(15.0),

@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:auto_route/auto_route_annotations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -118,17 +118,24 @@ class _MealScreenState extends State<MealScreen> {
                                                 PopupMenuItem(
                                                   value: 'edit',
                                                   child: ListTile(
-                                                    title: Text('Bearbeiten'),
+                                                    title: Text(
+                                                      'meel_details_edit',
+                                                    ).tr(),
                                                     leading: Icon(
-                                                        EvaIcons.edit2Outline),
+                                                      EvaIcons.edit2Outline,
+                                                    ),
                                                   ),
                                                 ),
                                                 PopupMenuItem(
                                                   value: 'delete',
                                                   child: ListTile(
-                                                    title: Text('Löschen'),
-                                                    leading: Icon(EvaIcons
-                                                        .minusCircleOutline),
+                                                    title: Text(
+                                                      'meel_details_delete',
+                                                    ).tr(),
+                                                    leading: Icon(
+                                                      EvaIcons
+                                                          .minusCircleOutline,
+                                                    ),
                                                   ),
                                                 ),
                                               ],
@@ -177,8 +184,10 @@ class _MealScreenState extends State<MealScreen> {
                                         Text(
                                           meal.source != null &&
                                                   meal.source.isNotEmpty
-                                              ? 'von ${meal.source}'
-                                              : 'von Unbekannt',
+                                              ? 'meel_details_source_known'
+                                                  .tr(args: [meal.source])
+                                              : 'meel_details_source_unknown'
+                                                  .tr(),
                                           style: TextStyle(
                                             fontSize: 16.0,
                                             fontWeight: FontWeight.bold,
@@ -194,7 +203,8 @@ class _MealScreenState extends State<MealScreen> {
                                   ),
                                   BorderIcon(
                                     child: Text(
-                                      '${meal.duration.toString()} Minuten',
+                                      'meel_details_duration_trailing'
+                                          .tr(args: [meal.duration.toString()]),
                                       style: TextStyle(
                                         fontSize: 20.0,
                                         fontWeight: FontWeight.bold,
@@ -222,7 +232,7 @@ class _MealScreenState extends State<MealScreen> {
                             ),
                             SizedBox(height: kPadding),
                             ..._buildSection(
-                              'Zutaten',
+                              'meel_details_ingredient'.tr(),
                               Container(
                                 child: ListView.separated(
                                   shrinkWrap: true,
@@ -240,7 +250,7 @@ class _MealScreenState extends State<MealScreen> {
                             ),
                             SizedBox(height: kPadding),
                             ..._buildSection(
-                              'Zubereitung',
+                              'meel_details_instructions'.tr(),
                               MarkdownBody(
                                 data: meal.instructions ?? '',
                                 styleSheet: MarkdownStyleSheet.fromTheme(

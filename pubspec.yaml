@@ -35,6 +35,8 @@ dependencies:
   path_provider: ^2.0.1
   sign_in_with_apple: ^3.2.0
   crypto: ^3.0.1
+  easy_localization: ^3.0.0
+  flutter_localized_locales: ^2.0.3
 
   # Firebase
   firebase_core: ^1.0.0
@@ -93,6 +95,7 @@ flutter:
     - assets/images/
     - assets/onboarding/
     - assets/help_slide/
+    - assets/translations/
 
   fonts:
     - family: Poppins

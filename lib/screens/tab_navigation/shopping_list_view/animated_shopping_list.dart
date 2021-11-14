@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -58,7 +59,7 @@ class AnimatedShoppingList extends StatelessWidget {
           ),
           secondaryActions: [
             IconSlideAction(
-              caption: 'Löschen',
+              caption: 'delete'.tr(),
               color: Theme.of(context).errorColor,
               icon: EvaIcons.closeCircleOutline,
               onTap: () => _deleteItem(index),

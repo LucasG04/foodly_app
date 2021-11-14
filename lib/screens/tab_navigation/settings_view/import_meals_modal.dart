@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,10 +33,10 @@ class ImportMealsModal extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: kPadding),
               child: Text(
-                'GERICHTE IMPORTIEREN',
+                'settings_import_title',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
-              ),
+              ).tr(),
             ),
           ),
           FutureBuilder<List<Plan>>(
@@ -54,13 +55,13 @@ class ImportMealsModal extends StatelessWidget {
                   height: 200,
                   child: Center(
                     child: Text(
-                      'Du warst bis jetzt nur in einem Plan. Daher kannst du noch keine Gerichte von einem anderen Plan importieren.',
+                      'settings_import_one_plan_msg',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize:
                             Theme.of(context).textTheme.bodyText1.fontSize + 2,
                       ),
-                    ),
+                    ).tr(),
                   ),
                 );
               } else {

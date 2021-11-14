@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -54,7 +55,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   AutoSizeText(
-                    'PASSWORT ZURÜCKSETZEN',
+                    'modal_password_reset_title'.tr().toUpperCase(),
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -71,7 +72,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
           ),
           MainTextField(
             controller: _emailController,
-            title: 'E-Mail-Adresse',
+            title: 'modal_password_reset_mail_title'.tr(),
             placeholder: 'tony@gmail.com',
             errorText: _errorText,
             onSubmit: _resetPassword,
@@ -88,8 +89,8 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
                     SizedBox(width: kPadding),
                     Flexible(
                       child: Text(
-                        'Wir haben dir eine E-Mail zum Zurücksetzen von deinem Passwort geschickt.',
-                      ),
+                        'modal_password_reset_result_msg',
+                      ).tr(),
                     ),
                   ],
                 )
@@ -99,7 +100,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
           ),
           Center(
             child: MainButton(
-              text: 'Zurücksetzen',
+              text: 'modal_password_reset_reset'.tr(),
               isProgress: true,
               buttonState: _buttonState,
               onTap: _resetPassword,
@@ -139,7 +140,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
       });
     } else {
       setState(() {
-        _errorText = 'Bitte gib eine richtige E-Mail ein.';
+        _errorText = 'modal_password_reset_error_mail_invalid'.tr();
         _buttonState = ButtonState.error;
       });
     }
@@ -148,14 +149,12 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
   void _handleFirebaseResetException(dynamic exception) {
     if (exception is FirebaseAuthException) {
       if (exception.code == 'user-not-found') {
-        _errorText = 'Diese E-Mail ist nicht vergeben.';
+        _errorText = 'modal_password_reset_error_mail_not_found'.tr();
       } else {
-        _errorText =
-            'Zurücksetzen nicht möglich. Bitte versuche es später erneut.';
+        _errorText = 'modal_password_reset_error_unknown'.tr();
       }
     } else {
-      _errorText =
-          'Zurücksetzen nicht möglich. Bitte versuche es später erneut.';
+      _errorText = 'modal_password_reset_error_unknown'.tr();
     }
     setState(() {
       _buttonState = ButtonState.error;

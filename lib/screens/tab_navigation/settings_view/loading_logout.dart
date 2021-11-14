@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:foodly/constants.dart';
 import 'package:foodly/services/authentication_service.dart';
@@ -26,7 +27,7 @@ class _LoadingLogutState extends State<LoadingLogut> {
                   TextButton(
                     onPressed: () => AuthenticationService.signOut(),
                     child: Text(
-                      'Logout',
+                      'settings_section_account_logout'.tr(),
                       style: TextStyle(color: Theme.of(context).primaryColor),
                     ),
                   ),

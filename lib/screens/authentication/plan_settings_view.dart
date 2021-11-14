@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -65,7 +66,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
               fontSize: 14,
               fontWeight: FontWeight.w400,
             ),
-            labels: ['Plan erstellen'],
+            labels: ['plan_settings_create_plan'.tr()],
             selectedLabelIndex: null,
           ),
           Expanded(
@@ -74,9 +75,9 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
               child: Wrap(
                 children: [
                   Text(
-                    'Wie soll der Plan heißen?',
+                    'plan_settings_what_name',
                     style: _titleTextStyle,
-                  ),
+                  ).tr(),
                 ],
               ),
             ),
@@ -84,7 +85,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
           SizedBox(height: kPadding),
           MainTextField(
             controller: _nameController,
-            title: 'Name vom Plan',
+            title: 'plan_settings_name_title'.tr(),
             textInputAction: TextInputAction.go,
             errorText: _nameErrorText,
           ),
@@ -117,7 +118,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
                   isSecondary: true,
                 ),
                 MainButton(
-                  text: 'Weiter',
+                  text: 'modal_password_reset_next'.tr(),
                   width: constraints.maxWidth * 0.65,
                   onTap: _updatePlanSettings,
                   isProgress: true,
@@ -141,7 +142,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
     if (_nameController.text.isEmpty ||
         _nameController.text.trim().length < 3) {
       setState(() {
-        _nameErrorText = 'Der Name muss mindestens 3 Zeichen enthalten';
+        _nameErrorText = 'plan_settings_error_name'.tr();
       });
       return false;
     }

@@ -1,4 +1,4 @@
-import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -55,7 +55,7 @@ class _ShoppingListViewState extends State<ShoppingListView>
                                 Padding(
                                   padding: const EdgeInsets.only(left: 5.0),
                                   child: PageTitle(
-                                    text: 'Einkaufsliste',
+                                    text: 'shopping_list_title'.tr(),
                                   ),
                                 ),
                                 SizedBox(
@@ -85,12 +85,12 @@ class _ShoppingListViewState extends State<ShoppingListView>
                                   ),
                                   child: ExpansionTile(
                                     title: Text(
-                                      'BEREITS GEKAUFT',
+                                      'shopping_list_already_bought',
                                       style: TextStyle(
                                         color: Theme.of(context).primaryColor,
                                         fontWeight: FontWeight.bold,
                                       ),
-                                    ),
+                                    ).tr(),
                                     children: [
                                       AnimatedShoppingList(
                                         groceries: boughtItems,
@@ -113,12 +113,12 @@ class _ShoppingListViewState extends State<ShoppingListView>
                                                         .deleteAllBoughtGrocery(
                                                             listId),
                                                 child: Text(
-                                                  'Alle entfernen',
+                                                  'shopping_list_remove_all',
                                                   style: TextStyle(
                                                     color: Theme.of(context)
                                                         .errorColor,
                                                   ),
-                                                ),
+                                                ).tr(),
                                                 style: ButtonStyle(
                                                   shadowColor:
                                                       MaterialStateProperty.all<

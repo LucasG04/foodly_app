@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../constants.dart';
@@ -67,16 +68,18 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: kPadding),
               child: Text(
-                _isCreating ? 'HINZUFÜGEN' : 'BEARBEITEN',
+                _isCreating
+                    ? 'edit_grocery_modal_add'
+                    : 'edit_grocery_modal_edit',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
-              ),
+              ).tr(),
             ),
           ),
           MainTextField(
             controller: _nameController,
-            title: 'Bezeichnung',
-            placeholder: 'Brötchen',
+            title: 'edit_grocery_modal_ctrl_name_title'.tr(),
+            placeholder: 'edit_grocery_modal_ctrl_name_placeholder'.tr(),
             errorText: _errorText,
             textInputAction: TextInputAction.next,
             onSubmit: () => (_amountFocusNode.requestFocus()),
@@ -89,7 +92,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
                 child: MainTextField(
                   controller: _amountController,
                   focusNode: _amountFocusNode,
-                  title: 'Menge',
+                  title: 'edit_grocery_modal_ctrl_amount_title'.tr(),
                   placeholder: '1',
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
@@ -101,8 +104,8 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
                 child: MainTextField(
                   controller: _unitController,
                   focusNode: _unitFocusNode,
-                  title: 'Einheit',
-                  placeholder: 'Stück',
+                  title: 'edit_grocery_modal_ctrl_unit_title'.tr(),
+                  placeholder: 'edit_grocery_modal_ctrl_unit_placeholder'.tr(),
                   onSubmit: _saveGrocery,
                 ),
               ),
@@ -111,7 +114,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
           SizedBox(height: kPadding * 2),
           Center(
             child: MainButton(
-              text: 'Speichern',
+              text: 'save'.tr(),
               isProgress: true,
               buttonState: _buttonState,
               onTap: _saveGrocery,
@@ -152,7 +155,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
       Navigator.pop(context);
     } else {
       setState(() {
-        _errorText = 'Bitte trag eine Bezeichnung ein.';
+        _errorText = 'edit_grocery_modal_error'.tr();
         _buttonState = ButtonState.error;
       });
     }

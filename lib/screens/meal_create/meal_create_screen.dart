@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:auto_route/auto_route_annotations.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -81,7 +82,9 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
 
     return Scaffold(
       appBar: MainAppBar(
-        text: _isCreatingMeal ? 'Gericht erstellen' : 'Gericht bearbeiten',
+        text: _isCreatingMeal
+            ? 'meal_create_title_add'.tr()
+            : 'meal_create_title_edit'.tr(),
         scrollController: _scrollController,
         actions: [
           IconButton(
@@ -107,7 +110,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                     children: [
                       MainTextField(
                         controller: _titleController,
-                        title: 'Name',
+                        title: 'meal_create_title_title'.tr(),
                       ),
                       Divider(),
                       _isLoadingMeal
@@ -115,7 +118,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                               key: UniqueKey(),
                               content: [],
                               onChanged: null,
-                              title: 'Zutaten:',
+                              title: 'meal_create_ingredients_title'.tr() + ':',
                             )
                           : EditIngredients(
                               content: _meal.ingredients ?? [],
@@ -124,15 +127,15 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                                   _meal.ingredients = results;
                                 });
                               },
-                              title: 'Zutaten:',
+                              title: 'meal_create_ingredients_title'.tr() + ':',
                             ),
                       Divider(),
                       Container(
                         width: double.infinity,
                         child: Text(
-                          'Anleitung',
+                          'meal_create_instruction_title',
                           style: Theme.of(context).textTheme.bodyText1,
-                        ),
+                        ).tr(),
                       ),
                       _isLoadingMeal
                           ? MarkdownEditor(
@@ -160,8 +163,9 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                             flex: 2,
                             child: MainTextField(
                               controller: _sourceController,
-                              title: 'Quelle',
-                              placeholder: 'Chefkoch',
+                              title: 'meal_create_source_title'.tr(),
+                              placeholder:
+                                  'meal_create_source_placeholder'.tr(),
                             ),
                           ),
                           SizedBox(width: kPadding / 2),
@@ -169,7 +173,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                             flex: 1,
                             child: MainTextField(
                               controller: _durationController,
-                              title: 'Dauer (min)',
+                              title: 'meal_create_duration_title'.tr(),
                               placeholder: '10',
                               textAlign: TextAlign.end,
                               keyboardType: TextInputType.number,
@@ -182,13 +186,13 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                           ? EditListContent(
                               content: _meal.tags,
                               onChanged: (list) => _meal.tags = list,
-                              title: 'Kategorien:',
+                              title: 'meal_create_tags_title'.tr() + ':',
                             )
                           : SizedBox(),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: kPadding),
                         child: MainButton(
-                          text: 'Speichern',
+                          text: 'save'.tr(),
                           onTap: _saveMeal,
                           isProgress: true,
                           buttonState: _buttonState,
@@ -283,15 +287,14 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
       } catch (e) {
         print(e);
         MainSnackbar(
-          message:
-              'Es ist ein Fehler aufgetreten. Prüfe deine Internetverbindung oder versuche es später erneut.',
+          message: 'meal_create_error_unknown'.tr(),
           isError: true,
         ).show(context);
         _buttonState = ButtonState.error;
       }
     } else {
       MainSnackbar(
-        message: 'Bitte vergib einen Namen und mindestens eine Zutat.',
+        message: 'meal_create_error_missing_input'.tr(),
         isError: true,
       ).show(context);
       _buttonState = ButtonState.error;
