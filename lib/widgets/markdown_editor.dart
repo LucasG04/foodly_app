@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -65,7 +66,8 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                   children: <Widget>[
                     Icon(EvaIcons.editOutline, color: textColor),
                     SizedBox(width: 8.0),
-                    Text('Bearbeiten', style: TextStyle(color: textColor)),
+                    Text('markdown_edit', style: TextStyle(color: textColor))
+                        .tr(),
                   ],
                 ),
               ),
@@ -76,7 +78,8 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                   children: <Widget>[
                     Icon(EvaIcons.eyeOutline, color: textColor),
                     SizedBox(width: 8.0),
-                    Text('Vorschau', style: TextStyle(color: textColor)),
+                    Text('markdown_preview', style: TextStyle(color: textColor))
+                        .tr(),
                   ],
                 ),
               )
@@ -147,7 +150,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                   children: [
                     Flexible(
                       child: AutoSizeText(
-                        'Formatiere den Text (klick für mehr Info).',
+                        'markdown_format_text'.tr(),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

@@ -99,10 +99,7 @@ class _SelectMealTileState extends State<SelectMealTile> {
       setState(() {
         _buttonState = _ButtonState.DONE;
       });
-      // await Future.delayed(Duration(seconds: 3));
-      // setState(() {
-      //   _buttonState = _ButtonState.DEFAULT;
-      // });
+
       ExtendedNavigator.root.pop();
     }
   }

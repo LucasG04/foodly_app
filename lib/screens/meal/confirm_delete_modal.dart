@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
@@ -27,10 +28,10 @@ class ConfirmDeleteModal extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: kPadding),
               child: Text(
-                'LÖSCHEN',
+                'delete'.toUpperCase(),
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
-              ),
+              ).tr(),
             ),
           ),
           RichText(
@@ -39,14 +40,13 @@ class ConfirmDeleteModal extends StatelessWidget {
                     fontSize: 16.0,
                   ),
               children: <TextSpan>[
-                TextSpan(text: 'Bist du dir sicher, dass du das Gericht '),
+                TextSpan(text: 'modal_delete_sure_leading'.tr() + ' '),
                 TextSpan(
                   text: '"${meal.name}"',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 TextSpan(
-                  text:
-                      ' für immer löschen möchtest. Es kann nicht wiederhergestellt noch von jemanden aufgerufen werden.',
+                  text: ' ' + 'modal_delete_sure_trailing'.tr(),
                 ),
               ],
             ),
@@ -54,7 +54,7 @@ class ConfirmDeleteModal extends StatelessWidget {
           SizedBox(height: kPadding * 2),
           Center(
             child: MainButton(
-              text: 'Permanent löschen',
+              text: 'modal_delete_delete'.tr(),
               onTap: () => Navigator.pop(context, true),
               color: Theme.of(context).errorColor,
             ),

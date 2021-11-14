@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:concentric_transition/concentric_transition.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
@@ -15,37 +15,32 @@ class OnboardingScreen extends StatelessWidget {
   final List<PageData> pages = [
     PageData(
       assetPath: 'assets/onboarding/welcome.png',
-      title: 'Danke, dass du $kAppName verwendest.',
-      subtitle:
-          '$kAppName verbindet für dich deinen Essensplan, Einkaufsliste und Kochbuch.',
+      title: 'onboarding_one_title'.tr(args: [kAppName]),
+      subtitle: 'onboarding_one_subtitle'.tr(args: [kAppName]),
       background: Color(0xFFeb3b5a),
     ),
     PageData(
       assetPath: 'assets/onboarding/scrum.png',
-      title: 'Essensplan',
-      subtitle:
-          'Plane & organisiere dein Essen für die nächste Woche. So sparst du Zeit und Geld.',
+      title: 'onboarding_two_title'.tr(),
+      subtitle: 'onboarding_two_subtitle'.tr(),
       background: Color(0xFF2d98da),
     ),
     PageData(
       assetPath: 'assets/onboarding/shopping.png',
-      title: 'Einkaufsliste',
-      subtitle:
-          'Nutze gemeinsam mit deinen Mitbewohnern eine Liste und bleib so immer organisiert.',
+      title: 'onboarding_three_title'.tr(),
+      subtitle: 'onboarding_three_subtitle'.tr(),
       background: Color(0xFF0043D0),
     ),
     PageData(
       assetPath: 'assets/onboarding/cooking.png',
-      title: 'Kochbuch',
-      subtitle:
-          'Hab alle deine Lieblingsgerichte an einem Ort, verwende öffentliche aus der Community und importiere sie von bekannten Webseiten.',
+      title: 'onboarding_four_title'.tr(),
+      subtitle: 'onboarding_four_subtitle'.tr(),
       background: Color(0xFFf7b731),
     ),
     PageData(
       assetPath: 'assets/onboarding/rocket.png',
-      title: 'Zu guter Letzt',
-      subtitle:
-          'Um $kAppName zu verwenden, musst du dich registrieren, um einen Plan zu erstellen oder einem beizutreten. Deine E-Mail wird hierbei nur verwendet, um deine Einstellungen zu speichern.',
+      title: 'onboarding_five_title'.tr(),
+      subtitle: 'onboarding_five_subtitle'.tr(args: [kAppName]),
       background: Color(0xFF20bf6b),
     ),
   ];

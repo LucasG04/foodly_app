@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
@@ -23,8 +24,6 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
   FocusNode _unitFocusNode;
 
   String _nameErrorText;
-  String _amountErrorText;
-  String _unitErrorText;
 
   @override
   void initState() {
@@ -60,16 +59,18 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: kPadding),
               child: Text(
-                _isCreating ? 'HINZUFÜGEN' : 'BEARBEITEN',
+                _isCreating
+                    ? 'ingredient_modal_title_add'.toUpperCase()
+                    : 'ingredient_modal_title_edit'.toUpperCase(),
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
-              ),
+              ).tr(),
             ),
           ),
           MainTextField(
             controller: _nameController,
-            title: 'Bezeichnung',
-            placeholder: 'Salz',
+            title: 'ingredient_modal_name_title'.tr(),
+            placeholder: 'ingredient_modal_name_placeholder'.tr(),
             errorText: _nameErrorText,
             textInputAction: TextInputAction.next,
             onSubmit: () => (_amountFocusNode.requestFocus()),
@@ -82,10 +83,9 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
                 child: MainTextField(
                   controller: _amountController,
                   focusNode: _amountFocusNode,
-                  title: 'Menge',
+                  title: 'ingredient_modal_amount_title'.tr(),
                   placeholder: '1',
                   keyboardType: TextInputType.number,
-                  errorText: _amountErrorText,
                   textInputAction: TextInputAction.next,
                   onSubmit: () => (_unitFocusNode.requestFocus()),
                 ),
@@ -95,9 +95,8 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
                 child: MainTextField(
                   controller: _unitController,
                   focusNode: _unitFocusNode,
-                  title: 'Einheit',
-                  placeholder: 'Prise',
-                  errorText: _unitErrorText,
+                  title: 'ingredient_modal_unit_title'.tr(),
+                  placeholder: 'ingredient_modal_unit_placeholder'.tr(),
                   onSubmit: _saveIngredient,
                 ),
               ),
@@ -106,7 +105,7 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
           SizedBox(height: kPadding * 2),
           Center(
             child: MainButton(
-              text: 'Speichern',
+              text: 'save'.tr(),
               onTap: _saveIngredient,
             ),
           ),
@@ -129,30 +128,21 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
 
     if (ingredient.name.isEmpty) {
       setState(() {
-        _nameErrorText = 'Bitte trag eine Bezeichnung ein.';
+        _nameErrorText = 'ingredient_modal_error_name'.tr();
       });
       return;
     }
 
     if (ingredient.amount == null) {
       ingredient.amount = 0;
-      // setState(() {
-      //   _amountErrorText = 'Zahl eintragen.';
-      // });
-      // return;
     }
 
-    if (ingredient.name.isEmpty) {
-      setState(() {
-        _unitErrorText = 'Maßeinheit eintragen.';
-      });
-      return;
+    if (ingredient.unit == null) {
+      ingredient.unit = '';
     }
 
     setState(() {
       _nameErrorText = null;
-      _amountErrorText = null;
-      _unitErrorText = null;
     });
 
     FocusScope.of(context).unfocus();

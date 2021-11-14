@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -53,17 +54,17 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
                     children: [
                       _buildPickerTypeTile(
                         EvaIcons.cameraOutline,
-                        'Kamera',
+                        'image_picker_dialog_camera'.tr(),
                         () => _uploadLocalImage(ImageSource.camera),
                       ),
                       _buildPickerTypeTile(
                         EvaIcons.imageOutline,
-                        'Gallerie',
+                        'image_picker_dialog_gallery'.tr(),
                         () => _uploadLocalImage(ImageSource.gallery),
                       ),
                       _buildPickerTypeTile(
                         EvaIcons.globe2Outline,
-                        'Web',
+                        'image_picker_dialog_web'.tr(),
                         () => setState(() => (_showUrlInput = true)),
                       ),
                     ],
@@ -103,8 +104,8 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
                                 SizedBox(height: kPadding / 2),
                                 Expanded(
                                   child: Text(
-                                    'Der Link konnte nicht aufgerufen werden. Bitte überprüfe ihn oder verwende die "Gallerie"-Funktion.',
-                                  ),
+                                    'image_picker_dialog_error_link',
+                                  ).tr(),
                                 ),
                               ],
                             )
@@ -154,8 +155,7 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
     } catch (e) {
       _log.severe('ERR: StorageService.uploadFile', image);
       MainSnackbar(
-        message:
-            'Das Bild konnte leider nicht gespeichert werden. Wähle ein anderes Bild oder versuche es später erneut.',
+        message: 'image_picker_dialog_error_not_found'.tr(),
         isError: true,
       ).show(context);
     }

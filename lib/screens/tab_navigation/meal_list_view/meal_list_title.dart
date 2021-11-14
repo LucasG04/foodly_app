@@ -1,11 +1,10 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:badges/badges.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../app_router.gr.dart';
 import '../../../constants.dart';
 import '../../../providers/state_providers.dart';
 import 'tag_filter_modal.dart';
@@ -112,7 +111,7 @@ class _MealListTitleState extends State<MealListTitle> {
     return Container(
       width: double.infinity,
       child: AutoSizeText(
-        'Gerichte',
+        'meal_list_title'.tr(),
         style: TextStyle(
           fontSize: 32.0,
           fontWeight: FontWeight.w700,
@@ -134,7 +133,7 @@ class _MealListTitleState extends State<MealListTitle> {
         fontFamily: 'Poppins',
       ),
       decoration: InputDecoration(
-        hintText: 'Suchen...',
+        hintText: 'meal_list_search'.tr() + '...',
       ),
     );
   }

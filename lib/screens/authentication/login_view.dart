@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -86,7 +87,9 @@ class _LoginViewState extends State<LoginView> {
               color: Colors.grey,
               fontWeight: FontWeight.w400,
             ),
-            labels: _forgotPlan ? ['Anmelden'] : ['Registrieren', 'Anmelden'],
+            labels: _forgotPlan
+                ? ['login_title_login'.tr()]
+                : ['login_title_register'.tr(), 'login_title_login'.tr()],
             selectedLabelIndex: (index) {
               setState(() {
                 _isRegistering = index == 0;
@@ -102,24 +105,24 @@ class _LoginViewState extends State<LoginView> {
                     duration: const Duration(milliseconds: 250),
                     child: _isRegistering
                         ? Text(
-                            'Registriere dich ',
+                            'login_register_leading'.tr() + ' ',
                             key: ValueKey<int>(0),
                             style: _titleTextStyle,
                           )
                         : Text(
-                            'Melde dich an ',
+                            'login_login_leading'.tr() + ' ',
                             key: ValueKey<int>(1),
                             style: _titleTextStyle,
                           ),
                   ),
                   Text(
                     widget.isCreatingPlan
-                        ? 'um den Plan zu erstellen'
-                        : 'um dem Plan beizuteten',
+                        ? 'login_cta_create'
+                        : 'login_cta_join',
                     style: _titleTextStyle.copyWith(
                       fontWeight: FontWeight.w400,
                     ),
-                  ),
+                  ).tr(),
                 ],
               ),
             ),
@@ -127,7 +130,7 @@ class _LoginViewState extends State<LoginView> {
           SizedBox(height: kPadding),
           MainTextField(
             controller: _emailController,
-            title: 'E-Mail-Adresse',
+            title: 'login_mail_title'.tr(),
             textInputAction: TextInputAction.next,
             errorText: _emailErrorText,
             autofocus: true,
@@ -136,7 +139,7 @@ class _LoginViewState extends State<LoginView> {
           ),
           MainTextField(
             controller: _passwordController,
-            title: 'Passwort',
+            title: 'login_password_title'.tr(),
             textInputAction: TextInputAction.go,
             obscureText: true,
             errorText: _passwordErrorText,
@@ -151,7 +154,7 @@ class _LoginViewState extends State<LoginView> {
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        child: Text('Passwort vergessen?'),
+                        child: Text('login_forgot_password').tr(),
                         onPressed: _showPasswordReset,
                       ),
                     ),
@@ -192,7 +195,7 @@ class _LoginViewState extends State<LoginView> {
                   isSecondary: true,
                 ),
                 MainButton(
-                  text: 'Beitreten',
+                  text: 'login_join'.tr(),
                   width: constraints.maxWidth * 0.65,
                   onTap: _authWithEmail,
                   isProgress: true,
@@ -216,7 +219,7 @@ class _LoginViewState extends State<LoginView> {
     if (_emailController.text == null ||
         !EmailValidator.validate(_emailController.text)) {
       setState(() {
-        _emailErrorText = 'Bitte gib eine richtige E-Mail ein.';
+        _emailErrorText = 'login_error_wrong_mail'.tr();
       });
       return false;
     }
@@ -227,8 +230,7 @@ class _LoginViewState extends State<LoginView> {
     if (_passwordController.text.isEmpty ||
         _passwordController.text.length < 6) {
       setState(() {
-        _passwordErrorText =
-            'Dein Passwort muss mindestens 6 Zeichen enthalten';
+        _passwordErrorText = 'login_error_password'.tr();
       });
       return false;
     }
@@ -330,17 +332,14 @@ class _LoginViewState extends State<LoginView> {
   void _handleAuthException(dynamic exception) {
     if (exception is FirebaseAuthException) {
       if (exception.code == 'weak-password') {
-        _passwordErrorText =
-            'Das Passwort ist zu leicht. Es muss mindestens 6 Zeichen lang sein.';
+        _passwordErrorText = 'login_error_password_weak'.tr();
       } else if (exception.code == 'email-already-in-use') {
-        _emailErrorText = 'Es gibt bereits ein Konto mit dieser E-Mail.';
+        _emailErrorText = 'login_error_mail_in_use'.tr();
       } else {
-        _unknownErrorText =
-            'Anmeldung nicht möglich. Bitte versuche es später erneut.';
+        _unknownErrorText = 'login_error_unknown'.tr();
       }
     } else {
-      _unknownErrorText =
-          'Anmeldung nicht möglich. Bitte versuche es später erneut.';
+      _unknownErrorText = 'login_error_unknown'.tr();
     }
     setState(() {
       _buttonState = ButtonState.error;

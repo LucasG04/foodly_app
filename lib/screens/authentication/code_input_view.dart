@@ -1,5 +1,6 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import '../../constants.dart';
 import '../../services/plan_service.dart';
@@ -47,7 +48,7 @@ class _CodeInputViewState extends State<CodeInputView> {
               SizedBox(
                 width: contentWidth * 0.7,
                 child: Text(
-                  'Gib den Code von einem Plan ein, um ihm beizutreten:',
+                  'login_code_title_msg'.tr() + ':',
                   style: TextStyle(fontSize: 18),
                 ),
               ),
@@ -58,7 +59,7 @@ class _CodeInputViewState extends State<CodeInputView> {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    child: Text('Code vergessen?'),
+                    child: Text('login_code_forgot').tr(),
                     onPressed: () =>
                         widget.onPageChange(CodeInputResult.FORGOT),
                   ),
@@ -68,15 +69,15 @@ class _CodeInputViewState extends State<CodeInputView> {
               SizedBox(
                 width: contentWidth * 0.7,
                 child: Text(
-                  'Hast du noch keinen Plan? Dann erstell einfach einen.',
+                  'login_code_no_plan',
                   style: TextStyle(fontSize: 18),
                   textAlign: TextAlign.center,
-                ),
+                ).tr(),
               ),
               SizedBox(height: kPadding * 2),
               Center(
                 child: MainButton(
-                  text: 'Plan erstellen',
+                  text: 'login_code_create_plan'.tr(),
                   onTap: () => widget.onPageChange(CodeInputResult.NEW),
                 ),
               ),
@@ -99,12 +100,12 @@ class _CodeInputViewState extends State<CodeInputView> {
                   children: <Widget>[
                     SizedBox(height: size.height * 0.1),
                     Text(
-                      'Wilkommen bei',
+                      'login_code_welcome',
                       style: TextStyle(
                         fontSize: 24.0,
                         color: Colors.white,
                       ),
-                    ),
+                    ).tr(),
                     Text(
                       kAppName,
                       style: TextStyle(
@@ -168,7 +169,7 @@ class _CodeInputViewState extends State<CodeInputView> {
       } catch (e) {
         print(e);
         setState(() {
-          _errorText = 'Der Code ist leider nicht vergeben.';
+          _errorText = 'login_code_not_found'.tr();
         });
       }
 

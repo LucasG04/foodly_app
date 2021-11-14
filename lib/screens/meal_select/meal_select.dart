@@ -1,6 +1,7 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:auto_route/auto_route_annotations.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
@@ -57,7 +58,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     final activePlan = context.read(planProvider).state;
 
     return Scaffold(
-      appBar: MainAppBar(text: 'Hinzufügen'),
+      appBar: MainAppBar(text: 'meal_select_title'.tr()),
       body: SingleChildScrollView(
         controller: _scrollController,
         child: Column(
@@ -128,20 +129,20 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     return (index == 0)
         ? _buildContainer(
             EvaIcons.codeOutline,
-            'Platzhalter eintragen',
+            'meal_select_placeholder'.tr(),
             () => _showPlaceholderDialog(),
           )
         : (index == 1)
             ? _buildContainer(
                 EvaIcons.plusOutline,
-                'Neues Gericht erstellen',
+                'meal_select_new'.tr(),
                 () => _createNewMeal(),
               )
             : _isSearching
                 ? UserInformation(
                     'assets/images/undraw_empty.png',
-                    'Keine Ergebnisse',
-                    'Wir konnten keine Gerichte für deine Suche finden.',
+                    'meal_select_no_results'.tr(),
+                    'meal_select_no_results_msg'.tr(),
                   )
                 : _buildPreviewMeals(planId);
   }
@@ -175,13 +176,13 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                     vertical: kPadding / 4,
                   ),
                   child: Text(
-                    'Vorschläge',
+                    'meal_select_recommondations',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.start,
-                  ),
+                  ).tr(),
                 );
               }
               index--;
@@ -278,12 +279,13 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
       context: context,
       textFields: [
         DialogTextField(
-          validator: (value) =>
-              value.isEmpty ? 'Bitte trag einen Platzhalter ein.' : null,
+          validator: (value) => value.isEmpty
+              ? 'meal_select_placeholder_dialog_placeholder'.tr()
+              : null,
         ),
       ],
-      title: 'Platzhalter',
-      cancelLabel: 'ABBRECHEN',
+      title: 'meal_select_placeholder_dialog_title'.tr(),
+      cancelLabel: 'meal_select_placeholder_dialog_cancel'.tr(),
     );
 
     if (texts != null && texts.isNotEmpty) {

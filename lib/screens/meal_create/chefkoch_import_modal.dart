@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:foodly/utils/basic_utils.dart';
@@ -49,15 +50,15 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: kPadding),
               child: Text(
-                'CHEFKOCH-IMPORT',
+                'import_modal_title'.toUpperCase(),
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
-              ),
+              ).tr(),
             ),
           ),
           MainTextField(
             controller: _linkController,
-            title: 'Link von Chefkoch',
+            title: 'import_modal_link_title'.tr(),
             placeholder:
                 'https://www.chefkoch.de/rezepte/2280941363879458/Brokkoli-Spaetzle-Pfanne.html',
             errorText: _linkErrorText,
@@ -80,9 +81,7 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
                       ),
                       SizedBox(width: kPadding),
                       Expanded(
-                        child: Text(
-                          'Leider konnte für diesen Link kein Gericht auf Chefkoch gefunden werden.',
-                        ),
+                        child: Text('import_modal_error_not_found').tr(),
                       )
                     ],
                   ),
@@ -95,7 +94,7 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
           ),
           Center(
             child: MainButton(
-              text: 'Importieren',
+              text: 'import_modal_import'.tr(),
               onTap: _importMeal,
               isProgress: true,
               buttonState: _buttonState,
@@ -114,7 +113,7 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
     if (link.isEmpty) {
       setState(() {
         _buttonState = ButtonState.error;
-        _linkErrorText = 'Bitte füg einen Link ein.';
+        _linkErrorText = 'import_modal_error_no_link'.tr();
       });
       return;
     }
