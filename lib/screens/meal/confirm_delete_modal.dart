@@ -28,10 +28,10 @@ class ConfirmDeleteModal extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: kPadding),
               child: Text(
-                'delete'.toUpperCase(),
+                'delete'.tr().toUpperCase(),
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
-              ).tr(),
+              ),
             ),
           ),
           RichText(
