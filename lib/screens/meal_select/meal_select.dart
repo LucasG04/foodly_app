@@ -164,7 +164,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
         return FutureBuilder<List<Meal>>(
             future: MealService.getMealsByIds(mealIds),
             builder: (context, mealsSnapshot) {
-              final mealRecommondations = mealsSnapshot.hasData
+              List<Meal> mealRecommondations = mealsSnapshot.hasData
                   ? mealsSnapshot.data
                       .where((meal) => mealIds.contains(meal.id))
                       .toList()
@@ -176,7 +176,9 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                   shrinkWrap: true,
                   padding: const EdgeInsets.symmetric(vertical: kPadding),
                   physics: NeverScrollableScrollPhysics(),
-                  itemCount: mealRecommondations.length,
+                  itemCount: mealRecommondations.length == 0
+                      ? 0
+                      : mealRecommondations.length + 1,
                   itemBuilder: (context, index) {
                     if (index == 0) {
                       return Padding(

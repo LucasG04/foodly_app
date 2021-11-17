@@ -6,6 +6,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodly/services/meal_stat_service.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -380,8 +381,9 @@ class _MealScreenState extends State<MealScreen> {
         _isDeleting = true;
       });
       await MealService.deleteMeal(meal.id);
-
       final plan = context.read(planProvider).state;
+      await MealStatService.deleteStatByMealId(plan.id, meal.id);
+
       if (plan.meals != null && plan.meals.length > 0) {
         for (var planMeal in plan.meals.where((e) => e.meal == meal.id)) {
           await PlanService.deletePlanMealFromPlan(plan.id, planMeal.id);

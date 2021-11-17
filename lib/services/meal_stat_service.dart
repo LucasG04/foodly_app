@@ -93,6 +93,28 @@ class MealStatService {
     }
   }
 
+  static Future<void> deleteStatByMealId(String planId, String mealId) async {
+    log.finer('Call deleteStatByMealId for plan $planId with meal $mealId');
+    try {
+      final querySnapshot = await _firestore
+          .collection('plans')
+          .doc(planId)
+          .collection('stats')
+          .where('mealId', isEqualTo: mealId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        await deleteStat(planId, querySnapshot.docs.first.id);
+      } else {
+        log.finer(
+            'ERR: deleteStatByMealId for plan $planId with meal $mealId. Could not find stat.');
+      }
+    } catch (e) {
+      log.severe('ERR: deleteStatByMealId for plan $planId with $mealId', e);
+      return null;
+    }
+  }
+
   static Future<void> deleteStat(String planId, String statId) async {
     log.finer('Call deleteStat for plan $planId with stat $statId');
     try {
