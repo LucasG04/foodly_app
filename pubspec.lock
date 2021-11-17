@@ -467,7 +467,7 @@ packages:
       name: flutter_riverpod
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.12.4"
+    version: "0.14.0+3"
   flutter_slidable:
     dependency: "direct main"
     description:
@@ -514,7 +514,7 @@ packages:
       name: freezed_annotation
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.15.0"
+    version: "0.14.3"
   glob:
     dependency: transitive
     description:
@@ -808,7 +808,7 @@ packages:
       name: riverpod
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.12.4"
+    version: "0.14.0+3"
   rxdart:
     dependency: transitive
     description:

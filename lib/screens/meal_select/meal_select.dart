@@ -161,53 +161,60 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
           ...{...mealIds}
         ];
 
-        return AnimationLimiter(
-          key: _animationLimiterKey,
-          child: ListView.builder(
-            shrinkWrap: true,
-            padding: const EdgeInsets.symmetric(vertical: kPadding),
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: mealIds.length,
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: kPadding,
-                    vertical: kPadding / 4,
-                  ),
-                  child: Text(
-                    'meal_select_recommondations',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.start,
-                  ).tr(),
-                );
-              }
-              index--;
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                duration: const Duration(milliseconds: 375),
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(
-                    child: FutureBuilder<Meal>(
-                      future: MealService.getMealById(mealIds[index]),
-                      builder: (context, snapshot) => snapshot.hasData
-                          ? SelectMealTile(
-                              meal: snapshot.data,
-                              onAddMeal: () =>
-                                  _addMealToPlan(snapshot.data.id, planId),
-                            )
-                          : SelectMealTile(isLoading: true),
-                    ),
-                  ),
+        return FutureBuilder<List<Meal>>(
+            future: MealService.getMealsByIds(mealIds),
+            builder: (context, mealsSnapshot) {
+              final mealRecommondations = mealsSnapshot.hasData
+                  ? mealsSnapshot.data
+                      .where((meal) => mealIds.contains(meal.id))
+                      .toList()
+                  : [];
+
+              return AnimationLimiter(
+                key: _animationLimiterKey,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.symmetric(vertical: kPadding),
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: mealRecommondations.length,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: kPadding,
+                          vertical: kPadding / 4,
+                        ),
+                        child: Text(
+                          'meal_select_recommondations',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.start,
+                        ).tr(),
+                      );
+                    }
+                    index--;
+                    return AnimationConfiguration.staggeredList(
+                      position: index,
+                      duration: const Duration(milliseconds: 375),
+                      child: SlideAnimation(
+                        verticalOffset: 50.0,
+                        child: FadeInAnimation(
+                          child: SelectMealTile(
+                            meal: mealRecommondations[index],
+                            onAddMeal: () => _addMealToPlan(
+                              mealRecommondations[index].id,
+                              planId,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               );
-            },
-          ),
-        );
+            });
       },
     );
   }

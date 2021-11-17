@@ -27,7 +27,7 @@ class MealStatService {
         .collection('plans')
         .doc(planId)
         .collection('stats')
-        .orderBy('plannedCount', descending: true)
+        .orderBy('plannedCount')
         .limit(limit)
         .get();
 
@@ -43,7 +43,7 @@ class MealStatService {
         .collection('plans')
         .doc(planId)
         .collection('stats')
-        .orderBy('lastTimePlanned', descending: true)
+        .orderBy('lastTimePlanned')
         .limit(limit)
         .get();
 

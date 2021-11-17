@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:foodly/services/meal_stat_service.dart';
+import 'package:foodly/utils/convert_util.dart';
 import 'package:logging/logging.dart';
 
 import '../models/meal.dart';
@@ -22,6 +23,21 @@ class MealService {
       meals.add(Meal.fromMap(doc.id, doc.data()));
     }
     return meals;
+  }
+
+  static Future<List<Meal>> getMealsByIds(List<String> ids) async {
+    log.finer('Call getMealsByIds with $ids');
+    final List<DocumentSnapshot> documents = [];
+
+    for (var idList in ConvertUtil.splitArray(ids)) {
+      final results = await _firestore
+          .collection('meals')
+          .where(FieldPath.documentId, whereIn: idList)
+          .get();
+      documents.addAll(results.docs);
+    }
+
+    return documents.map((e) => Meal.fromMap(e.id, e.data())).toList();
   }
 
   static Future<Meal> getMealById(String mealId) async {

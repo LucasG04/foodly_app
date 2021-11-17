@@ -8,14 +8,14 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.1.2+6
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.11.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
   # Util
-  flutter_riverpod: ^0.12.1
+  flutter_riverpod: ^0.14.0
   auto_route: ^0.6.9
   intl: ^0.17.0
   hive: ^1.4.4+1
