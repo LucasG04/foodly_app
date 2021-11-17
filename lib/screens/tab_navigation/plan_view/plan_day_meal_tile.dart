@@ -3,7 +3,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/all.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
@@ -206,14 +206,14 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                     PopupMenuItem(
                       value: 'tolist',
                       child: ListTile(
-                        title: Text('plan_ingredients_to_list'.tr()),
+                        title: Text('plan_ingredients_to_list').tr(),
                         leading: Icon(EvaIcons.fileAddOutline),
                       ),
                     ),
                     PopupMenuItem(
                       value: 'delete',
                       child: ListTile(
-                        title: Text('delete'),
+                        title: Text('delete').tr(),
                         leading: Icon(EvaIcons.minusCircleOutline),
                       ),
                     ),

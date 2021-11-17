@@ -60,11 +60,11 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
               padding: const EdgeInsets.symmetric(vertical: kPadding),
               child: Text(
                 _isCreating
-                    ? 'ingredient_modal_title_add'.toUpperCase()
-                    : 'ingredient_modal_title_edit'.toUpperCase(),
+                    ? 'ingredient_modal_title_add'.tr().toUpperCase()
+                    : 'ingredient_modal_title_edit'.tr().toUpperCase(),
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
-              ).tr(),
+              ),
             ),
           ),
           MainTextField(

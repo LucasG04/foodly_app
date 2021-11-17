@@ -27,7 +27,7 @@ class MealStatService {
         .collection('plans')
         .doc(planId)
         .collection('stats')
-        .orderBy('plannedCount', descending: true)
+        .orderBy('plannedCount')
         .limit(limit)
         .get();
 
@@ -43,7 +43,7 @@ class MealStatService {
         .collection('plans')
         .doc(planId)
         .collection('stats')
-        .orderBy('lastTimePlanned', descending: true)
+        .orderBy('lastTimePlanned')
         .limit(limit)
         .get();
 
@@ -89,6 +89,28 @@ class MealStatService {
       }
     } catch (e) {
       log.severe('ERR: updateStat for plan $planId with $mealId', e);
+      return null;
+    }
+  }
+
+  static Future<void> deleteStatByMealId(String planId, String mealId) async {
+    log.finer('Call deleteStatByMealId for plan $planId with meal $mealId');
+    try {
+      final querySnapshot = await _firestore
+          .collection('plans')
+          .doc(planId)
+          .collection('stats')
+          .where('mealId', isEqualTo: mealId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        await deleteStat(planId, querySnapshot.docs.first.id);
+      } else {
+        log.finer(
+            'ERR: deleteStatByMealId for plan $planId with meal $mealId. Could not find stat.');
+      }
+    } catch (e) {
+      log.severe('ERR: deleteStatByMealId for plan $planId with $mealId', e);
       return null;
     }
   }

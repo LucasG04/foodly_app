@@ -6,6 +6,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodly/services/meal_stat_service.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -119,7 +120,7 @@ class _MealScreenState extends State<MealScreen> {
                                                   value: 'edit',
                                                   child: ListTile(
                                                     title: Text(
-                                                      'meel_details_edit',
+                                                      'meal_details_edit',
                                                     ).tr(),
                                                     leading: Icon(
                                                       EvaIcons.edit2Outline,
@@ -130,7 +131,7 @@ class _MealScreenState extends State<MealScreen> {
                                                   value: 'delete',
                                                   child: ListTile(
                                                     title: Text(
-                                                      'meel_details_delete',
+                                                      'meal_details_delete',
                                                     ).tr(),
                                                     leading: Icon(
                                                       EvaIcons
@@ -184,9 +185,9 @@ class _MealScreenState extends State<MealScreen> {
                                         Text(
                                           meal.source != null &&
                                                   meal.source.isNotEmpty
-                                              ? 'meel_details_source_known'
+                                              ? 'meal_details_source_known'
                                                   .tr(args: [meal.source])
-                                              : 'meel_details_source_unknown'
+                                              : 'meal_details_source_unknown'
                                                   .tr(),
                                           style: TextStyle(
                                             fontSize: 16.0,
@@ -203,7 +204,7 @@ class _MealScreenState extends State<MealScreen> {
                                   ),
                                   BorderIcon(
                                     child: Text(
-                                      'meel_details_duration_trailing'
+                                      'meal_details_duration_trailing'
                                           .tr(args: [meal.duration.toString()]),
                                       style: TextStyle(
                                         fontSize: 20.0,
@@ -232,7 +233,7 @@ class _MealScreenState extends State<MealScreen> {
                             ),
                             SizedBox(height: kPadding),
                             ..._buildSection(
-                              'meel_details_ingredient'.tr(),
+                              'meal_details_ingredient'.tr(),
                               Container(
                                 child: ListView.separated(
                                   shrinkWrap: true,
@@ -250,7 +251,7 @@ class _MealScreenState extends State<MealScreen> {
                             ),
                             SizedBox(height: kPadding),
                             ..._buildSection(
-                              'meel_details_instructions'.tr(),
+                              'meal_details_instructions'.tr(),
                               MarkdownBody(
                                 data: meal.instructions ?? '',
                                 styleSheet: MarkdownStyleSheet.fromTheme(
@@ -380,8 +381,9 @@ class _MealScreenState extends State<MealScreen> {
         _isDeleting = true;
       });
       await MealService.deleteMeal(meal.id);
-
       final plan = context.read(planProvider).state;
+      await MealStatService.deleteStatByMealId(plan.id, meal.id);
+
       if (plan.meals != null && plan.meals.length > 0) {
         for (var planMeal in plan.meals.where((e) => e.meal == meal.id)) {
           await PlanService.deletePlanMealFromPlan(plan.id, planMeal.id);

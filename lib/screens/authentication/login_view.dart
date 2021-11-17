@@ -53,8 +53,9 @@ class _LoginViewState extends State<LoginView> {
   @override
   void initState() {
     _buttonState = ButtonState.normal;
-    _isRegistering = true;
     _forgotPlan = widget.plan == null;
+    _isRegistering =
+        !_forgotPlan; // default `true`, but if user forgot plan then not registering
 
     _emailController = new TextEditingController();
     _passwordController = new TextEditingController();
