@@ -176,7 +176,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                   shrinkWrap: true,
                   padding: const EdgeInsets.symmetric(vertical: kPadding),
                   physics: NeverScrollableScrollPhysics(),
-                  itemCount: mealRecommondations.length == 0
+                  itemCount: mealRecommondations.isEmpty
                       ? 0
                       : mealRecommondations.length + 1,
                   itemBuilder: (context, index) {
