@@ -4,7 +4,7 @@ import 'package:auto_route/auto_route_annotations.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/all.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:foodly/models/meal_stat.dart';
 import 'package:foodly/services/meal_service.dart';
