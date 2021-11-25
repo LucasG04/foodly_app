@@ -463,7 +463,7 @@ PODS:
     - Flutter
   - share (0.0.1):
     - Flutter
-  - shared_preferences (0.0.1):
+  - shared_preferences_ios (0.0.1):
     - Flutter
   - sign_in_with_apple (0.0.1):
     - Flutter
@@ -483,7 +483,7 @@ DEPENDENCIES:
   - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
   - receive_sharing_intent (from `.symlinks/plugins/receive_sharing_intent/ios`)
   - share (from `.symlinks/plugins/share/ios`)
-  - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
+  - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
   - sign_in_with_apple (from `.symlinks/plugins/sign_in_with_apple/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
@@ -527,8 +527,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/receive_sharing_intent/ios"
   share:
     :path: ".symlinks/plugins/share/ios"
-  shared_preferences:
-    :path: ".symlinks/plugins/shared_preferences/ios"
+  shared_preferences_ios:
+    :path: ".symlinks/plugins/shared_preferences_ios/ios"
   sign_in_with_apple:
     :path: ".symlinks/plugins/sign_in_with_apple/ios"
   sqflite:
@@ -563,11 +563,11 @@ SPEC CHECKSUMS:
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
   receive_sharing_intent: c0d87310754e74c0f9542947e7cbdf3a0335a3b1
   share: 0b2c3e82132f5888bccca3351c504d0003b3b410
-  shared_preferences: 5033afbb22d372e15aff8ff766df9021b845f273
+  shared_preferences_ios: aef470a42dc4675a1cdd50e3158b42e3d1232b32
   sign_in_with_apple: f3bf75217ea4c2c8b91823f225d70230119b8440
   sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
   url_launcher: b6e016d912f04be9f5bf6e8e82dc599b7ba59649
 
 PODFILE CHECKSUM: ad039222394ce2d6e75df42ec138c57cbd947c84
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.11.2
