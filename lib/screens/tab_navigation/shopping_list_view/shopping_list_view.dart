@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:share/share.dart';
 
 import '../../../constants.dart';
 import '../../../models/grocery.dart';
@@ -56,6 +58,12 @@ class _ShoppingListViewState extends State<ShoppingListView>
                                   padding: const EdgeInsets.only(left: 5.0),
                                   child: PageTitle(
                                     text: 'shopping_list_title'.tr(),
+                                    actions: [
+                                      IconButton(
+                                        onPressed: () => _shareList(todoItems),
+                                        icon: Icon(EvaIcons.shareOutline),
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 SizedBox(
@@ -176,4 +184,20 @@ class _ShoppingListViewState extends State<ShoppingListView>
       ),
     );
   }
+
+  void _shareList(List<Grocery> groceries) {
+    if (groceries == null || groceries.isEmpty) {
+      return;
+    }
+    final list = groceries
+        .map((e) => e.amount == null
+            ? '\n- ${e.name}'
+            : e.unit == null
+                ? '\n- ${e.amount} ${e.name}'
+                : '\n- ${e.amount} ${e.unit} ${e.name}')
+        .toList();
+    Share.share(list.join());
+  }
 }
+
+// 1 Stk Apfel
