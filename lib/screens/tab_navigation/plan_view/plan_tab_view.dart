@@ -90,8 +90,8 @@ class _PlanTabViewState extends State<PlanTabView>
     final List<PlanMeal> updatedMeals = [...planMeals];
 
     final now =
-        new DateTime.now().toUtc().add(Duration(days: plan.hourDiffToUtc));
-    final today = new DateTime(now.year, now.month, now.day - 1);
+        new DateTime.now().toUtc().add(Duration(hours: plan.hourDiffToUtc));
+    final today = new DateTime(now.year, now.month, now.day);
 
     // remove old plan days
     final oldMeals = planMeals.where((meal) => meal.date.isBefore(today));
@@ -102,7 +102,7 @@ class _PlanTabViewState extends State<PlanTabView>
     );
     oldMeals.forEach(updatedMeals.remove);
 
-    // update days for the meals
+    // update plan days
     for (var i = 0; i < 8; i++) {
       final date = today.add(Duration(days: i));
       days.add(
@@ -115,7 +115,6 @@ class _PlanTabViewState extends State<PlanTabView>
     }
 
     // apply updates to firebase collection
-    // TODO: does this really check deep equality?
     if (planMeals != updatedMeals) {
       Future.wait(
         updatedMeals.map((e) => PlanService.updatePlanMealFromPlan(plan.id, e)),
