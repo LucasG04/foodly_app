@@ -148,18 +148,10 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
   }
 
   Widget _buildPreviewMeals(String planId) {
-    return FutureBuilder<List<List<MealStat>>>(
-      future: Future.wait<List<MealStat>>([
-        MealStatService.getLeastPlanned(planId),
-        MealStatService.getLongestNotPlanned(planId),
-      ]),
-      builder: (context, statSnapshots) {
-        List<String> mealIds = statSnapshots.hasData
-            ? statSnapshots.data.expand((i) => i).map((i) => i.mealId).toList()
-            : [];
-        mealIds = [
-          ...{...mealIds}
-        ];
+    return FutureBuilder<List<Meal>>(
+      future: MealStatService.getMealRecommendations(planId),
+      builder: (context, snapshot) {
+        final meals = snapshot.hasData ? snapshot.data : [];
 
         return AnimationLimiter(
           key: _animationLimiterKey,
@@ -167,7 +159,10 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
             shrinkWrap: true,
             padding: const EdgeInsets.symmetric(vertical: kPadding),
             physics: NeverScrollableScrollPhysics(),
-            itemCount: mealIds.length,
+            itemCount: meals.length == 0
+                ? 0
+                : meals.length +
+                    1, // +1 to make space for title and 0 to not show title
             itemBuilder: (context, index) {
               if (index == 0) {
                 return Padding(
@@ -192,15 +187,9 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                 child: SlideAnimation(
                   verticalOffset: 50.0,
                   child: FadeInAnimation(
-                    child: FutureBuilder<Meal>(
-                      future: MealService.getMealById(mealIds[index]),
-                      builder: (context, snapshot) => snapshot.hasData
-                          ? SelectMealTile(
-                              meal: snapshot.data,
-                              onAddMeal: () =>
-                                  _addMealToPlan(snapshot.data.id, planId),
-                            )
-                          : SelectMealTile(isLoading: true),
+                    child: SelectMealTile(
+                      meal: meals[index],
+                      onAddMeal: () => _addMealToPlan(meals[index].id, planId),
                     ),
                   ),
                 ),
