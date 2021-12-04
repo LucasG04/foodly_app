@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:foodly/models/meal.dart';
 import 'package:foodly/models/meal_stat.dart';
+import 'package:foodly/services/meal_service.dart';
 import 'package:logging/logging.dart';
 
 class MealStatService {
@@ -18,6 +20,23 @@ class MealStatService {
         .get();
 
     return querySnapshot.docs.map((e) => MealStat.fromMap(e.id, e.data()));
+  }
+
+  static Future<List<Meal>> getMealRecommendations(String planId) async {
+    final stats = await Future.wait(
+        [getLeastPlanned(planId), getLongestNotPlanned(planId)]);
+    List<String> mealIds = stats != null && stats.isNotEmpty
+        ? stats.expand((i) => i).map((i) => i.mealId).toList()
+        : [];
+    mealIds = [
+      ...{...mealIds}
+    ];
+
+    final meals = await MealService.getMealsByIds(mealIds);
+
+    return meals != null && meals.isNotEmpty
+        ? meals.where((meal) => mealIds.contains(meal.id)).toList()
+        : [];
   }
 
   static Future<List<MealStat>> getLeastPlanned(String planId,
