@@ -6,9 +6,8 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:foodly/models/meal_stat.dart';
-import 'package:foodly/services/meal_service.dart';
 import 'package:foodly/services/meal_stat_service.dart';
+import 'package:foodly/services/settings_service.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -144,7 +143,9 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                     'meal_select_no_results'.tr(),
                     'meal_select_no_results_msg'.tr(),
                   )
-                : _buildPreviewMeals(planId);
+                : SettingsService.showSuggestions
+                    ? _buildPreviewMeals(planId)
+                    : SizedBox();
   }
 
   Widget _buildPreviewMeals(String planId) {
