@@ -23,20 +23,27 @@ class MealStatService {
   }
 
   static Future<List<Meal>> getMealRecommendations(String planId) async {
-    final stats = await Future.wait(
-        [getLeastPlanned(planId), getLongestNotPlanned(planId)]);
-    List<String> mealIds = stats != null && stats.isNotEmpty
-        ? stats.expand((i) => i).map((i) => i.mealId).toList()
-        : [];
-    mealIds = [
-      ...{...mealIds}
-    ];
+    log.finer('Call getMealRecommendations for $planId');
+    try {
+      final stats = await Future.wait(
+          [getLeastPlanned(planId), getLongestNotPlanned(planId)]);
+      List<String> mealIds = stats != null && stats.isNotEmpty
+          ? stats.expand((i) => i).map((i) => i.mealId).toList()
+          : [];
+      mealIds = [
+        ...{...mealIds}
+      ];
+      log.finest('getMealRecommendations mealIds: ', mealIds);
 
-    final meals = await MealService.getMealsByIds(mealIds);
+      final meals = await MealService.getMealsByIds(mealIds);
 
-    return meals != null && meals.isNotEmpty
-        ? meals.where((meal) => mealIds.contains(meal.id)).toList()
-        : [];
+      return meals != null && meals.isNotEmpty
+          ? meals.where((meal) => mealIds.contains(meal.id)).toList()
+          : [];
+    } catch (e) {
+      log.severe('Failed getMealRecommendations for $planId', e);
+      return [];
+    }
   }
 
   static Future<List<MealStat>> getLeastPlanned(String planId,
