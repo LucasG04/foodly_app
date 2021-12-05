@@ -68,6 +68,25 @@ class _SettingsViewState extends State<SettingsView> {
                         }),
                       ),
                       SettingsTile(
+                        onTap: () => Navigator.push(
+                          context,
+                          ConcentricPageRoute(
+                              builder: (_) => OnboardingScreen()),
+                        ),
+                        leadingIcon: EvaIcons.trendingUpOutline,
+                        text: 'settings_section_general_suggestions'.tr(),
+                        trailing: Consumer(builder: (context, watch, _) {
+                          return Switch.adaptive(
+                            value: SettingsService.showSuggestions,
+                            onChanged: (value) {
+                              setState(() {
+                                SettingsService.setShowSuggestions(value);
+                              });
+                            },
+                          );
+                        }),
+                      ),
+                      SettingsTile(
                         leadingIcon: EvaIcons.globe2Outline,
                         text: 'settings_section_general_language'.tr(),
                         trailing: DropdownButton<Locale>(
