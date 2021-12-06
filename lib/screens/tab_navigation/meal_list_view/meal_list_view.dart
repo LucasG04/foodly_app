@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodly/services/meal_service.dart';
 import 'package:group_list_view/group_list_view.dart';
 
 import '../../../constants.dart';
@@ -76,6 +77,14 @@ class _MealListViewState extends State<MealListView>
                           ),
                           icon: Icon(EvaIcons.questionMarkCircleOutline),
                           label: Text('meal_list_help_import').tr(),
+                        ),
+                        SizedBox(height: kPadding),
+                        IconButton(
+                          onPressed: _refreshMeals,
+                          icon: Icon(
+                            EvaIcons.refreshOutline,
+                            color: Theme.of(context).primaryColor,
+                          ),
                         ),
                       ],
                     );
@@ -164,6 +173,12 @@ class _MealListViewState extends State<MealListView>
       ].toSet().toList();
     }
     return mealsCopy;
+  }
+
+  Future<void> _refreshMeals() async {
+    final activePlan = context.read(planProvider).state;
+    final meals = await MealService.getAllMeals(activePlan.id);
+    context.read(allMealsProvider).state = meals;
   }
 }
 

@@ -27,6 +27,10 @@ class MealService {
 
   static Future<List<Meal>> getMealsByIds(List<String> ids) async {
     log.finer('Call getMealsByIds with $ids');
+    if (ids == null || ids.isEmpty) {
+      return [];
+    }
+
     final List<DocumentSnapshot> documents = [];
 
     for (var idList in ConvertUtil.splitArray(ids)) {

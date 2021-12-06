@@ -166,10 +166,12 @@ class _FoodlyAppState extends State<FoodlyApp> {
               .listen((meals) {
         _privateMealsStreamValue = meals;
         mergeMealsIntoProvider();
+        _log.finest('Private meals updated: ' + meals.toString());
       });
       _publicMealsStream = MealService.streamPublicMeals().listen((meals) {
         _publicMealsStreamValue = meals;
         mergeMealsIntoProvider();
+        _log.finest('Public meals updated: ' + meals.toString());
       });
     }
   }
