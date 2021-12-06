@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:foodly/constants.dart';
 import 'package:foodly/services/meal_stat_service.dart';
 import 'package:logging/logging.dart';
 
@@ -147,8 +148,10 @@ class PlanService {
       String planId, PlanMeal planMeal) async {
     log.finer(
         'Call addPlanMealToPlan with planId: $planId | planMeal: ${planMeal.toMap()}');
-    await MealStatService.bumpStat(planId, planMeal.meal,
-        bumpCount: true, bumpLastPlanned: true);
+    if (!planMeal.meal.startsWith(kPlaceholderSymbol)) {
+      await MealStatService.bumpStat(planId, planMeal.meal,
+          bumpCount: true, bumpLastPlanned: true);
+    }
     return _firestore
         .collection('plans')
         .doc(planId)

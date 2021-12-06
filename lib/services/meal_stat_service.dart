@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:foodly/constants.dart';
 import 'package:foodly/models/meal.dart';
 import 'package:foodly/models/meal_stat.dart';
 import 'package:foodly/services/meal_service.dart';
@@ -33,7 +34,7 @@ class MealStatService {
       mealIds = [
         ...{...mealIds}
       ];
-      log.finest('getMealRecommendations mealIds: ', mealIds);
+      log.finest('getMealRecommendations mealIds: ' + mealIds.toString());
 
       final meals = await MealService.getMealsByIds(mealIds);
 
@@ -80,7 +81,12 @@ class MealStatService {
 
   static Future<void> bumpStat(String planId, String mealId,
       {bool bumpCount, bool bumpLastPlanned}) async {
-    log.finer('Call updateStat for plan $planId');
+    log.finer('Call bumpStat for plan $planId');
+    if (planId.startsWith(kPlaceholderSymbol)) {
+      log.finer(
+          'bumpStat for plan $planId tried with placeholder: $mealId. Abort bump.');
+      return;
+    }
     try {
       final querySnapshot = await _firestore
           .collection('plans')
