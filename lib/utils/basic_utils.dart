@@ -37,4 +37,8 @@ class BasicUtils {
     final match = exp.firstMatch(input);
     return input.substring(match.start, match.end);
   }
+
+  static bool isValidUri(String uri) {
+    return Uri.tryParse(uri)?.isAbsolute ?? false;
+  }
 }

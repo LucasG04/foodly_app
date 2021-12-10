@@ -16,9 +16,9 @@ dependencies:
 
   # Util
   flutter_riverpod: ^0.14.0
-  auto_route: ^0.6.9
+  auto_route: ^3.1.1
   intl: ^0.17.0
-  hive: ^1.4.4+1
+  hive: ^2.0.4
   # flutter_cache_manager_hive:
   #   git:
   #     url: https://github.com/X-Wei/flutter_cache_manager_hive.git
@@ -26,8 +26,8 @@ dependencies:
   dio: ^4.0.0-beta5
   url_launcher:
   flushbar:
-  share: ^0.6.5+4
-  email_validator: ^1.0.6
+  share: ^2.0.4
+  email_validator: ^2.0.1
   logging: ^1.0.0
   receive_sharing_intent: ^1.4.5
   image_picker: ^0.7.3
@@ -37,6 +37,7 @@ dependencies:
   crypto: ^3.0.1
   easy_localization: ^3.0.0
   flutter_localized_locales: ^2.0.3
+  metadata_fetch: ^0.4.1
 
   # Firebase
   firebase_core: ^1.0.0
@@ -46,11 +47,11 @@ dependencies:
   firebase_storage: ^8.0.0
 
   # Widgets
-  flutter_snake_navigationbar: ^0.4.2
-  eva_icons_flutter: ^2.0.1
+  flutter_snake_navigationbar: ^0.5.0
+  eva_icons_flutter: ^3.0.2
   cached_network_image: ^3.0.0-nullsafety
-  group_list_view: ^1.0.6
-  adaptive_dialog: ^0.9.3
+  group_list_view: ^1.1.1
+  adaptive_dialog: ^1.2.0
   flutter_markdown:
   auto_size_text:
   flutter_slidable: ^0.6.0-nullsafety.0
@@ -74,8 +75,9 @@ dev_dependencies:
     sdk: flutter
   # integration_test:
   #   sdk: flutter
-  auto_route_generator: ^0.6.10
   build_runner:
+  auto_route_generator: ^3.1.0
+  hive_generator: ^1.1.1
   flutter_launcher_icons: ^0.9.0
 
 flutter_icons:

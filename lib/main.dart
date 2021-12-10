@@ -8,8 +8,11 @@ import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodly/services/link_metadata_service.dart';
+import 'package:hive/hive.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:logging/logging.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 import 'app_router.gr.dart';
@@ -28,7 +31,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp();
+  var dir = await getApplicationDocumentsDirectory();
+  Hive.init(dir.path);
   await SettingsService.initialize();
+  await LinkMetadataService.initialize();
 
   runApp(
     ProviderScope(
@@ -55,6 +61,8 @@ class _FoodlyAppState extends State<FoodlyApp> {
   List<Meal> _privateMealsStreamValue;
   StreamSubscription<List<Meal>> _publicMealsStream;
   List<Meal> _publicMealsStreamValue;
+
+  final _appRouter = AppRouter();
 
   @override
   void dispose() {
@@ -97,7 +105,9 @@ class _FoodlyAppState extends State<FoodlyApp> {
                 _streamMeals();
               }
 
-              return MaterialApp(
+              return MaterialApp.router(
+                routerDelegate: _appRouter.delegate(),
+                routeInformationParser: _appRouter.defaultRouteParser(),
                 debugShowCheckedModeBanner: false,
                 theme: ThemeData(
                   // TODO: Nunito default font?
@@ -112,12 +122,6 @@ class _FoodlyAppState extends State<FoodlyApp> {
                 ],
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
-                builder: (_, __) => ScrollConfiguration(
-                  behavior: ScrollBehaviorModified(),
-                  child: ExtendedNavigator<AppRouter>(
-                    router: AppRouter(),
-                  ),
-                ),
               );
             },
           );
@@ -196,8 +200,8 @@ class _FoodlyAppState extends State<FoodlyApp> {
       if (AuthenticationService.currentUser != null &&
           value != null &&
           value.startsWith(kChefkochShareEndpoint)) {
-        ExtendedNavigator.root
-            .push(Routes.mealCreateScreen(id: Uri.encodeComponent(value)));
+        context.router
+            .push(MealCreateScreenRoute(id: Uri.encodeComponent(value)));
       }
     }, onError: (err) {
       _log.severe('ERR in ReceiveSharingIntent.getTextStream()', err);
@@ -208,8 +212,8 @@ class _FoodlyAppState extends State<FoodlyApp> {
       if (AuthenticationService.currentUser != null &&
           value != null &&
           value.startsWith(kChefkochShareEndpoint)) {
-        ExtendedNavigator.root
-            .push(Routes.mealCreateScreen(id: Uri.encodeComponent(value)));
+        context.router
+            .push(MealCreateScreenRoute(id: Uri.encodeComponent(value)));
       }
     });
   }

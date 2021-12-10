@@ -52,10 +52,10 @@ class _HomeScreenState extends State<HomeScreen> {
     } else if (_currentUser != null) {
       return TabNavigationView();
     } else if (SettingsService.isFirstUsage) {
-      ExtendedNavigator.root.replace(Routes.onboardingScreen);
+      context.router.replace(OnboardingScreenRoute());
       return Scaffold();
     } else {
-      ExtendedNavigator.root.replace(Routes.authenticationScreen);
+      context.router.replace(AuthenticationScreenRoute());
       return Scaffold();
     }
   }

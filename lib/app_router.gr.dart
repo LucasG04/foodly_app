@@ -1,103 +1,178 @@
+// **************************************************************************
+// AutoRouteGenerator
+// **************************************************************************
+
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
 // AutoRouteGenerator
 // **************************************************************************
 
-// ignore_for_file: public_member_api_docs
+import 'package:auto_route/auto_route.dart' as _i8;
+import 'package:flutter/material.dart' as _i9;
 
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/cupertino.dart';
+import 'screens/authentication/authentication_screen.dart' as _i2;
+import 'screens/meal/meal_screen.dart' as _i6;
+import 'screens/meal_create/meal_create_screen.dart' as _i5;
+import 'screens/meal_select/meal_select.dart' as _i3;
+import 'screens/onboarding/onboarding_screen.dart' as _i4;
+import 'screens/tab_navigation/home_screen.dart' as _i1;
+import 'screens/unknown_route/unknown_route_screen.dart' as _i7;
 
-import 'screens/authentication/authentication_screen.dart';
-import 'screens/meal/meal_screen.dart';
-import 'screens/meal_create/meal_create_screen.dart';
-import 'screens/meal_select/meal_select.dart';
-import 'screens/onboarding/onboarding_screen.dart';
-import 'screens/tab_navigation/home_screen.dart';
-import 'screens/unknown_route/unknown_route_screen.dart';
+class AppRouter extends _i8.RootStackRouter {
+  AppRouter([_i9.GlobalKey<_i9.NavigatorState> navigatorKey])
+      : super(navigatorKey);
 
-class Routes {
-  static const String homeScreen = '/';
-  static const String authenticationScreen = '/authentication-screen';
-  static const String mealSelectScreen = '/meal-select-screen';
-  static const String onboardingScreen = '/onboarding-screen';
-  static const String _mealCreateScreen = '/meal-create/:id';
-  static String mealCreateScreen({@required dynamic id}) => '/meal-create/$id';
-  static const String _mealScreen = '/meal/:id';
-  static String mealScreen({@required dynamic id}) => '/meal/$id';
-  static const String unknownRouteScreen = '*';
-  static const all = <String>{
-    homeScreen,
-    authenticationScreen,
-    mealSelectScreen,
-    onboardingScreen,
-    _mealCreateScreen,
-    _mealScreen,
-    unknownRouteScreen,
+  @override
+  final Map<String, _i8.PageFactory> pagesMap = {
+    HomeScreenRoute.name: (routeData) {
+      return _i8.CupertinoPageX<dynamic>(
+          routeData: routeData, child: _i1.HomeScreen());
+    },
+    AuthenticationScreenRoute.name: (routeData) {
+      return _i8.CupertinoPageX<dynamic>(
+          routeData: routeData, child: _i2.AuthenticationScreen());
+    },
+    MealSelectScreenRoute.name: (routeData) {
+      final args = routeData.argsAs<MealSelectScreenRouteArgs>(
+          orElse: () => const MealSelectScreenRouteArgs());
+      return _i8.CupertinoPageX<dynamic>(
+          routeData: routeData,
+          child: _i3.MealSelectScreen(date: args.date, isLunch: args.isLunch));
+    },
+    OnboardingScreenRoute.name: (routeData) {
+      return _i8.CupertinoPageX<dynamic>(
+          routeData: routeData, child: _i4.OnboardingScreen());
+    },
+    MealCreateScreenRoute.name: (routeData) {
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<MealCreateScreenRouteArgs>(
+          orElse: () =>
+              MealCreateScreenRouteArgs(id: pathParams.getString('id')));
+      return _i8.CupertinoPageX<dynamic>(
+          routeData: routeData, child: _i5.MealCreateScreen(id: args.id));
+    },
+    MealScreenRoute.name: (routeData) {
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<MealScreenRouteArgs>(
+          orElse: () => MealScreenRouteArgs(id: pathParams.getString('id')));
+      return _i8.CupertinoPageX<dynamic>(
+          routeData: routeData, child: _i6.MealScreen(id: args.id));
+    },
+    UnknownRouteScreenRoute.name: (routeData) {
+      return _i8.CupertinoPageX<dynamic>(
+          routeData: routeData, child: _i7.UnknownRouteScreen());
+    }
   };
+
+  @override
+  List<_i8.RouteConfig> get routes => [
+        _i8.RouteConfig(HomeScreenRoute.name, path: '/'),
+        _i8.RouteConfig(AuthenticationScreenRoute.name,
+            path: '/authentication-screen'),
+        _i8.RouteConfig(MealSelectScreenRoute.name,
+            path: '/meal-select-screen'),
+        _i8.RouteConfig(OnboardingScreenRoute.name, path: '/onboarding-screen'),
+        _i8.RouteConfig(MealCreateScreenRoute.name, path: '/meal-create/:id'),
+        _i8.RouteConfig(MealScreenRoute.name, path: '/meal/:id'),
+        _i8.RouteConfig(UnknownRouteScreenRoute.name, path: '*')
+      ];
 }
 
-class AppRouter extends RouterBase {
+/// generated route for [_i1.HomeScreen]
+class HomeScreenRoute extends _i8.PageRouteInfo<void> {
+  const HomeScreenRoute() : super(name, path: '/');
+
+  static const String name = 'HomeScreenRoute';
+}
+
+/// generated route for [_i2.AuthenticationScreen]
+class AuthenticationScreenRoute extends _i8.PageRouteInfo<void> {
+  const AuthenticationScreenRoute()
+      : super(name, path: '/authentication-screen');
+
+  static const String name = 'AuthenticationScreenRoute';
+}
+
+/// generated route for [_i3.MealSelectScreen]
+class MealSelectScreenRoute
+    extends _i8.PageRouteInfo<MealSelectScreenRouteArgs> {
+  MealSelectScreenRoute({DateTime date, bool isLunch})
+      : super(name,
+            path: '/meal-select-screen',
+            args: MealSelectScreenRouteArgs(date: date, isLunch: isLunch));
+
+  static const String name = 'MealSelectScreenRoute';
+}
+
+class MealSelectScreenRouteArgs {
+  const MealSelectScreenRouteArgs({this.date, this.isLunch});
+
+  final DateTime date;
+
+  final bool isLunch;
+
   @override
-  List<RouteDef> get routes => _routes;
-  final _routes = <RouteDef>[
-    RouteDef(Routes.homeScreen, page: HomeScreen),
-    RouteDef(Routes.authenticationScreen, page: AuthenticationScreen),
-    RouteDef(Routes.mealSelectScreen, page: MealSelectScreen),
-    RouteDef(Routes.onboardingScreen, page: OnboardingScreen),
-    RouteDef(Routes._mealCreateScreen, page: MealCreateScreen),
-    RouteDef(Routes._mealScreen, page: MealScreen),
-    RouteDef(Routes.unknownRouteScreen, page: UnknownRouteScreen),
-  ];
+  String toString() {
+    return 'MealSelectScreenRouteArgs{date: $date, isLunch: $isLunch}';
+  }
+}
+
+/// generated route for [_i4.OnboardingScreen]
+class OnboardingScreenRoute extends _i8.PageRouteInfo<void> {
+  const OnboardingScreenRoute() : super(name, path: '/onboarding-screen');
+
+  static const String name = 'OnboardingScreenRoute';
+}
+
+/// generated route for [_i5.MealCreateScreen]
+class MealCreateScreenRoute
+    extends _i8.PageRouteInfo<MealCreateScreenRouteArgs> {
+  MealCreateScreenRoute({String id})
+      : super(name,
+            path: '/meal-create/:id',
+            args: MealCreateScreenRouteArgs(id: id),
+            rawPathParams: {'id': id});
+
+  static const String name = 'MealCreateScreenRoute';
+}
+
+class MealCreateScreenRouteArgs {
+  const MealCreateScreenRouteArgs({this.id});
+
+  final String id;
+
   @override
-  Map<Type, AutoRouteFactory> get pagesMap => _pagesMap;
-  final _pagesMap = <Type, AutoRouteFactory>{
-    HomeScreen: (data) {
-      return CupertinoPageRoute<dynamic>(
-        builder: (context) => HomeScreen(),
-        settings: data,
-      );
-    },
-    AuthenticationScreen: (data) {
-      return CupertinoPageRoute<dynamic>(
-        builder: (context) => AuthenticationScreen(),
-        settings: data,
-      );
-    },
-    MealSelectScreen: (data) {
-      return CupertinoPageRoute<dynamic>(
-        builder: (context) => MealSelectScreen(
-          dateString: data.queryParams['date'].stringValue,
-          isLunchString: data.queryParams['isLunch'].stringValue,
-        ),
-        settings: data,
-      );
-    },
-    OnboardingScreen: (data) {
-      return CupertinoPageRoute<dynamic>(
-        builder: (context) => OnboardingScreen(),
-        settings: data,
-      );
-    },
-    MealCreateScreen: (data) {
-      return CupertinoPageRoute<dynamic>(
-        builder: (context) =>
-            MealCreateScreen(id: data.pathParams['id'].stringValue),
-        settings: data,
-      );
-    },
-    MealScreen: (data) {
-      return CupertinoPageRoute<dynamic>(
-        builder: (context) => MealScreen(id: data.pathParams['id'].stringValue),
-        settings: data,
-      );
-    },
-    UnknownRouteScreen: (data) {
-      return CupertinoPageRoute<dynamic>(
-        builder: (context) => UnknownRouteScreen(),
-        settings: data,
-      );
-    },
-  };
+  String toString() {
+    return 'MealCreateScreenRouteArgs{id: $id}';
+  }
+}
+
+/// generated route for [_i6.MealScreen]
+class MealScreenRoute extends _i8.PageRouteInfo<MealScreenRouteArgs> {
+  MealScreenRoute({String id})
+      : super(name,
+            path: '/meal/:id',
+            args: MealScreenRouteArgs(id: id),
+            rawPathParams: {'id': id});
+
+  static const String name = 'MealScreenRoute';
+}
+
+class MealScreenRouteArgs {
+  const MealScreenRouteArgs({this.id});
+
+  final String id;
+
+  @override
+  String toString() {
+    return 'MealScreenRouteArgs{id: $id}';
+  }
+}
+
+/// generated route for [_i7.UnknownRouteScreen]
+class UnknownRouteScreenRoute extends _i8.PageRouteInfo<void> {
+  const UnknownRouteScreenRoute() : super(name, path: '*');
+
+  static const String name = 'UnknownRouteScreenRoute';
 }

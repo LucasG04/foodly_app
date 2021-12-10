@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:auto_route/auto_route_annotations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -7,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodly/services/meal_stat_service.dart';
+import 'package:foodly/widgets/link_preview.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -185,8 +185,11 @@ class _MealScreenState extends State<MealScreen> {
                                         Text(
                                           meal.source != null &&
                                                   meal.source.isNotEmpty
-                                              ? 'meal_details_source_known'
-                                                  .tr(args: [meal.source])
+                                              ? 'meal_details_source_known'.tr(
+                                                  args: [
+                                                      _formatSourceString(
+                                                          meal.source)
+                                                    ])
                                               : 'meal_details_source_unknown'
                                                   .tr(),
                                           style: TextStyle(
@@ -221,6 +224,12 @@ class _MealScreenState extends State<MealScreen> {
                               ),
                             ),
                             SizedBox(height: kPadding),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: kPadding),
+                              child: LinkPreview(meal.source),
+                            ),
+                            SizedBox(height: kPadding),
                             SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               physics: BouncingScrollPhysics(),
@@ -240,7 +249,7 @@ class _MealScreenState extends State<MealScreen> {
                                   physics: NeverScrollableScrollPhysics(),
                                   itemCount: meal.ingredients.length,
                                   separatorBuilder: (context, index) =>
-                                      Divider(),
+                                      const Divider(),
                                   itemBuilder: (context, index) =>
                                       _buildIngredientTile(
                                     meal.ingredients[index],
@@ -345,12 +354,18 @@ class _MealScreenState extends State<MealScreen> {
     ];
   }
 
+  String _formatSourceString(String source) {
+    return BasicUtils.isValidUri(source)
+        ? Uri.parse(source).host.replaceAll('www.', '')
+        : source;
+  }
+
   void _onMenuSelected(String value, Meal meal, String planId) async {
     if (meal.planId != planId) return;
     switch (value) {
       case 'edit':
-        final result = await ExtendedNavigator.root.push(
-          Routes.mealCreateScreen(id: meal.id),
+        final result = await context.router.push(
+          MealCreateScreenRoute(id: meal.id),
         );
 
         if (result != null && result is Meal) {
@@ -390,7 +405,7 @@ class _MealScreenState extends State<MealScreen> {
         }
       }
 
-      ExtendedNavigator.root.pop();
+      context.router.pop();
       _isDeleting = false;
     }
   }

@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:auto_route/auto_route_annotations.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodly/widgets/link_preview.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../constants.dart';
@@ -118,7 +118,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                               key: UniqueKey(),
                               content: [],
                               onChanged: null,
-                              title: 'meal_create_ingredients_title'.tr() + ':',
+                              title: 'meal_create_ingredients_title'.tr(),
                             )
                           : EditIngredients(
                               content: _meal.ingredients ?? [],
@@ -127,7 +127,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                                   _meal.ingredients = results;
                                 });
                               },
-                              title: 'meal_create_ingredients_title'.tr() + ':',
+                              title: 'meal_create_ingredients_title'.tr(),
                             ),
                       Divider(),
                       Container(
@@ -181,12 +181,17 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                           ),
                         ],
                       ),
+                      Padding(
+                        padding:
+                            const EdgeInsets.symmetric(vertical: kPadding / 2),
+                        child: LinkPreview(_sourceController.text),
+                      ),
                       Divider(),
                       !_isLoadingMeal
                           ? EditListContent(
                               content: _meal.tags,
                               onChanged: (list) => _meal.tags = list,
-                              title: 'meal_create_tags_title'.tr() + ':',
+                              title: 'meal_create_tags_title'.tr(),
                             )
                           : SizedBox(),
                       Padding(
@@ -283,7 +288,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
             : await MealService.updateMeal(_meal);
         _buttonState = ButtonState.normal;
         _mealSaved = true;
-        ExtendedNavigator.root.pop(newMeal);
+        context.router.pop(newMeal);
       } catch (e) {
         print(e);
         MainSnackbar(

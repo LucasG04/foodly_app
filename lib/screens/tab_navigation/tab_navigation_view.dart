@@ -131,8 +131,6 @@ class _TabNavigationViewState extends State<TabNavigationView> {
   }
 
   void _openMealCreate() {
-    ExtendedNavigator.root.push(
-      Routes.mealCreateScreen(id: 'create'),
-    );
+    context.router.push(MealCreateScreenRoute(id: 'create'));
   }
 }

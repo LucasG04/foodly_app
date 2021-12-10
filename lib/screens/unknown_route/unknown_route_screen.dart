@@ -28,7 +28,7 @@ class UnknownRouteScreen extends StatelessWidget {
             ),
             SizedBox(height: 40.0),
             TextButton(
-              onPressed: _navigateToHome,
+              onPressed: () => _navigateToHome(context),
               child: Text('Back to Home'),
             ),
           ],
@@ -37,8 +37,7 @@ class UnknownRouteScreen extends StatelessWidget {
     );
   }
 
-  void _navigateToHome() {
-    ExtendedNavigator.root
-        .pushAndRemoveUntil(Routes.homeScreen, (route) => route.isFirst);
+  void _navigateToHome(context) {
+    context.router.replaceAll([HomeScreenRoute()]);
   }
 }

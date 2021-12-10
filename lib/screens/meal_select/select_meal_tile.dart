@@ -100,7 +100,7 @@ class _SelectMealTileState extends State<SelectMealTile> {
         _buttonState = _ButtonState.DONE;
       });
 
-      ExtendedNavigator.root.pop();
+      context.router.pop();
     }
   }
 }

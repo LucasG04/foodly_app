@@ -318,7 +318,7 @@ class _LoginViewState extends State<LoginView> {
       _buttonState = ButtonState.normal;
     });
 
-    ExtendedNavigator.root.replace(Routes.homeScreen);
+    context.router.replace(HomeScreenRoute());
   }
 
   void _resetErrors() {

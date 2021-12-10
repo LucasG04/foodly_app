@@ -1,6 +1,5 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:auto_route/auto_route_annotations.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -21,15 +20,13 @@ import 'search_bar.dart';
 import 'select_meal_tile.dart';
 
 class MealSelectScreen extends StatefulWidget {
-  /// both are strings because the need to be extracted from the url
-  /// for better usage this widgets contains two getters: `date` & `isLunch`
-  final String dateString;
+  final DateTime date;
 
-  final String isLunchString;
+  final bool isLunch;
 
   MealSelectScreen({
-    @QueryParam('date') this.dateString,
-    @QueryParam('isLunch') this.isLunchString,
+    this.date,
+    this.isLunch,
   });
 
   @override
@@ -118,11 +115,6 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
       ),
     );
   }
-
-  DateTime get date =>
-      new DateTime.fromMillisecondsSinceEpoch(int.parse(widget.dateString));
-
-  bool get isLunch => widget.isLunchString == 'true';
 
   Widget _buildNoResultsForIndex(int index, String planId) {
     return (index == 0)
@@ -283,17 +275,16 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
         kPlaceholderSymbol + texts.first,
         context.read(planProvider).state.id,
       );
-      ExtendedNavigator.root.pop();
+      context.router.pop();
     }
   }
 
   Future _createNewMeal() async {
-    final meal = await ExtendedNavigator.root
-        .push(Routes.mealCreateScreen(id: 'create'));
+    final meal = await context.router.push(MealCreateScreenRoute(id: 'create'));
 
     if (meal != null && meal is Meal) {
       await _addMealToPlan(meal.id, context.read(planProvider).state.id);
-      ExtendedNavigator.root.pop();
+      context.router.pop();
     }
   }
 
@@ -301,9 +292,9 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     return PlanService.addPlanMealToPlan(
       planId,
       new PlanMeal(
-        date: date,
+        date: widget.date,
         meal: mealId,
-        type: isLunch ? MealType.LUNCH : MealType.DINNER,
+        type: widget.isLunch ? MealType.LUNCH : MealType.DINNER,
         upvotes: [],
         downvotes: [],
       ),

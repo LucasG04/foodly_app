@@ -1,8 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:foodly/app_router.gr.dart';
 
-import '../../../app_router.gr.dart';
 import '../../../constants.dart';
 import '../../../models/plan_meal.dart';
 import '../../../services/settings_service.dart';
@@ -87,12 +87,8 @@ class PlanDayCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: OutlinedButton(
-          onPressed: () => ExtendedNavigator.root.push(
-            Routes.mealSelectScreen,
-            queryParams: {
-              'date': date.millisecondsSinceEpoch.toString(),
-              'isLunch': isLunch.toString(),
-            },
+          onPressed: () => context.router.push(
+            MealSelectScreenRoute(date: date, isLunch: isLunch),
           ),
           child: Text(
             'add',

@@ -49,8 +49,8 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                   if (snapshot.hasData) {
                     final meal = snapshot.data;
                     return GestureDetector(
-                      onTap: () => ExtendedNavigator.root
-                          .push(Routes.mealScreen(id: meal.id)),
+                      onTap: () =>
+                          context.router.push(MealScreenRoute(id: meal.id)),
                       child: _buildDataRow(context, meal: meal),
                     );
                   } else {
