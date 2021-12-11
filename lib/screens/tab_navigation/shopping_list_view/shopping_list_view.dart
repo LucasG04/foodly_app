@@ -79,10 +79,6 @@ class _ShoppingListViewState extends State<ShoppingListView>
                                       ShoppingListService.updateGrocery(
                                           listId, item);
                                     },
-                                    onDelete: (item) {
-                                      ShoppingListService.deleteGrocery(
-                                          listId, item.id);
-                                    },
                                   ),
                                 ),
                                 SizedBox(height: kPadding),
@@ -107,10 +103,6 @@ class _ShoppingListViewState extends State<ShoppingListView>
                                           item.bought = false;
                                           ShoppingListService.updateGrocery(
                                               listId, item);
-                                        },
-                                        onDelete: (item) {
-                                          ShoppingListService.deleteGrocery(
-                                              listId, item.id);
                                         },
                                       ),
                                       boughtItems.isNotEmpty
