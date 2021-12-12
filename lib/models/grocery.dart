@@ -40,5 +40,5 @@ class Grocery {
 
   @override
   String toString() =>
-      'Grocery(id: $id, name: $name, amount: $amount, bought: $bought)';
+      'Grocery(id: $id, name: $name, amount: $amount, unit: $unit, bought: $bought)';
 }

@@ -197,7 +197,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                     PopupMenuItem(
                       value: 'delete',
                       child: ListTile(
-                        title: Text('delete').tr(),
+                        title: Text('plan_day_tile_remove').tr(),
                         leading: Icon(EvaIcons.minusCircleOutline),
                       ),
                     ),
@@ -213,7 +213,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                     PopupMenuItem(
                       value: 'delete',
                       child: ListTile(
-                        title: Text('delete').tr(),
+                        title: Text('plan_day_tile_remove').tr(),
                         leading: Icon(EvaIcons.minusCircleOutline),
                       ),
                     ),
