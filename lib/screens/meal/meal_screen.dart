@@ -5,8 +5,8 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/services/meal_stat_service.dart';
-import 'package:foodly/widgets/link_preview.dart';
+import '../../services/meal_stat_service.dart';
+import '../../widgets/link_preview.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';

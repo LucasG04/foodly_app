@@ -82,7 +82,7 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
                             ),
                           ),
                           IconButton(
-                            icon: Icon(EvaIcons.checkmarkOutline),
+                            icon: Icon(EvaIcons.checkmark),
                             onPressed: _setWebImageUrl,
                           ),
                         ],

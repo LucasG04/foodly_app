@@ -5,8 +5,8 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:foodly/services/meal_stat_service.dart';
-import 'package:foodly/services/settings_service.dart';
+import '../../services/meal_stat_service.dart';
+import '../../services/settings_service.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -119,13 +119,13 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
   Widget _buildNoResultsForIndex(int index, String planId) {
     return (index == 0)
         ? _buildContainer(
-            EvaIcons.codeOutline,
+            EvaIcons.code,
             'meal_select_placeholder'.tr(),
             () => _showPlaceholderDialog(),
           )
         : (index == 1)
             ? _buildContainer(
-                EvaIcons.plusOutline,
+                EvaIcons.plus,
                 'meal_select_new'.tr(),
                 () => _createNewMeal(),
               )

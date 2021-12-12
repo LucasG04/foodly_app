@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:foodly/constants.dart';
-import 'package:foodly/services/meal_stat_service.dart';
+import '../constants.dart';
+import 'meal_stat_service.dart';
 import 'package:logging/logging.dart';
 
 import '../models/plan.dart';

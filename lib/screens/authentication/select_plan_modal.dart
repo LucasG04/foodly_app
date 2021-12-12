@@ -3,11 +3,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/models/foodly_user.dart';
-import 'package:foodly/models/plan.dart';
-import 'package:foodly/services/foodly_user_service.dart';
-import 'package:foodly/services/plan_service.dart';
-import 'package:foodly/widgets/small_circular_progress_indicator.dart';
+import '../../models/foodly_user.dart';
+import '../../models/plan.dart';
+import '../../services/foodly_user_service.dart';
+import '../../services/plan_service.dart';
+import '../../widgets/small_circular_progress_indicator.dart';
 
 import '../../constants.dart';
 
@@ -45,7 +45,7 @@ class SelectPlanModal extends ConsumerWidget {
                     textAlign: TextAlign.center,
                   ),
                   GestureDetector(
-                    child: Icon(EvaIcons.closeOutline),
+                    child: Icon(EvaIcons.close),
                     onTap: () => Navigator.maybePop(context),
                   ),
                 ],

@@ -1,4 +1,4 @@
-import 'package:foodly/models/link_metadata.dart';
+import '../models/link_metadata.dart';
 import 'package:hive/hive.dart';
 import 'package:logging/logging.dart';
 import 'package:metadata_fetch/metadata_fetch.dart';

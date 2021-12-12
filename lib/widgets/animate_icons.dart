@@ -112,7 +112,7 @@ class _AnimateIconsState extends State<AnimateIcons>
         child: Opacity(
           opacity: y,
           child: Icon(
-            widget.startIcon != null ? widget.startIcon : EvaIcons.closeOutline,
+            widget.startIcon != null ? widget.startIcon : EvaIcons.close,
             size: widget.size,
             color: widget.startIcon != null ? widget.color : Colors.transparent,
           ),
@@ -126,7 +126,7 @@ class _AnimateIconsState extends State<AnimateIcons>
         child: Opacity(
           opacity: x ?? 0.0,
           child: Icon(
-            widget.endIcon != null ? widget.endIcon : EvaIcons.closeOutline,
+            widget.endIcon != null ? widget.endIcon : EvaIcons.close,
             size: widget.size,
             color: widget.endIcon != null ? widget.color : Colors.transparent,
           ),

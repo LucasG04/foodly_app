@@ -3,7 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/services/meal_service.dart';
+import '../../../services/meal_service.dart';
 import 'package:group_list_view/group_list_view.dart';
 
 import '../../../constants.dart';

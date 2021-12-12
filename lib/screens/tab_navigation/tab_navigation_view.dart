@@ -3,8 +3,8 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/src/provider.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
-import 'package:foodly/providers/state_providers.dart';
-import 'package:foodly/services/shopping_list_service.dart';
+import '../../providers/state_providers.dart';
+import '../../services/shopping_list_service.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../app_router.gr.dart';
@@ -50,7 +50,7 @@ class _TabNavigationViewState extends State<TabNavigationView> {
       ),
       floatingActionButton: _showActionButton()
           ? FloatingActionButton(
-              child: Icon(EvaIcons.plusOutline),
+              child: Icon(EvaIcons.plus),
               onPressed: () {
                 switch (_currentIndex) {
                   case 0:

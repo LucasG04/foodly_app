@@ -2,7 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/widgets/skeleton_container.dart';
+import '../../widgets/skeleton_container.dart';
 
 import '../../constants.dart';
 import '../../models/meal.dart';
@@ -75,11 +75,11 @@ class _SelectMealTileState extends State<SelectMealTile> {
             : AnimatedSwitcher(
                 duration: const Duration(milliseconds: 375),
                 child: _buttonState == _ButtonState.DEFAULT
-                    ? Icon(EvaIcons.plusOutline)
+                    ? Icon(EvaIcons.plus)
                     : _buttonState == _ButtonState.LOADING
                         ? SmallCircularProgressIndicator()
                         : Icon(
-                            EvaIcons.checkmarkOutline,
+                            EvaIcons.checkmark,
                             color: Colors.green,
                           ),
               ),

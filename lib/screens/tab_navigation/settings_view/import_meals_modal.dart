@@ -98,7 +98,7 @@ class _CopyPlanMealsTileState extends State<CopyPlanMealsTile> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(EvaIcons.minusOutline),
+      leading: Icon(EvaIcons.minus),
       title: Text(widget.plan.name),
       trailing: IconButton(
         icon: AnimatedSwitcher(

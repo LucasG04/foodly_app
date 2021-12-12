@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/utils/basic_utils.dart';
+import '../../utils/basic_utils.dart';
 
 import '../../constants.dart';
 import '../../services/chefkoch_service.dart';

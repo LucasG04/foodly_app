@@ -63,7 +63,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
                     textAlign: TextAlign.center,
                   ),
                   GestureDetector(
-                    child: Icon(EvaIcons.closeOutline),
+                    child: Icon(EvaIcons.close),
                     onTap: () => Navigator.maybePop(context),
                   ),
                 ],

@@ -4,8 +4,8 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/screens/tab_navigation/settings_view/loading_logout.dart';
-import 'package:foodly/utils/main_snackbar.dart';
+import 'loading_logout.dart';
+import '../../../utils/main_snackbar.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share/share.dart';
 

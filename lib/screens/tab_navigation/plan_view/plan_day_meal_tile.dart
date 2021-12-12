@@ -104,7 +104,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                     width: 50.0,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10000),
-                      child: Center(child: Icon(EvaIcons.codeOutline)),
+                      child: Center(child: Icon(EvaIcons.code)),
                     ),
                   )
                 : meal.imageUrl != null && meal.imageUrl.isNotEmpty

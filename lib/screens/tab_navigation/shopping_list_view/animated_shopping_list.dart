@@ -49,7 +49,7 @@ class AnimatedShoppingList extends StatelessWidget {
                 ? Text(ConvertUtil.amountToString(grocery.amount, grocery.unit))
                 : null,
             trailing: IconButton(
-              icon: Icon(EvaIcons.moreHorizotnalOutline),
+              icon: Icon(EvaIcons.moreHorizontalOutline),
               onPressed: () => onEdit(grocery),
             ),
             dense: true,

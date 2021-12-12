@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:foodly/constants.dart';
-import 'package:foodly/models/link_metadata.dart';
-import 'package:foodly/services/link_metadata_service.dart';
-import 'package:foodly/utils/basic_utils.dart';
-import 'package:foodly/widgets/foodly_network_image.dart';
-import 'package:foodly/widgets/skeleton_container.dart';
+import '../constants.dart';
+import '../models/link_metadata.dart';
+import '../services/link_metadata_service.dart';
+import '../utils/basic_utils.dart';
+import 'foodly_network_image.dart';
+import 'skeleton_container.dart';
 
 class LinkPreview extends StatelessWidget {
   final String link;

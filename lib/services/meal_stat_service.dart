@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:foodly/constants.dart';
-import 'package:foodly/models/meal.dart';
-import 'package:foodly/models/meal_stat.dart';
-import 'package:foodly/services/meal_service.dart';
+import '../constants.dart';
+import '../models/meal.dart';
+import '../models/meal_stat.dart';
+import 'meal_service.dart';
 import 'package:logging/logging.dart';
 
 class MealStatService {

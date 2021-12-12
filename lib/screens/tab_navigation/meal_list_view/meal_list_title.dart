@@ -80,7 +80,7 @@ class _MealListTitleState extends State<MealListTitle> {
                 duration: const Duration(milliseconds: 250),
                 child: _searchActive
                     ? IconButton(
-                        icon: Icon(EvaIcons.closeOutline),
+                        icon: Icon(EvaIcons.close),
                         onPressed: () {
                           _textEditingController.clear();
                           widget.onSearch('');

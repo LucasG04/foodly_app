@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
-import 'package:foodly/services/meal_stat_service.dart';
-import 'package:foodly/utils/convert_util.dart';
+import 'meal_stat_service.dart';
+import '../utils/convert_util.dart';
 import 'package:logging/logging.dart';
 
 import '../models/meal.dart';
