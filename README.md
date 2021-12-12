@@ -2,11 +2,15 @@
 
 [![CodeFactor](https://www.codefactor.io/repository/github/lucasg04/foodly_app/badge)](https://www.codefactor.io/repository/github/lucasg04/foodly_app)
 
+![Flutter](https://img.shields.io/badge/Framework-Flutter-3cc6fd?logo=flutter)
+![Dart](https://img.shields.io/badge/Language-Dart-0c458b?logo=dart)
+![Firebase](https://img.shields.io/badge/Cloud-Firebase-f5ba23?logo=Firebase)
+
 **Meal planning with calendar, shopping list and cookbook.**
 
 With Foodly, you can easily plan your food for the upcoming week with your family, friends and roommates. It's a perfect synergy of planning, cookbook and shopping list.
 
-## Availability 
+## Download 
 
 - Android: [Get it on **Google Play**](https://play.google.com/store/apps/details?id=io.golenia.foodly)
 - iOS: [Download on the **AppStore**](https://apps.apple.com/de/app/foodster-planen-einkaufen/id1590739803)
