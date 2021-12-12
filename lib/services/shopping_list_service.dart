@@ -114,10 +114,19 @@ class ShoppingListService {
         .where('bought', isEqualTo: false)
         .get();
 
-    if (groceriesSnap.size != 0) {
+    if (groceriesSnap.size > 0) {
       final existingGrocery = Grocery.fromMap(
           groceriesSnap.docs.first.id, groceriesSnap.docs.first.data());
-      existingGrocery.amount += grocery.amount;
+
+      if (grocery.unit == null || grocery.unit.isEmpty) {
+        existingGrocery.amount =
+            (existingGrocery.amount ?? 1) + (grocery.amount ?? 1);
+      } else if (grocery.amount == null || existingGrocery.amount == null) {
+        return false;
+      } else {
+        existingGrocery.amount += grocery.amount;
+      }
+
       await updateGrocery(listId, existingGrocery);
       return true;
     }
