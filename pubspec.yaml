@@ -25,7 +25,7 @@ dependencies:
   #     ref: master
   dio: ^4.0.0-beta5
   url_launcher:
-  flushbar:
+  another_flushbar: ^1.10.28
   share: ^2.0.4
   email_validator: ^2.0.1
   logging: ^1.0.0
@@ -64,10 +64,7 @@ dependencies:
 
   # Icons/Styles/Animations
   cupertino_icons: ^1.0.1
-  flutter_staggered_animations:
-    git:
-      url: https://github.com/josh-burton/flutter_staggered_animations.git
-      ref: findAncestorWidgetOfExactType
+  flutter_staggered_animations: ^1.0.0
   font_awesome_flutter: ^9.2.0
 
 dev_dependencies:

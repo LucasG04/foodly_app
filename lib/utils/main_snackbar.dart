@@ -1,5 +1,5 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 
 /// Custom Snackbar.
@@ -27,7 +27,7 @@ class MainSnackbar {
   void show(BuildContext context) {
     Flushbar(
       margin: EdgeInsets.all(8),
-      borderRadius: 15,
+      borderRadius: BorderRadius.circular(15.0),
       flushbarStyle: FlushbarStyle.FLOATING,
       title: this.title,
       message: this.message,

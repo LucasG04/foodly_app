@@ -29,6 +29,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.2"
+  another_flushbar:
+    dependency: "direct main"
+    description:
+      name: another_flushbar
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.10.28"
   archive:
     dependency: transitive
     description:
@@ -237,10 +244,10 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "538e7d38316853af9a1f0c42240551aedbaca4c9"
+      resolved-ref: f3860973aa2e2667fdbbd9bbde3d9338d58b1962
       url: "https://github.com/LucasG04/flutter-concentric-transition.git"
     source: git
-    version: "0.1.2"
+    version: "1.0.1"
   convert:
     dependency: transitive
     description:
@@ -409,13 +416,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
-  flushbar:
-    dependency: "direct main"
-    description:
-      name: flushbar
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.10.4"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -492,12 +492,10 @@ packages:
   flutter_staggered_animations:
     dependency: "direct main"
     description:
-      path: "."
-      ref: findAncestorWidgetOfExactType
-      resolved-ref: f9576bd6d1b07c67d642227a2e7d7398306213ff
-      url: "https://github.com/josh-burton/flutter_staggered_animations.git"
-    source: git
-    version: "0.1.2"
+      name: flutter_staggered_animations
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
