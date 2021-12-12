@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -9,7 +8,6 @@ import '../../../utils/convert_util.dart';
 class AnimatedShoppingList extends StatelessWidget {
   final List<Grocery> groceries;
   final void Function(Grocery) onTap;
-  final void Function(Grocery) onDelete;
   final void Function(Grocery) onEdit;
 
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
@@ -17,7 +15,6 @@ class AnimatedShoppingList extends StatelessWidget {
   AnimatedShoppingList({
     @required this.groceries,
     @required this.onTap,
-    @required this.onDelete,
     @required this.onEdit,
   });
 
@@ -57,14 +54,6 @@ class AnimatedShoppingList extends StatelessWidget {
             ),
             dense: true,
           ),
-          secondaryActions: [
-            IconSlideAction(
-              caption: 'delete'.tr(),
-              color: Theme.of(context).errorColor,
-              icon: EvaIcons.closeCircleOutline,
-              onTap: () => _deleteItem(index),
-            ),
-          ],
         ),
       ),
     );
@@ -80,17 +69,5 @@ class AnimatedShoppingList extends StatelessWidget {
     Future.delayed(
       const Duration(milliseconds: 250),
     ).then((_) => onTap(groceries.removeAt(index)));
-  }
-
-  void _deleteItem(int index) {
-    listKey.currentState.removeItem(
-      index,
-      (ctx, animation) => _buildSlideTile(index, animation, ctx),
-      duration: const Duration(milliseconds: 250),
-    );
-
-    Future.delayed(
-      const Duration(milliseconds: 250),
-    ).then((_) => onDelete(groceries.removeAt(index)));
   }
 }
