@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import '../../constants.dart';
 
 class EditListContent extends StatefulWidget {
-  final List<String> content;
-  final void Function(List<String>) onChanged;
-  final String title;
+  final List<String>? content;
+  final void Function(List<String>?)? onChanged;
+  final String? title;
 
   const EditListContent({
     this.content,
@@ -19,7 +19,7 @@ class EditListContent extends StatefulWidget {
 }
 
 class _EditListContentState extends State<EditListContent> {
-  List<String> _content = [];
+  List<String>? _content = [];
 
   @override
   void initState() {
@@ -35,22 +35,22 @@ class _EditListContentState extends State<EditListContent> {
         Container(
           width: double.infinity,
           child: Text(
-            widget.title,
+            widget.title!,
             style: Theme.of(context).textTheme.bodyText1,
           ),
         ),
-        ..._content.map((item) {
+        ..._content!.map((item) {
           return Row(
             children: <Widget>[
               Expanded(
-                child: _buildTextField(item, _content.indexOf(item), context),
+                child: _buildTextField(item, _content!.indexOf(item), context),
               ),
               IconButton(
                   icon: Icon(EvaIcons.minusCircleOutline),
                   onPressed: () {
                     setState(() {
-                      _content.remove(item);
-                      widget.onChanged(_content);
+                      _content!.remove(item);
+                      widget.onChanged!(_content);
                     });
                   }),
             ],
@@ -63,8 +63,8 @@ class _EditListContentState extends State<EditListContent> {
               icon: Icon(EvaIcons.plusCircleOutline),
               onPressed: () {
                 setState(() {
-                  _content.add('');
-                  widget.onChanged(_content);
+                  _content!.add('');
+                  widget.onChanged!(_content);
                 });
               },
             ),
@@ -77,8 +77,8 @@ class _EditListContentState extends State<EditListContent> {
   TextField _buildTextField(String item, int index, BuildContext context) {
     final controller = TextEditingController(text: item);
     controller.addListener(() {
-      _content[index] = controller.text;
-      widget.onChanged(_content);
+      _content![index] = controller.text;
+      widget.onChanged!(_content);
     });
 
     return TextField(

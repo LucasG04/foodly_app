@@ -20,7 +20,9 @@ class MealStatService {
         .collection('stats')
         .get();
 
-    return querySnapshot.docs.map((e) => MealStat.fromMap(e.id, e.data()));
+    return querySnapshot.docs
+        .map((e) => MealStat.fromMap(e.id, e.data()))
+        .toList();
   }
 
   static Future<List<Meal>> getMealRecommendations(String planId) async {
@@ -28,7 +30,7 @@ class MealStatService {
     try {
       final stats = await Future.wait(
           [getLeastPlanned(planId), getLongestNotPlanned(planId)]);
-      List<String> mealIds = stats != null && stats.isNotEmpty
+      List<String> mealIds = stats.isNotEmpty
           ? stats.expand((i) => i).map((i) => i.mealId).toList()
           : [];
       mealIds = [
@@ -38,7 +40,7 @@ class MealStatService {
 
       final meals = await MealService.getMealsByIds(mealIds);
 
-      return meals != null && meals.isNotEmpty
+      return meals.isNotEmpty
           ? meals.where((meal) => mealIds.contains(meal.id)).toList()
           : [];
     } catch (e) {
@@ -47,7 +49,7 @@ class MealStatService {
     }
   }
 
-  static Future<List<MealStat>> getLeastPlanned(String planId,
+  static Future<List<MealStat>> getLeastPlanned(String? planId,
       [int limit = 5]) async {
     log.finer('Call getLeastPlanned from $planId');
     final querySnapshot = await _firestore
@@ -63,7 +65,7 @@ class MealStatService {
         .toList();
   }
 
-  static Future<List<MealStat>> getLongestNotPlanned(String planId,
+  static Future<List<MealStat>> getLongestNotPlanned(String? planId,
       [int limit = 5]) async {
     log.finer('Call getLongestNotPlanned from $planId');
     final querySnapshot = await _firestore
@@ -80,7 +82,7 @@ class MealStatService {
   }
 
   static Future<void> bumpStat(String planId, String mealId,
-      {bool bumpCount, bool bumpLastPlanned}) async {
+      {bool? bumpCount, bool? bumpLastPlanned}) async {
     log.finer('Call bumpStat for plan $planId');
     if (planId.startsWith(kPlaceholderSymbol)) {
       log.finer(
@@ -106,10 +108,10 @@ class MealStatService {
       } else {
         final stat = MealStat.fromMap(
             querySnapshot.docs.first.id, querySnapshot.docs.first.data());
-        if (bumpCount) {
-          stat.plannedCount++;
+        if (bumpCount!) {
+          stat.plannedCount = (stat.plannedCount ?? 0) + 1;
         }
-        if (bumpLastPlanned) {
+        if (bumpLastPlanned!) {
           stat.lastTimePlanned = DateTime.now();
         }
         await _firestore
@@ -125,7 +127,7 @@ class MealStatService {
     }
   }
 
-  static Future<void> deleteStatByMealId(String planId, String mealId) async {
+  static Future<void> deleteStatByMealId(String? planId, String? mealId) async {
     log.finer('Call deleteStatByMealId for plan $planId with meal $mealId');
     try {
       final querySnapshot = await _firestore
@@ -147,7 +149,7 @@ class MealStatService {
     }
   }
 
-  static Future<void> deleteStat(String planId, String statId) async {
+  static Future<void> deleteStat(String? planId, String statId) async {
     log.finer('Call deleteStat for plan $planId with stat $statId');
     try {
       await _firestore

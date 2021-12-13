@@ -13,9 +13,9 @@ class AnimatedShoppingList extends StatelessWidget {
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
 
   AnimatedShoppingList({
-    @required this.groceries,
-    @required this.onTap,
-    @required this.onEdit,
+    required this.groceries,
+    required this.onTap,
+    required this.onEdit,
   });
 
   @override
@@ -44,7 +44,7 @@ class AnimatedShoppingList extends StatelessWidget {
         child: Slidable(
           actionPane: SlidableDrawerActionPane(),
           child: ListTile(
-            title: Text(grocery.name, style: TextStyle(fontSize: 18.0)),
+            title: Text(grocery.name!, style: TextStyle(fontSize: 18.0)),
             subtitle: grocery.amount != null && grocery.amount != 0
                 ? Text(ConvertUtil.amountToString(grocery.amount, grocery.unit))
                 : null,
@@ -60,7 +60,7 @@ class AnimatedShoppingList extends StatelessWidget {
   }
 
   void _tapItem(int index) {
-    listKey.currentState.removeItem(
+    listKey.currentState!.removeItem(
       index,
       (ctx, animation) => _buildSlideTile(index, animation, ctx),
       duration: const Duration(milliseconds: 250),

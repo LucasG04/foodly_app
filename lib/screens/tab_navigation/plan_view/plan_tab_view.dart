@@ -53,7 +53,7 @@ class _PlanTabViewState extends State<PlanTabView>
                               return ListView(
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
-                                children: _getDaysByMeals(snapshot.data)
+                                children: _getDaysByMeals(snapshot.data!)
                                     .map(
                                       (e) => PlanDayCard(
                                         date: e.date,
@@ -80,17 +80,17 @@ class _PlanTabViewState extends State<PlanTabView>
   }
 
   List<PlanDay> _getDaysByMeals(List<PlanMeal> meals) {
-    context.read(planProvider).state.meals = meals;
+    context.read(planProvider).state!.meals = meals;
     return _updateMealsForDays(meals);
   }
 
   List<PlanDay> _updateMealsForDays(List<PlanMeal> planMeals) {
-    final Plan plan = context.read(planProvider).state;
+    final Plan plan = context.read(planProvider).state!;
     final List<PlanDay> days = [];
     final List<PlanMeal> updatedMeals = [...planMeals];
 
     final now =
-        new DateTime.now().toUtc().add(Duration(hours: plan.hourDiffToUtc));
+        new DateTime.now().toUtc().add(Duration(hours: plan.hourDiffToUtc!));
     final today = new DateTime(now.year, now.month, now.day);
 
     // remove old plan days

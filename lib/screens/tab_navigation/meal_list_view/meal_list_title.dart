@@ -11,7 +11,7 @@ import 'tag_filter_modal.dart';
 
 class MealListTitle extends StatefulWidget {
   MealListTitle({
-    @required this.onSearch,
+    required this.onSearch,
   });
 
   @override
@@ -22,7 +22,7 @@ class MealListTitle extends StatefulWidget {
 
 class _MealListTitleState extends State<MealListTitle> {
   bool _searchActive = false;
-  TextEditingController _textEditingController;
+  TextEditingController? _textEditingController;
 
   @override
   void initState() {
@@ -82,7 +82,7 @@ class _MealListTitleState extends State<MealListTitle> {
                     ? IconButton(
                         icon: Icon(EvaIcons.close),
                         onPressed: () {
-                          _textEditingController.clear();
+                          _textEditingController!.clear();
                           widget.onSearch('');
                           setState(() {
                             _searchActive = !_searchActive;

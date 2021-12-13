@@ -8,7 +8,7 @@ class LinkMetadataService {
 
   static final log = Logger('LinkMetadataService');
 
-  static Box<LinkMetadata> _dataBox;
+  static late Box<LinkMetadata> _dataBox;
   static bool _isReady = false;
 
   static Future initialize() async {
@@ -19,7 +19,7 @@ class LinkMetadataService {
 
   static bool get isReady => _isReady;
 
-  static Future<LinkMetadata> getFromApi(String link) async {
+  static Future<LinkMetadata?> getFromApi(String link) async {
     log.finer('Call getFromApi with $link');
     final data = await MetadataFetch.extract(link);
 
@@ -29,11 +29,10 @@ class LinkMetadataService {
 
     final linkMetadata = _parseMetadata(data);
     await _cacheData(linkMetadata);
-    return null;
     return linkMetadata;
   }
 
-  static LinkMetadata getFromCache(String link) {
+  static LinkMetadata? getFromCache(String? link) {
     log.finer('Call getFromCache with $link');
     if (!isCached(link)) {
       throw Exception('Requested Link is not cached yet');
@@ -42,12 +41,12 @@ class LinkMetadataService {
     return _dataBox.get(link);
   }
 
-  static bool isCached(String link,
+  static bool isCached(String? link,
       [Duration cacheDuration = const Duration(days: 7)]) {
     log.finer('Call isCached with $link');
     final cachedData = _dataBox.get(link);
     final validCacheDate = DateTime.now().subtract(cacheDuration);
-    return cachedData != null && cachedData.cachedAt.isAfter(validCacheDate);
+    return cachedData != null && cachedData.cachedAt!.isAfter(validCacheDate);
   }
 
   static Future<void> _cacheData(LinkMetadata data) async {
@@ -58,10 +57,7 @@ class LinkMetadataService {
     });
   }
 
-  static _parseMetadata(Metadata data, [DateTime cachedAt]) {
-    if (data == null) {
-      return null;
-    }
+  static _parseMetadata(Metadata data, [DateTime? cachedAt]) {
     if (cachedAt == null) {
       cachedAt = DateTime.now();
     }

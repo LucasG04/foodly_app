@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 /// Custom Snackbar.
 class MainSnackbar {
-  final String title;
+  final String? title;
   final String message;
-  final TextButton button;
+  final TextButton? button;
   final int seconds;
   final bool isSuccess;
   final bool isError;
@@ -15,7 +15,7 @@ class MainSnackbar {
   ///
   /// Only required param is the `message` String. `isSuccess` and `isError` cannot be both true.
   MainSnackbar({
-    @required this.message,
+    required this.message,
     this.title,
     this.button,
     this.seconds = 5,

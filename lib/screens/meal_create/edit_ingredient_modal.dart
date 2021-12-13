@@ -7,7 +7,7 @@ import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 
 class EditIngredientModal extends StatefulWidget {
-  final Ingredient ingredient;
+  final Ingredient? ingredient;
 
   EditIngredientModal({this.ingredient});
 
@@ -16,14 +16,14 @@ class EditIngredientModal extends StatefulWidget {
 }
 
 class _EditIngredientModalState extends State<EditIngredientModal> {
-  bool _isCreating;
-  TextEditingController _nameController;
-  TextEditingController _amountController;
-  TextEditingController _unitController;
-  FocusNode _amountFocusNode;
-  FocusNode _unitFocusNode;
+  late bool _isCreating;
+  TextEditingController? _nameController;
+  TextEditingController? _amountController;
+  TextEditingController? _unitController;
+  FocusNode? _amountFocusNode;
+  FocusNode? _unitFocusNode;
 
-  String _nameErrorText;
+  String? _nameErrorText;
 
   @override
   void initState() {
@@ -73,7 +73,7 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
             placeholder: 'ingredient_modal_name_placeholder'.tr(),
             errorText: _nameErrorText,
             textInputAction: TextInputAction.next,
-            onSubmit: () => (_amountFocusNode.requestFocus()),
+            onSubmit: () => (_amountFocusNode!.requestFocus()),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -87,7 +87,7 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
                   placeholder: '1',
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
-                  onSubmit: () => (_unitFocusNode.requestFocus()),
+                  onSubmit: () => (_unitFocusNode!.requestFocus()),
                 ),
               ),
               SizedBox(
@@ -120,13 +120,13 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
   }
 
   void _saveIngredient() async {
-    final ingredient = _isCreating ? Ingredient() : widget.ingredient;
-    ingredient.name = _nameController.text.trim();
+    final ingredient = _isCreating ? Ingredient() : widget.ingredient!;
+    ingredient.name = _nameController!.text.trim();
     ingredient.amount =
-        double.tryParse(_amountController.text.trim().replaceAll(',', '.'));
-    ingredient.unit = _unitController.text.trim();
+        double.tryParse(_amountController!.text.trim().replaceAll(',', '.'));
+    ingredient.unit = _unitController!.text.trim();
 
-    if (ingredient.name.isEmpty) {
+    if (ingredient.name!.isEmpty) {
       setState(() {
         _nameErrorText = 'ingredient_modal_error_name'.tr();
       });

@@ -6,25 +6,25 @@ import '../utils/basic_utils.dart';
 import 'skeleton_container.dart';
 
 class FoodlyNetworkImage extends StatelessWidget {
-  final String imageUrl;
+  final String? imageUrl;
 
   FoodlyNetworkImage(this.imageUrl);
 
   @override
   Widget build(BuildContext context) {
-    return BasicUtils.isStorageMealImage(imageUrl)
+    return BasicUtils.isStorageMealImage(imageUrl!)
         ? FutureBuilder<String>(
             future: StorageService.getMealImageUrl(imageUrl),
             builder: (context, snapshot) {
-              return snapshot.data != null && snapshot.data.isNotEmpty
-                  ? _buildCachedNetworkImage(snapshot.data)
+              return snapshot.data != null && snapshot.data!.isNotEmpty
+                  ? _buildCachedNetworkImage(snapshot.data!)
                   : SkeletonContainer(
                       width: double.infinity,
                       height: double.infinity,
                     );
             },
           )
-        : _buildCachedNetworkImage(imageUrl);
+        : _buildCachedNetworkImage(imageUrl!);
   }
 
   CachedNetworkImage _buildCachedNetworkImage(String url) {

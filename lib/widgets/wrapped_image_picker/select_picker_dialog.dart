@@ -16,13 +16,13 @@ class SelectPickerDialog extends StatefulWidget {
 }
 
 class _SelectPickerDialogState extends State<SelectPickerDialog> {
-  Logger _log;
+  late Logger _log;
 
-  bool _isLoading;
-  ImagePicker _imagePicker;
-  bool _showUrlInput;
-  TextEditingController _linkController;
-  bool _showLinkError;
+  late bool _isLoading;
+  late ImagePicker _imagePicker;
+  late bool _showUrlInput;
+  TextEditingController? _linkController;
+  late bool _showLinkError;
 
   @override
   void initState() {
@@ -149,7 +149,7 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
       setState(() {
         _isLoading = true;
       });
-      final result = await upload;
+      final result = await upload!;
       _isLoading = false;
       Navigator.pop(context, result.ref.name);
     } catch (e) {
@@ -164,8 +164,8 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
   void _setWebImageUrl() {
     _showLinkError = false;
 
-    final String url = _linkController.text.trim();
-    if (Uri.tryParse(url).isAbsolute) {
+    final String url = _linkController!.text.trim();
+    if (Uri.tryParse(url)!.isAbsolute) {
       Navigator.pop(context, url);
     } else {
       setState(() {

@@ -5,10 +5,10 @@ import '../models/meal.dart';
 import '../models/plan.dart';
 
 /// Provides the active plan object.
-final planProvider = StateProvider<Plan>((ref) => null);
+final planProvider = StateProvider<Plan?>((ref) => null);
 
 /// Provides the active foodly user object.
-final userProvider = StateProvider<FoodlyUser>((ref) => null);
+final userProvider = StateProvider<FoodlyUser?>((ref) => null);
 
 /// Provides the active plan object.
 final allMealsProvider = StateProvider<List<Meal>>((ref) => []);

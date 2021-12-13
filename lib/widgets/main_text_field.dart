@@ -4,25 +4,25 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 
 class MainTextField extends StatefulWidget {
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final String title;
-  final String placeholder;
+  final TextEditingController? controller;
+  final FocusNode? focusNode;
+  final String? title;
+  final String? placeholder;
   final bool isMultiline;
   final TextInputAction textInputAction;
   final TextInputType keyboardType;
-  final void Function() onSubmit;
-  final void Function(String) onChange;
+  final void Function()? onSubmit;
+  final void Function(String)? onChange;
   final bool isDense;
   final bool obscureText;
   final bool autofocus;
   final TextAlign textAlign;
-  final Widget suffix;
-  final String errorText;
-  final String Function(String) validator;
+  final Widget? suffix;
+  final String? errorText;
+  final String Function(String?)? validator;
 
   const MainTextField({
-    @required this.controller,
+    required this.controller,
     this.focusNode,
     this.title,
     this.placeholder,
@@ -46,8 +46,8 @@ class MainTextField extends StatefulWidget {
 
 class _MainTextFieldState extends State<MainTextField> {
   bool _hasFocus = false;
-  bool _obscureText;
-  FocusNode _focusNode;
+  late bool _obscureText;
+  FocusNode? _focusNode;
 
   @override
   void initState() {
@@ -93,10 +93,10 @@ class _MainTextFieldState extends State<MainTextField> {
         decoration: InputDecoration(
           hintText: widget.placeholder,
           border: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey[300]),
+            borderSide: BorderSide(color: Colors.grey[300]!),
           ),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey[300]),
+            borderSide: BorderSide(color: Colors.grey[300]!),
           ),
           fillColor: _hasFocus
               ? Theme.of(context).scaffoldBackgroundColor
@@ -134,7 +134,7 @@ class _MainTextFieldState extends State<MainTextField> {
           }
 
           if (widget.onSubmit != null) {
-            widget.onSubmit();
+            widget.onSubmit!();
           }
         },
         onChanged: widget.onChange,

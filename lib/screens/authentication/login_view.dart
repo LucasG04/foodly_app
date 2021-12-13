@@ -24,14 +24,14 @@ import '../../widgets/toggle_tab/flutter_toggle_tab.dart';
 import 'reset_password_modal.dart';
 
 class LoginView extends StatefulWidget {
-  final bool isCreatingPlan;
-  final Plan plan;
+  final bool? isCreatingPlan;
+  final Plan? plan;
   final void Function() navigateBack;
 
   LoginView({
-    @required this.isCreatingPlan,
-    @required this.plan,
-    @required this.navigateBack,
+    required this.isCreatingPlan,
+    required this.plan,
+    required this.navigateBack,
   });
 
   @override
@@ -39,16 +39,16 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  ButtonState _buttonState;
-  bool _isRegistering;
-  bool _forgotPlan;
+  ButtonState? _buttonState;
+  late bool _isRegistering;
+  late bool _forgotPlan;
 
-  TextEditingController _emailController;
-  TextEditingController _passwordController;
-  FocusNode _passwordFocusNode;
-  String _emailErrorText;
-  String _passwordErrorText;
-  String _unknownErrorText;
+  TextEditingController? _emailController;
+  TextEditingController? _passwordController;
+  FocusNode? _passwordFocusNode;
+  String? _emailErrorText;
+  String? _passwordErrorText;
+  String? _unknownErrorText;
 
   @override
   void initState() {
@@ -117,7 +117,7 @@ class _LoginViewState extends State<LoginView> {
                           ),
                   ),
                   Text(
-                    widget.isCreatingPlan
+                    widget.isCreatingPlan!
                         ? 'login_cta_create'
                         : 'login_cta_join',
                     style: _titleTextStyle.copyWith(
@@ -136,7 +136,7 @@ class _LoginViewState extends State<LoginView> {
             errorText: _emailErrorText,
             autofocus: true,
             keyboardType: TextInputType.emailAddress,
-            onSubmit: () => (_passwordFocusNode.requestFocus()),
+            onSubmit: () => (_passwordFocusNode!.requestFocus()),
           ),
           MainTextField(
             controller: _passwordController,
@@ -217,8 +217,7 @@ class _LoginViewState extends State<LoginView> {
       );
 
   bool _validateEmail() {
-    if (_emailController.text == null ||
-        !EmailValidator.validate(_emailController.text)) {
+    if (!EmailValidator.validate(_emailController!.text)) {
       setState(() {
         _emailErrorText = 'login_error_wrong_mail'.tr();
       });
@@ -228,8 +227,8 @@ class _LoginViewState extends State<LoginView> {
   }
 
   bool _validatePassword() {
-    if (_passwordController.text.isEmpty ||
-        _passwordController.text.length < 6) {
+    if (_passwordController!.text.isEmpty ||
+        _passwordController!.text.length < 6) {
       setState(() {
         _passwordErrorText = 'login_error_password'.tr();
       });
@@ -250,9 +249,9 @@ class _LoginViewState extends State<LoginView> {
     try {
       final userId = await (_isRegistering && !_forgotPlan
           ? AuthenticationService.registerUser(
-              _emailController.text, _passwordController.text)
+              _emailController!.text, _passwordController!.text)
           : AuthenticationService.signInUser(
-              _emailController.text, _passwordController.text));
+              _emailController!.text, _passwordController!.text));
       await _processAuthentication(userId);
     } catch (e) {
       _handleAuthException(e);
@@ -279,11 +278,11 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Future<void> _processAuthentication(String userId) async {
-    if (userId == null || userId.isEmpty) {
+    if (userId.isEmpty) {
       throw Exception('No user id.');
     }
 
-    Plan plan;
+    Plan? plan;
     if (_forgotPlan) {
       plan = await _showPlanSelect(userId);
       if (plan == null) {
@@ -291,13 +290,13 @@ class _LoginViewState extends State<LoginView> {
         throw Exception('No plan selected.');
       }
     } else {
-      plan = widget.isCreatingPlan
-          ? await PlanService.createPlan(widget.plan.name)
-          : await PlanService.getPlanById(widget.plan.id);
+      plan = widget.isCreatingPlan!
+          ? await PlanService.createPlan(widget.plan!.name)
+          : await PlanService.getPlanById(widget.plan!.id);
     }
 
-    if (!plan.users.contains(userId)) {
-      plan.users.add(userId);
+    if (plan != null && !plan.users!.contains(userId)) {
+      plan.users!.add(userId);
       await PlanService.updatePlan(plan);
     }
 
@@ -305,10 +304,10 @@ class _LoginViewState extends State<LoginView> {
     if (_isRegistering) {
       foodlyUser = await FoodlyUserService.createUserWithId(userId);
     } else {
-      foodlyUser = await FoodlyUserService.getUserById(userId);
+      foodlyUser = (await FoodlyUserService.getUserById(userId))!;
     }
 
-    foodlyUser.oldPlans.add(plan.id);
+    foodlyUser.oldPlans!.add(plan!.id);
     await FoodlyUserService.addOldPlanIdToUser(userId, plan.id);
 
     context.read(planProvider).state = plan;
@@ -356,11 +355,11 @@ class _LoginViewState extends State<LoginView> {
       ),
       context: context,
       isScrollControlled: true,
-      builder: (context) => ResetPasswordModal(_emailController.text),
+      builder: (context) => ResetPasswordModal(_emailController!.text),
     );
   }
 
-  Future<Plan> _showPlanSelect(userId) {
+  Future<Plan?> _showPlanSelect(userId) {
     return showModalBottomSheet(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(

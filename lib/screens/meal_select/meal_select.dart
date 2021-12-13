@@ -21,12 +21,11 @@ import 'select_meal_tile.dart';
 
 class MealSelectScreen extends StatefulWidget {
   final DateTime date;
-
   final bool isLunch;
 
   MealSelectScreen({
-    this.date,
-    this.isLunch,
+    required this.date,
+    required this.isLunch,
   });
 
   @override
@@ -34,11 +33,11 @@ class MealSelectScreen extends StatefulWidget {
 }
 
 class _MealSelectScreenState extends State<MealSelectScreen> {
-  List<Meal> searchedMeals;
-  bool _isSearching;
+  late List<Meal> searchedMeals;
+  bool? _isSearching;
 
-  ScrollController _scrollController;
-  Key _animationLimiterKey;
+  ScrollController? _scrollController;
+  Key? _animationLimiterKey;
 
   @override
   void initState() {
@@ -51,7 +50,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final activePlan = context.read(planProvider).state;
+    final activePlan = context.read(planProvider).state!;
 
     return Scaffold(
       appBar: MainAppBar(text: 'meal_select_title'.tr()),
@@ -96,12 +95,12 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                       verticalOffset: 50.0,
                       child: FadeInAnimation(
                         child: searchedMeals.isEmpty
-                            ? _buildNoResultsForIndex(index, activePlan.id)
+                            ? _buildNoResultsForIndex(index, activePlan.id!)
                             : SelectMealTile(
                                 meal: searchedMeals[index],
                                 onAddMeal: () => _addMealToPlan(
-                                  searchedMeals[index].id,
-                                  activePlan.id,
+                                  searchedMeals[index].id!,
+                                  activePlan.id!,
                                 ),
                               ),
                       ),
@@ -129,7 +128,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                 'meal_select_new'.tr(),
                 () => _createNewMeal(),
               )
-            : _isSearching
+            : _isSearching!
                 ? UserInformation(
                     'assets/images/undraw_empty.png',
                     'meal_select_no_results'.tr(),
@@ -144,7 +143,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     return FutureBuilder<List<Meal>>(
       future: MealStatService.getMealRecommendations(planId),
       builder: (context, snapshot) {
-        final meals = snapshot.hasData ? snapshot.data : [];
+        final meals = snapshot.hasData ? snapshot.data! : [];
 
         return AnimationLimiter(
           key: _animationLimiterKey,
@@ -241,7 +240,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
               width: _height / 2,
               margin: const EdgeInsets.only(right: 20.0),
               child: OutlinedButton(
-                onPressed: action,
+                onPressed: action as void Function()?,
                 child:
                     Icon(EvaIcons.arrowIosForwardOutline, color: Colors.black),
                 style: ButtonStyle(
@@ -261,7 +260,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
       context: context,
       textFields: [
         DialogTextField(
-          validator: (value) => value.isEmpty
+          validator: (value) => value!.isEmpty
               ? 'meal_select_placeholder_dialog_placeholder'.tr()
               : null,
         ),
@@ -273,7 +272,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     if (texts != null && texts.isNotEmpty) {
       await _addMealToPlan(
         kPlaceholderSymbol + texts.first,
-        context.read(planProvider).state.id,
+        context.read(planProvider).state!.id!,
       );
       context.router.pop();
     }
@@ -283,7 +282,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     final meal = await context.router.push(MealCreateScreenRoute(id: 'create'));
 
     if (meal != null && meal is Meal) {
-      await _addMealToPlan(meal.id, context.read(planProvider).state.id);
+      await _addMealToPlan(meal.id!, context.read(planProvider).state!.id!);
       context.router.pop();
     }
   }
@@ -306,7 +305,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
         .where(
           (meal) =>
               meal.name.toLowerCase().contains(query.toLowerCase()) ||
-              meal.tags
+              meal.tags!
                   .any((t) => t.toLowerCase().contains(query.toLowerCase())),
         )
         .toList();

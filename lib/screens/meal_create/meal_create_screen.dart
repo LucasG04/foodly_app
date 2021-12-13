@@ -30,7 +30,7 @@ class MealCreateScreen extends StatefulWidget {
   final String id;
 
   const MealCreateScreen({
-    @PathParam() this.id,
+    required this.id,
   });
 
   @override
@@ -38,17 +38,17 @@ class MealCreateScreen extends StatefulWidget {
 }
 
 class _MealCreateScreenState extends State<MealCreateScreen> {
-  ButtonState _buttonState;
-  TextEditingController _durationController;
-  TextEditingController _instructionsController;
-  bool _isCreatingMeal;
-  bool _isLoadingMeal;
-  bool _mealSaved;
-  Meal _meal = new Meal();
-  ScrollController _scrollController;
-  TextEditingController _sourceController;
-  TextEditingController _titleController;
-  String _updatedImage;
+  ButtonState? _buttonState;
+  TextEditingController? _durationController;
+  TextEditingController? _instructionsController;
+  late bool _isCreatingMeal;
+  late bool _isLoadingMeal;
+  late bool _mealSaved;
+  Meal _meal = new Meal(name: '');
+  ScrollController? _scrollController;
+  TextEditingController? _sourceController;
+  TextEditingController? _titleController;
+  String? _updatedImage;
 
   @override
   void initState() {
@@ -64,7 +64,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   void dispose() {
     if (_updatedImage != null &&
         !_mealSaved &&
-        BasicUtils.isStorageMealImage(_updatedImage)) {
+        BasicUtils.isStorageMealImage(_updatedImage!)) {
       StorageService.removeFile(_updatedImage);
     }
     super.dispose();
@@ -72,13 +72,10 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _meal.planId = context.read(planProvider).state.id;
+    _meal.planId = context.read(planProvider).state!.id;
     final fullWidth = MediaQuery.of(context).size.width > 699
         ? 700.0
         : MediaQuery.of(context).size.width * 0.8;
-
-    print(_meal?.name);
-    print(_meal?.tags);
 
     return Scaffold(
       appBar: MainAppBar(
@@ -90,7 +87,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
           IconButton(
             icon: Icon(
               EvaIcons.downloadOutline,
-              color: Theme.of(context).textTheme.bodyText1.color,
+              color: Theme.of(context).textTheme.bodyText1!.color,
             ),
             onPressed: () => _openChefkochImport(),
           ),
@@ -184,7 +181,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                       Padding(
                         padding:
                             const EdgeInsets.symmetric(vertical: kPadding / 2),
-                        child: LinkPreview(_sourceController.text),
+                        child: LinkPreview(_sourceController!.text),
                       ),
                       Divider(),
                       !_isLoadingMeal
@@ -231,34 +228,39 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
       _isCreatingMeal = true;
       ChefkochService.getMealFromChefkochUrl(Uri.decodeComponent(widget.id))
           .then((meal) {
-        meal.imageUrl = meal.imageUrl.replaceFirst('http:', 'https:');
-        _meal = meal;
-        _titleController = new TextEditingController(text: meal.name);
-        _sourceController = new TextEditingController(text: meal.source);
-        _durationController =
-            new TextEditingController(text: meal.duration.toString());
-        _instructionsController =
-            new TextEditingController(text: meal.instructions);
-        _meal.ingredients = _meal.ingredients ?? [];
-        _meal.tags = _meal.tags ?? [];
+        if (meal != null) {
+          meal.imageUrl = meal.imageUrl!.replaceFirst('http:', 'https:');
+          _meal = meal;
+          _titleController = new TextEditingController(text: meal.name);
+          _sourceController = new TextEditingController(text: meal.source);
+          _durationController =
+              new TextEditingController(text: meal.duration.toString());
+          _instructionsController =
+              new TextEditingController(text: meal.instructions);
+          _meal.ingredients = _meal.ingredients ?? [];
+          _meal.tags = _meal.tags ?? [];
+        }
 
         setState(() {
           _isLoadingMeal = false;
         });
+        // ignore: invalid_return_type_for_catch_error
       }).catchError((err) => print(err));
     } else {
       _isLoadingMeal = true;
       _isCreatingMeal = false;
       MealService.getMealById(widget.id).then((meal) {
-        _meal = meal;
-        _titleController = new TextEditingController(text: meal.name);
-        _sourceController = new TextEditingController(text: meal.source);
-        _durationController =
-            new TextEditingController(text: meal.duration.toString());
-        _instructionsController =
-            new TextEditingController(text: meal.instructions);
-        _meal.ingredients = _meal.ingredients ?? [];
-        _meal.tags = _meal.tags ?? [];
+        if (meal != null) {
+          _meal = meal;
+          _titleController = new TextEditingController(text: meal.name);
+          _sourceController = new TextEditingController(text: meal.source);
+          _durationController =
+              new TextEditingController(text: meal.duration.toString());
+          _instructionsController =
+              new TextEditingController(text: meal.instructions);
+          _meal.ingredients = _meal.ingredients ?? [];
+          _meal.tags = _meal.tags ?? [];
+        }
 
         setState(() {
           _isLoadingMeal = false;
@@ -272,12 +274,12 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
       _buttonState = ButtonState.inProgress;
     });
 
-    _meal.name = _titleController.text;
-    _meal.source = _sourceController.text;
-    _meal.duration = int.tryParse(_durationController.text) ?? 0;
-    _meal.instructions = _instructionsController.text;
+    _meal.name = _titleController!.text;
+    _meal.source = _sourceController!.text;
+    _meal.duration = int.tryParse(_durationController!.text) ?? 0;
+    _meal.instructions = _instructionsController!.text;
     _meal.createdBy = _isCreatingMeal
-        ? AuthenticationService.currentUser.uid
+        ? AuthenticationService.currentUser!.uid
         : _meal.createdBy;
     _meal.imageUrl = _updatedImage ?? _meal.imageUrl;
 
@@ -310,7 +312,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   }
 
   bool _formIsValid() {
-    return _titleController.text.isNotEmpty && _meal.ingredients.isNotEmpty;
+    return _titleController!.text.isNotEmpty && _meal.ingredients!.isNotEmpty;
   }
 
   void _openChefkochImport() async {
@@ -326,11 +328,11 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
 
     if (result != null) {
       setState(() {
-        _titleController.text = result.name;
+        _titleController!.text = result.name;
         _meal.imageUrl = result.imageUrl;
-        _sourceController.text = result.source;
-        _durationController.text = result.duration.toString();
-        _instructionsController.text = result.instructions;
+        _sourceController!.text = result.source!;
+        _durationController!.text = result.duration.toString();
+        _instructionsController!.text = result.instructions!;
         _meal.ingredients = result.ingredients ?? [];
 
         _meal.tags = result.tags;

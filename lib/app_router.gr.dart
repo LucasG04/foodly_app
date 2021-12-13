@@ -20,7 +20,7 @@ import 'screens/tab_navigation/home_screen.dart' as _i1;
 import 'screens/unknown_route/unknown_route_screen.dart' as _i7;
 
 class AppRouter extends _i8.RootStackRouter {
-  AppRouter([_i9.GlobalKey<_i9.NavigatorState> navigatorKey])
+  AppRouter([_i9.GlobalKey<_i9.NavigatorState>? navigatorKey])
       : super(navigatorKey);
 
   @override
@@ -34,8 +34,7 @@ class AppRouter extends _i8.RootStackRouter {
           routeData: routeData, child: _i2.AuthenticationScreen());
     },
     MealSelectScreenRoute.name: (routeData) {
-      final args = routeData.argsAs<MealSelectScreenRouteArgs>(
-          orElse: () => const MealSelectScreenRouteArgs());
+      final args = routeData.argsAs<MealSelectScreenRouteArgs>();
       return _i8.CupertinoPageX<dynamic>(
           routeData: routeData,
           child: _i3.MealSelectScreen(date: args.date, isLunch: args.isLunch));
@@ -45,17 +44,12 @@ class AppRouter extends _i8.RootStackRouter {
           routeData: routeData, child: _i4.OnboardingScreen());
     },
     MealCreateScreenRoute.name: (routeData) {
-      final pathParams = routeData.inheritedPathParams;
-      final args = routeData.argsAs<MealCreateScreenRouteArgs>(
-          orElse: () =>
-              MealCreateScreenRouteArgs(id: pathParams.getString('id')));
+      final args = routeData.argsAs<MealCreateScreenRouteArgs>();
       return _i8.CupertinoPageX<dynamic>(
           routeData: routeData, child: _i5.MealCreateScreen(id: args.id));
     },
     MealScreenRoute.name: (routeData) {
-      final pathParams = routeData.inheritedPathParams;
-      final args = routeData.argsAs<MealScreenRouteArgs>(
-          orElse: () => MealScreenRouteArgs(id: pathParams.getString('id')));
+      final args = routeData.argsAs<MealScreenRouteArgs>();
       return _i8.CupertinoPageX<dynamic>(
           routeData: routeData, child: _i6.MealScreen(id: args.id));
     },
@@ -97,7 +91,7 @@ class AuthenticationScreenRoute extends _i8.PageRouteInfo<void> {
 /// generated route for [_i3.MealSelectScreen]
 class MealSelectScreenRoute
     extends _i8.PageRouteInfo<MealSelectScreenRouteArgs> {
-  MealSelectScreenRoute({DateTime date, bool isLunch})
+  MealSelectScreenRoute({required DateTime date, required bool isLunch})
       : super(name,
             path: '/meal-select-screen',
             args: MealSelectScreenRouteArgs(date: date, isLunch: isLunch));
@@ -106,7 +100,7 @@ class MealSelectScreenRoute
 }
 
 class MealSelectScreenRouteArgs {
-  const MealSelectScreenRouteArgs({this.date, this.isLunch});
+  const MealSelectScreenRouteArgs({required this.date, required this.isLunch});
 
   final DateTime date;
 
@@ -128,17 +122,15 @@ class OnboardingScreenRoute extends _i8.PageRouteInfo<void> {
 /// generated route for [_i5.MealCreateScreen]
 class MealCreateScreenRoute
     extends _i8.PageRouteInfo<MealCreateScreenRouteArgs> {
-  MealCreateScreenRoute({String id})
+  MealCreateScreenRoute({required String id})
       : super(name,
-            path: '/meal-create/:id',
-            args: MealCreateScreenRouteArgs(id: id),
-            rawPathParams: {'id': id});
+            path: '/meal-create/:id', args: MealCreateScreenRouteArgs(id: id));
 
   static const String name = 'MealCreateScreenRoute';
 }
 
 class MealCreateScreenRouteArgs {
-  const MealCreateScreenRouteArgs({this.id});
+  const MealCreateScreenRouteArgs({required this.id});
 
   final String id;
 
@@ -150,17 +142,14 @@ class MealCreateScreenRouteArgs {
 
 /// generated route for [_i6.MealScreen]
 class MealScreenRoute extends _i8.PageRouteInfo<MealScreenRouteArgs> {
-  MealScreenRoute({String id})
-      : super(name,
-            path: '/meal/:id',
-            args: MealScreenRouteArgs(id: id),
-            rawPathParams: {'id': id});
+  MealScreenRoute({required String id})
+      : super(name, path: '/meal/:id', args: MealScreenRouteArgs(id: id));
 
   static const String name = 'MealScreenRoute';
 }
 
 class MealScreenRouteArgs {
-  const MealScreenRouteArgs({this.id});
+  const MealScreenRouteArgs({required this.id});
 
   final String id;
 

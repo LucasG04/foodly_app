@@ -10,10 +10,10 @@ import '../../../widgets/progress_button.dart';
 
 class EditGroceryModal extends StatefulWidget {
   final String shoppingListId;
-  final Grocery grocery;
+  final Grocery? grocery;
 
   EditGroceryModal({
-    @required this.shoppingListId,
+    required this.shoppingListId,
     this.grocery,
   });
 
@@ -22,15 +22,15 @@ class EditGroceryModal extends StatefulWidget {
 }
 
 class _EditGroceryModalState extends State<EditGroceryModal> {
-  bool _isCreating;
-  TextEditingController _nameController;
-  TextEditingController _amountController;
-  TextEditingController _unitController;
-  FocusNode _amountFocusNode;
-  FocusNode _unitFocusNode;
+  late bool _isCreating;
+  TextEditingController? _nameController;
+  TextEditingController? _amountController;
+  TextEditingController? _unitController;
+  FocusNode? _amountFocusNode;
+  FocusNode? _unitFocusNode;
 
-  ButtonState _buttonState;
-  String _errorText;
+  ButtonState? _buttonState;
+  String? _errorText;
 
   @override
   void initState() {
@@ -82,7 +82,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
             placeholder: 'edit_grocery_modal_ctrl_name_placeholder'.tr(),
             errorText: _errorText,
             textInputAction: TextInputAction.next,
-            onSubmit: () => (_amountFocusNode.requestFocus()),
+            onSubmit: () => (_amountFocusNode!.requestFocus()),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -96,7 +96,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
                   placeholder: '1',
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
-                  onSubmit: () => (_unitFocusNode.requestFocus()),
+                  onSubmit: () => (_unitFocusNode!.requestFocus()),
                 ),
               ),
               SizedBox(
@@ -131,14 +131,14 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
   }
 
   void _saveGrocery() async {
-    final grocery = _isCreating ? Grocery() : widget.grocery;
-    grocery.name = _nameController.text.trim();
+    final grocery = _isCreating ? Grocery() : widget.grocery!;
+    grocery.name = _nameController!.text.trim();
     grocery.amount =
-        double.tryParse(_amountController.text.trim().replaceAll(',', '.'));
-    grocery.unit = _unitController.text.trim();
+        double.tryParse(_amountController!.text.trim().replaceAll(',', '.'));
+    grocery.unit = _unitController!.text.trim();
     grocery.bought = _isCreating ? false : grocery.bought;
 
-    if (grocery.name.isNotEmpty) {
+    if (grocery.name!.isNotEmpty) {
       setState(() {
         _buttonState = ButtonState.inProgress;
       });

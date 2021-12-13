@@ -1,13 +1,13 @@
 import 'plan_meal.dart';
 
 class Plan {
-  String id;
-  String name;
-  String code;
-  List<PlanMeal> meals;
-  List<String> users;
-  int hourDiffToUtc;
-  bool adFree;
+  String? id;
+  String? name;
+  String? code;
+  List<PlanMeal>? meals;
+  List<String>? users;
+  int? hourDiffToUtc;
+  bool? adFree;
 
   Plan({
     this.id,
@@ -29,9 +29,7 @@ class Plan {
     };
   }
 
-  factory Plan.fromMap(String id, Map<String, dynamic> map) {
-    if (map == null) return null;
-
+  factory Plan.fromMap(String? id, Map<String, dynamic> map) {
     return Plan(
       id: id,
       name: map['name'],

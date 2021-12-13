@@ -3,19 +3,19 @@ import 'package:hive/hive.dart';
 @HiveType(typeId: 0)
 class LinkMetadata extends HiveObject {
   @HiveField(0)
-  String url;
+  String? url;
 
   @HiveField(1)
-  String image;
+  String? image;
 
   @HiveField(2)
-  String title;
+  String? title;
 
   @HiveField(3)
-  String description;
+  String? description;
 
   @HiveField(4)
-  DateTime cachedAt;
+  DateTime? cachedAt;
 
   LinkMetadata({
     this.url,

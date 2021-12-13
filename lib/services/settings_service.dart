@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 class SettingsService {
   SettingsService._();
 
-  static Box _settingsBox;
+  static late Box _settingsBox;
   static bool _isReady = false;
 
   static Future initialize() async {

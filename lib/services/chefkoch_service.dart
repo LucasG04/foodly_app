@@ -11,9 +11,9 @@ class ChefkochService {
 
   static String get chefkochRecipeEndpoint => _chefkochRecipeEndpoint;
 
-  static Future<Meal> getMealFromChefkochUrl(String url) async {
+  static Future<Meal?> getMealFromChefkochUrl(String url) async {
     final recipeId = _extractRecipeIdFromChefkochUrl(url);
-    Response<dynamic> response;
+    late Response<dynamic> response;
 
     try {
       response = await _dio.get('$_chefkochRecipeEndpoint/$recipeId');
@@ -22,14 +22,13 @@ class ChefkochService {
     }
 
     if (response.data != null) {
-      Meal meal = Meal();
-      meal.name = response.data['title'];
+      Meal meal = Meal(name: response.data['title']);
       meal.source = 'Chefkoch';
       meal.instructions = response.data['instructions'];
       meal.tags = List<String>.from(response.data['tags'])
           .where((tag) => tag.toString().isNotEmpty)
           .toList();
-      meal.tags = meal.tags.toSet().toList(); // removes duplicates
+      meal.tags = meal.tags!.toSet().toList(); // removes duplicates
       meal.duration = response.data['totalTime'];
       meal.ingredients = _filterIngredientsFromChefkochIngredientGroups(
           List<Map<String, dynamic>>.from(response.data['ingredientGroups']));
@@ -63,7 +62,7 @@ class ChefkochService {
         .toList();
   }
 
-  static Future<String> _getImageUrlByRecipeId(String recipeId) async {
+  static Future<String?> _getImageUrlByRecipeId(String recipeId) async {
     try {
       final imagesResponse =
           await _dio.get('$_chefkochRecipeEndpoint/$recipeId/images');

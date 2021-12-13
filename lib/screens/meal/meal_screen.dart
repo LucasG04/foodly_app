@@ -27,7 +27,7 @@ class MealScreen extends StatefulWidget {
   final String id;
 
   const MealScreen({
-    @PathParam() this.id,
+    required this.id,
   });
 
   @override
@@ -35,7 +35,7 @@ class MealScreen extends StatefulWidget {
 }
 
 class _MealScreenState extends State<MealScreen> {
-  bool _isDeleting;
+  late bool _isDeleting;
 
   @override
   void initState() {
@@ -47,16 +47,16 @@ class _MealScreenState extends State<MealScreen> {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     final sidePadding = const EdgeInsets.symmetric(horizontal: kPadding);
-    final currentPlanId = context.read(planProvider).state.id;
+    final currentPlanId = context.read(planProvider).state!.id;
 
     return Scaffold(
       body: Stack(
         children: [
-          FutureBuilder<Meal>(
+          FutureBuilder<Meal?>(
             future: MealService.getMealById(widget.id),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                final meal = snapshot.data;
+                final meal = snapshot.data!;
                 return CustomScrollView(
                   slivers: [
                     SliverAppBar(
@@ -70,7 +70,7 @@ class _MealScreenState extends State<MealScreen> {
                         titlePadding: const EdgeInsets.all(0),
                         background: Stack(
                           children: [
-                            meal.imageUrl != null && meal.imageUrl.isNotEmpty
+                            meal.imageUrl != null && meal.imageUrl!.isNotEmpty
                                 ? Positioned.fill(
                                     child: FoodlyNetworkImage(meal.imageUrl),
                                   )
@@ -109,7 +109,7 @@ class _MealScreenState extends State<MealScreen> {
                                             width: 50,
                                             child: PopupMenuButton(
                                               padding: const EdgeInsets.all(0),
-                                              onSelected: (value) =>
+                                              onSelected: (dynamic value) =>
                                                   _onMenuSelected(
                                                 value,
                                                 meal,
@@ -184,11 +184,11 @@ class _MealScreenState extends State<MealScreen> {
                                         SizedBox(height: 5.0),
                                         Text(
                                           meal.source != null &&
-                                                  meal.source.isNotEmpty
+                                                  meal.source!.isNotEmpty
                                               ? 'meal_details_source_known'.tr(
                                                   args: [
                                                       _formatSourceString(
-                                                          meal.source)
+                                                          meal.source!)
                                                     ])
                                               : 'meal_details_source_unknown'
                                                   .tr(),
@@ -197,8 +197,8 @@ class _MealScreenState extends State<MealScreen> {
                                             fontWeight: FontWeight.bold,
                                             color: Theme.of(context)
                                                 .textTheme
-                                                .bodyText1
-                                                .color
+                                                .bodyText1!
+                                                .color!
                                                 .withOpacity(0.5),
                                           ),
                                         ),
@@ -223,19 +223,23 @@ class _MealScreenState extends State<MealScreen> {
                                 ],
                               ),
                             ),
-                            SizedBox(height: kPadding),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: kPadding),
-                              child: LinkPreview(meal.source),
-                            ),
+                            if (meal.source != null &&
+                                meal.source!.isNotEmpty) ...[
+                              SizedBox(height: kPadding),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: kPadding),
+                                child: LinkPreview(meal.source!),
+                              ),
+                            ] else
+                              SizedBox(),
                             SizedBox(height: kPadding),
                             SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               physics: BouncingScrollPhysics(),
                               child: Row(
                                 children: [
-                                  ...meal.tags.map((e) => TagTile(e)).toList(),
+                                  ...meal.tags!.map((e) => TagTile(e)).toList(),
                                   SizedBox(width: kPadding),
                                 ],
                               ),
@@ -247,12 +251,12 @@ class _MealScreenState extends State<MealScreen> {
                                 child: ListView.separated(
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
-                                  itemCount: meal.ingredients.length,
+                                  itemCount: meal.ingredients!.length,
                                   separatorBuilder: (context, index) =>
                                       const Divider(),
                                   itemBuilder: (context, index) =>
                                       _buildIngredientTile(
-                                    meal.ingredients[index],
+                                    meal.ingredients![index],
                                   ),
                                   padding: const EdgeInsets.all(0),
                                 ),
@@ -360,12 +364,12 @@ class _MealScreenState extends State<MealScreen> {
         : source;
   }
 
-  void _onMenuSelected(String value, Meal meal, String planId) async {
+  void _onMenuSelected(String value, Meal meal, String? planId) async {
     if (meal.planId != planId) return;
     switch (value) {
       case 'edit':
         final result = await context.router.push(
-          MealCreateScreenRoute(id: meal.id),
+          MealCreateScreenRoute(id: meal.id!),
         );
 
         if (result != null && result is Meal) {
@@ -395,12 +399,12 @@ class _MealScreenState extends State<MealScreen> {
       setState(() {
         _isDeleting = true;
       });
-      await MealService.deleteMeal(meal.id);
-      final plan = context.read(planProvider).state;
+      await MealService.deleteMeal(meal.id!);
+      final plan = context.read(planProvider).state!;
       await MealStatService.deleteStatByMealId(plan.id, meal.id);
 
-      if (plan.meals != null && plan.meals.length > 0) {
-        for (var planMeal in plan.meals.where((e) => e.meal == meal.id)) {
+      if (plan.meals != null && plan.meals!.length > 0) {
+        for (var planMeal in plan.meals!.where((e) => e.meal == meal.id)) {
           await PlanService.deletePlanMealFromPlan(plan.id, planMeal.id);
         }
       }

@@ -8,32 +8,29 @@ import 'skeleton_container.dart';
 
 class LinkPreview extends StatelessWidget {
   final String link;
-  const LinkPreview(this.link, {Key key}) : super(key: key);
+  const LinkPreview(this.link, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     if (!BasicUtils.isValidUri(link)) {
       return SizedBox();
     }
-    LinkMetadata metadata;
+    LinkMetadata? metadata;
     if (LinkMetadataService.isCached(link)) {
       metadata = LinkMetadataService.getFromCache(link);
     }
     return metadata != null
         ? _buildCard(metadata)
-        : FutureBuilder(
+        : FutureBuilder<LinkMetadata?>(
             future: LinkMetadataService.getFromApi(link),
             builder: (context, snapshot) {
-              print(snapshot.connectionState);
-              print(snapshot.hasData);
-              print(snapshot.data);
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return _buildSkeletonCard(context);
               } else if (!snapshot.hasData) {
                 return SizedBox();
               }
 
-              return _buildCard(snapshot.data);
+              return _buildCard(snapshot.data!);
             },
           );
   }
@@ -48,14 +45,14 @@ class LinkPreview extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  metadata.title,
+                  metadata.title!,
                   style: TextStyle(fontWeight: FontWeight.bold),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: kPadding / 4),
                 Text(
-                  metadata.description,
+                  metadata.description!,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -74,7 +71,7 @@ class LinkPreview extends StatelessWidget {
         children: [
           SkeletonContainer(
             width: size.width,
-            height: Theme.of(context).textTheme.bodyText1.fontSize,
+            height: Theme.of(context).textTheme.bodyText1!.fontSize,
           ),
           Padding(
             padding: const EdgeInsets.all(kPadding / 2),
@@ -82,12 +79,12 @@ class LinkPreview extends StatelessWidget {
               children: [
                 SkeletonContainer(
                   width: size.width * 0.5,
-                  height: Theme.of(context).textTheme.bodyText1.fontSize,
+                  height: Theme.of(context).textTheme.bodyText1!.fontSize,
                 ),
                 SizedBox(height: kPadding / 4),
                 SkeletonContainer(
                   width: size.width,
-                  height: Theme.of(context).textTheme.bodyText1.fontSize * 2,
+                  height: Theme.of(context).textTheme.bodyText1!.fontSize! * 2,
                 ),
               ],
             ),

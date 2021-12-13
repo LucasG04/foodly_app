@@ -18,12 +18,12 @@ class PlanService {
 
   PlanService._();
 
-  static Future<String> getCurrentPlanId() async {
+  static Future<String?> getCurrentPlanId() async {
     log.finer(
         'Call getCurrentPlanId for User: ${AuthenticationService.currentUser}');
     if (AuthenticationService.currentUser == null) return '';
 
-    final currentUserId = AuthenticationService.currentUser.uid;
+    final currentUserId = AuthenticationService.currentUser!.uid;
     final querySnaps = await _firestore
         .collection('plans')
         .where('users', arrayContains: currentUserId)
@@ -33,14 +33,14 @@ class PlanService {
     return querySnaps.docs.isEmpty ? null : querySnaps.docs.first.id;
   }
 
-  static Future<Plan> getPlanById(String id) async {
+  static Future<Plan?> getPlanById(String? id) async {
     log.finer('Call getPlanById with $id');
     final doc = await _firestore.collection('plans').doc(id).get();
 
-    return Plan.fromMap(id, doc.data());
+    return doc.exists ? Plan.fromMap(id, doc.data()!) : null;
   }
 
-  static Future<List<Plan>> getPlansByIds(List<String> ids) async {
+  static Future<List<Plan>> getPlansByIds(List<String?> ids) async {
     log.finer('Call getPlansByIds with ${ids.toString()}');
     final List<DocumentSnapshot> documents = [];
 
@@ -52,7 +52,8 @@ class PlanService {
       documents.addAll(results.docs);
     }
 
-    return documents.map((e) => Plan.fromMap(e.id, e.data())).toList();
+    documents.removeWhere((e) => !e.exists);
+    return documents.map((e) => Plan.fromMap(e.id, e.data()!)).toList();
   }
 
   static Stream<Plan> streamPlanById(String id) {
@@ -61,10 +62,10 @@ class PlanService {
         .collection('plans')
         .doc(id)
         .snapshots()
-        .map((snap) => Plan.fromMap(snap.id, snap.data()));
+        .map((snap) => Plan.fromMap(snap.id, snap.data()!));
   }
 
-  static Future<Plan> createPlan(String name) async {
+  static Future<Plan> createPlan(String? name) async {
     log.finer('Call createPlan');
     String code = _generateCode().toString();
     while ((await getPlanById(code)) != null) {
@@ -97,7 +98,7 @@ class PlanService {
     return min + randomizer.nextInt(max - min);
   }
 
-  static Future<Plan> getPlanByCode(String code, {withMeals = true}) async {
+  static Future<Plan?> getPlanByCode(String code, {withMeals = true}) async {
     log.finer('Call getPlanByCode with $code');
     final snaps = await _firestore
         .collection('plans')
@@ -133,7 +134,7 @@ class PlanService {
     return _firestore.collection('plans').doc(plan.id).update(plan.toMap());
   }
 
-  static Stream<List<PlanMeal>> streamPlanMealsByPlanId(String id) {
+  static Stream<List<PlanMeal>> streamPlanMealsByPlanId(String? id) {
     log.finer('Call streamPlanMealsByPlanId with $id');
     return _firestore
         .collection('plans')
@@ -152,14 +153,14 @@ class PlanService {
       await MealStatService.bumpStat(planId, planMeal.meal,
           bumpCount: true, bumpLastPlanned: true);
     }
-    return _firestore
+    await _firestore
         .collection('plans')
         .doc(planId)
         .collection('meals')
         .add(planMeal.toMap());
   }
 
-  static Future<void> updatePlanMealFromPlan(String planId, PlanMeal meal) {
+  static Future<void> updatePlanMealFromPlan(String? planId, PlanMeal meal) {
     log.finer(
         'Call updatePlanMealFromPlan with planId: $planId | planMeal: ${meal.toMap()}');
     return _firestore
@@ -170,7 +171,7 @@ class PlanService {
         .set(meal.toMap(), SetOptions(merge: true));
   }
 
-  static Future<void> deletePlanMealFromPlan(String planId, String mealId) {
+  static Future<void> deletePlanMealFromPlan(String? planId, String? mealId) {
     log.finer(
         'Call deletePlanMealFromPlan with planId: $planId | mealId: $mealId');
     return _firestore
@@ -182,15 +183,15 @@ class PlanService {
   }
 
   static Future<void> voteForPlanMeal(
-      String planId, PlanMeal planMeal, String userId) {
+      String? planId, PlanMeal planMeal, String userId) {
     log.finer(
         'Call voteForPlanMeal with planId: $planId | planMeal: ${planMeal.toMap()} | userId: $userId');
-    if (planMeal.upvotes.contains(userId)) {
+    if (planMeal.upvotes!.contains(userId)) {
       log.finest('voteForPlanMeal: upvotes contain userId.');
-      planMeal.upvotes.remove(userId);
+      planMeal.upvotes!.remove(userId);
     } else {
       log.finest('voteForPlanMeal: upvotes dont contain userId.');
-      planMeal.upvotes.add(userId);
+      planMeal.upvotes!.add(userId);
     }
 
     return _firestore
@@ -201,12 +202,12 @@ class PlanService {
         .update(planMeal.toMap());
   }
 
-  static Future<void> leavePlan(String planId, String userId) async {
+  static Future<void> leavePlan(String? planId, String userId) async {
     log.finer('Call leavePlan with planId: $planId | userId: $userId');
     final plan = await getPlanById(planId);
 
-    if (plan.users.contains(userId)) {
-      plan.users.remove(userId);
+    if (plan != null && plan.users != null && plan.users!.contains(userId)) {
+      plan.users!.remove(userId);
       _firestore.collection('plans').doc(planId).update({'users': plan.users});
     }
   }

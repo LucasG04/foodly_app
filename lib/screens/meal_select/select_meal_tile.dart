@@ -11,8 +11,8 @@ import '../../widgets/foodly_network_image.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
 class SelectMealTile extends StatefulWidget {
-  final Meal meal;
-  final Function() onAddMeal;
+  final Meal? meal;
+  final Function()? onAddMeal;
   final bool isLoading;
 
   SelectMealTile({
@@ -40,8 +40,8 @@ class _SelectMealTileState extends State<SelectMealTile> {
                   height: double.infinity,
                   width: double.infinity,
                 )
-              : widget.meal.imageUrl != null && widget.meal.imageUrl.isNotEmpty
-                  ? FoodlyNetworkImage(widget.meal.imageUrl)
+              : widget.meal!.imageUrl != null && widget.meal!.imageUrl!.isNotEmpty
+                  ? FoodlyNetworkImage(widget.meal!.imageUrl)
                   : Image.asset(
                       'assets/images/food_fallback.png',
                       fit: BoxFit.cover,
@@ -59,7 +59,7 @@ class _SelectMealTileState extends State<SelectMealTile> {
                       width: MediaQuery.of(context).size.width * 0.5,
                     )
                   : AutoSizeText(
-                      widget.meal.name,
+                      widget.meal!.name,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -94,7 +94,7 @@ class _SelectMealTileState extends State<SelectMealTile> {
         _buttonState = _ButtonState.LOADING;
       });
 
-      await widget.onAddMeal();
+      await widget.onAddMeal!();
 
       setState(() {
         _buttonState = _ButtonState.DONE;

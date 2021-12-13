@@ -9,7 +9,7 @@ import '../../widgets/small_circular_progress_indicator.dart';
 import 'login_design_clipper.dart';
 
 class CodeInputView extends StatefulWidget {
-  final void Function(CodeInputResult, [String]) onPageChange;
+  final void Function(CodeInputResult, [String?]) onPageChange;
 
   CodeInputView(this.onPageChange);
 
@@ -18,9 +18,9 @@ class CodeInputView extends StatefulWidget {
 }
 
 class _CodeInputViewState extends State<CodeInputView> {
-  bool _loadingCode;
-  TextEditingController _codeController;
-  String _errorText;
+  late bool _loadingCode;
+  TextEditingController? _codeController;
+  String? _errorText;
 
   @override
   void initState() {
@@ -148,7 +148,7 @@ class _CodeInputViewState extends State<CodeInputView> {
                   EvaIcons.checkmark,
                   color: Theme.of(context).colorScheme.secondary,
                 ),
-                onPressed: () => _validateCode(_codeController.text),
+                onPressed: () => _validateCode(_codeController!.text),
               ),
         errorText: _errorText,
       ),
@@ -165,7 +165,13 @@ class _CodeInputViewState extends State<CodeInputView> {
       // Check code
       try {
         final plan = await PlanService.getPlanByCode(text, withMeals: false);
-        widget.onPageChange(CodeInputResult.JOIN, plan.id);
+        if (plan != null) {
+          widget.onPageChange(CodeInputResult.JOIN, plan.id);
+        } else {
+          setState(() {
+            _errorText = 'login_code_not_found'.tr();
+          });
+        }
       } catch (e) {
         print(e);
         setState(() {

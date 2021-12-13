@@ -16,10 +16,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  StreamSubscription<User> _authStream;
+  late StreamSubscription<User?> _authStream;
 
-  bool _isLoading;
-  User _currentUser;
+  late bool _isLoading;
+  User? _currentUser;
 
   @override
   void initState() {

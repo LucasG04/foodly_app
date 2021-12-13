@@ -5,11 +5,11 @@ import '../constants.dart';
 
 class PageTitle extends StatelessWidget {
   final String text;
-  final List<Widget> actions;
+  final List<Widget>? actions;
 
   const PageTitle({
-    Key key,
-    @required this.text,
+    Key? key,
+    required this.text,
     this.actions,
   }) : super(key: key);
 
@@ -26,10 +26,10 @@ class PageTitle extends StatelessWidget {
           child: Row(
             children: [
               _buildTitle(),
-              if (actions != null && actions.isNotEmpty) ...[
+              if (actions != null && actions!.isNotEmpty) ...[
                 SizedBox(width: kPadding),
                 Spacer(),
-                ...actions,
+                ...actions!,
               ],
             ],
           ),

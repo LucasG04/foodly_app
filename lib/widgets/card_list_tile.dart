@@ -4,14 +4,14 @@ import '../constants.dart';
 
 class CardListTile extends StatelessWidget {
   final double height;
-  final double width;
-  final Widget leading;
-  final Widget content;
-  final Widget trailing;
-  final void Function() trailingAction;
+  final double? width;
+  final Widget? leading;
+  final Widget? content;
+  final Widget? trailing;
+  final void Function()? trailingAction;
 
   const CardListTile({
-    Key key,
+    Key? key,
     this.height = 75.0,
     this.width,
     this.leading,
@@ -51,7 +51,7 @@ class CardListTile extends StatelessWidget {
             margin: const EdgeInsets.only(right: 20.0),
             child: OutlinedButton(
               onPressed: trailingAction,
-              child: trailing,
+              child: trailing!,
               style: ButtonStyle(
                 padding: MaterialStateProperty.resolveWith(
                   (states) => const EdgeInsets.all(0),

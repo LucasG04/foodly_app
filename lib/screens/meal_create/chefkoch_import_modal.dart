@@ -18,10 +18,10 @@ class ChefkochImportModal extends StatefulWidget {
 
 class _ChefkochImportModalState extends State<ChefkochImportModal> {
   TextEditingController _linkController = new TextEditingController();
-  String _linkErrorText;
-  bool _linkError;
+  String? _linkErrorText;
+  late bool _linkError;
 
-  ButtonState _buttonState;
+  ButtonState? _buttonState;
 
   @override
   void initState() {

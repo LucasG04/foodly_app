@@ -1,6 +1,6 @@
 class FoodlyUser {
-  String id;
-  List<String> oldPlans;
+  String? id;
+  List<String?>? oldPlans;
 
   FoodlyUser({
     this.id,
@@ -14,8 +14,6 @@ class FoodlyUser {
   }
 
   factory FoodlyUser.fromMap(String id, Map<String, dynamic> map) {
-    if (map == null) return null;
-
     return FoodlyUser(
       id: id,
       oldPlans: List<String>.from(map['oldPlans']),
