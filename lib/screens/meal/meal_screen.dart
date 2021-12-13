@@ -231,8 +231,7 @@ class _MealScreenState extends State<MealScreen> {
                                     horizontal: kPadding),
                                 child: LinkPreview(meal.source!),
                               ),
-                            ] else
-                              SizedBox(),
+                            ],
                             SizedBox(height: kPadding),
                             SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
@@ -262,21 +261,24 @@ class _MealScreenState extends State<MealScreen> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: kPadding),
-                            ..._buildSection(
-                              'meal_details_instructions'.tr(),
-                              MarkdownBody(
-                                data: meal.instructions ?? '',
-                                styleSheet: MarkdownStyleSheet.fromTheme(
-                                  ThemeData(
-                                    textTheme: TextTheme(
-                                      bodyText1: TextStyle(fontSize: 16),
-                                      bodyText2: TextStyle(fontSize: 16),
+                            if (meal.instructions != null &&
+                                meal.instructions!.isNotEmpty) ...[
+                              SizedBox(height: kPadding),
+                              ..._buildSection(
+                                'meal_details_instructions'.tr(),
+                                MarkdownBody(
+                                  data: meal.instructions ?? '',
+                                  styleSheet: MarkdownStyleSheet.fromTheme(
+                                    ThemeData(
+                                      textTheme: TextTheme(
+                                        bodyText1: TextStyle(fontSize: 16),
+                                        bodyText2: TextStyle(fontSize: 16),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
+                            ],
                             SizedBox(height: kPadding),
                             SizedBox(height: 100.0),
                           ]
@@ -368,7 +370,7 @@ class _MealScreenState extends State<MealScreen> {
     if (meal.planId != planId) return;
     switch (value) {
       case 'edit':
-        final result = await context.router.push(
+        final result = await AutoRouter.of(context).push(
           MealCreateScreenRoute(id: meal.id!),
         );
 
@@ -409,7 +411,7 @@ class _MealScreenState extends State<MealScreen> {
         }
       }
 
-      context.router.pop();
+      AutoRouter.of(context).pop();
       _isDeleting = false;
     }
   }

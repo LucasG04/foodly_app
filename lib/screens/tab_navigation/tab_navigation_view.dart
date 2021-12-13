@@ -132,6 +132,6 @@ class _TabNavigationViewState extends State<TabNavigationView> {
   }
 
   void _openMealCreate() {
-    context.router.push(MealCreateScreenRoute(id: 'create'));
+    AutoRouter.of(context).push(MealCreateScreenRoute(id: 'create'));
   }
 }

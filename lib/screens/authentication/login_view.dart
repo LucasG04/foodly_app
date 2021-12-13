@@ -317,7 +317,7 @@ class _LoginViewState extends State<LoginView> {
       _buttonState = ButtonState.normal;
     });
 
-    context.router.replace(HomeScreenRoute());
+    AutoRouter.of(context).replace(HomeScreenRoute());
   }
 
   void _resetErrors() {

@@ -202,7 +202,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
         ReceiveSharingIntent.getTextStream().listen((String value) {
       if (AuthenticationService.currentUser != null &&
           value.startsWith(kChefkochShareEndpoint)) {
-        context.router
+        AutoRouter.of(context)
             .push(MealCreateScreenRoute(id: Uri.encodeComponent(value)));
       }
     }, onError: (err) {
@@ -214,7 +214,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
       if (AuthenticationService.currentUser != null &&
           value != null &&
           value.startsWith(kChefkochShareEndpoint)) {
-        context.router
+        AutoRouter.of(context)
             .push(MealCreateScreenRoute(id: Uri.encodeComponent(value)));
       }
     });

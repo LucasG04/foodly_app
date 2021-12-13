@@ -142,10 +142,9 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
   }
 
   void _uploadLocalImage(ImageSource source) async {
-    final image = await _imagePicker.getImage(source: source);
-    final upload = await StorageService.uploadFile(image);
-
     try {
+      final image = await _imagePicker.getImage(source: source);
+      final upload = await StorageService.uploadFile(image);
       setState(() {
         _isLoading = true;
       });
@@ -153,7 +152,10 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
       _isLoading = false;
       Navigator.pop(context, result.ref.name);
     } catch (e) {
-      _log.severe('ERR: StorageService.uploadFile', image);
+      _log.severe('ERR: StorageService.uploadFile');
+      setState(() {
+        _isLoading = false;
+      });
       MainSnackbar(
         message: 'image_picker_dialog_error_not_found'.tr(),
         isError: true,

@@ -290,7 +290,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
             : await MealService.updateMeal(_meal);
         _buttonState = ButtonState.normal;
         _mealSaved = true;
-        context.router.pop(newMeal);
+        AutoRouter.of(context).pop(newMeal);
       } catch (e) {
         print(e);
         MainSnackbar(

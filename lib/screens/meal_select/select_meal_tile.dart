@@ -40,7 +40,8 @@ class _SelectMealTileState extends State<SelectMealTile> {
                   height: double.infinity,
                   width: double.infinity,
                 )
-              : widget.meal!.imageUrl != null && widget.meal!.imageUrl!.isNotEmpty
+              : widget.meal!.imageUrl != null &&
+                      widget.meal!.imageUrl!.isNotEmpty
                   ? FoodlyNetworkImage(widget.meal!.imageUrl)
                   : Image.asset(
                       'assets/images/food_fallback.png',
@@ -100,7 +101,7 @@ class _SelectMealTileState extends State<SelectMealTile> {
         _buttonState = _ButtonState.DONE;
       });
 
-      context.router.pop();
+      AutoRouter.of(context).pop();
     }
   }
 }

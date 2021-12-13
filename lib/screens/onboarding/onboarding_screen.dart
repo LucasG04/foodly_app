@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:concentric_transition/concentric_transition.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -85,7 +86,7 @@ class OnboardingScreen extends StatelessWidget {
         ConcentricPageRoute(builder: (_) => AuthenticationScreen()),
       );
     } else {
-      context.router.pop();
+      AutoRouter.of(context).pop();
     }
   }
 }

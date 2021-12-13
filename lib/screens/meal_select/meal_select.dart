@@ -274,16 +274,17 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
         kPlaceholderSymbol + texts.first,
         context.read(planProvider).state!.id!,
       );
-      context.router.pop();
+      AutoRouter.of(context).pop();
     }
   }
 
   Future _createNewMeal() async {
-    final meal = await context.router.push(MealCreateScreenRoute(id: 'create'));
+    final meal =
+        await AutoRouter.of(context).push(MealCreateScreenRoute(id: 'create'));
 
     if (meal != null && meal is Meal) {
       await _addMealToPlan(meal.id!, context.read(planProvider).state!.id!);
-      context.router.pop();
+      AutoRouter.of(context).pop();
     }
   }
 

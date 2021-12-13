@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
 import '../../app_router.gr.dart';
@@ -37,6 +38,6 @@ class UnknownRouteScreen extends StatelessWidget {
   }
 
   void _navigateToHome(context) {
-    context.router.replaceAll([HomeScreenRoute()]);
+    AutoRouter.of(context).replaceAll([HomeScreenRoute()]);
   }
 }

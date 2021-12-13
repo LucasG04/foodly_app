@@ -42,7 +42,7 @@ class HelpSlideShareImport extends StatelessWidget {
         curve: Curves.ease,
         duration: Duration(seconds: 1),
         verticalPosition: heightMultiplier,
-        onFinish: () => context.router.pop(),
+        onFinish: () => AutoRouter.of(context).pop(),
         buttonChild: Center(
           child: Icon(
             EvaIcons.arrowForwardOutline,

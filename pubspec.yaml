@@ -16,7 +16,7 @@ dependencies:
 
   # Util
   flutter_riverpod: ^0.14.0
-  auto_route: ^3.1.1
+  auto_route: ^3.2.0
   intl: ^0.17.0
   hive: ^2.0.4
   # flutter_cache_manager_hive:
