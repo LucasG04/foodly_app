@@ -178,11 +178,12 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                           ),
                         ],
                       ),
-                      Padding(
-                        padding:
-                            const EdgeInsets.symmetric(vertical: kPadding / 2),
-                        child: LinkPreview(_sourceController!.text),
-                      ),
+                      if (!_isLoadingMeal)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: kPadding / 2),
+                          child: LinkPreview(_sourceController!.text),
+                        ),
                       Divider(),
                       !_isLoadingMeal
                           ? EditListContent(
