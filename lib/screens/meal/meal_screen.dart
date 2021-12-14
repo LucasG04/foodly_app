@@ -72,7 +72,7 @@ class _MealScreenState extends State<MealScreen> {
                           children: [
                             meal.imageUrl != null && meal.imageUrl!.isNotEmpty
                                 ? Positioned.fill(
-                                    child: FoodlyNetworkImage(meal.imageUrl),
+                                    child: FoodlyNetworkImage(meal.imageUrl!),
                                   )
                                 : Positioned.fill(
                                     child: Image.asset(

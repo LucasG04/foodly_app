@@ -108,7 +108,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                     ),
                   )
                 : meal!.imageUrl != null && meal.imageUrl!.isNotEmpty
-                    ? FoodlyNetworkImage(meal.imageUrl)
+                    ? FoodlyNetworkImage(meal.imageUrl!)
                     : Image.asset(
                         'assets/images/food_fallback.png',
                         fit: BoxFit.cover,

@@ -1,7 +1,8 @@
 import 'package:hive/hive.dart';
+part 'link_metadata.g.dart';
 
-@HiveType(typeId: 0)
-class LinkMetadata extends HiveObject {
+@HiveType(typeId: 1)
+class LinkMetadata {
   @HiveField(0)
   String? url;
 

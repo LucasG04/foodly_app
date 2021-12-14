@@ -54,7 +54,7 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
         child: _imageUrl != null
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(kRadius),
-                child: FoodlyNetworkImage(_imageUrl),
+                child: FoodlyNetworkImage(_imageUrl!),
               )
             : Center(
                 child: Row(

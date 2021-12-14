@@ -39,7 +39,7 @@ class MealListTile extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(kRadius),
                   child: meal.imageUrl != null && meal.imageUrl!.isNotEmpty
-                      ? FoodlyNetworkImage(meal.imageUrl)
+                      ? FoodlyNetworkImage(meal.imageUrl!)
                       : Image.asset(
                           'assets/images/food_fallback.png',
                           fit: BoxFit.cover,

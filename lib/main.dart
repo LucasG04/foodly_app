@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'models/link_metadata.dart';
 import 'services/link_metadata_service.dart';
 import 'package:hive/hive.dart';
 import 'package:in_app_update/in_app_update.dart';
@@ -31,10 +32,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp();
-  var dir = await getApplicationDocumentsDirectory();
-  Hive.init(dir.path);
-  await SettingsService.initialize();
-  await LinkMetadataService.initialize();
+  await initializeHive();
 
   runApp(
     ProviderScope(
@@ -46,6 +44,14 @@ Future<void> main() async {
       ),
     ),
   );
+}
+
+Future<void> initializeHive() async {
+  var dir = await getApplicationDocumentsDirectory();
+  Hive.init(dir.path);
+  Hive.registerAdapter(LinkMetadataAdapter());
+  await SettingsService.initialize();
+  await LinkMetadataService.initialize();
 }
 
 class FoodlyApp extends StatefulWidget {

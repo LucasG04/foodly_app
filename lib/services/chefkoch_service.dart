@@ -23,7 +23,7 @@ class ChefkochService {
 
     if (response.data != null) {
       Meal meal = Meal(name: response.data['title']);
-      meal.source = 'Chefkoch';
+      meal.source = url;
       meal.instructions = response.data['instructions'];
       meal.tags = List<String>.from(response.data['tags'])
           .where((tag) => tag.toString().isNotEmpty)

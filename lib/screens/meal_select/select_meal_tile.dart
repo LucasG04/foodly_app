@@ -42,7 +42,7 @@ class _SelectMealTileState extends State<SelectMealTile> {
                 )
               : widget.meal!.imageUrl != null &&
                       widget.meal!.imageUrl!.isNotEmpty
-                  ? FoodlyNetworkImage(widget.meal!.imageUrl)
+                  ? FoodlyNetworkImage(widget.meal!.imageUrl!)
                   : Image.asset(
                       'assets/images/food_fallback.png',
                       fit: BoxFit.cover,
