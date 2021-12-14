@@ -24,7 +24,7 @@ dependencies:
   #     url: https://github.com/X-Wei/flutter_cache_manager_hive.git
   #     ref: master
   dio: ^4.0.0-beta5
-  url_launcher:
+  url_launcher: ^6.0.17
   another_flushbar: ^1.10.28
   share: ^2.0.4
   email_validator: ^2.0.1
@@ -49,7 +49,7 @@ dependencies:
   # Widgets
   flutter_snake_navigationbar: ^0.5.0
   eva_icons_flutter: ^3.0.2
-  cached_network_image: ^3.0.0-nullsafety
+  cached_network_image: ^3.2.0
   group_list_view: ^1.1.1
   adaptive_dialog: ^1.2.0
   flutter_markdown:
@@ -63,7 +63,7 @@ dependencies:
       url: https://github.com/LucasG04/flutter-concentric-transition.git
 
   # Icons/Styles/Animations
-  cupertino_icons: ^1.0.1
+  cupertino_icons: ^1.0.4
   flutter_staggered_animations: ^1.0.0
   font_awesome_flutter: ^9.2.0
 
@@ -74,7 +74,7 @@ dev_dependencies:
   #   sdk: flutter
   # build runner via: `flutter packages pub run build_runner build`
   build_runner:
-  auto_route_generator: ^3.1.0
+  auto_route_generator: ^3.2.0
   hive_generator: ^1.1.1
   flutter_launcher_icons: ^0.9.0
 
