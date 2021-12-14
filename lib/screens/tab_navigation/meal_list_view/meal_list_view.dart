@@ -3,7 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/services/meal_service.dart';
+import '../../../services/meal_service.dart';
 import 'package:group_list_view/group_list_view.dart';
 
 import '../../../constants.dart';
@@ -21,8 +21,8 @@ class MealListView extends StatefulWidget {
 
 class _MealListViewState extends State<MealListView>
     with AutomaticKeepAliveClientMixin {
-  List<Meal> _allMeals;
-  List<Meal> _filteredMeals;
+  List<Meal>? _allMeals;
+  List<Meal>? _filteredMeals;
   String _searchInput = '';
 
   @override
@@ -50,9 +50,9 @@ class _MealListViewState extends State<MealListView>
               final tagFilter = watch(mealTagFilterProvider).state;
               _filteredMeals = _filterMeals(_searchInput, tagFilter);
 
-              return _filteredMeals != null && _filteredMeals.isNotEmpty
+              return _filteredMeals != null && _filteredMeals!.isNotEmpty
                   ? tagFilter.isEmpty
-                      ? _buildRawMealList(_filteredMeals)
+                      ? _buildRawMealList(_filteredMeals!)
                       : _buildGroupedTagList(
                           _groupMealsByTags(
                             this._filteredMeals ?? [],
@@ -148,14 +148,14 @@ class _MealListViewState extends State<MealListView>
 
     for (var group in tagList) {
       group.meals =
-          meals.where((element) => element.tags.contains(group.tag)).toList();
+          meals.where((element) => element.tags!.contains(group.tag)).toList();
     }
 
     return tagList;
   }
 
   List<Meal> _filterMeals(String query, List<String> tagList) {
-    final mealsCopy = [..._allMeals];
+    final mealsCopy = [..._allMeals!];
     mealsCopy.sort((m1, m2) => m1.name.compareTo(m2.name));
 
     if (query.isNotEmpty) {
@@ -164,11 +164,11 @@ class _MealListViewState extends State<MealListView>
             .where((el) => el.name.toLowerCase().contains(query.toLowerCase()))
             .toList(),
         ...mealsCopy
-            .where((el) => el.tags
+            .where((el) => el.tags!
                 .any((t) => t.toLowerCase().contains(query.toLowerCase())))
             .toList(),
         ...mealsCopy
-            .where((el) => el.tags.any((tag) => tagList.contains(tag)))
+            .where((el) => el.tags!.any((tag) => tagList.contains(tag)))
             .toList()
       ].toSet().toList();
     }
@@ -176,8 +176,8 @@ class _MealListViewState extends State<MealListView>
   }
 
   Future<void> _refreshMeals() async {
-    final activePlan = context.read(planProvider).state;
-    final meals = await MealService.getAllMeals(activePlan.id);
+    final activePlan = context.read(planProvider).state!;
+    final meals = await MealService.getAllMeals(activePlan.id!);
     context.read(allMealsProvider).state = meals;
   }
 }

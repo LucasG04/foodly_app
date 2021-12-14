@@ -40,15 +40,15 @@ class _ShoppingListViewState extends State<ShoppingListView>
                 future: ShoppingListService.getShoppingListByPlanId(planId),
                 builder: (_, shoppingListSnap) {
                   if (shoppingListSnap.hasData) {
-                    final listId = shoppingListSnap.data.id;
+                    final listId = shoppingListSnap.data!.id!;
                     return StreamBuilder<List<Grocery>>(
                       stream: ShoppingListService.streamShoppingList(listId),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           final List<Grocery> todoItems =
-                              snapshot.data.where((e) => !e.bought).toList();
+                              snapshot.data!.where((e) => !e.bought!).toList();
                           final List<Grocery> boughtItems =
-                              snapshot.data.where((e) => e.bought).toList();
+                              snapshot.data!.where((e) => e.bought!).toList();
 
                           return SingleChildScrollView(
                             child: Column(
@@ -162,7 +162,7 @@ class _ShoppingListViewState extends State<ShoppingListView>
     );
   }
 
-  void _editGrocery(String listId, [Grocery grocery]) {
+  void _editGrocery(String listId, [Grocery? grocery]) {
     showBarModalBottomSheet(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
@@ -178,7 +178,7 @@ class _ShoppingListViewState extends State<ShoppingListView>
   }
 
   void _shareList(List<Grocery> groceries) {
-    if (groceries == null || groceries.isEmpty) {
+    if (groceries.isEmpty) {
       return;
     }
     final list = groceries

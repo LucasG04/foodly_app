@@ -16,10 +16,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  StreamSubscription<User> _authStream;
+  late StreamSubscription<User?> _authStream;
 
-  bool _isLoading;
-  User _currentUser;
+  late bool _isLoading;
+  User? _currentUser;
 
   @override
   void initState() {
@@ -52,10 +52,10 @@ class _HomeScreenState extends State<HomeScreen> {
     } else if (_currentUser != null) {
       return TabNavigationView();
     } else if (SettingsService.isFirstUsage) {
-      ExtendedNavigator.root.replace(Routes.onboardingScreen);
+      AutoRouter.of(context).replace(OnboardingScreenRoute());
       return Scaffold();
     } else {
-      ExtendedNavigator.root.replace(Routes.authenticationScreen);
+      AutoRouter.of(context).replace(AuthenticationScreenRoute());
       return Scaffold();
     }
   }

@@ -9,13 +9,13 @@ import 'edit_ingredient_modal.dart';
 class EditIngredients extends StatelessWidget {
   final String title;
   final List<Ingredient> content;
-  final void Function(List<Ingredient>) onChanged;
+  final void Function(List<Ingredient>)? onChanged;
 
   EditIngredients({
-    Key key,
-    @required this.title,
-    @required this.content,
-    @required this.onChanged,
+    Key? key,
+    required this.title,
+    required this.content,
+    required this.onChanged,
   }) : super(key: key);
 
   @override
@@ -37,13 +37,13 @@ class EditIngredients extends StatelessWidget {
             String amount = ConvertUtil.amountToString(
                 content[index].amount, content[index].unit);
             return ListTile(
-              title: Text(content[index].name),
+              title: Text(content[index].name!),
               subtitle: amount.isNotEmpty ? Text(amount) : null,
               trailing: IconButton(
                 icon: Icon(EvaIcons.minusCircleOutline, color: Colors.black),
                 onPressed: () {
                   content.removeAt(index);
-                  onChanged(content);
+                  onChanged!(content);
                 },
               ),
               onTap: () => _editIngredient(context, content[index], index),
@@ -61,7 +61,7 @@ class EditIngredients extends StatelessWidget {
     );
   }
 
-  void _editIngredient(context, [Ingredient ingredient, int index]) async {
+  void _editIngredient(context, [Ingredient? ingredient, int? index]) async {
     final result = await showBarModalBottomSheet<Ingredient>(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
@@ -75,10 +75,10 @@ class EditIngredients extends StatelessWidget {
     if (result != null) {
       if (ingredient == null) {
         content.add(result);
-        onChanged(content);
+        onChanged!(content);
       } else {
-        content[index] = result;
-        onChanged(content);
+        content[index!] = result;
+        onChanged!(content);
       }
     }
   }

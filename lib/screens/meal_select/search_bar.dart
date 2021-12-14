@@ -9,7 +9,7 @@ class SearchBar extends StatefulWidget {
   final void Function(String) onSearch;
 
   SearchBar({
-    @required this.onSearch,
+    required this.onSearch,
   });
 
   @override
@@ -18,11 +18,11 @@ class SearchBar extends StatefulWidget {
 
 class _SearchBarState extends State<SearchBar> {
   FocusNode _focusNode = FocusNode();
-  TextEditingController _textEditingController;
-  AnimateIconController _closeIconController;
-  Timer _debounce;
+  TextEditingController? _textEditingController;
+  AnimateIconController? _closeIconController;
+  Timer? _debounce;
 
-  bool _isLoading;
+  late bool _isLoading;
 
   @override
   void initState() {
@@ -32,9 +32,9 @@ class _SearchBarState extends State<SearchBar> {
     super.initState();
     _focusNode.addListener(() {
       if (mounted && _focusNode.hasFocus) {
-        _closeIconController.animateToEnd();
+        _closeIconController!.animateToEnd!();
       } else {
-        _closeIconController.animateToStart();
+        _closeIconController!.animateToStart!();
       }
     });
   }
@@ -70,7 +70,7 @@ class _SearchBarState extends State<SearchBar> {
                   disabledBorder: InputBorder.none,
                 ),
                 onChanged: (text) {
-                  if (_debounce?.isActive ?? false) _debounce.cancel();
+                  if (_debounce?.isActive ?? false) _debounce!.cancel();
                   _debounce = Timer(const Duration(milliseconds: 500), () {
                     widget.onSearch(text);
                   });
@@ -92,15 +92,15 @@ class _SearchBarState extends State<SearchBar> {
       onTap: () {
         if (_focusNode.hasFocus) {
           _focusNode.unfocus();
-          _textEditingController.clear();
+          _textEditingController!.clear();
           widget.onSearch('');
         }
       },
       controller: _closeIconController,
       startIcon: null,
-      endIcon: EvaIcons.closeOutline,
+      endIcon: EvaIcons.close,
       duration: Duration(milliseconds: 300),
-      color: Theme.of(context).textTheme.bodyText1.color,
+      color: Theme.of(context).textTheme.bodyText1!.color,
     );
   }
 }

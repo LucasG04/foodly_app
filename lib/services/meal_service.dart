@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
-import 'package:foodly/services/meal_stat_service.dart';
-import 'package:foodly/utils/convert_util.dart';
+import 'meal_stat_service.dart';
+import '../utils/convert_util.dart';
 import 'package:logging/logging.dart';
 
 import '../models/meal.dart';
@@ -25,7 +25,7 @@ class MealService {
     return meals;
   }
 
-  static Future<List<Meal>> getMealsByIds(List<String> ids) async {
+  static Future<List<Meal>> getMealsByIds(List<String>? ids) async {
     log.finer('Call getMealsByIds with $ids');
     if (ids == null || ids.isEmpty) {
       return [];
@@ -41,15 +41,17 @@ class MealService {
       documents.addAll(results.docs);
     }
 
-    return documents.map((e) => Meal.fromMap(e.id, e.data())).toList();
+    // remove non existing documents
+    documents.removeWhere((e) => !e.exists);
+    return documents.map((e) => Meal.fromMap(e.id, e.data()!)).toList();
   }
 
-  static Future<Meal> getMealById(String mealId) async {
+  static Future<Meal?> getMealById(String mealId) async {
     log.finer('Call getMeals with $mealId');
     try {
       final doc = await _firestore.collection('meals').doc(mealId).get();
 
-      return Meal.fromMap(doc.id, doc.data());
+      return doc.exists ? Meal.fromMap(doc.id, doc.data()!) : null;
     } catch (e) {
       log.severe('ERR: getMeals with $mealId', e);
       return null;
@@ -105,9 +107,9 @@ class MealService {
             event.docs.map((e) => Meal.fromMap(e.id, e.data())).toList());
   }
 
-  static Future<Meal> createMeal(Meal meal) async {
+  static Future<Meal?> createMeal(Meal meal) async {
     log.finer('Call createMeal with ${meal.toMap()}');
-    if (meal.imageUrl == null || meal.imageUrl.isEmpty) {
+    if (meal.imageUrl == null || meal.imageUrl!.isEmpty) {
       try {
         meal.imageUrl = (await _getMealPhotos(meal.name))[0] ?? '';
         log.finest('createMeal: Generated image: ${meal.imageUrl}');
@@ -120,7 +122,7 @@ class MealService {
       final id = new DateTime.now().microsecondsSinceEpoch.toString();
       await _firestore.collection('meals').doc(id).set(meal.toMap());
       meal.id = id;
-      await MealStatService.bumpStat(meal.planId, meal.id);
+      await MealStatService.bumpStat(meal.planId!, meal.id!);
 
       return meal;
     } catch (e) {
@@ -129,7 +131,7 @@ class MealService {
     }
   }
 
-  static Future<Meal> updateMeal(Meal meal) async {
+  static Future<Meal?> updateMeal(Meal meal) async {
     log.finer('Call updateMeal with ${meal.toMap()}');
     try {
       await _firestore.collection('meals').doc(meal.id).update(meal.toMap());
@@ -166,8 +168,8 @@ class MealService {
     }
   }
 
-  static Future<List<String>> _getMealPhotos(String mealName) async {
-    List<String> urls = [];
+  static Future<List<String?>> _getMealPhotos(String mealName) async {
+    List<String?> urls = [];
     final response = await Dio().get(
       'https://pixabay.com/api/',
       queryParameters: {

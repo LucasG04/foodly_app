@@ -6,13 +6,13 @@ import '../../../constants.dart';
 class SettingsTile extends StatelessWidget {
   final IconData leadingIcon;
   final String text;
-  final Widget trailing;
-  final void Function() onTap;
-  final Color color;
+  final Widget? trailing;
+  final void Function()? onTap;
+  final Color? color;
 
   SettingsTile({
-    @required this.leadingIcon,
-    @required this.text,
+    required this.leadingIcon,
+    required this.text,
     this.trailing,
     this.onTap,
     this.color,
@@ -20,7 +20,7 @@ class SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color _color = color ?? Theme.of(context).textTheme.bodyText1.color;
+    Color? _color = color ?? Theme.of(context).textTheme.bodyText1!.color;
     return InkWell(
       onTap: onTap,
       child: Container(

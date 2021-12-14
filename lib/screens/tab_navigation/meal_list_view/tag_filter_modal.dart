@@ -16,12 +16,12 @@ class _TagFilterModalState extends State<TagFilterModal> {
   static const double EMPTY_SPACE = kPadding / 2;
 
   bool _isScrollToTop = true;
-  ScrollController _scrollController;
+  ScrollController? _scrollController;
 
   @override
   void dispose() {
     if (_scrollController != null) {
-      _scrollController.dispose();
+      _scrollController!.dispose();
     }
 
     super.dispose();
@@ -30,7 +30,7 @@ class _TagFilterModalState extends State<TagFilterModal> {
   @override
   void initState() {
     _scrollController = new ScrollController();
-    _scrollController.addListener(_scrollListener);
+    _scrollController!.addListener(_scrollListener);
 
     super.initState();
   }
@@ -89,15 +89,15 @@ class _TagFilterModalState extends State<TagFilterModal> {
   }
 
   void _scrollListener() {
-    if (_scrollController.offset <=
-        _scrollController.position.minScrollExtent) {
+    if (_scrollController!.offset <=
+        _scrollController!.position.minScrollExtent) {
       if (!_isScrollToTop) {
         setState(() {
           _isScrollToTop = true;
         });
       }
     } else {
-      if (_scrollController.offset > EMPTY_SPACE && _isScrollToTop) {
+      if (_scrollController!.offset > EMPTY_SPACE && _isScrollToTop) {
         setState(() {
           _isScrollToTop = false;
         });
@@ -173,7 +173,7 @@ class _TagFilterModalState extends State<TagFilterModal> {
 
   List<String> _getAllTagsFromMeals(List<Meal> meals) {
     final result = meals.map((e) => e.tags).toList(); // get all tags
-    final flatResults = result.expand((e) => e).toList(); // flatten the list
+    final flatResults = result.expand((e) => e!).toList(); // flatten the list
     return flatResults.toSet().toList(); // remove duplicates
   }
 }

@@ -1,8 +1,8 @@
 class Ingredient {
-  String name;
-  double amount;
-  String unit;
-  String productGroup;
+  String? name;
+  double? amount;
+  String? unit;
+  String? productGroup;
 
   Ingredient({
     this.name,

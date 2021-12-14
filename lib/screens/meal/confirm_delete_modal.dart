@@ -36,7 +36,7 @@ class ConfirmDeleteModal extends StatelessWidget {
           ),
           RichText(
             text: TextSpan(
-              style: Theme.of(context).textTheme.bodyText1.copyWith(
+              style: Theme.of(context).textTheme.bodyText1!.copyWith(
                     fontSize: 16.0,
                   ),
               children: <TextSpan>[

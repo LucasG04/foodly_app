@@ -9,7 +9,7 @@ class StorageService {
 
   static final String _storageMealImageFolder = 'meal-images/';
 
-  static Future<UploadTask> uploadFile(PickedFile file) async {
+  static Future<UploadTask?> uploadFile(PickedFile? file) async {
     if (file == null) {
       return null;
     }
@@ -31,7 +31,7 @@ class StorageService {
     return Future.value(uploadTask);
   }
 
-  static Future<String> getMealImageUrl(String fileName) async {
+  static Future<String> getMealImageUrl(String? fileName) async {
     if (fileName == null || fileName.isEmpty) {
       return '';
     }
@@ -45,7 +45,7 @@ class StorageService {
     return ref.getDownloadURL();
   }
 
-  static Future<void> removeFile(String fileName) async {
+  static Future<void> removeFile(String? fileName) async {
     if (fileName == null || fileName.isEmpty) {
       return;
     }

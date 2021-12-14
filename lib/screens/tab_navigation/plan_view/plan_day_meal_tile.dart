@@ -42,19 +42,19 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
               context,
               placeholder: widget.planMeal.meal.split(kPlaceholderSymbol)[1],
             )
-          : FutureBuilder<Meal>(
+          : FutureBuilder<Meal?>(
               future: MealService.getMealById(widget.planMeal.meal),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (snapshot.hasData) {
-                    final meal = snapshot.data;
+                    final meal = snapshot.data!;
                     return GestureDetector(
-                      onTap: () => ExtendedNavigator.root
-                          .push(Routes.mealScreen(id: meal.id)),
+                      onTap: () => AutoRouter.of(context)
+                          .push(MealScreenRoute(id: meal.id!)),
                       child: _buildDataRow(context, meal: meal),
                     );
                   } else {
-                    final currentPlanId = context.read(planProvider).state.id;
+                    final currentPlanId = context.read(planProvider).state!.id;
                     PlanService.deletePlanMealFromPlan(
                         currentPlanId, widget.planMeal.id);
                     return _buildSkeletonLoading();
@@ -85,12 +85,12 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
     );
   }
 
-  Row _buildDataRow(BuildContext context, {String placeholder, Meal meal}) {
+  Row _buildDataRow(BuildContext context, {String? placeholder, Meal? meal}) {
     bool isPlaceholder = placeholder != null && placeholder.isNotEmpty;
-    final voteColor =
-        widget.planMeal.upvotes.contains(AuthenticationService.currentUser.uid)
-            ? Theme.of(context).primaryColor
-            : Theme.of(context).textTheme.bodyText1.color;
+    final voteColor = widget.planMeal.upvotes!
+            .contains(AuthenticationService.currentUser!.uid)
+        ? Theme.of(context).primaryColor
+        : Theme.of(context).textTheme.bodyText1!.color;
 
     return Row(
       children: [
@@ -104,11 +104,11 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                     width: 50.0,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10000),
-                      child: Center(child: Icon(EvaIcons.codeOutline)),
+                      child: Center(child: Icon(EvaIcons.code)),
                     ),
                   )
-                : meal.imageUrl != null && meal.imageUrl.isNotEmpty
-                    ? FoodlyNetworkImage(meal.imageUrl)
+                : meal!.imageUrl != null && meal.imageUrl!.isNotEmpty
+                    ? FoodlyNetworkImage(meal.imageUrl!)
                     : Image.asset(
                         'assets/images/food_fallback.png',
                         fit: BoxFit.cover,
@@ -118,9 +118,9 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: isPlaceholder || (meal.tags == null || meal.tags.isEmpty)
+            child: isPlaceholder || (meal!.tags == null || meal.tags!.isEmpty)
                 ? AutoSizeText(
-                    isPlaceholder ? placeholder : meal.name,
+                    isPlaceholder ? placeholder : meal!.name,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -148,7 +148,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                         height: MealTag.tagHeight,
                         child: Wrap(
                           clipBehavior: Clip.hardEdge,
-                          children: meal.tags.map((e) => MealTag(e)).toList(),
+                          children: meal.tags!.map((e) => MealTag(e)).toList(),
                         ),
                       ),
                     ],
@@ -172,13 +172,13 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                 onPressed: _voteIsLoading
                     ? null
                     : () => _voteMeal(
-                          context.read(planProvider).state.id,
-                          AuthenticationService.currentUser.uid,
+                          context.read(planProvider).state!.id,
+                          AuthenticationService.currentUser!.uid,
                         ),
                 splashRadius: 15.0,
               ),
               Text(
-                widget.planMeal.upvotes.length.toString(),
+                widget.planMeal.upvotes!.length.toString(),
                 style: TextStyle(
                   color: voteColor,
                 ),
@@ -188,8 +188,8 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
           SizedBox(width: kPadding / 2),
         ],
         PopupMenuButton(
-          onSelected: (val) =>
-              _onMenuSelected(val, context.read(planProvider).state.id),
+          onSelected: (dynamic val) =>
+              _onMenuSelected(val, context.read(planProvider).state!.id!),
           icon: Icon(EvaIcons.moreVerticalOutline),
           itemBuilder: (BuildContext context) {
             return widget.planMeal.meal.startsWith(kPlaceholderSymbol)
@@ -224,7 +224,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
     );
   }
 
-  void _voteMeal(String planId, String userId) async {
+  void _voteMeal(String? planId, String userId) async {
     setState(() {
       _voteIsLoading = true;
     });
@@ -239,11 +239,14 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
       PlanService.deletePlanMealFromPlan(planId, widget.planMeal.id);
     } else if (value == 'tolist') {
       final meal = await MealService.getMealById(widget.planMeal.meal);
+      if (meal == null || meal.ingredients == null) {
+        return;
+      }
       final listId =
           (await ShoppingListService.getShoppingListByPlanId(planId)).id;
-      for (var ingredient in meal.ingredients) {
+      for (var ingredient in meal.ingredients!) {
         ShoppingListService.addGrocery(
-          listId,
+          listId!,
           new Grocery(
             name: ingredient.name,
             amount: ingredient.amount,

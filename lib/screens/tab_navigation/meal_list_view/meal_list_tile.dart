@@ -21,9 +21,7 @@ class MealListTile extends StatelessWidget {
     return Align(
       alignment: Alignment.center,
       child: GestureDetector(
-        onTap: () => ExtendedNavigator.root.push(
-          Routes.mealScreen(id: meal.id),
-        ),
+        onTap: () => AutoRouter.of(context).push(MealScreenRoute(id: meal.id!)),
         child: Container(
           width: width > 599 ? 600 : width * 0.9,
           height: height,
@@ -40,8 +38,8 @@ class MealListTile extends StatelessWidget {
                 width: height,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(kRadius),
-                  child: meal.imageUrl != null && meal.imageUrl.isNotEmpty
-                      ? FoodlyNetworkImage(meal.imageUrl)
+                  child: meal.imageUrl != null && meal.imageUrl!.isNotEmpty
+                      ? FoodlyNetworkImage(meal.imageUrl!)
                       : Image.asset(
                           'assets/images/food_fallback.png',
                           fit: BoxFit.cover,
@@ -66,13 +64,13 @@ class MealListTile extends StatelessWidget {
                           maxLines: 2,
                         ),
                       ),
-                      meal.tags.isNotEmpty
+                      meal.tags!.isNotEmpty
                           ? Container(
                               height: MealTag.tagHeight,
                               child: Wrap(
                                 clipBehavior: Clip.hardEdge,
                                 children:
-                                    meal.tags.map((e) => MealTag(e)).toList(),
+                                    meal.tags!.map((e) => MealTag(e)).toList(),
                               ),
                             )
                           : SizedBox(),

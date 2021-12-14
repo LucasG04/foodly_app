@@ -9,12 +9,12 @@ import 'small_circular_progress_indicator.dart';
 /// Normal state is the button itself
 class ProgressButton extends StatefulWidget {
   final VoidCallback onPressed;
-  final ButtonState buttonState;
-  final Widget child;
+  final ButtonState? buttonState;
+  final Widget? child;
 
-  final BoxDecoration decoration;
-  final Color progressColor;
-  final BorderRadius borderRadius;
+  final BoxDecoration? decoration;
+  final Color? progressColor;
+  final BorderRadius? borderRadius;
 
   final int progressAnimationDuration;
   final int errorAnimationDuration;
@@ -22,9 +22,9 @@ class ProgressButton extends StatefulWidget {
   final int errorAnimationSwingCount;
 
   ProgressButton({
-    Key key,
-    @required this.buttonState,
-    @required this.onPressed,
+    Key? key,
+    required this.buttonState,
+    required this.onPressed,
     this.child,
     this.decoration,
     this.progressColor,
@@ -43,21 +43,21 @@ enum ButtonState { inProgress, error, normal }
 
 class _ProgressButtonState extends State<ProgressButton>
     with TickerProviderStateMixin {
-  AnimationController _errorAnimationController;
-  AnimationController _progressAnimationController;
-  Animation<Offset> _errorAnimation;
-  Animation<BorderRadius> _borderAnimation;
-  Animation<double> _widthAnimation;
+  late AnimationController _errorAnimationController;
+  late AnimationController _progressAnimationController;
+  late Animation<Offset> _errorAnimation;
+  late Animation<BorderRadius?> _borderAnimation;
+  late Animation<double> _widthAnimation;
 
-  double get buttonWidth => _widthAnimation.value ?? 0;
+  double get buttonWidth => _widthAnimation.value;
   BorderRadius get widgetBorderRadius =>
       widget.borderRadius ?? BorderRadius.circular(8);
   BorderRadius get borderRadius => _borderAnimation.value ?? widgetBorderRadius;
 
   BoxDecoration get widgetDecoration {
     if (widget.decoration != null) {
-      return widget.decoration.copyWith(
-          color: widget.decoration.color ?? Theme.of(context).primaryColor);
+      return widget.decoration!.copyWith(
+          color: widget.decoration!.color ?? Theme.of(context).primaryColor);
     } else {
       return BoxDecoration(color: Theme.of(context).primaryColor);
     }
@@ -194,7 +194,7 @@ class _ProgressButtonState extends State<ProgressButton>
       curve: Curves.linear,
     ));
 
-    Widget buttonContent;
+    Widget? buttonContent;
 
     if (widget.buttonState != ButtonState.inProgress) {
       buttonContent = child;
@@ -205,7 +205,7 @@ class _ProgressButtonState extends State<ProgressButton>
         child: Padding(
           padding: EdgeInsets.all(8),
           child: SmallCircularProgressIndicator(
-            color: progressColor ?? Colors.white,
+            color: progressColor,
           ),
         ),
       );

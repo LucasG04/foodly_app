@@ -4,8 +4,8 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/screens/tab_navigation/settings_view/loading_logout.dart';
-import 'package:foodly/utils/main_snackbar.dart';
+import 'loading_logout.dart';
+import '../../../utils/main_snackbar.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share/share.dart';
 
@@ -95,13 +95,13 @@ class _SettingsViewState extends State<SettingsView> {
                               .map((locale) => DropdownMenuItem<Locale>(
                                     value: locale,
                                     child: Text(
-                                      LocaleNames.of(context)
-                                          .nameOf(locale.languageCode),
+                                      LocaleNames.of(context)!
+                                          .nameOf(locale.languageCode)!,
                                     ),
                                   ))
                               .toList(),
-                          onChanged: (Locale locale) async {
-                            await context.setLocale(locale);
+                          onChanged: (Locale? locale) async {
+                            await context.setLocale(locale!);
                           },
                         ),
                       ),
@@ -109,10 +109,10 @@ class _SettingsViewState extends State<SettingsView> {
                     _buildSectionTitle('settings_section_plan'.tr()),
                     _buildSection([
                       SettingsTile(
-                        onTap: () => _shareCode(plan.code),
+                        onTap: () => _shareCode(plan.code!),
                         leadingIcon: EvaIcons.shareOutline,
                         text:
-                            'settings_section_plan_share'.tr(args: [plan.code]),
+                            'settings_section_plan_share'.tr(args: [plan.code!]),
                         trailing: Icon(EvaIcons.arrowIosForwardOutline),
                       ),
                       SettingsTile(
@@ -126,14 +126,14 @@ class _SettingsViewState extends State<SettingsView> {
                         color: Colors.red,
                       ),
                     ], context),
-                    foodlyUser != null && foodlyUser.oldPlans.length > 1
+                    foodlyUser.oldPlans!.length > 1
                         ? _buildSectionTitle('settings_section_meals'.tr())
                         : SizedBox(),
-                    foodlyUser != null && foodlyUser.oldPlans.length > 1
+                    foodlyUser.oldPlans!.length > 1
                         ? _buildSection([
                             SettingsTile(
                               onTap: () => _importMeals(
-                                foodlyUser.oldPlans
+                                foodlyUser.oldPlans!
                                     .where((id) => id != plan.id)
                                     .toList(),
                                 context,
@@ -173,7 +173,7 @@ class _SettingsViewState extends State<SettingsView> {
                       SettingsTile(
                         onTap: () async {
                           await AuthenticationService.resetPassword(
-                              firebaseUser.email);
+                              firebaseUser!.email!);
                           MainSnackbar(
                             message: 'settings_section_account_reset_msg'.tr(),
                             isSuccess: true,
@@ -201,7 +201,7 @@ class _SettingsViewState extends State<SettingsView> {
                         children: <TextSpan>[
                           TextSpan(text: 'settings_sign_in_as'.tr()),
                           TextSpan(
-                            text: '\n' + firebaseUser.email,
+                            text: '\n' + firebaseUser!.email!,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
@@ -257,14 +257,14 @@ class _SettingsViewState extends State<SettingsView> {
     Share.share('settings_share_msg'.tr(args: [kAppName, code]));
   }
 
-  void _leavePlan(String planId, context) async {
-    String userId = AuthenticationService.currentUser.uid;
+  void _leavePlan(String? planId, context) async {
+    String userId = AuthenticationService.currentUser!.uid;
     await PlanService.leavePlan(planId, userId);
     AuthenticationService.signOut();
     BasicUtils.clearAllProvider(context);
   }
 
-  void _importMeals(List<String> planIds, context) async {
+  void _importMeals(List<String?> planIds, context) async {
     showBarModalBottomSheet(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(

@@ -2,7 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/widgets/skeleton_container.dart';
+import '../../widgets/skeleton_container.dart';
 
 import '../../constants.dart';
 import '../../models/meal.dart';
@@ -11,8 +11,8 @@ import '../../widgets/foodly_network_image.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
 class SelectMealTile extends StatefulWidget {
-  final Meal meal;
-  final Function() onAddMeal;
+  final Meal? meal;
+  final Function()? onAddMeal;
   final bool isLoading;
 
   SelectMealTile({
@@ -40,8 +40,9 @@ class _SelectMealTileState extends State<SelectMealTile> {
                   height: double.infinity,
                   width: double.infinity,
                 )
-              : widget.meal.imageUrl != null && widget.meal.imageUrl.isNotEmpty
-                  ? FoodlyNetworkImage(widget.meal.imageUrl)
+              : widget.meal!.imageUrl != null &&
+                      widget.meal!.imageUrl!.isNotEmpty
+                  ? FoodlyNetworkImage(widget.meal!.imageUrl!)
                   : Image.asset(
                       'assets/images/food_fallback.png',
                       fit: BoxFit.cover,
@@ -59,7 +60,7 @@ class _SelectMealTileState extends State<SelectMealTile> {
                       width: MediaQuery.of(context).size.width * 0.5,
                     )
                   : AutoSizeText(
-                      widget.meal.name,
+                      widget.meal!.name,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -75,11 +76,11 @@ class _SelectMealTileState extends State<SelectMealTile> {
             : AnimatedSwitcher(
                 duration: const Duration(milliseconds: 375),
                 child: _buttonState == _ButtonState.DEFAULT
-                    ? Icon(EvaIcons.plusOutline)
+                    ? Icon(EvaIcons.plus)
                     : _buttonState == _ButtonState.LOADING
                         ? SmallCircularProgressIndicator()
                         : Icon(
-                            EvaIcons.checkmarkOutline,
+                            EvaIcons.checkmark,
                             color: Colors.green,
                           ),
               ),
@@ -94,13 +95,13 @@ class _SelectMealTileState extends State<SelectMealTile> {
         _buttonState = _ButtonState.LOADING;
       });
 
-      await widget.onAddMeal();
+      await widget.onAddMeal!();
 
       setState(() {
         _buttonState = _ButtonState.DONE;
       });
 
-      ExtendedNavigator.root.pop();
+      AutoRouter.of(context).pop();
     }
   }
 }

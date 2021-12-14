@@ -16,7 +16,7 @@ class BasicUtils {
     try {
       final date = new DateTime.fromMicrosecondsSinceEpoch(
           int.parse(image.split('.').first));
-      return !Uri.tryParse(image).isAbsolute && date.microsecondsSinceEpoch > 0;
+      return !Uri.tryParse(image)!.isAbsolute && date.microsecondsSinceEpoch > 0;
     } catch (e) {
       return false;
     }
@@ -34,7 +34,11 @@ class BasicUtils {
   static String getUrlFromString(String input) {
     RegExp exp =
         new RegExp(r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+');
-    final match = exp.firstMatch(input);
+    final match = exp.firstMatch(input)!;
     return input.substring(match.start, match.end);
+  }
+
+  static bool isValidUri(String uri) {
+    return Uri.tryParse(uri)?.isAbsolute ?? false;
   }
 }

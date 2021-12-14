@@ -12,7 +12,7 @@ import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
 
 class ResetPasswordModal extends StatefulWidget {
-  final String email;
+  final String? email;
 
   ResetPasswordModal([this.email]);
 
@@ -21,9 +21,9 @@ class ResetPasswordModal extends StatefulWidget {
 }
 
 class _ResetPasswordModalState extends State<ResetPasswordModal> {
-  TextEditingController _emailController;
-  ButtonState _buttonState;
-  String _errorText;
+  TextEditingController? _emailController;
+  ButtonState? _buttonState;
+  String? _errorText;
   bool _showSuccess = false;
 
   @override
@@ -63,7 +63,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
                     textAlign: TextAlign.center,
                   ),
                   GestureDetector(
-                    child: Icon(EvaIcons.closeOutline),
+                    child: Icon(EvaIcons.close),
                     onTap: () => Navigator.maybePop(context),
                   ),
                 ],
@@ -113,15 +113,14 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
   }
 
   void _resetPassword() async {
-    if (_emailController.text != null &&
-        EmailValidator.validate(_emailController.text) &&
+    if (EmailValidator.validate(_emailController!.text) &&
         !_showSuccess) {
       setState(() {
         _buttonState = ButtonState.inProgress;
       });
 
       try {
-        await AuthenticationService.resetPassword(_emailController.text);
+        await AuthenticationService.resetPassword(_emailController!.text);
       } catch (e) {
         _handleFirebaseResetException(e);
         return;

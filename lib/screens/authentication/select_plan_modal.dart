@@ -3,11 +3,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/models/foodly_user.dart';
-import 'package:foodly/models/plan.dart';
-import 'package:foodly/services/foodly_user_service.dart';
-import 'package:foodly/services/plan_service.dart';
-import 'package:foodly/widgets/small_circular_progress_indicator.dart';
+import '../../models/foodly_user.dart';
+import '../../models/plan.dart';
+import '../../services/foodly_user_service.dart';
+import '../../services/plan_service.dart';
+import '../../widgets/small_circular_progress_indicator.dart';
 
 import '../../constants.dart';
 
@@ -45,14 +45,14 @@ class SelectPlanModal extends ConsumerWidget {
                     textAlign: TextAlign.center,
                   ),
                   GestureDetector(
-                    child: Icon(EvaIcons.closeOutline),
+                    child: Icon(EvaIcons.close),
                     onTap: () => Navigator.maybePop(context),
                   ),
                 ],
               ),
             ),
           ),
-          FutureBuilder<FoodlyUser>(
+          FutureBuilder<FoodlyUser?>(
             future: FoodlyUserService.getUserById(userId),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -71,7 +71,7 @@ class SelectPlanModal extends ConsumerWidget {
                   ),
                 );
               }
-              return _buildPlanList(snapshot.data, size.height * 0.3);
+              return _buildPlanList(snapshot.data!, size.height * 0.3);
             },
           ),
         ],
@@ -81,7 +81,7 @@ class SelectPlanModal extends ConsumerWidget {
 
   _buildPlanList(FoodlyUser user, double emptySpaceHeight) {
     return FutureBuilder<List<Plan>>(
-      future: PlanService.getPlansByIds(user.oldPlans),
+      future: PlanService.getPlansByIds(user.oldPlans!),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return SizedBox(
@@ -102,11 +102,11 @@ class SelectPlanModal extends ConsumerWidget {
 
         return ListView.builder(
           shrinkWrap: true,
-          itemCount: snapshot.data.length,
+          itemCount: snapshot.data!.length,
           itemBuilder: (ctx, index) => ListTile(
-            title: Text(snapshot.data[index].name),
-            subtitle: Text(snapshot.data[index].code),
-            onTap: () => Navigator.pop(ctx, snapshot.data[index]),
+            title: Text(snapshot.data![index].name!),
+            subtitle: Text(snapshot.data![index].code!),
+            onTap: () => Navigator.pop(ctx, snapshot.data![index]),
             trailing: Icon(Icons.arrow_forward_ios_rounded),
           ),
         );

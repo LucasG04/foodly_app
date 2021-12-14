@@ -1,12 +1,12 @@
 class MealStat {
-  String id;
+  String? id;
   String mealId;
-  DateTime lastTimePlanned;
-  int plannedCount;
+  DateTime? lastTimePlanned;
+  int? plannedCount;
 
   MealStat({
     this.id,
-    this.mealId,
+    required this.mealId,
     this.lastTimePlanned,
     this.plannedCount,
   });
@@ -14,7 +14,7 @@ class MealStat {
   Map<String, dynamic> toMap() {
     return {
       'mealId': mealId,
-      'lastTimePlanned': lastTimePlanned.millisecondsSinceEpoch,
+      'lastTimePlanned': lastTimePlanned!.millisecondsSinceEpoch,
       'plannedCount': plannedCount,
     };
   }

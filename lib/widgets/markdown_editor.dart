@@ -6,12 +6,12 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MarkdownEditor extends StatefulWidget {
-  final String initialValue;
-  final TextEditingController textEditingController;
-  final void Function(String) onChange;
+  final String? initialValue;
+  final TextEditingController? textEditingController;
+  final void Function(String)? onChange;
 
   MarkdownEditor({
-    Key key,
+    Key? key,
     this.initialValue,
     this.textEditingController,
     this.onChange,
@@ -25,8 +25,8 @@ class MarkdownEditor extends StatefulWidget {
 
 class _MarkdownEditorState extends State<MarkdownEditor>
     with TickerProviderStateMixin {
-  TabController _tabController;
-  String _content;
+  TabController? _tabController;
+  String? _content;
 
   @override
   void initState() {
@@ -36,14 +36,14 @@ class _MarkdownEditorState extends State<MarkdownEditor>
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _tabController!.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     _content = widget.initialValue ?? '';
-    final textColor = Theme.of(context).textTheme.bodyText1.color;
+    final textColor = Theme.of(context).textTheme.bodyText1!.color;
     return Container(
       width: MediaQuery.of(context).size.width > 599
           ? 600.0
@@ -123,10 +123,10 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                     child: SingleChildScrollView(
                       child: MarkdownBody(
                         data: widget.initialValue != null
-                            ? _content
-                            : widget.textEditingController.text,
+                            ? _content!
+                            : widget.textEditingController!.text,
                         selectable: true,
-                        onTapLink: (_, href, __) => linkOnTapHandler(href),
+                        onTapLink: (_, href, __) => linkOnTapHandler(href!),
                       ),
                     ),
                   ),
@@ -170,7 +170,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
       setState(() {
         _content = data;
       });
-      widget.onChange(data);
+      widget.onChange!(data);
     }
   }
 

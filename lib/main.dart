@@ -8,8 +8,12 @@ import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'models/link_metadata.dart';
+import 'services/link_metadata_service.dart';
+import 'package:hive/hive.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:logging/logging.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 import 'app_router.gr.dart';
@@ -28,7 +32,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp();
-  await SettingsService.initialize();
+  await initializeHive();
 
   runApp(
     ProviderScope(
@@ -42,24 +46,36 @@ Future<void> main() async {
   );
 }
 
+Future<void> initializeHive() async {
+  var dir = await getApplicationDocumentsDirectory();
+  Hive.init(dir.path);
+  Hive.registerAdapter(LinkMetadataAdapter());
+  await SettingsService.initialize();
+  await LinkMetadataService.initialize();
+}
+
 class FoodlyApp extends StatefulWidget {
   @override
   _FoodlyAppState createState() => _FoodlyAppState();
 }
 
 class _FoodlyAppState extends State<FoodlyApp> {
-  StreamSubscription<String> _intentDataStreamSubscription;
+  late StreamSubscription<String> _intentDataStreamSubscription;
   Logger _log = new Logger('FoodlyApp');
-  StreamSubscription<LogRecord> _logStream;
-  StreamSubscription<List<Meal>> _privateMealsStream;
-  List<Meal> _privateMealsStreamValue;
-  StreamSubscription<List<Meal>> _publicMealsStream;
-  List<Meal> _publicMealsStreamValue;
+  late StreamSubscription<LogRecord> _logStream;
+  // ignore: cancel_subscriptions
+  StreamSubscription<List<Meal>>? _privateMealsStream;
+  List<Meal>? _privateMealsStreamValue;
+  // ignore: cancel_subscriptions
+  StreamSubscription<List<Meal>>? _publicMealsStream;
+  List<Meal>? _publicMealsStreamValue;
+
+  final _appRouter = AppRouter();
 
   @override
   void dispose() {
-    _privateMealsStream.cancel();
-    _publicMealsStream.cancel();
+    _privateMealsStream!.cancel();
+    _publicMealsStream!.cancel();
     _logStream.cancel();
     _intentDataStreamSubscription.cancel();
     super.dispose();
@@ -97,7 +113,9 @@ class _FoodlyAppState extends State<FoodlyApp> {
                 _streamMeals();
               }
 
-              return MaterialApp(
+              return MaterialApp.router(
+                routerDelegate: _appRouter.delegate(),
+                routeInformationParser: _appRouter.defaultRouteParser(),
                 debugShowCheckedModeBanner: false,
                 theme: ThemeData(
                   // TODO: Nunito default font?
@@ -112,12 +130,6 @@ class _FoodlyAppState extends State<FoodlyApp> {
                 ],
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
-                builder: (_, __) => ScrollConfiguration(
-                  behavior: ScrollBehaviorModified(),
-                  child: ExtendedNavigator<AppRouter>(
-                    router: AppRouter(),
-                  ),
-                ),
               );
             },
           );
@@ -131,10 +143,10 @@ class _FoodlyAppState extends State<FoodlyApp> {
   Future<void> _loadActivePlan(BuildContext context) async {
     final currentPlan = context.read(planProvider).state;
     if (currentPlan == null) {
-      String planId = await PlanService.getCurrentPlanId();
+      String? planId = await PlanService.getCurrentPlanId();
 
       if (planId != null && planId.isNotEmpty) {
-        Plan newPlan = await PlanService.getPlanById(planId);
+        Plan newPlan = (await PlanService.getPlanById(planId))!;
         context.read(planProvider).state = newPlan;
       }
     }
@@ -143,7 +155,8 @@ class _FoodlyAppState extends State<FoodlyApp> {
   Future<void> _loadActiveUser(BuildContext context) async {
     final firebaseUser = AuthenticationService.currentUser;
     if (firebaseUser != null) {
-      FoodlyUser user = await FoodlyUserService.getUserById(firebaseUser.uid);
+      FoodlyUser user =
+          (await FoodlyUserService.getUserById(firebaseUser.uid))!;
       context.read(userProvider).state = user;
     }
   }
@@ -162,7 +175,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
   void _streamMeals() {
     if (_privateMealsStream == null && _publicMealsStream == null) {
       _privateMealsStream =
-          MealService.streamPlanMeals(context.read(planProvider).state.id)
+          MealService.streamPlanMeals(context.read(planProvider).state!.id!)
               .listen((meals) {
         _privateMealsStreamValue = meals;
         mergeMealsIntoProvider();
@@ -180,8 +193,8 @@ class _FoodlyAppState extends State<FoodlyApp> {
     _log.finer('Call mergeMealsIntoProvider');
 
     var updatedMeals = [
-      ..._privateMealsStreamValue,
-      ..._publicMealsStreamValue
+      ..._privateMealsStreamValue!,
+      ..._publicMealsStreamValue!
     ];
     updatedMeals = [
       ...{...updatedMeals}
@@ -194,22 +207,21 @@ class _FoodlyAppState extends State<FoodlyApp> {
     _intentDataStreamSubscription =
         ReceiveSharingIntent.getTextStream().listen((String value) {
       if (AuthenticationService.currentUser != null &&
-          value != null &&
           value.startsWith(kChefkochShareEndpoint)) {
-        ExtendedNavigator.root
-            .push(Routes.mealCreateScreen(id: Uri.encodeComponent(value)));
+        AutoRouter.of(context)
+            .push(MealCreateScreenRoute(id: Uri.encodeComponent(value)));
       }
     }, onError: (err) {
       _log.severe('ERR in ReceiveSharingIntent.getTextStream()', err);
     });
 
     // For sharing or opening urls/text coming from outside the app while the app is closed
-    ReceiveSharingIntent.getInitialText().then((String value) {
+    ReceiveSharingIntent.getInitialText().then((String? value) {
       if (AuthenticationService.currentUser != null &&
           value != null &&
           value.startsWith(kChefkochShareEndpoint)) {
-        ExtendedNavigator.root
-            .push(Routes.mealCreateScreen(id: Uri.encodeComponent(value)));
+        AutoRouter.of(context)
+            .push(MealCreateScreenRoute(id: Uri.encodeComponent(value)));
       }
     });
   }
@@ -223,7 +235,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
       _log.severe('ERR in InAppUpdate.checkForUpdate()', err);
     });
 
-    if (updateInfo?.updateAvailability == UpdateAvailability.updateAvailable) {
+    if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
       InAppUpdate.startFlexibleUpdate().then((_) {
         InAppUpdate.completeFlexibleUpdate().catchError((err) {
           _log.severe('ERR in InAppUpdate.completeFlexibleUpdate()', err);
@@ -250,6 +262,5 @@ class ScrollBehaviorModified extends ScrollBehavior {
       case TargetPlatform.windows:
         return const ClampingScrollPhysics();
     }
-    return const ClampingScrollPhysics();
   }
 }

@@ -1,7 +1,7 @@
 class PlanDay {
-  DateTime date;
-  List<String> lunch;
-  String dinner;
+  DateTime? date;
+  List<String>? lunch;
+  String? dinner;
 
   PlanDay({
     this.date,
@@ -18,8 +18,6 @@ class PlanDay {
   }
 
   factory PlanDay.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
-
     return PlanDay(
       date: DateTime.fromMillisecondsSinceEpoch(map['date']),
       lunch: map['lunch'],

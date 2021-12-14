@@ -6,13 +6,13 @@ import '../../constants.dart';
 
 class BorderIcon extends StatelessWidget {
   final Widget child;
-  final EdgeInsets padding;
-  final double width, height;
+  final EdgeInsets? padding;
+  final double? width, height;
   final bool withBorder;
 
   const BorderIcon({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
     this.width,
     this.height,
     this.padding,

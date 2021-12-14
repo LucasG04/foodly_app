@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -11,14 +10,14 @@ import '../../widgets/progress_button.dart';
 import '../../widgets/toggle_tab/flutter_toggle_tab.dart';
 
 class PlanSettingsView extends StatefulWidget {
-  final Plan plan;
+  final Plan? plan;
   final void Function() navigateBack;
   final void Function(Plan) navigateForward;
 
   PlanSettingsView({
-    @required this.plan,
-    @required this.navigateBack,
-    @required this.navigateForward,
+    required this.plan,
+    required this.navigateBack,
+    required this.navigateForward,
   });
 
   @override
@@ -26,11 +25,11 @@ class PlanSettingsView extends StatefulWidget {
 }
 
 class _PlanSettingsViewState extends State<PlanSettingsView> {
-  ButtonState _buttonState;
+  ButtonState? _buttonState;
 
-  TextEditingController _nameController;
-  String _nameErrorText;
-  String _unknownErrorText;
+  TextEditingController? _nameController;
+  String? _nameErrorText;
+  String? _unknownErrorText;
 
   @override
   void initState() {
@@ -139,8 +138,8 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
       );
 
   bool _validateName() {
-    if (_nameController.text.isEmpty ||
-        _nameController.text.trim().length < 3) {
+    if (_nameController!.text.isEmpty ||
+        _nameController!.text.trim().length < 3) {
       setState(() {
         _nameErrorText = 'plan_settings_error_name'.tr();
       });
@@ -153,7 +152,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
     _resetErrors();
 
     if (_validateName()) {
-      final plan = new Plan(name: _nameController.text.trim());
+      final plan = new Plan(name: _nameController!.text.trim());
       widget.navigateForward(plan);
     } else {
       setState(() {

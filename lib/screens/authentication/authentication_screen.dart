@@ -11,9 +11,9 @@ class AuthenticationScreen extends StatefulWidget {
 }
 
 class _AuthenticationScreenState extends State<AuthenticationScreen> {
-  PageController _pageController;
-  Plan _plan;
-  bool _isCreatingPlan;
+  PageController? _pageController;
+  Plan? _plan;
+  bool? _isCreatingPlan;
 
   @override
   void initState() {
@@ -47,14 +47,14 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                       ? new Plan(id: planId)
                       : null;
                 });
-                _pageController.animateToPage(
+                _pageController!.animateToPage(
                   1,
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeIn,
                 );
               }),
-              _isCreatingPlan ? _buildPlanSettingsView() : _buildLoginView(),
-              _isCreatingPlan ? _buildLoginView() : SizedBox()
+              _isCreatingPlan! ? _buildPlanSettingsView() : _buildLoginView(),
+              _isCreatingPlan! ? _buildLoginView() : SizedBox()
             ],
           ),
         ),
@@ -66,7 +66,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
     return PlanSettingsView(
       plan: _plan,
       navigateBack: () {
-        _pageController.previousPage(
+        _pageController!.previousPage(
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeIn,
         );
@@ -75,7 +75,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
         setState(() {
           _plan = plan;
         });
-        _pageController.animateToPage(
+        _pageController!.animateToPage(
           2,
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeIn,
@@ -89,7 +89,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
       isCreatingPlan: _isCreatingPlan,
       plan: _plan,
       navigateBack: () {
-        _pageController.previousPage(
+        _pageController!.previousPage(
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeIn,
         );

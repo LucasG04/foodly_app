@@ -1,4 +1,4 @@
-import 'package:auto_route/auto_route_annotations.dart';
+import 'package:auto_route/auto_route.dart';
 
 import 'screens/authentication/authentication_screen.dart';
 import 'screens/meal/meal_screen.dart';

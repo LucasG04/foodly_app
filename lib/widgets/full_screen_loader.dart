@@ -10,7 +10,7 @@ class FullScreenLoader extends StatefulWidget {
   final Color loaderColor;
 
   const FullScreenLoader({
-    Key key,
+    Key? key,
     this.backgroundColor = Colors.black26,
     this.loaderColor = Colors.white,
   }) : super(key: key);

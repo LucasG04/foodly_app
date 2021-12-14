@@ -64,7 +64,7 @@ class ShoppingListService {
       log.finest('addGrocery: adding prevented and existing one updated');
       return;
     }
-    return _firestore
+    await _firestore
         .collection('shoppinglists')
         .doc(listId)
         .collection('groceries')
@@ -94,7 +94,7 @@ class ShoppingListService {
     log.finest(
         'deleteAllBoughtGrocery: Query results: ${snaps.docs.toString()}');
 
-    return Future.wait(
+    await Future.wait(
         snaps.docs.map((e) => deleteGrocery(listId, e.id)).toList());
   }
 
@@ -118,13 +118,13 @@ class ShoppingListService {
       final existingGrocery = Grocery.fromMap(
           groceriesSnap.docs.first.id, groceriesSnap.docs.first.data());
 
-      if (grocery.unit == null || grocery.unit.isEmpty) {
+      if (grocery.unit == null || grocery.unit!.isEmpty) {
         existingGrocery.amount =
             (existingGrocery.amount ?? 1) + (grocery.amount ?? 1);
       } else if (grocery.amount == null || existingGrocery.amount == null) {
         return false;
       } else {
-        existingGrocery.amount += grocery.amount;
+        existingGrocery.amount = existingGrocery.amount! + grocery.amount!;
       }
 
       await updateGrocery(listId, existingGrocery);

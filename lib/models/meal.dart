@@ -1,21 +1,21 @@
 import 'ingredient.dart';
 
 class Meal {
-  String id;
+  String? id;
   String name;
-  String source;
-  String instructions;
-  int duration;
-  List<Ingredient> ingredients;
-  List<String> tags;
-  String imageUrl;
-  String planId;
-  String createdBy;
-  bool isPublic;
+  String? source;
+  String? instructions;
+  int? duration;
+  List<Ingredient>? ingredients;
+  List<String>? tags;
+  String? imageUrl;
+  String? planId;
+  String? createdBy;
+  bool? isPublic;
 
   Meal({
     this.id,
-    this.name,
+    required this.name,
     this.source,
     this.instructions,
     this.duration,
@@ -33,7 +33,7 @@ class Meal {
       'source': source,
       'instructions': instructions,
       'duration': duration,
-      'ingredients': ingredients?.map((x) => x.toMap())?.toList(),
+      'ingredients': ingredients?.map((x) => x.toMap()).toList(),
       'tags': tags,
       'imageUrl': imageUrl ?? '',
       'planId': planId,
@@ -43,8 +43,6 @@ class Meal {
   }
 
   factory Meal.fromMap(String id, Map<String, dynamic> map) {
-    if (map == null) return null;
-
     return Meal(
       id: id,
       name: map['name'],
