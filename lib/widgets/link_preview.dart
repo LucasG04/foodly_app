@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../constants.dart';
 import '../models/link_metadata.dart';
 import '../services/link_metadata_service.dart';
@@ -20,7 +21,7 @@ class LinkPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!BasicUtils.isValidUri(link)) {
-      return SizedBox();
+      return const SizedBox();
     }
     LinkMetadata? metadata;
     if (LinkMetadataService.isCached(link)) {
@@ -38,7 +39,7 @@ class LinkPreview extends StatelessWidget {
                     ? _buildSmallSkeletonCard(context)
                     : _buildLargeSkeletonCard(context);
               } else if (!snapshot.hasData) {
-                return SizedBox();
+                return const SizedBox();
               }
 
               return isSmall
@@ -66,11 +67,11 @@ class LinkPreview extends StatelessWidget {
                 children: [
                   Text(
                     metadata.title!,
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: kPadding / 4),
+                  const SizedBox(height: kPadding / 4),
                   Text(
                     metadata.description!,
                     maxLines: 2,
@@ -93,13 +94,13 @@ class LinkPreview extends StatelessWidget {
         width: double.infinity,
         height: height,
         decoration: BoxDecoration(
-          boxShadow: [kSmallShadow],
+          boxShadow: const [kSmallShadow],
           borderRadius: BorderRadius.circular(kRadius),
           color: Colors.white,
         ),
         child: Row(
           children: [
-            Container(
+            SizedBox(
               height: height,
               width: height,
               child: ClipRRect(
@@ -122,7 +123,7 @@ class LinkPreview extends StatelessWidget {
                     if (metadata.title != null && metadata.title!.isNotEmpty)
                       AutoSizeText(
                         metadata.title!,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.w600,
                         ),
@@ -163,7 +164,7 @@ class LinkPreview extends StatelessWidget {
                   width: size.width * 0.5,
                   height: _getLargeImageHeight(context),
                 ),
-                SizedBox(height: kPadding / 4),
+                const SizedBox(height: kPadding / 4),
                 SkeletonContainer(
                   width: size.width,
                   height: Theme.of(context).textTheme.bodyText1!.fontSize! * 2,
@@ -178,12 +179,12 @@ class LinkPreview extends StatelessWidget {
 
   Widget _buildSmallSkeletonCard(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final height = 75.0;
+    const height = 75.0;
     return Container(
       width: double.infinity,
       height: height,
       decoration: BoxDecoration(
-        boxShadow: [kSmallShadow],
+        boxShadow: const [kSmallShadow],
         borderRadius: BorderRadius.circular(kRadius),
         color: Colors.white,
       ),

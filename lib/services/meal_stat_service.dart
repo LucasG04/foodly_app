@@ -1,14 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:logging/logging.dart';
+
 import '../constants.dart';
 import '../models/meal.dart';
 import '../models/meal_stat.dart';
 import 'meal_service.dart';
-import 'package:logging/logging.dart';
 
 class MealStatService {
   static final log = Logger('MealStatService');
 
-  static FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   MealStatService._();
 
@@ -36,7 +37,7 @@ class MealStatService {
       mealIds = [
         ...{...mealIds}
       ];
-      log.finest('getMealRecommendations mealIds: ' + mealIds.toString());
+      log.finest('getMealRecommendations mealIds: $mealIds');
 
       final meals = await MealService.getMealsByIds(mealIds);
 
@@ -98,7 +99,7 @@ class MealStatService {
           .get();
 
       if (querySnapshot.docs.isEmpty) {
-        final stat = new MealStat(
+        final stat = MealStat(
             mealId: mealId, lastTimePlanned: DateTime.now(), plannedCount: 1);
         await _firestore
             .collection('plans')
@@ -123,7 +124,7 @@ class MealStatService {
       }
     } catch (e) {
       log.severe('ERR: updateStat for plan $planId with $mealId', e);
-      return null;
+      return;
     }
   }
 
@@ -145,7 +146,7 @@ class MealStatService {
       }
     } catch (e) {
       log.severe('ERR: deleteStatByMealId for plan $planId with $mealId', e);
-      return null;
+      return;
     }
   }
 
@@ -160,7 +161,7 @@ class MealStatService {
           .delete();
     } catch (e) {
       log.severe('ERR: deleteStat for plan $planId with $statId', e);
-      return null;
+      return;
     }
   }
 }

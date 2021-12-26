@@ -21,7 +21,7 @@ class BorderIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new ClipRRect(
+    return ClipRRect(
       borderRadius: BorderRadius.circular(kRadius * 2),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),

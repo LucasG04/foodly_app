@@ -32,7 +32,7 @@ class _EditListContentState extends State<EditListContent> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
+        SizedBox(
           width: double.infinity,
           child: Text(
             widget.title!,
@@ -46,7 +46,7 @@ class _EditListContentState extends State<EditListContent> {
                 child: _buildTextField(item, _content!.indexOf(item), context),
               ),
               IconButton(
-                  icon: Icon(EvaIcons.minusCircleOutline),
+                  icon: const Icon(EvaIcons.minusCircleOutline),
                   onPressed: () {
                     setState(() {
                       _content!.remove(item);
@@ -58,9 +58,9 @@ class _EditListContentState extends State<EditListContent> {
         }).toList(),
         Row(
           children: <Widget>[
-            Spacer(),
+            const Spacer(),
             IconButton(
-              icon: Icon(EvaIcons.plusCircleOutline),
+              icon: const Icon(EvaIcons.plusCircleOutline),
               onPressed: () {
                 setState(() {
                   _content!.add('');
@@ -83,13 +83,13 @@ class _EditListContentState extends State<EditListContent> {
 
     return TextField(
       controller: controller,
-      decoration: new InputDecoration(
+      decoration: InputDecoration(
         border: InputBorder.none,
         focusedBorder: InputBorder.none,
         enabledBorder: InputBorder.none,
         errorBorder: InputBorder.none,
         disabledBorder: InputBorder.none,
-        contentPadding: EdgeInsets.only(
+        contentPadding: const EdgeInsets.only(
           left: kPadding / 2,
           bottom: 11,
           top: 11,

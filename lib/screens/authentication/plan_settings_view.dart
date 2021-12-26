@@ -14,11 +14,12 @@ class PlanSettingsView extends StatefulWidget {
   final void Function() navigateBack;
   final void Function(Plan) navigateForward;
 
-  PlanSettingsView({
+  const PlanSettingsView({
     required this.plan,
     required this.navigateBack,
     required this.navigateForward,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   _PlanSettingsViewState createState() => _PlanSettingsViewState();
@@ -35,7 +36,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
   void initState() {
     _buttonState = ButtonState.normal;
 
-    _nameController = new TextEditingController();
+    _nameController = TextEditingController();
     super.initState();
   }
 
@@ -48,19 +49,18 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
         horizontal: (MediaQuery.of(context).size.width - contentWidth) / 2,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(height: kPadding + MediaQuery.of(context).padding.top),
           FlutterToggleTab(
             width: 80,
             borderRadius: 15,
             initialIndex: 0,
-            selectedTextStyle: TextStyle(
+            selectedTextStyle: const TextStyle(
               color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
-            unSelectedTextStyle: TextStyle(
+            unSelectedTextStyle: const TextStyle(
               color: Colors.grey,
               fontSize: 14,
               fontWeight: FontWeight.w400,
@@ -81,30 +81,31 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
               ),
             ),
           ),
-          SizedBox(height: kPadding),
+          const SizedBox(height: kPadding),
           MainTextField(
             controller: _nameController,
             title: 'plan_settings_name_title'.tr(),
             textInputAction: TextInputAction.go,
             errorText: _nameErrorText,
           ),
-          Container(
+          SizedBox(
             height: size.height * 0.2 +
                 MediaQuery.of(context).viewInsets.bottom / 4,
             child: _unknownErrorText != null
                 ? Row(
                     children: [
-                      Icon(EvaIcons.alertTriangleOutline, color: Colors.red),
-                      SizedBox(width: kPadding),
+                      const Icon(EvaIcons.alertTriangleOutline,
+                          color: Colors.red),
+                      const SizedBox(width: kPadding),
                       Expanded(
                         child: Text(
                           _unknownErrorText ?? '',
-                          style: TextStyle(color: Colors.red),
+                          style: const TextStyle(color: Colors.red),
                         ),
                       )
                     ],
                   )
-                : SizedBox(),
+                : const SizedBox(),
           ),
           LayoutBuilder(builder: (context, constraints) {
             return Row(
@@ -126,13 +127,13 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
               ],
             );
           }),
-          SizedBox(height: kPadding * 2),
+          const SizedBox(height: kPadding * 2),
         ],
       ),
     );
   }
 
-  TextStyle get _titleTextStyle => TextStyle(
+  TextStyle get _titleTextStyle => const TextStyle(
         fontSize: 22.0,
         fontWeight: FontWeight.w700,
       );
@@ -152,7 +153,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
     _resetErrors();
 
     if (_validateName()) {
-      final plan = new Plan(name: _nameController!.text.trim());
+      final plan = Plan(name: _nameController!.text.trim());
       widget.navigateForward(plan);
     } else {
       setState(() {

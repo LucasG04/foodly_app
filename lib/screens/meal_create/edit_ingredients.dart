@@ -22,7 +22,7 @@ class EditIngredients extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
+        SizedBox(
           width: double.infinity,
           child: Text(
             title,

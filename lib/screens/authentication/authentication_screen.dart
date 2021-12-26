@@ -17,7 +17,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
 
   @override
   void initState() {
-    _pageController = new PageController();
+    _pageController = PageController();
     _isCreatingPlan = false;
     super.initState();
   }
@@ -31,21 +31,20 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
         left: false,
         child: GestureDetector(
           onTap: () {
-            FocusScopeNode currentFocus = FocusScope.of(context);
+            final FocusScopeNode currentFocus = FocusScope.of(context);
             if (!currentFocus.hasPrimaryFocus) {
               currentFocus.unfocus();
             }
           },
           child: PageView(
             controller: _pageController,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             children: [
               CodeInputView((result, [planId]) {
                 setState(() {
                   _isCreatingPlan = result == CodeInputResult.NEW;
-                  _plan = result == CodeInputResult.JOIN
-                      ? new Plan(id: planId)
-                      : null;
+                  _plan =
+                      result == CodeInputResult.JOIN ? Plan(id: planId) : null;
                 });
                 _pageController!.animateToPage(
                   1,
@@ -53,8 +52,11 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                   curve: Curves.easeIn,
                 );
               }),
-              _isCreatingPlan! ? _buildPlanSettingsView() : _buildLoginView(),
-              _isCreatingPlan! ? _buildLoginView() : SizedBox()
+              if (_isCreatingPlan!)
+                _buildPlanSettingsView()
+              else
+                _buildLoginView(),
+              if (_isCreatingPlan!) _buildLoginView() else const SizedBox()
             ],
           ),
         ),

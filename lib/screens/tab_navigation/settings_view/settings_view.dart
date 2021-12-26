@@ -4,8 +4,6 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'loading_logout.dart';
-import '../../../utils/main_snackbar.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share/share.dart';
 
@@ -15,10 +13,12 @@ import '../../../services/authentication_service.dart';
 import '../../../services/plan_service.dart';
 import '../../../services/settings_service.dart';
 import '../../../utils/basic_utils.dart';
+import '../../../utils/main_snackbar.dart';
 import '../../../widgets/page_title.dart';
 import '../../onboarding/onboarding_screen.dart';
 import 'help_slides/help_slide_share_import.dart';
 import 'import_meals_modal.dart';
+import 'loading_logout.dart';
 import 'settings_tile.dart';
 
 class SettingsView extends StatefulWidget {
@@ -42,7 +42,6 @@ class _SettingsViewState extends State<SettingsView> {
                       2,
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: kPadding),
                     PageTitle(text: 'settings_title'.tr()),
@@ -203,7 +202,7 @@ class _SettingsViewState extends State<SettingsView> {
                         children: <TextSpan>[
                           TextSpan(text: 'settings_sign_in_as'.tr()),
                           TextSpan(
-                            text: '\n' + firebaseUser!.email!,
+                            text: '\n${firebaseUser!.email!}',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
@@ -233,8 +232,8 @@ class _SettingsViewState extends State<SettingsView> {
     );
   }
 
-  Container _buildSectionTitle(String title) {
-    return Container(
+  SizedBox _buildSectionTitle(String title) {
+    return SizedBox(
       width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(

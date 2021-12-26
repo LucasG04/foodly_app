@@ -8,8 +8,6 @@ import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'models/link_metadata.dart';
-import 'services/link_metadata_service.dart';
 import 'package:hive/hive.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:logging/logging.dart';
@@ -19,11 +17,13 @@ import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'app_router.gr.dart';
 import 'constants.dart';
 import 'models/foodly_user.dart';
+import 'models/link_metadata.dart';
 import 'models/meal.dart';
 import 'models/plan.dart';
 import 'providers/state_providers.dart';
 import 'services/authentication_service.dart';
 import 'services/foodly_user_service.dart';
+import 'services/link_metadata_service.dart';
 import 'services/meal_service.dart';
 import 'services/plan_service.dart';
 import 'services/settings_service.dart';
@@ -37,9 +37,9 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       child: EasyLocalization(
-        supportedLocales: [Locale('en'), Locale('de')],
+        supportedLocales: const [Locale('en'), Locale('de')],
         path: 'assets/translations',
-        fallbackLocale: Locale('en'),
+        fallbackLocale: const Locale('en'),
         child: FoodlyApp(),
       ),
     ),
@@ -47,7 +47,7 @@ Future<void> main() async {
 }
 
 Future<void> initializeHive() async {
-  var dir = await getApplicationDocumentsDirectory();
+  final dir = await getApplicationDocumentsDirectory();
   Hive.init(dir.path);
   Hive.registerAdapter(LinkMetadataAdapter());
   await SettingsService.initialize();
@@ -126,7 +126,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
                 ),
                 localizationsDelegates: [
                   ...context.localizationDelegates,
-                  LocaleNamesLocalizationsDelegate(),
+                  const LocaleNamesLocalizationsDelegate(),
                 ],
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
@@ -134,7 +134,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
             },
           );
         } else {
-          return MaterialApp(home: Scaffold());
+          return const MaterialApp(home: Scaffold());
         }
       },
     );
@@ -143,10 +143,10 @@ class _FoodlyAppState extends State<FoodlyApp> {
   Future<void> _loadActivePlan(BuildContext context) async {
     final currentPlan = context.read(planProvider).state;
     if (currentPlan == null) {
-      String? planId = await PlanService.getCurrentPlanId();
+      final String? planId = await PlanService.getCurrentPlanId();
 
       if (planId != null && planId.isNotEmpty) {
-        Plan newPlan = (await PlanService.getPlanById(planId))!;
+        final Plan newPlan = (await PlanService.getPlanById(planId))!;
         context.read(planProvider).state = newPlan;
       }
     }
@@ -155,7 +155,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
   Future<void> _loadActiveUser(BuildContext context) async {
     final firebaseUser = AuthenticationService.currentUser;
     if (firebaseUser != null) {
-      FoodlyUser user =
+      final FoodlyUser user =
           (await FoodlyUserService.getUserById(firebaseUser.uid))!;
       context.read(userProvider).state = user;
     }
@@ -179,12 +179,12 @@ class _FoodlyAppState extends State<FoodlyApp> {
               .listen((meals) {
         _privateMealsStreamValue = meals;
         mergeMealsIntoProvider();
-        _log.finest('Private meals updated: ' + meals.toString());
+        _log.finest('Private meals updated: $meals');
       });
       _publicMealsStream = MealService.streamPublicMeals().listen((meals) {
         _publicMealsStreamValue = meals;
         mergeMealsIntoProvider();
-        _log.finest('Public meals updated: ' + meals.toString());
+        _log.finest('Public meals updated: $meals');
       });
     }
   }
