@@ -25,8 +25,8 @@ class MainSnackbar {
 
   /// Show the snackbar.
   void show(BuildContext context) {
-    Flushbar(
-      margin: EdgeInsets.all(8),
+    Flushbar<dynamic>(
+      margin: const EdgeInsets.all(8),
       borderRadius: BorderRadius.circular(15.0),
       flushbarStyle: FlushbarStyle.FLOATING,
       title: this.title,
@@ -43,7 +43,7 @@ class MainSnackbar {
                   size: 28.0,
                   color: Colors.red[300],
                 )
-              : Icon(
+              : const Icon(
                   EvaIcons.infoOutline,
                   size: 28.0,
                   color: Colors.grey,

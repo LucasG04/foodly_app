@@ -11,7 +11,7 @@ class EditIngredients extends StatelessWidget {
   final List<Ingredient> content;
   final void Function(List<Ingredient>)? onChanged;
 
-  EditIngredients({
+  const EditIngredients({
     Key? key,
     required this.title,
     required this.content,
@@ -31,16 +31,17 @@ class EditIngredients extends StatelessWidget {
         ),
         ListView.builder(
           shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           itemCount: content.length,
           itemBuilder: (context, index) {
-            String amount = ConvertUtil.amountToString(
+            final String amount = ConvertUtil.amountToString(
                 content[index].amount, content[index].unit);
             return ListTile(
               title: Text(content[index].name!),
               subtitle: amount.isNotEmpty ? Text(amount) : null,
               trailing: IconButton(
-                icon: Icon(EvaIcons.minusCircleOutline, color: Colors.black),
+                icon: const Icon(EvaIcons.minusCircleOutline,
+                    color: Colors.black),
                 onPressed: () {
                   content.removeAt(index);
                   onChanged!(content);
@@ -53,7 +54,7 @@ class EditIngredients extends StatelessWidget {
         ),
         Center(
           child: IconButton(
-            icon: Icon(EvaIcons.plusCircleOutline, color: Colors.black),
+            icon: const Icon(EvaIcons.plusCircleOutline, color: Colors.black),
             onPressed: () => _editIngredient(context),
           ),
         ),
@@ -61,9 +62,10 @@ class EditIngredients extends StatelessWidget {
     );
   }
 
-  void _editIngredient(context, [Ingredient? ingredient, int? index]) async {
+  void _editIngredient(BuildContext context,
+      [Ingredient? ingredient, int? index]) async {
     final result = await showBarModalBottomSheet<Ingredient>(
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
         ),

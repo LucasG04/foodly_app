@@ -37,7 +37,7 @@ class FoodlyNetworkImage extends StatelessWidget {
         width: double.infinity,
         height: double.infinity,
       ),
-      errorWidget: (_, __, ___) => Image.asset(
+      errorWidget: (_, __, dynamic ___) => Image.asset(
         'assets/images/food_fallback.png',
       ),
       // cacheManager: HiveCacheManager(box: ImageCacheService.box)

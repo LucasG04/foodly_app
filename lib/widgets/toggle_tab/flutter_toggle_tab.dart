@@ -64,7 +64,7 @@ class FlutterToggleTab extends StatefulWidget {
 class _FlutterToggleTabState extends State<FlutterToggleTab> {
   List<DataTab> _labels = [];
 
-  _setDefaultSelected() {
+  void _setDefaultSelected() {
     setState(() {
       if (widget.selectedIndex != null) {
         _labels.clear();

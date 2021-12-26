@@ -3,7 +3,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../widgets/link_preview.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../constants.dart';
@@ -11,11 +10,13 @@ import '../../models/meal.dart';
 import '../../providers/state_providers.dart';
 import '../../services/authentication_service.dart';
 import '../../services/chefkoch_service.dart';
+import '../../services/link_metadata_service.dart';
 import '../../services/meal_service.dart';
 import '../../services/storage_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
 import '../../widgets/full_screen_loader.dart';
+import '../../widgets/link_preview.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
@@ -29,9 +30,7 @@ import 'edit_list_content.dart';
 class MealCreateScreen extends StatefulWidget {
   final String id;
 
-  const MealCreateScreen({
-    required this.id,
-  });
+  const MealCreateScreen({required this.id, Key? key}) : super(key: key);
 
   @override
   _MealCreateScreenState createState() => _MealCreateScreenState();
@@ -44,7 +43,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   late bool _isCreatingMeal;
   late bool _isLoadingMeal;
   late bool _mealSaved;
-  Meal _meal = new Meal(name: '');
+  Meal _meal = Meal(name: '');
   ScrollController? _scrollController;
   TextEditingController? _sourceController;
   TextEditingController? _titleController;
@@ -55,7 +54,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     _initialParseId();
 
     _buttonState = ButtonState.normal;
-    _scrollController = new ScrollController();
+    _scrollController = ScrollController();
     _mealSaved = false;
     super.initState();
   }
@@ -100,60 +99,63 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
             child: SingleChildScrollView(
               controller: _scrollController,
               child: Center(
-                child: Container(
+                child: SizedBox(
                   width: fullWidth,
                   child: Column(
+                    // ignore: avoid_redundant_argument_values
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       MainTextField(
                         controller: _titleController,
                         title: 'meal_create_title_title'.tr(),
                       ),
-                      Divider(),
-                      _isLoadingMeal
-                          ? EditIngredients(
-                              key: UniqueKey(),
-                              content: [],
-                              onChanged: null,
-                              title: 'meal_create_ingredients_title'.tr(),
-                            )
-                          : EditIngredients(
-                              content: _meal.ingredients ?? [],
-                              onChanged: (results) {
-                                setState(() {
-                                  _meal.ingredients = results;
-                                });
-                              },
-                              title: 'meal_create_ingredients_title'.tr(),
-                            ),
-                      Divider(),
-                      Container(
+                      const Divider(),
+                      if (_isLoadingMeal)
+                        EditIngredients(
+                          key: UniqueKey(),
+                          content: const [],
+                          onChanged: null,
+                          title: 'meal_create_ingredients_title'.tr(),
+                        )
+                      else
+                        EditIngredients(
+                          content: _meal.ingredients ?? [],
+                          onChanged: (results) {
+                            setState(() {
+                              _meal.ingredients = results;
+                            });
+                          },
+                          title: 'meal_create_ingredients_title'.tr(),
+                        ),
+                      const Divider(),
+                      SizedBox(
                         width: double.infinity,
                         child: Text(
                           'meal_create_instruction_title',
                           style: Theme.of(context).textTheme.bodyText1,
                         ).tr(),
                       ),
-                      _isLoadingMeal
-                          ? MarkdownEditor(
-                              key: UniqueKey(),
-                              onChange: null,
-                              initialValue: '',
-                            )
-                          : MarkdownEditor(
-                              textEditingController: _instructionsController,
-                            ),
-                      Divider(),
-                      _isLoadingMeal
-                          ? WrappedImagePicker(
-                              key: UniqueKey(),
-                              onPick: null,
-                            )
-                          : WrappedImagePicker(
-                              imageUrl: _meal.imageUrl,
-                              onPick: (value) => _updatedImage = value,
-                            ),
-                      Divider(),
+                      if (_isLoadingMeal)
+                        MarkdownEditor(
+                          key: UniqueKey(),
+                          initialValue: '',
+                        )
+                      else
+                        MarkdownEditor(
+                          textEditingController: _instructionsController,
+                        ),
+                      const Divider(),
+                      if (_isLoadingMeal)
+                        WrappedImagePicker(
+                          key: UniqueKey(),
+                          onPick: null,
+                        )
+                      else
+                        WrappedImagePicker(
+                          imageUrl: _meal.imageUrl,
+                          onPick: (value) => _updatedImage = value,
+                        ),
+                      const Divider(),
                       Row(
                         children: [
                           Flexible(
@@ -165,8 +167,9 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                                   'meal_create_source_placeholder'.tr(),
                             ),
                           ),
-                          SizedBox(width: kPadding / 2),
+                          const SizedBox(width: kPadding / 2),
                           Flexible(
+                            // ignore: avoid_redundant_argument_values
                             flex: 1,
                             child: MainTextField(
                               controller: _durationController,
@@ -184,14 +187,15 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                               vertical: kPadding / 2),
                           child: LinkPreview(_sourceController!.text),
                         ),
-                      Divider(),
-                      !_isLoadingMeal
-                          ? EditListContent(
-                              content: _meal.tags,
-                              onChanged: (list) => _meal.tags = list,
-                              title: 'meal_create_tags_title'.tr(),
-                            )
-                          : SizedBox(),
+                      const Divider(),
+                      if (!_isLoadingMeal)
+                        EditListContent(
+                          content: _meal.tags,
+                          onChanged: (list) => _meal.tags = list,
+                          title: 'meal_create_tags_title'.tr(),
+                        )
+                      else
+                        const SizedBox(),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: kPadding),
                         child: MainButton(
@@ -207,7 +211,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
               ),
             ),
           ),
-          _isLoadingMeal ? FullScreenLoader() : SizedBox(),
+          if (_isLoadingMeal) const FullScreenLoader() else const SizedBox(),
         ],
       ),
     );
@@ -217,10 +221,10 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     if (widget.id == 'create') {
       _isLoadingMeal = false;
       _isCreatingMeal = true;
-      _titleController = new TextEditingController();
-      _sourceController = new TextEditingController();
-      _durationController = new TextEditingController();
-      _instructionsController = new TextEditingController();
+      _titleController = TextEditingController();
+      _sourceController = TextEditingController();
+      _durationController = TextEditingController();
+      _instructionsController = TextEditingController();
       _meal.ingredients = [];
       _meal.tags = [];
     } else if (widget.id.startsWith('https') &&
@@ -232,12 +236,12 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         if (meal != null) {
           meal.imageUrl = meal.imageUrl!.replaceFirst('http:', 'https:');
           _meal = meal;
-          _titleController = new TextEditingController(text: meal.name);
-          _sourceController = new TextEditingController(text: meal.source);
+          _titleController = TextEditingController(text: meal.name);
+          _sourceController = TextEditingController(text: meal.source);
           _durationController =
-              new TextEditingController(text: meal.duration.toString());
+              TextEditingController(text: meal.duration.toString());
           _instructionsController =
-              new TextEditingController(text: meal.instructions);
+              TextEditingController(text: meal.instructions);
           _meal.ingredients = _meal.ingredients ?? [];
           _meal.tags = _meal.tags ?? [];
         }
@@ -245,20 +249,19 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         setState(() {
           _isLoadingMeal = false;
         });
-        // ignore: invalid_return_type_for_catch_error
-      }).catchError((err) => print(err));
+      });
     } else {
       _isLoadingMeal = true;
       _isCreatingMeal = false;
       MealService.getMealById(widget.id).then((meal) {
         if (meal != null) {
           _meal = meal;
-          _titleController = new TextEditingController(text: meal.name);
-          _sourceController = new TextEditingController(text: meal.source);
+          _titleController = TextEditingController(text: meal.name);
+          _sourceController = TextEditingController(text: meal.source);
           _durationController =
-              new TextEditingController(text: meal.duration.toString());
+              TextEditingController(text: meal.duration.toString());
           _instructionsController =
-              new TextEditingController(text: meal.instructions);
+              TextEditingController(text: meal.instructions);
           _meal.ingredients = _meal.ingredients ?? [];
           _meal.tags = _meal.tags ?? [];
         }
@@ -282,7 +285,10 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     _meal.createdBy = _isCreatingMeal
         ? AuthenticationService.currentUser!.uid
         : _meal.createdBy;
-    _meal.imageUrl = _updatedImage ?? _meal.imageUrl;
+
+    _meal.imageUrl = _updatedImage ??
+        (await LinkMetadataService.get(_meal.source!))?.image ??
+        _meal.imageUrl;
 
     if (_formIsValid()) {
       try {
@@ -293,7 +299,6 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         _mealSaved = true;
         AutoRouter.of(context).pop(newMeal);
       } catch (e) {
-        print(e);
         MainSnackbar(
           message: 'meal_create_error_unknown'.tr(),
           isError: true,
@@ -313,12 +318,12 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   }
 
   bool _formIsValid() {
-    return _titleController!.text.isNotEmpty && _meal.ingredients!.isNotEmpty;
+    return _titleController!.text.isNotEmpty;
   }
 
   void _openChefkochImport() async {
     final result = await showBarModalBottomSheet<Meal>(
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
         ),

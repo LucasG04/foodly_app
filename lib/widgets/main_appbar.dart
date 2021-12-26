@@ -35,7 +35,7 @@ class _MainAppBarState extends State<MainAppBar> {
     super.initState();
   }
 
-  _scrollListener() {
+  void _scrollListener() {
     if (widget.scrollController!.offset <=
         widget.scrollController!.position.minScrollExtent) {
       if (!_isScrollToTop) {

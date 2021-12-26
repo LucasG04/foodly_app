@@ -16,7 +16,7 @@ class PlanMeal {
   });
 
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       'date': date.millisecondsSinceEpoch,
       'meal': meal,
       'type': type.toString(),
@@ -28,14 +28,16 @@ class PlanMeal {
   factory PlanMeal.fromMap(String id, Map<String, dynamic> map) {
     return PlanMeal(
       id: id,
-      date: DateTime.fromMillisecondsSinceEpoch(map['date']),
-      meal: map['meal'],
+      date: DateTime.fromMillisecondsSinceEpoch(map['date'] as int),
+      meal: map['meal'] as String,
       type: MealType.values.firstWhere(
         (e) => e.toString() == map['type'],
         orElse: () => MealType.LUNCH,
       ),
-      upvotes: List<String>.from(map['upvotes'] ?? []),
-      downvotes: List<String>.from(map['downvotes'] ?? []),
+      upvotes:
+          List<String>.from((map['upvotes'] as List<dynamic>?) ?? <String>[]),
+      downvotes:
+          List<String>.from((map['downvotes'] as List<dynamic>?) ?? <String>[]),
     );
   }
 

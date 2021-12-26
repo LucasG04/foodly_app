@@ -48,7 +48,7 @@ class LinkPreview extends StatelessWidget {
           );
   }
 
-  Widget _buildLargeCard(LinkMetadata metadata, context) {
+  Widget _buildLargeCard(LinkMetadata metadata, BuildContext context) {
     return GestureDetector(
       onTap: metadata.url != null ? () => launch(metadata.url!) : () {},
       child: Card(
@@ -85,8 +85,8 @@ class LinkPreview extends StatelessWidget {
     );
   }
 
-  Widget _buildSmallCard(LinkMetadata metadata, context) {
-    final height = 75.0;
+  Widget _buildSmallCard(LinkMetadata metadata, BuildContext context) {
+    const height = 75.0;
     return GestureDetector(
       onTap: metadata.url != null ? () => launch(metadata.url!) : () {},
       child: Container(

@@ -1,7 +1,8 @@
-import '../models/link_metadata.dart';
 import 'package:hive/hive.dart';
 import 'package:logging/logging.dart';
 import 'package:metadata_fetch/metadata_fetch.dart';
+
+import '../models/link_metadata.dart';
 
 class LinkMetadataService {
   LinkMetadataService._();
@@ -18,6 +19,11 @@ class LinkMetadataService {
   }
 
   static bool get isReady => _isReady;
+
+  static Future<LinkMetadata?> get(String link) async {
+    log.finer('Call getFromApi with $link');
+    return isCached(link) ? getFromCache(link) : await getFromApi(link);
+  }
 
   static Future<LinkMetadata?> getFromApi(String link) async {
     log.finer('Call getFromApi with $link');
@@ -51,18 +57,16 @@ class LinkMetadataService {
 
   static Future<void> _cacheData(LinkMetadata data) async {
     log.finer('Call _cacheData with key ${data.url}');
-    await _dataBox.put(data.url, data).catchError((err) {
+    await _dataBox.put(data.url, data).catchError((dynamic err) {
       log.severe('ERR _cacheData with key ${data.url}');
       log.severe(err);
     });
   }
 
-  static _parseMetadata(Metadata data, [DateTime? cachedAt]) {
-    if (cachedAt == null) {
-      cachedAt = DateTime.now();
-    }
+  static LinkMetadata _parseMetadata(Metadata data, [DateTime? cachedAt]) {
+    cachedAt ??= DateTime.now();
 
-    return new LinkMetadata(
+    return LinkMetadata(
       url: data.url,
       image: data.image,
       title: data.title,

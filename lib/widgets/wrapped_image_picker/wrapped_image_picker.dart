@@ -77,7 +77,7 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
   }
 
   void _selectImage() async {
-    final result = await showDialog(
+    final String? result = await showDialog<String>(
       context: context,
       builder: (_) => Dialog(child: SelectPickerDialog()),
     );

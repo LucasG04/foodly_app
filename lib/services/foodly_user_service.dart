@@ -4,15 +4,14 @@ import 'package:logging/logging.dart';
 import '../models/foodly_user.dart';
 
 class FoodlyUserService {
-  static final log = Logger('FoodlyUserService');
-
-  static FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   FoodlyUserService._();
+
+  static final log = Logger('FoodlyUserService');
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   static Future<FoodlyUser> createUserWithId(String userId) async {
     log.finer('Call createUserWithId with $userId');
-    final user = new FoodlyUser(id: userId, oldPlans: []);
+    final user = FoodlyUser(id: userId, oldPlans: []);
     await _firestore.collection('users').doc(userId).set(user.toMap());
     return user;
   }
@@ -34,7 +33,7 @@ class FoodlyUserService {
       return _firestore
           .collection('users')
           .doc(userId)
-          .update({'oldPlans': user.oldPlans});
+          .update(<String, List<String?>>{'oldPlans': user.oldPlans ?? []});
     }
     log.finest(
         'Call addOldPlanIdToUser with UserId: $userId | PlanId: $planId | ${user.toString()} | oldPlans dont contain planId');

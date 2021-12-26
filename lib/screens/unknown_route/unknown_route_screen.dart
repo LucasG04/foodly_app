@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../../app_router.gr.dart';
 
 class UnknownRouteScreen extends StatelessWidget {
+  const UnknownRouteScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final size =
@@ -14,22 +16,22 @@ class UnknownRouteScreen extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
-            Container(
+            SizedBox(
               height: size * 0.5,
               width: size * 0.5,
               child: Image.asset(
                 'assets/images/undraw_page_not_found.png',
               ),
             ),
-            SizedBox(height: 0.0),
-            Text(
+            const SizedBox(height: 0.0),
+            const Text(
               'Page not found.',
               style: TextStyle(fontSize: 30),
             ),
-            SizedBox(height: 40.0),
+            const SizedBox(height: 40.0),
             TextButton(
               onPressed: () => _navigateToHome(context),
-              child: Text('Back to Home'),
+              child: const Text('Back to Home'),
             ),
           ],
         ),
@@ -37,7 +39,7 @@ class UnknownRouteScreen extends StatelessWidget {
     );
   }
 
-  void _navigateToHome(context) {
-    AutoRouter.of(context).replaceAll([HomeScreenRoute()]);
+  void _navigateToHome(BuildContext context) {
+    AutoRouter.of(context).replaceAll([const HomeScreenRoute()]);
   }
 }

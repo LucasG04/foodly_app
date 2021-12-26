@@ -28,7 +28,7 @@ class Meal {
   });
 
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       'name': name,
       'source': source,
       'instructions': instructions,
@@ -45,17 +45,19 @@ class Meal {
   factory Meal.fromMap(String id, Map<String, dynamic> map) {
     return Meal(
       id: id,
-      name: map['name'],
-      source: map['source'],
-      instructions: map['instructions'],
-      imageUrl: map['imageUrl'] ?? '',
+      name: map['name'] as String,
+      source: map['source'] as String?,
+      instructions: map['instructions'] as String?,
+      imageUrl: (map['imageUrl'] as String?) ?? '',
       duration: int.tryParse(map['duration'].toString()) ?? 0,
       ingredients: List<Ingredient>.from(
-          map['ingredients']?.map((x) => Ingredient.fromMap(x))),
-      tags: List<String>.from(map['tags'] ?? []),
-      planId: map['planId'],
-      createdBy: map['createdBy'],
-      isPublic: map['isPublic'] ?? false,
+        (map['ingredients'] as List<dynamic>).map<dynamic>(
+            (dynamic x) => Ingredient.fromMap(x as Map<String, dynamic>)),
+      ),
+      tags: List<String>.from((map['tags'] as List<dynamic>?) ?? <String>[]),
+      planId: map['planId'] as String?,
+      createdBy: map['createdBy'] as String?,
+      isPublic: (map['isPublic'] as bool?) ?? false,
     );
   }
 

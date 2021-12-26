@@ -8,7 +8,7 @@ class FoodlyUser {
   });
 
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       'oldPlans': oldPlans,
     };
   }
@@ -16,7 +16,7 @@ class FoodlyUser {
   factory FoodlyUser.fromMap(String id, Map<String, dynamic> map) {
     return FoodlyUser(
       id: id,
-      oldPlans: List<String>.from(map['oldPlans']),
+      oldPlans: List<String>.from(map['oldPlans'] as List<dynamic>),
     );
   }
 }

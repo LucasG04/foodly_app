@@ -170,11 +170,11 @@ class MealService {
 
   static Future<List<String?>> _getMealPhotos(String mealName) async {
     List<String?> urls = [];
-    final response = await Dio().get(
+    final Response<dynamic> response = await Dio().get<dynamic>(
       'https://pixabay.com/api/',
-      queryParameters: {
+      queryParameters: <String, dynamic>{
         'key': secretPixabay,
-        'q': mealName.toString() + ' food',
+        'q': '$mealName food',
         'per_page': '3',
         'safesearch': 'true',
         'lang': 'de',
@@ -183,7 +183,7 @@ class MealService {
 
     if (response.data != null && response.data['totalHits'] != 0) {
       for (var item in response.data['hits']) {
-        urls.add(item['webformatURL']);
+        urls.add(item['webformatURL'] as String);
       }
     }
 

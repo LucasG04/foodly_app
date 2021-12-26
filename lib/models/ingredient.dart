@@ -12,7 +12,7 @@ class Ingredient {
   });
 
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       'name': name,
       'amount': amount,
       'unit': unit,
@@ -22,10 +22,10 @@ class Ingredient {
 
   factory Ingredient.fromMap(Map<String, dynamic> map) {
     return Ingredient(
-      name: map['name'],
-      amount: map['amount'],
-      unit: map['unit'],
-      productGroup: map['productGroup'],
+      name: map['name'] as String?,
+      amount: map['amount'] as double?,
+      unit: map['unit'] as String?,
+      productGroup: map['productGroup'] as String?,
     );
   }
 

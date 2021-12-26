@@ -3,18 +3,18 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../constants.dart';
 import '../../models/foodly_user.dart';
 import '../../models/plan.dart';
 import '../../services/foodly_user_service.dart';
 import '../../services/plan_service.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
-import '../../constants.dart';
-
 class SelectPlanModal extends ConsumerWidget {
   final String userId;
 
-  SelectPlanModal(this.userId);
+  const SelectPlanModal(this.userId, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, watch) {
@@ -38,14 +38,14 @@ class SelectPlanModal extends ConsumerWidget {
                 children: [
                   AutoSizeText(
                     'modal_select_plan_title'.tr().toUpperCase(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   GestureDetector(
-                    child: Icon(EvaIcons.close),
+                    child: const Icon(EvaIcons.close),
                     onTap: () => Navigator.maybePop(context),
                   ),
                 ],
@@ -64,7 +64,7 @@ class SelectPlanModal extends ConsumerWidget {
                 return SizedBox(
                   height: size.height * 0.3,
                   child: Center(
-                    child: Text(
+                    child: const Text(
                       'modal_select_plan_no_plan',
                       textAlign: TextAlign.center,
                     ).tr(),
@@ -79,7 +79,7 @@ class SelectPlanModal extends ConsumerWidget {
     );
   }
 
-  _buildPlanList(FoodlyUser user, double emptySpaceHeight) {
+  Widget _buildPlanList(FoodlyUser user, double emptySpaceHeight) {
     return FutureBuilder<List<Plan>>(
       future: PlanService.getPlansByIds(user.oldPlans!),
       builder: (context, snapshot) {
@@ -92,7 +92,7 @@ class SelectPlanModal extends ConsumerWidget {
           return SizedBox(
             height: emptySpaceHeight,
             child: Center(
-              child: Text(
+              child: const Text(
                 'modal_select_plan_no_plan',
                 textAlign: TextAlign.center,
               ).tr(),
@@ -107,7 +107,7 @@ class SelectPlanModal extends ConsumerWidget {
             title: Text(snapshot.data![index].name!),
             subtitle: Text(snapshot.data![index].code!),
             onTap: () => Navigator.pop(ctx, snapshot.data![index]),
-            trailing: Icon(Icons.arrow_forward_ios_rounded),
+            trailing: const Icon(Icons.arrow_forward_ios_rounded),
           ),
         );
       },

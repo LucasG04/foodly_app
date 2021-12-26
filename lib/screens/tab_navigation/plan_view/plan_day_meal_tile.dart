@@ -24,7 +24,8 @@ class PlanDayMealTile extends StatefulWidget {
   final bool enableVoting;
   final PlanMeal planMeal;
 
-  PlanDayMealTile(this.planMeal, [this.enableVoting = false]);
+  const PlanDayMealTile(this.planMeal, {Key? key, this.enableVoting = false})
+      : super(key: key);
 
   @override
   _PlanDayMealTileState createState() => _PlanDayMealTileState();
@@ -75,7 +76,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
           height: 50.0,
           borderRadius: 1000,
         ),
-        SizedBox(width: 10.0),
+        const SizedBox(width: 10.0),
         SkeletonContainer(
           width: 150.0,
           height: 17.0,
@@ -86,7 +87,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
   }
 
   Row _buildDataRow(BuildContext context, {String? placeholder, Meal? meal}) {
-    bool isPlaceholder = placeholder != null && placeholder.isNotEmpty;
+    final bool isPlaceholder = placeholder != null && placeholder.isNotEmpty;
     final voteColor = widget.planMeal.upvotes!
             .contains(AuthenticationService.currentUser!.uid)
         ? Theme.of(context).primaryColor
@@ -94,17 +95,17 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
 
     return Row(
       children: [
-        Container(
+        SizedBox(
           width: 50.0,
           height: 50.0,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10000),
             child: isPlaceholder
-                ? Container(
+                ? SizedBox(
                     width: 50.0,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10000),
-                      child: Center(child: Icon(EvaIcons.code)),
+                      child: const Center(child: Icon(EvaIcons.code)),
                     ),
                   )
                 : meal!.imageUrl != null && meal.imageUrl!.isNotEmpty
@@ -123,7 +124,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                     isPlaceholder ? placeholder : meal!.name,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.w600,
                     ),
@@ -138,13 +139,13 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                           meal.name,
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         height: MealTag.tagHeight,
                         child: Wrap(
                           clipBehavior: Clip.hardEdge,
@@ -156,7 +157,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
           ),
         ),
         if (widget.enableVoting) ...[
-          SizedBox(width: kPadding / 2),
+          const SizedBox(width: kPadding / 2),
           Row(
             children: [
               IconButton(
@@ -185,20 +186,20 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
               ),
             ],
           ),
-          SizedBox(width: kPadding / 2),
+          const SizedBox(width: kPadding / 2),
         ],
         PopupMenuButton(
-          onSelected: (dynamic val) =>
+          onSelected: (String val) =>
               _onMenuSelected(val, context.read(planProvider).state!.id!),
-          icon: Icon(EvaIcons.moreVerticalOutline),
+          icon: const Icon(EvaIcons.moreVerticalOutline),
           itemBuilder: (BuildContext context) {
             return widget.planMeal.meal.startsWith(kPlaceholderSymbol)
                 ? [
                     PopupMenuItem(
                       value: 'delete',
                       child: ListTile(
-                        title: Text('plan_day_tile_remove').tr(),
-                        leading: Icon(EvaIcons.minusCircleOutline),
+                        title: const Text('plan_day_tile_remove').tr(),
+                        leading: const Icon(EvaIcons.minusCircleOutline),
                       ),
                     ),
                   ]
@@ -206,15 +207,15 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                     PopupMenuItem(
                       value: 'tolist',
                       child: ListTile(
-                        title: Text('plan_ingredients_to_list').tr(),
-                        leading: Icon(EvaIcons.fileAddOutline),
+                        title: const Text('plan_ingredients_to_list').tr(),
+                        leading: const Icon(EvaIcons.fileAddOutline),
                       ),
                     ),
                     PopupMenuItem(
                       value: 'delete',
                       child: ListTile(
-                        title: Text('plan_day_tile_remove').tr(),
-                        leading: Icon(EvaIcons.minusCircleOutline),
+                        title: const Text('plan_day_tile_remove').tr(),
+                        leading: const Icon(EvaIcons.minusCircleOutline),
                       ),
                     ),
                   ];
@@ -244,10 +245,10 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
       }
       final listId =
           (await ShoppingListService.getShoppingListByPlanId(planId)).id;
-      for (var ingredient in meal.ingredients!) {
+      for (final ingredient in meal.ingredients!) {
         ShoppingListService.addGrocery(
           listId!,
-          new Grocery(
+          Grocery(
             name: ingredient.name,
             amount: ingredient.amount,
             unit: ingredient.unit,

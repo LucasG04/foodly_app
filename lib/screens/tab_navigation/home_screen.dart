@@ -11,6 +11,8 @@ import '../../widgets/small_circular_progress_indicator.dart';
 import 'tab_navigation_view.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -39,8 +41,10 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void setStateIfMounted(f) {
-    if (mounted) setState(f);
+  void setStateIfMounted(void Function() f) {
+    if (mounted) {
+      setState(f);
+    }
   }
 
   @override
@@ -50,13 +54,13 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Center(child: SmallCircularProgressIndicator()),
       );
     } else if (_currentUser != null) {
-      return TabNavigationView();
+      return const TabNavigationView();
     } else if (SettingsService.isFirstUsage) {
-      AutoRouter.of(context).replace(OnboardingScreenRoute());
-      return Scaffold();
+      AutoRouter.of(context).replace(const OnboardingScreenRoute());
+      return const Scaffold();
     } else {
-      AutoRouter.of(context).replace(AuthenticationScreenRoute());
-      return Scaffold();
+      AutoRouter.of(context).replace(const AuthenticationScreenRoute());
+      return const Scaffold();
     }
   }
 }

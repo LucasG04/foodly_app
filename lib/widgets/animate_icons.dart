@@ -72,11 +72,11 @@ class _AnimateIconsState extends State<AnimateIcons>
 
   @override
   void dispose() {
-    this._controller.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
-  initControllerFunctions() {
+  void initControllerFunctions() {
     if (widget.controller != null) {
       widget.controller!.animateToEnd = () {
         _controller.forward();

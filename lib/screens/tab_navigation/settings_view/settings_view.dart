@@ -44,14 +44,14 @@ class _SettingsViewState extends State<SettingsView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(height: kPadding),
+                    const SizedBox(height: kPadding),
                     PageTitle(text: 'settings_title'.tr()),
                     _buildSectionTitle('settings_section_general'.tr()),
                     _buildSection([
                       SettingsTile(
                         onTap: () => Navigator.push(
                           context,
-                          ConcentricPageRoute(
+                          ConcentricPageRoute<OnboardingScreen>(
                               builder: (_) => OnboardingScreen()),
                         ),
                         leadingIcon: EvaIcons.listOutline,
@@ -70,7 +70,7 @@ class _SettingsViewState extends State<SettingsView> {
                       SettingsTile(
                         onTap: () => Navigator.push(
                           context,
-                          ConcentricPageRoute(
+                          ConcentricPageRoute<OnboardingScreen>(
                               builder: (_) => OnboardingScreen()),
                         ),
                         leadingIcon: EvaIcons.trendingUpOutline,
@@ -111,61 +111,63 @@ class _SettingsViewState extends State<SettingsView> {
                       SettingsTile(
                         onTap: () => _shareCode(plan.code!),
                         leadingIcon: EvaIcons.shareOutline,
-                        text:
-                            'settings_section_plan_share'.tr(args: [plan.code!]),
-                        trailing: Icon(EvaIcons.arrowIosForwardOutline),
+                        text: 'settings_section_plan_share'
+                            .tr(args: [plan.code!]),
+                        trailing: const Icon(EvaIcons.arrowIosForwardOutline),
                       ),
                       SettingsTile(
                         onTap: () => _leavePlan(plan.id, context),
                         leadingIcon: EvaIcons.closeCircleOutline,
                         text: 'settings_section_plan_leave'.tr(),
-                        trailing: Icon(
+                        trailing: const Icon(
                           EvaIcons.arrowIosForwardOutline,
                           color: Colors.red,
                         ),
                         color: Colors.red,
                       ),
                     ], context),
-                    foodlyUser.oldPlans!.length > 1
-                        ? _buildSectionTitle('settings_section_meals'.tr())
-                        : SizedBox(),
-                    foodlyUser.oldPlans!.length > 1
-                        ? _buildSection([
-                            SettingsTile(
-                              onTap: () => _importMeals(
-                                foodlyUser.oldPlans!
-                                    .where((id) => id != plan.id)
-                                    .toList(),
-                                context,
-                              ),
-                              leadingIcon: EvaIcons.downloadOutline,
-                              text: 'settings_section_meals_import'.tr(),
-                              trailing: Icon(EvaIcons.arrowIosForwardOutline),
-                            ),
-                          ], context)
-                        : SizedBox(),
+                    if (foodlyUser.oldPlans!.length > 1)
+                      _buildSectionTitle('settings_section_meals'.tr())
+                    else
+                      const SizedBox(),
+                    if (foodlyUser.oldPlans!.length > 1)
+                      _buildSection([
+                        SettingsTile(
+                          onTap: () => _importMeals(
+                            foodlyUser.oldPlans!
+                                .where((id) => id != plan.id)
+                                .toList(),
+                            context,
+                          ),
+                          leadingIcon: EvaIcons.downloadOutline,
+                          text: 'settings_section_meals_import'.tr(),
+                          trailing: const Icon(EvaIcons.arrowIosForwardOutline),
+                        ),
+                      ], context)
+                    else
+                      const SizedBox(),
                     _buildSectionTitle('settings_section_help'.tr()),
                     _buildSection([
                       SettingsTile(
                         onTap: () => Navigator.push(
                           context,
-                          ConcentricPageRoute(
+                          ConcentricPageRoute<OnboardingScreen>(
                               builder: (_) => OnboardingScreen()),
                         ),
                         leadingIcon: EvaIcons.questionMarkCircleOutline,
                         text: 'settings_section_help_intro'.tr(),
-                        trailing: Icon(EvaIcons.arrowIosForwardOutline),
+                        trailing: const Icon(EvaIcons.arrowIosForwardOutline),
                       ),
                       SettingsTile(
                         onTap: () => Navigator.push(
                           context,
-                          ConcentricPageRoute(
+                          ConcentricPageRoute<HelpSlideShareImport>(
                             builder: (_) => HelpSlideShareImport(),
                           ),
                         ),
                         leadingIcon: EvaIcons.questionMarkCircleOutline,
                         text: 'settings_section_help_import'.tr(),
-                        trailing: Icon(EvaIcons.arrowIosForwardOutline),
+                        trailing: const Icon(EvaIcons.arrowIosForwardOutline),
                       ),
                     ], context),
                     _buildSectionTitle('settings_section_account'.tr()),
@@ -181,13 +183,13 @@ class _SettingsViewState extends State<SettingsView> {
                         },
                         leadingIcon: EvaIcons.lockOutline,
                         text: 'settings_section_account_reset'.tr(),
-                        trailing: Icon(EvaIcons.arrowIosForwardOutline),
+                        trailing: const Icon(EvaIcons.arrowIosForwardOutline),
                       ),
                       SettingsTile(
                         onTap: () => AuthenticationService.signOut(),
                         leadingIcon: EvaIcons.logOutOutline,
                         text: 'settings_section_account_logout'.tr(),
-                        trailing: Icon(
+                        trailing: const Icon(
                           EvaIcons.arrowIosForwardOutline,
                           color: Colors.red,
                         ),
@@ -202,17 +204,17 @@ class _SettingsViewState extends State<SettingsView> {
                           TextSpan(text: 'settings_sign_in_as'.tr()),
                           TextSpan(
                             text: '\n' + firebaseUser!.email!,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: kPadding),
+                    const SizedBox(height: kPadding),
                   ],
                 ),
               ),
             )
-          : LoadingLogut();
+          : const LoadingLogut();
     });
   }
 
@@ -243,7 +245,7 @@ class _SettingsViewState extends State<SettingsView> {
         ),
         child: Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -257,16 +259,17 @@ class _SettingsViewState extends State<SettingsView> {
     Share.share('settings_share_msg'.tr(args: [kAppName, code]));
   }
 
-  void _leavePlan(String? planId, context) async {
-    String userId = AuthenticationService.currentUser!.uid;
-    await PlanService.leavePlan(planId, userId);
-    AuthenticationService.signOut();
-    BasicUtils.clearAllProvider(context);
+  void _leavePlan(String? planId, BuildContext context) {
+    final String userId = AuthenticationService.currentUser!.uid;
+    PlanService.leavePlan(planId, userId).then((_) {
+      AuthenticationService.signOut();
+      BasicUtils.clearAllProvider(context);
+    });
   }
 
-  void _importMeals(List<String?> planIds, context) async {
-    showBarModalBottomSheet(
-      shape: RoundedRectangleBorder(
+  void _importMeals(List<String?> planIds, BuildContext context) {
+    showBarModalBottomSheet<void>(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
         ),

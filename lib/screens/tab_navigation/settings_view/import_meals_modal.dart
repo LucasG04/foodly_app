@@ -132,7 +132,7 @@ class _CopyPlanMealsTileState extends State<CopyPlanMealsTile> {
     setState(() {
       _buttonState = CopyButtonState.DONE;
     });
-    await Future.delayed(const Duration(seconds: 2));
+    await Future<void>.delayed(const Duration(seconds: 1));
     setState(() {
       _buttonState = CopyButtonState.NORMAL;
     });

@@ -15,7 +15,7 @@ class _LoadingLogutState extends State<LoadingLogut> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: FutureBuilder(
+      child: FutureBuilder<void>(
         future: Future.delayed(const Duration(seconds: 10)),
         builder: (context, snapshot) => snapshot.connectionState ==
                 ConnectionState.done

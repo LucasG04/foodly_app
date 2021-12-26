@@ -20,7 +20,7 @@ class Plan {
   });
 
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       'name': name,
       'code': code,
       'users': users,
@@ -32,11 +32,11 @@ class Plan {
   factory Plan.fromMap(String? id, Map<String, dynamic> map) {
     return Plan(
       id: id,
-      name: map['name'],
-      code: map['code'],
-      users: List<String>.from(map['users'] ?? []),
-      hourDiffToUtc: map['hourDiffToUtc'],
-      adFree: map['adFree'] ?? false,
+      name: map['name'] as String?,
+      code: map['code'] as String?,
+      users: List<String>.from((map['users'] as List<dynamic>?) ?? <String>[]),
+      hourDiffToUtc: map['hourDiffToUtc'] as int? ?? 0,
+      adFree: (map['adFree'] as bool?) ?? false,
     );
   }
 

@@ -61,7 +61,7 @@ class FoodlyApp extends StatefulWidget {
 
 class _FoodlyAppState extends State<FoodlyApp> {
   late StreamSubscription<String> _intentDataStreamSubscription;
-  Logger _log = new Logger('FoodlyApp');
+  final Logger _log = Logger('FoodlyApp');
   late StreamSubscription<LogRecord> _logStream;
   // ignore: cancel_subscriptions
   StreamSubscription<List<Meal>>? _privateMealsStream;
@@ -211,7 +211,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
         AutoRouter.of(context)
             .push(MealCreateScreenRoute(id: Uri.encodeComponent(value)));
       }
-    }, onError: (err) {
+    }, onError: (dynamic err) {
       _log.severe('ERR in ReceiveSharingIntent.getTextStream()', err);
     });
 
@@ -231,16 +231,17 @@ class _FoodlyAppState extends State<FoodlyApp> {
       return;
     }
 
-    final updateInfo = await InAppUpdate.checkForUpdate().catchError((err) {
+    final updateInfo =
+        await InAppUpdate.checkForUpdate().catchError((dynamic err) {
       _log.severe('ERR in InAppUpdate.checkForUpdate()', err);
     });
 
     if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
       InAppUpdate.startFlexibleUpdate().then((_) {
-        InAppUpdate.completeFlexibleUpdate().catchError((err) {
+        InAppUpdate.completeFlexibleUpdate().catchError((dynamic err) {
           _log.severe('ERR in InAppUpdate.completeFlexibleUpdate()', err);
         });
-      }).catchError((err) {
+      }).catchError((dynamic err) {
         _log.severe('ERR in InAppUpdate.startFlexibleUpdate()', err);
       });
     }

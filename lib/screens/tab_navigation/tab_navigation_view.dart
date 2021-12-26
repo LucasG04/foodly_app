@@ -16,12 +16,14 @@ import 'shopping_list_view/edit_grocery_modal.dart';
 import 'shopping_list_view/shopping_list_view.dart';
 
 class TabNavigationView extends StatefulWidget {
+  const TabNavigationView({Key? key}) : super(key: key);
+
   @override
   _TabNavigationViewState createState() => _TabNavigationViewState();
 }
 
 class _TabNavigationViewState extends State<TabNavigationView> {
-  PageController _pageController = new PageController(initialPage: 1);
+  final PageController _pageController = PageController(initialPage: 1);
   int _currentIndex = 1;
   bool _navbarAnimating = false;
 
@@ -33,7 +35,7 @@ class _TabNavigationViewState extends State<TabNavigationView> {
       body: SafeArea(
         child: PageView(
           controller: _pageController,
-          physics: BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           onPageChanged: (value) {
             if (!_navbarAnimating) {
               setState(() {
@@ -44,14 +46,14 @@ class _TabNavigationViewState extends State<TabNavigationView> {
           children: [
             ShoppingListView(),
             PlanTabView(),
-            MealListView(),
+            const MealListView(),
             SettingsView(),
           ],
         ),
       ),
       floatingActionButton: _showActionButton()
           ? FloatingActionButton(
-              child: Icon(EvaIcons.plus),
+              child: const Icon(EvaIcons.plus),
               onPressed: () {
                 switch (_currentIndex) {
                   case 0:
@@ -81,7 +83,7 @@ class _TabNavigationViewState extends State<TabNavigationView> {
           );
           _navbarAnimating = false;
         },
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(EvaIcons.shoppingBagOutline),
             label: 'shopping',
@@ -118,8 +120,8 @@ class _TabNavigationViewState extends State<TabNavigationView> {
       _activeListId = list.id;
     }
 
-    showBarModalBottomSheet(
-      shape: RoundedRectangleBorder(
+    showBarModalBottomSheet<void>(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
         ),

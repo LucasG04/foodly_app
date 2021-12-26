@@ -3,18 +3,20 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../services/meal_service.dart';
 import 'package:group_list_view/group_list_view.dart';
 
 import '../../../constants.dart';
 import '../../../models/meal.dart';
 import '../../../providers/state_providers.dart';
+import '../../../services/meal_service.dart';
 import '../../../widgets/user_information.dart';
 import '../settings_view/help_slides/help_slide_share_import.dart';
 import 'meal_list_tile.dart';
 import 'meal_list_title.dart';
 
 class MealListView extends StatefulWidget {
+  const MealListView({Key? key}) : super(key: key);
+
   @override
   _MealListViewState createState() => _MealListViewState();
 }
@@ -35,7 +37,7 @@ class _MealListViewState extends State<MealListView>
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(height: kPadding),
+            const SizedBox(height: kPadding),
             MealListTitle(
               onSearch: (search) {
                 setState(() {
@@ -55,30 +57,29 @@ class _MealListViewState extends State<MealListView>
                       ? _buildRawMealList(_filteredMeals!)
                       : _buildGroupedTagList(
                           _groupMealsByTags(
-                            this._filteredMeals ?? [],
+                            _filteredMeals ?? [],
                             tagFilter,
                           ),
                         )
                   : Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         UserInformation(
                           'assets/images/undraw_empty.png',
                           'meal_list_empty_title'.tr(),
                           'meal_list_empty_subtitle'.tr(),
                         ),
-                        SizedBox(height: kPadding),
+                        const SizedBox(height: kPadding),
                         TextButton.icon(
                           onPressed: () => Navigator.push(
                             context,
-                            ConcentricPageRoute(
+                            ConcentricPageRoute<HelpSlideShareImport>(
                               builder: (_) => HelpSlideShareImport(),
                             ),
                           ),
-                          icon: Icon(EvaIcons.questionMarkCircleOutline),
-                          label: Text('meal_list_help_import').tr(),
+                          icon: const Icon(EvaIcons.questionMarkCircleOutline),
+                          label: const Text('meal_list_help_import').tr(),
                         ),
-                        SizedBox(height: kPadding),
+                        const SizedBox(height: kPadding),
                         IconButton(
                           onPressed: _refreshMeals,
                           icon: Icon(
@@ -95,7 +96,7 @@ class _MealListViewState extends State<MealListView>
     );
   }
 
-  Widget _buildSubtitle(context, String value) {
+  Widget _buildSubtitle(BuildContext context, String value) {
     return Center(
       child: Container(
         width: MediaQuery.of(context).size.width > 599
@@ -104,7 +105,7 @@ class _MealListViewState extends State<MealListView>
         margin: const EdgeInsets.only(top: kPadding),
         child: Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 20.0,
             fontWeight: FontWeight.w500,
             fontFamily: 'Poppins',
@@ -120,7 +121,7 @@ class _MealListViewState extends State<MealListView>
       child: ListView.builder(
         itemCount: meals.length,
         itemBuilder: (_, index) => MealListTile(meals[index]),
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
       ),
     );
@@ -137,16 +138,16 @@ class _MealListViewState extends State<MealListView>
         groups[group].tag,
       ),
       countOfItemInSection: (section) => groups[section].meals.length,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
     );
   }
 
   List<TagGroup> _groupMealsByTags(List<Meal> meals, List<String> tags) {
     final List<TagGroup> tagList =
-        tags.map((tag) => new TagGroup(tag, [])).toList();
+        tags.map((tag) => TagGroup(tag, [])).toList();
 
-    for (var group in tagList) {
+    for (final group in tagList) {
       group.meals =
           meals.where((element) => element.tags!.contains(group.tag)).toList();
     }
@@ -159,7 +160,7 @@ class _MealListViewState extends State<MealListView>
     mealsCopy.sort((m1, m2) => m1.name.compareTo(m2.name));
 
     if (query.isNotEmpty) {
-      return [
+      return <Meal>{
         ...mealsCopy
             .where((el) => el.name.toLowerCase().contains(query.toLowerCase()))
             .toList(),
@@ -170,15 +171,15 @@ class _MealListViewState extends State<MealListView>
         ...mealsCopy
             .where((el) => el.tags!.any((tag) => tagList.contains(tag)))
             .toList()
-      ].toSet().toList();
+      }.toList();
     }
     return mealsCopy;
   }
 
-  Future<void> _refreshMeals() async {
+  void _refreshMeals() {
     final activePlan = context.read(planProvider).state!;
-    final meals = await MealService.getAllMeals(activePlan.id!);
-    context.read(allMealsProvider).state = meals;
+    MealService.getAllMeals(activePlan.id!)
+        .then((meals) => context.read(allMealsProvider).state = meals);
   }
 }
 

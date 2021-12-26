@@ -5,7 +5,6 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'select_plan_modal.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../app_router.gr.dart';
@@ -22,17 +21,19 @@ import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
 import '../../widgets/toggle_tab/flutter_toggle_tab.dart';
 import 'reset_password_modal.dart';
+import 'select_plan_modal.dart';
 
 class LoginView extends StatefulWidget {
   final bool? isCreatingPlan;
   final Plan? plan;
   final void Function() navigateBack;
 
-  LoginView({
-    required this.isCreatingPlan,
-    required this.plan,
-    required this.navigateBack,
-  });
+  const LoginView(
+      {required this.isCreatingPlan,
+      required this.plan,
+      required this.navigateBack,
+      Key? key})
+      : super(key: key);
 
   @override
   _LoginViewState createState() => _LoginViewState();
@@ -57,9 +58,9 @@ class _LoginViewState extends State<LoginView> {
     _isRegistering =
         !_forgotPlan; // default `true`, but if user forgot plan then not registering
 
-    _emailController = new TextEditingController();
-    _passwordController = new TextEditingController();
-    _passwordFocusNode = new FocusNode();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+    _passwordFocusNode = FocusNode();
 
     super.initState();
   }
@@ -73,18 +74,17 @@ class _LoginViewState extends State<LoginView> {
         horizontal: (MediaQuery.of(context).size.width - contentWidth) / 2,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(height: kPadding + MediaQuery.of(context).padding.top),
           FlutterToggleTab(
             width: 50,
             borderRadius: 15,
             initialIndex: 0,
-            selectedTextStyle: TextStyle(
+            selectedTextStyle: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w600,
             ),
-            unSelectedTextStyle: TextStyle(
+            unSelectedTextStyle: const TextStyle(
               color: Colors.grey,
               fontWeight: FontWeight.w400,
             ),
@@ -106,13 +106,13 @@ class _LoginViewState extends State<LoginView> {
                     duration: const Duration(milliseconds: 250),
                     child: _isRegistering
                         ? Text(
-                            'login_register_leading'.tr() + ' ',
-                            key: ValueKey<int>(0),
+                            '${'login_register_leading'.tr()} ',
+                            key: const ValueKey<int>(0),
                             style: _titleTextStyle,
                           )
                         : Text(
-                            'login_login_leading'.tr() + ' ',
-                            key: ValueKey<int>(1),
+                            '${'login_login_leading'.tr()} ',
+                            key: const ValueKey<int>(1),
                             style: _titleTextStyle,
                           ),
                   ),
@@ -128,7 +128,7 @@ class _LoginViewState extends State<LoginView> {
               ),
             ),
           ),
-          SizedBox(height: kPadding),
+          const SizedBox(height: kPadding),
           MainTextField(
             controller: _emailController,
             title: 'login_mail_title'.tr(),
@@ -136,7 +136,7 @@ class _LoginViewState extends State<LoginView> {
             errorText: _emailErrorText,
             autofocus: true,
             keyboardType: TextInputType.emailAddress,
-            onSubmit: () => (_passwordFocusNode!.requestFocus()),
+            onSubmit: () => _passwordFocusNode!.requestFocus(),
           ),
           MainTextField(
             controller: _passwordController,
@@ -150,40 +150,41 @@ class _LoginViewState extends State<LoginView> {
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 250),
             child: !_isRegistering
-                ? Container(
+                ? SizedBox(
                     width: double.infinity,
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        child: Text('login_forgot_password').tr(),
                         onPressed: _showPasswordReset,
+                        child: const Text('login_forgot_password').tr(),
                       ),
                     ),
                   )
-                : TextButton(
-                    child: Text(''),
+                : const TextButton(
                     onPressed: null,
+                    child: Text(''),
                   ),
           ),
-          SizedBox(height: kPadding / 2),
+          const SizedBox(height: kPadding / 2),
           SignInWithAppleButton(onPressed: _authWithApple),
-          Container(
+          SizedBox(
             height: size.height * 0.1 +
                 MediaQuery.of(context).viewInsets.bottom / 6,
             child: _unknownErrorText != null
                 ? Row(
                     children: [
-                      Icon(EvaIcons.alertTriangleOutline, color: Colors.red),
-                      SizedBox(width: kPadding),
+                      const Icon(EvaIcons.alertTriangleOutline,
+                          color: Colors.red),
+                      const SizedBox(width: kPadding),
                       Expanded(
                         child: Text(
                           _unknownErrorText ?? '',
-                          style: TextStyle(color: Colors.red),
+                          style: const TextStyle(color: Colors.red),
                         ),
                       )
                     ],
                   )
-                : SizedBox(),
+                : const SizedBox(),
           ),
           LayoutBuilder(builder: (context, constraints) {
             return Row(
@@ -205,13 +206,13 @@ class _LoginViewState extends State<LoginView> {
               ],
             );
           }),
-          SizedBox(height: kPadding * 2),
+          const SizedBox(height: kPadding * 2),
         ],
       ),
     );
   }
 
-  TextStyle get _titleTextStyle => TextStyle(
+  TextStyle get _titleTextStyle => const TextStyle(
         fontSize: 22.0,
         fontWeight: FontWeight.w700,
       );
@@ -317,7 +318,7 @@ class _LoginViewState extends State<LoginView> {
       _buttonState = ButtonState.normal;
     });
 
-    AutoRouter.of(context).replace(HomeScreenRoute());
+    AutoRouter.of(context).replace(const HomeScreenRoute());
   }
 
   void _resetErrors() {
@@ -347,8 +348,8 @@ class _LoginViewState extends State<LoginView> {
   }
 
   void _showPasswordReset() {
-    showModalBottomSheet(
-      shape: RoundedRectangleBorder(
+    showModalBottomSheet<void>(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
         ),
@@ -359,9 +360,9 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Future<Plan?> _showPlanSelect(userId) {
+  Future<Plan?> _showPlanSelect(String userId) {
     return showModalBottomSheet(
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
         ),

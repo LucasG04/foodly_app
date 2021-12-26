@@ -74,7 +74,7 @@ class PlanService {
     log.finest('createPlan: Generated code: $code');
 
     final now = DateTime.now();
-    final plan = new Plan(
+    final plan = Plan(
       code: code,
       hourDiffToUtc: now.differenceTimeZoneOffset(now.toUtc()).inHours,
       name: name,
@@ -82,7 +82,7 @@ class PlanService {
     );
     log.finest('createPlan: Plan is: ${plan.toMap()}');
 
-    final id = new DateTime.now().microsecondsSinceEpoch.toString();
+    final id = DateTime.now().microsecondsSinceEpoch.toString();
     await _firestore.collection('plans').doc(id).set(plan.toMap());
     plan.id = id;
 
@@ -94,11 +94,12 @@ class PlanService {
   static int _generateCode() {
     int min = 10000000;
     int max = 99999999;
-    var randomizer = new Random();
+    var randomizer = Random();
     return min + randomizer.nextInt(max - min);
   }
 
-  static Future<Plan?> getPlanByCode(String code, {withMeals = true}) async {
+  static Future<Plan?> getPlanByCode(String code,
+      {bool withMeals = true}) async {
     log.finer('Call getPlanByCode with $code');
     final snaps = await _firestore
         .collection('plans')
@@ -208,7 +209,10 @@ class PlanService {
 
     if (plan != null && plan.users != null && plan.users!.contains(userId)) {
       plan.users!.remove(userId);
-      _firestore.collection('plans').doc(planId).update({'users': plan.users});
+      _firestore
+          .collection('plans')
+          .doc(planId)
+          .update(<String, List<String>>{'users': plan.users ?? []});
     }
   }
 }
