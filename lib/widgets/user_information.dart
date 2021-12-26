@@ -8,7 +8,7 @@ class UserInformation extends StatelessWidget {
   final String _title;
   final String _message;
 
-  UserInformation(this._assetPath, this._title, this._message);
+  const UserInformation(this._assetPath, this._title, this._message);
 
   @override
   Widget build(BuildContext context) {
@@ -16,14 +16,12 @@ class UserInformation extends StatelessWidget {
     return SizedBox(
       width: BasicUtils.contentWidth(context),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
             padding: EdgeInsets.all(size.width * 0.1),
             child: Image.asset(
               _assetPath,
-              alignment: Alignment.center,
               height: size.height * 0.2,
             ),
           ),
@@ -32,7 +30,7 @@ class UserInformation extends StatelessWidget {
             child: Text(
               _title,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           Padding(
@@ -45,7 +43,7 @@ class UserInformation extends StatelessWidget {
             child: Text(
               _message,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
               ),
             ),

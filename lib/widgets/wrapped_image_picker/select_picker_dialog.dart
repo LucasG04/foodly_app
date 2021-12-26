@@ -26,11 +26,11 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
 
   @override
   void initState() {
-    _log = new Logger('SelectPickerDialog');
+    _log = Logger('SelectPickerDialog');
     _isLoading = false;
     _imagePicker = ImagePicker();
     _showUrlInput = false;
-    _linkController = new TextEditingController();
+    _linkController = TextEditingController();
     _showLinkError = false;
     super.initState();
   }
@@ -45,7 +45,7 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
             ? SizedBox(
                 height: MediaQuery.of(context).size.width * 0.35,
                 width: MediaQuery.of(context).size.width * 0.7,
-                child: Center(child: SmallCircularProgressIndicator()),
+                child: const Center(child: SmallCircularProgressIndicator()),
               )
             : !_showUrlInput
                 ? Wrap(
@@ -65,7 +65,7 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
                       _buildPickerTypeTile(
                         EvaIcons.globe2Outline,
                         'image_picker_dialog_web'.tr(),
-                        () => setState(() => (_showUrlInput = true)),
+                        () => setState(() => _showUrlInput = true),
                       ),
                     ],
                   )
@@ -76,40 +76,38 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           IconButton(
-                            icon: Icon(EvaIcons.arrowBackOutline),
+                            icon: const Icon(EvaIcons.arrowBackOutline),
                             onPressed: () => setState(
-                              () => (_showUrlInput = false),
+                              () => _showUrlInput = false,
                             ),
                           ),
                           IconButton(
-                            icon: Icon(EvaIcons.checkmark),
+                            icon: const Icon(EvaIcons.checkmark),
                             onPressed: _setWebImageUrl,
                           ),
                         ],
                       ),
-                      SizedBox(height: kPadding / 2),
+                      const SizedBox(height: kPadding / 2),
                       MainTextField(
                         controller: _linkController,
                         onSubmit: _setWebImageUrl,
                         placeholder: 'http://food.com/images/23342',
                       ),
-                      SizedBox(height: kPadding / 2),
-                      _showLinkError
-                          ? Row(
+                      const SizedBox(height: kPadding / 2),
+                      if (_showLinkError) Row(
                               children: [
                                 Icon(
                                   EvaIcons.alertCircleOutline,
                                   color: Theme.of(context).errorColor,
                                 ),
-                                SizedBox(height: kPadding / 2),
+                                const SizedBox(height: kPadding / 2),
                                 Expanded(
-                                  child: Text(
+                                  child: const Text(
                                     'image_picker_dialog_error_link',
                                   ).tr(),
                                 ),
                               ],
-                            )
-                          : SizedBox(),
+                            ) else const SizedBox(),
                     ],
                   ),
       ),
@@ -124,17 +122,16 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
       margin: const EdgeInsets.all(kPadding / 2),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
-        boxShadow: [kSmallShadow],
+        boxShadow: const [kSmallShadow],
         borderRadius: BorderRadius.circular(kRadius),
       ),
       child: InkWell(
         onTap: onTap,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(iconData, color: Theme.of(context).primaryColor),
-            Text(text, style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
           ],
         ),
       ),

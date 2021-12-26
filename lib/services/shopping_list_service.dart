@@ -7,16 +7,16 @@ import '../models/shopping_list.dart';
 class ShoppingListService {
   static final log = Logger('ShoppingListService');
 
-  static FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   ShoppingListService._();
 
   static Future<ShoppingList> createShoppingListWithPlanId(
       String planId) async {
     log.finer('Call createShoppingListWithPlanId with $planId');
-    final list = new ShoppingList(meals: [], planId: planId);
+    final list = ShoppingList(meals: [], planId: planId);
 
-    final id = new DateTime.now().microsecondsSinceEpoch.toString();
+    final id = DateTime.now().microsecondsSinceEpoch.toString();
     await _firestore.collection('shoppinglists').doc(id).set(list.toMap());
     list.id = id;
 

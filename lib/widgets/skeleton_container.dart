@@ -12,7 +12,7 @@ class SkeletonContainer extends StatelessWidget {
   final Curve curve;
   final double borderRadius;
 
-  SkeletonContainer({
+  const SkeletonContainer({
     required this.width,
     required this.height,
     this.margin = const EdgeInsets.all(0),
@@ -52,7 +52,7 @@ class _SkeletonAnimation extends StatefulWidget {
   final Color gradientColor;
   final Curve curve;
 
-  _SkeletonAnimation(
+  const _SkeletonAnimation(
       {required this.child,
       this.shimmerColor = Colors.white54,
       this.gradientColor = const Color.fromARGB(0, 244, 244, 244),
@@ -99,8 +99,8 @@ class _SkeletonAnimationState extends State<_SkeletonAnimation>
               return FractionallySizedBox(
                 widthFactor: .2,
                 alignment: AlignmentGeometryTween(
-                  begin: Alignment(-1.0 - .2 * 3, .0),
-                  end: Alignment(1.0 + .2 * 3, .0),
+                  begin: const Alignment(-1.0 - .2 * 3, .0),
+                  end: const Alignment(1.0 + .2 * 3, .0),
                 ).chain(CurveTween(curve: widget.curve)).evaluate(_controller)!,
                 child: child,
               );

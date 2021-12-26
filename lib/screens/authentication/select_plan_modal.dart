@@ -58,7 +58,7 @@ class SelectPlanModal extends ConsumerWidget {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return SizedBox(
                   height: size.height * 0.3,
-                  child: Center(child: SmallCircularProgressIndicator()),
+                  child: const Center(child: SmallCircularProgressIndicator()),
                 );
               } else if (!snapshot.hasData) {
                 return SizedBox(
@@ -86,7 +86,7 @@ class SelectPlanModal extends ConsumerWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return SizedBox(
             height: emptySpaceHeight,
-            child: Center(child: SmallCircularProgressIndicator()),
+            child: const Center(child: SmallCircularProgressIndicator()),
           );
         } else if (!snapshot.hasData) {
           return SizedBox(

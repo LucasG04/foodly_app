@@ -10,7 +10,7 @@ class SettingsTile extends StatelessWidget {
   final void Function()? onTap;
   final Color? color;
 
-  SettingsTile({
+  const SettingsTile({
     required this.leadingIcon,
     required this.text,
     this.trailing,
@@ -20,7 +20,7 @@ class SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color? _color = color ?? Theme.of(context).textTheme.bodyText1!.color;
+    final Color? _color = color ?? Theme.of(context).textTheme.bodyText1!.color;
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -30,7 +30,7 @@ class SettingsTile extends StatelessWidget {
         child: Row(
           children: [
             Icon(leadingIcon, color: _color),
-            SizedBox(width: kPadding),
+            const SizedBox(width: kPadding),
             Expanded(
               child: AutoSizeText(
                 text,

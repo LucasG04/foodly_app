@@ -14,13 +14,13 @@ double heightInPercent(double percent, BuildContext context) {
 
 const BoxShadow bsInner = BoxShadow(
   color: Colors.black12,
-  offset: const Offset(0.0, 1.5),
+  offset: Offset(0.0, 1.5),
   blurRadius: 1.0,
   spreadRadius: -1.0,
 );
 const BoxShadow bsOuter = BoxShadow(
   color: Colors.black12,
-  offset: const Offset(0.0, 1.5),
+  offset: Offset(0.0, 1.5),
   blurRadius: 1.0,
   spreadRadius: 1.0,
 );

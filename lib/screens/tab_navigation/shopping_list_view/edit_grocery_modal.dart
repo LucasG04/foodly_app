@@ -12,7 +12,7 @@ class EditGroceryModal extends StatefulWidget {
   final String shoppingListId;
   final Grocery? grocery;
 
-  EditGroceryModal({
+  const EditGroceryModal({
     required this.shoppingListId,
     this.grocery,
   });
@@ -35,17 +35,17 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
   @override
   void initState() {
     _isCreating = widget.grocery == null;
-    _nameController = new TextEditingController(text: widget.grocery?.name);
+    _nameController = TextEditingController(text: widget.grocery?.name);
     String amountString = widget.grocery?.amount?.toString() ?? '';
     amountString = amountString.endsWith('.0')
         ? amountString.substring(0, amountString.length - 2)
         : amountString;
-    _amountController = new TextEditingController(text: amountString);
-    _unitController = new TextEditingController(text: widget.grocery?.unit);
+    _amountController = TextEditingController(text: amountString);
+    _unitController = TextEditingController(text: widget.grocery?.unit);
 
     _buttonState = ButtonState.normal;
-    _amountFocusNode = new FocusNode();
-    _unitFocusNode = new FocusNode();
+    _amountFocusNode = FocusNode();
+    _unitFocusNode = FocusNode();
 
     super.initState();
   }
@@ -71,7 +71,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
                 _isCreating
                     ? 'edit_grocery_modal_add'
                     : 'edit_grocery_modal_edit',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ).tr(),
             ),
@@ -82,7 +82,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
             placeholder: 'edit_grocery_modal_ctrl_name_placeholder'.tr(),
             errorText: _errorText,
             textInputAction: TextInputAction.next,
-            onSubmit: () => (_amountFocusNode!.requestFocus()),
+            onSubmit: () => _amountFocusNode!.requestFocus(),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -96,7 +96,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
                   placeholder: '1',
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
-                  onSubmit: () => (_unitFocusNode!.requestFocus()),
+                  onSubmit: () => _unitFocusNode!.requestFocus(),
                 ),
               ),
               SizedBox(
@@ -111,7 +111,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
               ),
             ],
           ),
-          SizedBox(height: kPadding * 2),
+          const SizedBox(height: kPadding * 2),
           Center(
             child: MainButton(
               text: 'save'.tr(),

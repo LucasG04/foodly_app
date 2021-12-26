@@ -6,7 +6,7 @@ class SmallCircularProgressIndicator extends StatelessWidget {
 
   final double _iconHeight = 24.0;
 
-  SmallCircularProgressIndicator({
+  const SmallCircularProgressIndicator({
     Key? key,
     this.color,
     this.additionalSize = 0,
@@ -19,7 +19,7 @@ class SmallCircularProgressIndicator extends StatelessWidget {
       width: _iconHeight - 5 + additionalSize,
       child: CircularProgressIndicator(
         strokeWidth: 2.5,
-        valueColor: new AlwaysStoppedAnimation<Color?>(
+        valueColor: AlwaysStoppedAnimation<Color?>(
           color ?? Theme.of(context).textTheme.bodyText1!.color,
         ),
       ),

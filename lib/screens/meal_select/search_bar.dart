@@ -8,7 +8,7 @@ import '../../widgets/animate_icons.dart';
 class SearchBar extends StatefulWidget {
   final void Function(String) onSearch;
 
-  SearchBar({
+  const SearchBar({
     required this.onSearch,
   });
 
@@ -17,7 +17,7 @@ class SearchBar extends StatefulWidget {
 }
 
 class _SearchBarState extends State<SearchBar> {
-  FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNode = FocusNode();
   TextEditingController? _textEditingController;
   AnimateIconController? _closeIconController;
   Timer? _debounce;
@@ -27,8 +27,8 @@ class _SearchBarState extends State<SearchBar> {
   @override
   void initState() {
     _isLoading = false;
-    _textEditingController = new TextEditingController();
-    _closeIconController = new AnimateIconController();
+    _textEditingController = TextEditingController();
+    _closeIconController = AnimateIconController();
     super.initState();
     _focusNode.addListener(() {
       if (mounted && _focusNode.hasFocus) {
@@ -47,7 +47,7 @@ class _SearchBarState extends State<SearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width > 649
           ? 650.0
           : MediaQuery.of(context).size.width * 0.95,
@@ -59,10 +59,10 @@ class _SearchBarState extends State<SearchBar> {
               child: TextFormField(
                 focusNode: _focusNode,
                 controller: _textEditingController,
-                style: TextStyle(fontSize: 20.0),
+                style: const TextStyle(fontSize: 20.0),
                 decoration: InputDecoration(
                   suffixIcon: _buildClearIcon(),
-                  icon: Icon(EvaIcons.searchOutline),
+                  icon: const Icon(EvaIcons.searchOutline),
                   border: InputBorder.none,
                   focusedBorder: InputBorder.none,
                   enabledBorder: InputBorder.none,
@@ -79,7 +79,7 @@ class _SearchBarState extends State<SearchBar> {
             ),
             SizedBox(
               height: 4.0,
-              child: _isLoading ? LinearProgressIndicator() : SizedBox(),
+              child: _isLoading ? const LinearProgressIndicator() : const SizedBox(),
             ),
           ],
         ),
@@ -99,7 +99,6 @@ class _SearchBarState extends State<SearchBar> {
       controller: _closeIconController,
       startIcon: null,
       endIcon: EvaIcons.close,
-      duration: Duration(milliseconds: 300),
       color: Theme.of(context).textTheme.bodyText1!.color,
     );
   }

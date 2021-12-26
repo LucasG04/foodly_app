@@ -14,7 +14,7 @@ class BasicUtils {
   /// Clears all state providers.
   static bool isStorageMealImage(String image) {
     try {
-      final date = new DateTime.fromMicrosecondsSinceEpoch(
+      final date = DateTime.fromMicrosecondsSinceEpoch(
           int.parse(image.split('.').first));
       return !Uri.tryParse(image)!.isAbsolute && date.microsecondsSinceEpoch > 0;
     } catch (e) {
@@ -32,8 +32,8 @@ class BasicUtils {
   }
 
   static String getUrlFromString(String input) {
-    RegExp exp =
-        new RegExp(r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+');
+    final RegExp exp =
+        RegExp(r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+');
     final match = exp.firstMatch(input)!;
     return input.substring(match.start, match.end);
   }

@@ -22,19 +22,19 @@ class CardListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width * 0.9;
+    final double _width = MediaQuery.of(context).size.width * 0.9;
     return Container(
       width: _width > 599 ? 600 : _width,
       height: height,
       margin: const EdgeInsets.symmetric(vertical: kPadding / 2),
       decoration: BoxDecoration(
-        boxShadow: [kSmallShadow],
+        boxShadow: const [kSmallShadow],
         borderRadius: BorderRadius.circular(kRadius),
         color: Colors.white,
       ),
       child: Row(
         children: [
-          Container(
+          SizedBox(
             height: height,
             width: height,
             child: leading,
@@ -51,7 +51,6 @@ class CardListTile extends StatelessWidget {
             margin: const EdgeInsets.only(right: 20.0),
             child: OutlinedButton(
               onPressed: trailingAction,
-              child: trailing!,
               style: ButtonStyle(
                 padding: MaterialStateProperty.resolveWith(
                   (states) => const EdgeInsets.all(0),
@@ -60,6 +59,7 @@ class CardListTile extends StatelessWidget {
                   (states) => Colors.black,
                 ),
               ),
+              child: trailing!,
             ),
           ),
         ],

@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Scaffold(
+      return const Scaffold(
         body: Center(child: SmallCircularProgressIndicator()),
       );
     } else if (_currentUser != null) {

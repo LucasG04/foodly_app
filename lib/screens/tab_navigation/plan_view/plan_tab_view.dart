@@ -37,7 +37,7 @@ class _PlanTabViewState extends State<PlanTabView>
                 child: AnimationLimiter(
                   child: Column(
                     children: [
-                      SizedBox(height: kPadding),
+                      const SizedBox(height: kPadding),
                       Padding(
                         padding: const EdgeInsets.only(left: 5.0),
                         child: PageTitle(text: 'plan_title'.tr()),
@@ -52,7 +52,7 @@ class _PlanTabViewState extends State<PlanTabView>
                             if (snapshot.hasData) {
                               return ListView(
                                 shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
+                                physics: const NeverScrollableScrollPhysics(),
                                 children: _getDaysByMeals(snapshot.data!)
                                     .map(
                                       (e) => PlanDayCard(
@@ -63,7 +63,7 @@ class _PlanTabViewState extends State<PlanTabView>
                                     .toList(),
                               );
                             } else {
-                              return Center(
+                              return const Center(
                                 child: SmallCircularProgressIndicator(),
                               );
                             }
@@ -74,7 +74,7 @@ class _PlanTabViewState extends State<PlanTabView>
                   ),
                 ),
               )
-            : Center(child: SmallCircularProgressIndicator());
+            : const Center(child: SmallCircularProgressIndicator());
       },
     );
   }
@@ -90,8 +90,8 @@ class _PlanTabViewState extends State<PlanTabView>
     final List<PlanMeal> updatedMeals = [...planMeals];
 
     final now =
-        new DateTime.now().toUtc().add(Duration(hours: plan.hourDiffToUtc!));
-    final today = new DateTime(now.year, now.month, now.day);
+        DateTime.now().toUtc().add(Duration(hours: plan.hourDiffToUtc!));
+    final today = DateTime(now.year, now.month, now.day);
 
     // remove old plan days
     final oldMeals = planMeals.where((meal) => meal.date.isBefore(today));
@@ -106,7 +106,7 @@ class _PlanTabViewState extends State<PlanTabView>
     for (var i = 0; i < 8; i++) {
       final date = today.add(Duration(days: i));
       days.add(
-        new PlanDay(date,
+        PlanDay(date,
             updatedMeals.where((element) => element.date == date).toList()),
       );
       updatedMeals.where((element) => element.date == date).forEach((element) {

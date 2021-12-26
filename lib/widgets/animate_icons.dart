@@ -55,13 +55,11 @@ class _AnimateIconsState extends State<AnimateIcons>
 
   @override
   void initState() {
-    this._controller = new AnimationController(
+    _controller = AnimationController(
       vsync: this,
       duration: widget.duration,
-      lowerBound: 0.0,
-      upperBound: 1.0,
     );
-    this._controller.addListener(() {
+    _controller.addListener(() {
       if (mounted) {
         setState(() {});
       }
@@ -101,10 +99,10 @@ class _AnimateIconsState extends State<AnimateIcons>
 
   @override
   Widget build(BuildContext context) {
-    double x = _controller.value;
-    double y = 1.0 - _controller.value;
-    double angleX = math.pi / 180 * (180 * x);
-    double angleY = math.pi / 180 * (180 * y);
+    final double x = _controller.value;
+    final double y = 1.0 - _controller.value;
+    final double angleX = math.pi / 180 * (180 * x);
+    final double angleY = math.pi / 180 * (180 * y);
 
     Widget first() {
       return Transform.rotate(
@@ -112,7 +110,7 @@ class _AnimateIconsState extends State<AnimateIcons>
         child: Opacity(
           opacity: y,
           child: Icon(
-            widget.startIcon != null ? widget.startIcon : EvaIcons.close,
+            widget.startIcon ?? EvaIcons.close,
             size: widget.size,
             color: widget.startIcon != null ? widget.color : Colors.transparent,
           ),
@@ -126,7 +124,7 @@ class _AnimateIconsState extends State<AnimateIcons>
         child: Opacity(
           opacity: x,
           child: Icon(
-            widget.endIcon != null ? widget.endIcon : EvaIcons.close,
+            widget.endIcon ?? EvaIcons.close,
             size: widget.size,
             color: widget.endIcon != null ? widget.color : Colors.transparent,
           ),
@@ -139,8 +137,8 @@ class _AnimateIconsState extends State<AnimateIcons>
       child: Stack(
         alignment: Alignment.center,
         children: [
-          x == 1 && y == 0 ? second() : first(),
-          x == 0 && y == 1 ? first() : second(),
+          if (x == 1 && y == 0) second() else first(),
+          if (x == 0 && y == 1) first() else second(),
         ],
       ),
     );

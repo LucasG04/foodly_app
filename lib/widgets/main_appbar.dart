@@ -7,7 +7,7 @@ class MainAppBar extends StatefulWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final ScrollController? scrollController;
 
-  MainAppBar({
+  const MainAppBar({
     required this.text,
     this.showBack = true,
     this.actions,
@@ -18,7 +18,7 @@ class MainAppBar extends StatefulWidget implements PreferredSizeWidget {
   _MainAppBarState createState() => _MainAppBarState();
 
   @override
-  Size get preferredSize => new Size.fromHeight(AppBar().preferredSize.height);
+  Size get preferredSize => Size.fromHeight(AppBar().preferredSize.height);
 }
 
 class _MainAppBarState extends State<MainAppBar> {

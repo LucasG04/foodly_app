@@ -72,9 +72,9 @@ class _MainTextFieldState extends State<MainTextField> {
             ? [
                 Text(
                   widget.title ?? '',
-                  style: TextStyle(color: Colors.black),
+                  style: const TextStyle(color: Colors.black),
                 ),
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 _buildInput(),
               ]
             : [
@@ -113,8 +113,8 @@ class _MainTextFieldState extends State<MainTextField> {
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 125),
                     child: _obscureText
-                        ? Icon(EvaIcons.eyeOutline, size: kIconHeight)
-                        : Icon(EvaIcons.eyeOff2Outline, size: kIconHeight),
+                        ? const Icon(EvaIcons.eyeOutline, size: kIconHeight)
+                        : const Icon(EvaIcons.eyeOff2Outline, size: kIconHeight),
                   ),
                 )
               : null,

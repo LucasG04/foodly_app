@@ -22,8 +22,8 @@ class _LoadingLogutState extends State<LoadingLogut> {
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SmallCircularProgressIndicator(),
-                  SizedBox(height: kPadding),
+                  const SmallCircularProgressIndicator(),
+                  const SizedBox(height: kPadding),
                   TextButton(
                     onPressed: () => AuthenticationService.signOut(),
                     child: Text(
@@ -33,7 +33,7 @@ class _LoadingLogutState extends State<LoadingLogut> {
                   ),
                 ],
               )
-            : SmallCircularProgressIndicator(),
+            : const SmallCircularProgressIndicator(),
       ),
     );
   }

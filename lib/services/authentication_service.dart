@@ -1,16 +1,16 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logging/logging.dart';
-import 'package:crypto/crypto.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthenticationService {
   AuthenticationService._();
 
   static final log = Logger('AuthenticationService');
-  static FirebaseAuth _auth = FirebaseAuth.instance;
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
   static User? get currentUser => _auth.currentUser;
 
   static Stream<User?> authenticationStream() {
@@ -47,7 +47,7 @@ class AuthenticationService {
   /// Generates a cryptographically secure random nonce, to be included in a
   /// credential request.
   static String _generateNonce([int length = 32]) {
-    final charset =
+    const charset =
         '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
     final random = Random.secure();
     return List.generate(length, (_) => charset[random.nextInt(charset.length)])
@@ -78,7 +78,7 @@ class AuthenticationService {
     );
 
     // Create an `OAuthCredential` from the credential returned by Apple.
-    final oauthCredential = OAuthProvider("apple.com").credential(
+    final oauthCredential = OAuthProvider('apple.com').credential(
       idToken: appleCredential.identityToken,
       rawNonce: rawNonce,
     );

@@ -62,7 +62,7 @@ class FlutterToggleTab extends StatefulWidget {
 }
 
 class _FlutterToggleTabState extends State<FlutterToggleTab> {
-  List<DataTab> _labels = [];
+  final List<DataTab> _labels = [];
 
   void _setDefaultSelected() {
     setState(() {
@@ -90,7 +90,7 @@ class _FlutterToggleTabState extends State<FlutterToggleTab> {
   @override
   Widget build(BuildContext context) {
     _setDefaultSelected();
-    var width = widget.width != null
+    final width = widget.width != null
         ? widthInPercent(widget.width!, context)
         : widthInPercent(100, context);
 
@@ -110,16 +110,16 @@ class _FlutterToggleTabState extends State<FlutterToggleTab> {
                       widget.unSelectedBackgroundColors![0]
                     ]
                   : widget.unSelectedBackgroundColors!)
-              : [Color(0xffe0e0e0), Color(0xffe0e0e0)],
+              : [const Color(0xffe0e0e0), const Color(0xffe0e0e0)],
         ),
         borderRadius: BorderRadius.circular(widget.borderRadius ?? 30),
-        boxShadow: [bsInner],
+        boxShadow: const [bsInner],
       ),
       child: ListView.builder(
         itemCount: _labels.length,
         physics: widget.isScroll
-            ? BouncingScrollPhysics()
-            : NeverScrollableScrollPhysics(),
+            ? const BouncingScrollPhysics()
+            : const NeverScrollableScrollPhysics(),
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
           return ButtonsTab(
@@ -130,7 +130,7 @@ class _FlutterToggleTabState extends State<FlutterToggleTab> {
                         widget.unSelectedBackgroundColors![0]
                       ]
                     : widget.unSelectedBackgroundColors)
-                : [Color(0xffe0e0e0), Color(0xffe0e0e0)],
+                : [const Color(0xffe0e0e0), const Color(0xffe0e0e0)],
             width: width / widget.labels.length,
             title: _labels[index].title,
             icons: widget.icons != null ? widget.icons![index] : null,
@@ -161,7 +161,7 @@ class _FlutterToggleTabState extends State<FlutterToggleTab> {
                   });
                 }
               } catch (e) {
-                print("err : $e");
+                print('err : $e');
               }
             },
           );

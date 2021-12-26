@@ -70,13 +70,13 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
 
   Widget _buildSkeletonLoading() {
     return Row(
-      children: [
+      children: const [
         SkeletonContainer(
           width: 50.0,
           height: 50.0,
           borderRadius: 1000,
         ),
-        const SizedBox(width: 10.0),
+        SizedBox(width: 10.0),
         SkeletonContainer(
           width: 150.0,
           height: 17.0,
@@ -164,7 +164,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                 icon: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 250),
                   child: _voteIsLoading
-                      ? SmallCircularProgressIndicator()
+                      ? const SmallCircularProgressIndicator()
                       : Icon(
                           EvaIcons.arrowIosUpwardOutline,
                           color: voteColor,

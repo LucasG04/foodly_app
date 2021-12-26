@@ -141,20 +141,20 @@ class _ShoppingListViewState extends State<ShoppingListView>
                             ),
                           );
                         } else {
-                          return Center(
+                          return const Center(
                             child: SmallCircularProgressIndicator(),
                           );
                         }
                       },
                     );
                   } else {
-                    return Center(
+                    return const Center(
                       child: SmallCircularProgressIndicator(),
                     );
                   }
                 },
               )
-            : Center(child: SmallCircularProgressIndicator());
+            : const Center(child: SmallCircularProgressIndicator());
       },
     );
   }

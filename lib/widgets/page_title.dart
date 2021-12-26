@@ -18,7 +18,7 @@ class PageTitle extends StatelessWidget {
     return Align(
       alignment: Alignment.centerLeft,
       child: Center(
-        child: Container(
+        child: SizedBox(
           height: 50.0,
           width: MediaQuery.of(context).size.width > 599
               ? 600.0
@@ -27,8 +27,8 @@ class PageTitle extends StatelessWidget {
             children: [
               _buildTitle(),
               if (actions != null && actions!.isNotEmpty) ...[
-                SizedBox(width: kPadding),
-                Spacer(),
+                const SizedBox(width: kPadding),
+                const Spacer(),
                 ...actions!,
               ],
             ],
@@ -41,7 +41,7 @@ class PageTitle extends StatelessWidget {
   AutoSizeText _buildTitle() {
     return AutoSizeText(
       text,
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 30.0,
         fontWeight: FontWeight.w700,
         fontFamily: 'Poppins',

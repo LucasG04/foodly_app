@@ -83,13 +83,13 @@ class _EditListContentState extends State<EditListContent> {
 
     return TextField(
       controller: controller,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         border: InputBorder.none,
         focusedBorder: InputBorder.none,
         enabledBorder: InputBorder.none,
         errorBorder: InputBorder.none,
         disabledBorder: InputBorder.none,
-        contentPadding: const EdgeInsets.only(
+        contentPadding: EdgeInsets.only(
           left: kPadding / 2,
           bottom: 11,
           top: 11,
