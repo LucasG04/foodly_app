@@ -9,20 +9,20 @@ import 'edit_ingredient_modal.dart';
 class EditIngredients extends StatelessWidget {
   final String title;
   final List<Ingredient> content;
-  final void Function(List<Ingredient>) onChanged;
+  final void Function(List<Ingredient>)? onChanged;
 
-  EditIngredients({
-    Key key,
-    @required this.title,
-    @required this.content,
-    @required this.onChanged,
+  const EditIngredients({
+    Key? key,
+    required this.title,
+    required this.content,
+    required this.onChanged,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
+        SizedBox(
           width: double.infinity,
           child: Text(
             title,
@@ -31,19 +31,20 @@ class EditIngredients extends StatelessWidget {
         ),
         ListView.builder(
           shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           itemCount: content.length,
           itemBuilder: (context, index) {
-            String amount = ConvertUtil.amountToString(
+            final String amount = ConvertUtil.amountToString(
                 content[index].amount, content[index].unit);
             return ListTile(
-              title: Text(content[index].name),
+              title: Text(content[index].name!),
               subtitle: amount.isNotEmpty ? Text(amount) : null,
               trailing: IconButton(
-                icon: Icon(EvaIcons.minusCircleOutline, color: Colors.black),
+                icon: const Icon(EvaIcons.minusCircleOutline,
+                    color: Colors.black),
                 onPressed: () {
                   content.removeAt(index);
-                  onChanged(content);
+                  onChanged!(content);
                 },
               ),
               onTap: () => _editIngredient(context, content[index], index),
@@ -53,7 +54,7 @@ class EditIngredients extends StatelessWidget {
         ),
         Center(
           child: IconButton(
-            icon: Icon(EvaIcons.plusCircleOutline, color: Colors.black),
+            icon: const Icon(EvaIcons.plusCircleOutline, color: Colors.black),
             onPressed: () => _editIngredient(context),
           ),
         ),
@@ -61,9 +62,10 @@ class EditIngredients extends StatelessWidget {
     );
   }
 
-  void _editIngredient(context, [Ingredient ingredient, int index]) async {
+  void _editIngredient(BuildContext context,
+      [Ingredient? ingredient, int? index]) async {
     final result = await showBarModalBottomSheet<Ingredient>(
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
         ),
@@ -75,10 +77,10 @@ class EditIngredients extends StatelessWidget {
     if (result != null) {
       if (ingredient == null) {
         content.add(result);
-        onChanged(content);
+        onChanged!(content);
       } else {
-        content[index] = result;
-        onChanged(content);
+        content[index!] = result;
+        onChanged!(content);
       }
     }
   }

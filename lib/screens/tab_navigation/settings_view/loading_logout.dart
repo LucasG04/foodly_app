@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/constants.dart';
-import 'package:foodly/services/authentication_service.dart';
-import 'package:foodly/widgets/small_circular_progress_indicator.dart';
+import '../../../constants.dart';
+import '../../../services/authentication_service.dart';
+import '../../../widgets/small_circular_progress_indicator.dart';
 
 class LoadingLogut extends StatefulWidget {
   const LoadingLogut();
@@ -15,7 +15,7 @@ class _LoadingLogutState extends State<LoadingLogut> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: FutureBuilder(
+      child: FutureBuilder<void>(
         future: Future.delayed(const Duration(seconds: 10)),
         builder: (context, snapshot) => snapshot.connectionState ==
                 ConnectionState.done

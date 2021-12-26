@@ -1,4 +1,4 @@
-import 'package:auto_route/auto_route_annotations.dart';
+import 'package:auto_route/auto_route.dart';
 
 import 'screens/authentication/authentication_screen.dart';
 import 'screens/meal/meal_screen.dart';
@@ -13,13 +13,13 @@ import 'screens/unknown_route/unknown_route_screen.dart';
 
 @MaterialAutoRouter(
   routes: <AutoRoute>[
-    CupertinoRoute(page: HomeScreen, initial: true),
-    CupertinoRoute(page: AuthenticationScreen),
-    CupertinoRoute(page: MealSelectScreen),
-    CupertinoRoute(page: OnboardingScreen),
-    CupertinoRoute(path: '/meal-create/:id', page: MealCreateScreen),
-    CupertinoRoute(path: '/meal/:id', page: MealScreen),
-    CupertinoRoute(path: '*', page: UnknownRouteScreen),
+    CupertinoRoute<dynamic>(page: HomeScreen, initial: true),
+    CupertinoRoute<dynamic>(page: AuthenticationScreen),
+    CupertinoRoute<dynamic>(page: MealSelectScreen),
+    CupertinoRoute<dynamic>(page: OnboardingScreen),
+    CupertinoRoute<dynamic>(path: '/meal-create/:id', page: MealCreateScreen),
+    CupertinoRoute<dynamic>(path: '/meal/:id', page: MealScreen),
+    CupertinoRoute<dynamic>(path: '*', page: UnknownRouteScreen),
   ],
 )
 class $AppRouter {}

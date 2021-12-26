@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 
 class SkeletonContainer extends StatelessWidget {
-  final double height;
+  final double? height;
   final double width;
   final EdgeInsetsGeometry margin;
   final Color shimmerColor;
   final Color gradientColor;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final Curve curve;
   final double borderRadius;
 
   SkeletonContainer({
-    @required this.width,
-    @required this.height,
+    required this.width,
+    required this.height,
     this.margin = const EdgeInsets.all(0),
     this.shimmerColor = Colors.white54,
     this.gradientColor = const Color.fromARGB(0, 244, 244, 244),
@@ -53,11 +53,11 @@ class _SkeletonAnimation extends StatefulWidget {
   final Curve curve;
 
   _SkeletonAnimation(
-      {@required this.child,
+      {required this.child,
       this.shimmerColor = Colors.white54,
       this.gradientColor = const Color.fromARGB(0, 244, 244, 244),
       this.curve = Curves.fastOutSlowIn,
-      Key key})
+      Key? key})
       : super(key: key);
 
   @override
@@ -66,7 +66,7 @@ class _SkeletonAnimation extends StatefulWidget {
 
 class _SkeletonAnimationState extends State<_SkeletonAnimation>
     with SingleTickerProviderStateMixin {
-  AnimationController _controller;
+  late AnimationController _controller;
 
   @override
   void initState() {
@@ -101,7 +101,7 @@ class _SkeletonAnimationState extends State<_SkeletonAnimation>
                 alignment: AlignmentGeometryTween(
                   begin: Alignment(-1.0 - .2 * 3, .0),
                   end: Alignment(1.0 + .2 * 3, .0),
-                ).chain(CurveTween(curve: widget.curve)).evaluate(_controller),
+                ).chain(CurveTween(curve: widget.curve)).evaluate(_controller)!,
                 child: child,
               );
             },

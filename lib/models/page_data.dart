@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class PageData {
-  final String title;
+  final String? title;
   final String subtitle;
-  final String assetPath;
+  final String? assetPath;
   final Color primaryColor;
   final Color background;
 

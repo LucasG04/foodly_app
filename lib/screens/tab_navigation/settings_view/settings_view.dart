@@ -4,8 +4,6 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/screens/tab_navigation/settings_view/loading_logout.dart';
-import 'package:foodly/utils/main_snackbar.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share/share.dart';
 
@@ -15,10 +13,12 @@ import '../../../services/authentication_service.dart';
 import '../../../services/plan_service.dart';
 import '../../../services/settings_service.dart';
 import '../../../utils/basic_utils.dart';
+import '../../../utils/main_snackbar.dart';
 import '../../../widgets/page_title.dart';
 import '../../onboarding/onboarding_screen.dart';
 import 'help_slides/help_slide_share_import.dart';
 import 'import_meals_modal.dart';
+import 'loading_logout.dart';
 import 'settings_tile.dart';
 
 class SettingsView extends StatefulWidget {
@@ -42,16 +42,15 @@ class _SettingsViewState extends State<SettingsView> {
                       2,
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(height: kPadding),
+                    const SizedBox(height: kPadding),
                     PageTitle(text: 'settings_title'.tr()),
                     _buildSectionTitle('settings_section_general'.tr()),
                     _buildSection([
                       SettingsTile(
                         onTap: () => Navigator.push(
                           context,
-                          ConcentricPageRoute(
+                          ConcentricPageRoute<OnboardingScreen>(
                               builder: (_) => OnboardingScreen()),
                         ),
                         leadingIcon: EvaIcons.listOutline,
@@ -70,7 +69,7 @@ class _SettingsViewState extends State<SettingsView> {
                       SettingsTile(
                         onTap: () => Navigator.push(
                           context,
-                          ConcentricPageRoute(
+                          ConcentricPageRoute<OnboardingScreen>(
                               builder: (_) => OnboardingScreen()),
                         ),
                         leadingIcon: EvaIcons.trendingUpOutline,
@@ -95,13 +94,13 @@ class _SettingsViewState extends State<SettingsView> {
                               .map((locale) => DropdownMenuItem<Locale>(
                                     value: locale,
                                     child: Text(
-                                      LocaleNames.of(context)
-                                          .nameOf(locale.languageCode),
+                                      LocaleNames.of(context)!
+                                          .nameOf(locale.languageCode)!,
                                     ),
                                   ))
                               .toList(),
-                          onChanged: (Locale locale) async {
-                            await context.setLocale(locale);
+                          onChanged: (Locale? locale) async {
+                            await context.setLocale(locale!);
                           },
                         ),
                       ),
@@ -109,63 +108,65 @@ class _SettingsViewState extends State<SettingsView> {
                     _buildSectionTitle('settings_section_plan'.tr()),
                     _buildSection([
                       SettingsTile(
-                        onTap: () => _shareCode(plan.code),
+                        onTap: () => _shareCode(plan.code!),
                         leadingIcon: EvaIcons.shareOutline,
-                        text:
-                            'settings_section_plan_share'.tr(args: [plan.code]),
-                        trailing: Icon(EvaIcons.arrowIosForwardOutline),
+                        text: 'settings_section_plan_share'
+                            .tr(args: [plan.code!]),
+                        trailing: const Icon(EvaIcons.arrowIosForwardOutline),
                       ),
                       SettingsTile(
                         onTap: () => _leavePlan(plan.id, context),
                         leadingIcon: EvaIcons.closeCircleOutline,
                         text: 'settings_section_plan_leave'.tr(),
-                        trailing: Icon(
+                        trailing: const Icon(
                           EvaIcons.arrowIosForwardOutline,
                           color: Colors.red,
                         ),
                         color: Colors.red,
                       ),
                     ], context),
-                    foodlyUser != null && foodlyUser.oldPlans.length > 1
-                        ? _buildSectionTitle('settings_section_meals'.tr())
-                        : SizedBox(),
-                    foodlyUser != null && foodlyUser.oldPlans.length > 1
-                        ? _buildSection([
-                            SettingsTile(
-                              onTap: () => _importMeals(
-                                foodlyUser.oldPlans
-                                    .where((id) => id != plan.id)
-                                    .toList(),
-                                context,
-                              ),
-                              leadingIcon: EvaIcons.downloadOutline,
-                              text: 'settings_section_meals_import'.tr(),
-                              trailing: Icon(EvaIcons.arrowIosForwardOutline),
-                            ),
-                          ], context)
-                        : SizedBox(),
+                    if (foodlyUser.oldPlans!.length > 1)
+                      _buildSectionTitle('settings_section_meals'.tr())
+                    else
+                      const SizedBox(),
+                    if (foodlyUser.oldPlans!.length > 1)
+                      _buildSection([
+                        SettingsTile(
+                          onTap: () => _importMeals(
+                            foodlyUser.oldPlans!
+                                .where((id) => id != plan.id)
+                                .toList(),
+                            context,
+                          ),
+                          leadingIcon: EvaIcons.downloadOutline,
+                          text: 'settings_section_meals_import'.tr(),
+                          trailing: const Icon(EvaIcons.arrowIosForwardOutline),
+                        ),
+                      ], context)
+                    else
+                      const SizedBox(),
                     _buildSectionTitle('settings_section_help'.tr()),
                     _buildSection([
                       SettingsTile(
                         onTap: () => Navigator.push(
                           context,
-                          ConcentricPageRoute(
+                          ConcentricPageRoute<OnboardingScreen>(
                               builder: (_) => OnboardingScreen()),
                         ),
                         leadingIcon: EvaIcons.questionMarkCircleOutline,
                         text: 'settings_section_help_intro'.tr(),
-                        trailing: Icon(EvaIcons.arrowIosForwardOutline),
+                        trailing: const Icon(EvaIcons.arrowIosForwardOutline),
                       ),
                       SettingsTile(
                         onTap: () => Navigator.push(
                           context,
-                          ConcentricPageRoute(
+                          ConcentricPageRoute<HelpSlideShareImport>(
                             builder: (_) => HelpSlideShareImport(),
                           ),
                         ),
                         leadingIcon: EvaIcons.questionMarkCircleOutline,
                         text: 'settings_section_help_import'.tr(),
-                        trailing: Icon(EvaIcons.arrowIosForwardOutline),
+                        trailing: const Icon(EvaIcons.arrowIosForwardOutline),
                       ),
                     ], context),
                     _buildSectionTitle('settings_section_account'.tr()),
@@ -173,7 +174,7 @@ class _SettingsViewState extends State<SettingsView> {
                       SettingsTile(
                         onTap: () async {
                           await AuthenticationService.resetPassword(
-                              firebaseUser.email);
+                              firebaseUser!.email!);
                           MainSnackbar(
                             message: 'settings_section_account_reset_msg'.tr(),
                             isSuccess: true,
@@ -181,13 +182,13 @@ class _SettingsViewState extends State<SettingsView> {
                         },
                         leadingIcon: EvaIcons.lockOutline,
                         text: 'settings_section_account_reset'.tr(),
-                        trailing: Icon(EvaIcons.arrowIosForwardOutline),
+                        trailing: const Icon(EvaIcons.arrowIosForwardOutline),
                       ),
                       SettingsTile(
                         onTap: () => AuthenticationService.signOut(),
                         leadingIcon: EvaIcons.logOutOutline,
                         text: 'settings_section_account_logout'.tr(),
-                        trailing: Icon(
+                        trailing: const Icon(
                           EvaIcons.arrowIosForwardOutline,
                           color: Colors.red,
                         ),
@@ -201,18 +202,18 @@ class _SettingsViewState extends State<SettingsView> {
                         children: <TextSpan>[
                           TextSpan(text: 'settings_sign_in_as'.tr()),
                           TextSpan(
-                            text: '\n' + firebaseUser.email,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            text: '\n${firebaseUser!.email!}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: kPadding),
+                    const SizedBox(height: kPadding),
                   ],
                 ),
               ),
             )
-          : LoadingLogut();
+          : const LoadingLogut();
     });
   }
 
@@ -231,8 +232,8 @@ class _SettingsViewState extends State<SettingsView> {
     );
   }
 
-  Container _buildSectionTitle(String title) {
-    return Container(
+  SizedBox _buildSectionTitle(String title) {
+    return SizedBox(
       width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
@@ -243,7 +244,7 @@ class _SettingsViewState extends State<SettingsView> {
         ),
         child: Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -257,16 +258,17 @@ class _SettingsViewState extends State<SettingsView> {
     Share.share('settings_share_msg'.tr(args: [kAppName, code]));
   }
 
-  void _leavePlan(String planId, context) async {
-    String userId = AuthenticationService.currentUser.uid;
-    await PlanService.leavePlan(planId, userId);
-    AuthenticationService.signOut();
-    BasicUtils.clearAllProvider(context);
+  void _leavePlan(String? planId, BuildContext context) {
+    final String userId = AuthenticationService.currentUser!.uid;
+    PlanService.leavePlan(planId, userId).then((_) {
+      AuthenticationService.signOut();
+      BasicUtils.clearAllProvider(context);
+    });
   }
 
-  void _importMeals(List<String> planIds, context) async {
-    showBarModalBottomSheet(
-      shape: RoundedRectangleBorder(
+  void _importMeals(List<String?> planIds, BuildContext context) {
+    showBarModalBottomSheet<void>(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
         ),

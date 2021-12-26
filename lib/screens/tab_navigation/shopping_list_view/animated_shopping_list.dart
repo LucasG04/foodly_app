@@ -13,9 +13,9 @@ class AnimatedShoppingList extends StatelessWidget {
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
 
   AnimatedShoppingList({
-    @required this.groceries,
-    @required this.onTap,
-    @required this.onEdit,
+    required this.groceries,
+    required this.onTap,
+    required this.onEdit,
   });
 
   @override
@@ -23,7 +23,7 @@ class AnimatedShoppingList extends StatelessWidget {
     return AnimatedList(
       key: listKey,
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       initialItemCount: groceries.length,
       itemBuilder: (context, index, animation) {
         return _buildSlideTile(index, animation, context);
@@ -31,25 +31,26 @@ class AnimatedShoppingList extends StatelessWidget {
     );
   }
 
-  Widget _buildSlideTile(int index, animation, context) {
-    Grocery grocery = groceries[index];
+  Widget _buildSlideTile(
+      int index, Animation<double> animation, BuildContext context) {
+    final Grocery grocery = groceries[index];
 
     return SlideTransition(
       position: Tween<Offset>(
         begin: const Offset(1, 0),
-        end: Offset(0, 0),
+        end: Offset.zero,
       ).animate(animation),
       child: InkWell(
         onTap: () => _tapItem(index),
         child: Slidable(
-          actionPane: SlidableDrawerActionPane(),
+          actionPane: const SlidableDrawerActionPane(),
           child: ListTile(
-            title: Text(grocery.name, style: TextStyle(fontSize: 18.0)),
+            title: Text(grocery.name!, style: const TextStyle(fontSize: 18.0)),
             subtitle: grocery.amount != null && grocery.amount != 0
                 ? Text(ConvertUtil.amountToString(grocery.amount, grocery.unit))
                 : null,
             trailing: IconButton(
-              icon: Icon(EvaIcons.moreHorizotnalOutline),
+              icon: const Icon(EvaIcons.moreHorizontalOutline),
               onPressed: () => onEdit(grocery),
             ),
             dense: true,
@@ -60,13 +61,13 @@ class AnimatedShoppingList extends StatelessWidget {
   }
 
   void _tapItem(int index) {
-    listKey.currentState.removeItem(
+    listKey.currentState!.removeItem(
       index,
       (ctx, animation) => _buildSlideTile(index, animation, ctx),
       duration: const Duration(milliseconds: 250),
     );
 
-    Future.delayed(
+    Future<void>.delayed(
       const Duration(milliseconds: 250),
     ).then((_) => onTap(groceries.removeAt(index)));
   }

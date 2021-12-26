@@ -1,10 +1,10 @@
 class Grocery {
-  String id;
-  String name;
-  double amount;
-  String unit;
-  String productGroup;
-  bool bought;
+  String? id;
+  String? name;
+  double? amount;
+  String? unit;
+  String? productGroup;
+  bool? bought;
 
   Grocery({
     this.id,
@@ -16,7 +16,7 @@ class Grocery {
   });
 
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       'name': name,
       'amount': amount,
       'unit': unit,
@@ -26,15 +26,13 @@ class Grocery {
   }
 
   factory Grocery.fromMap(String id, Map<String, dynamic> map) {
-    if (map == null) return null;
-
     return Grocery(
       id: id,
-      name: map['name'],
-      amount: map['amount'],
-      unit: map['unit'],
-      productGroup: map['productGroup'],
-      bought: map['bought'],
+      name: map['name'] as String?,
+      amount: map['amount'] as double?,
+      unit: map['unit'] as String?,
+      productGroup: map['productGroup'] as String?,
+      bought: map['bought'] as bool?,
     );
   }
 

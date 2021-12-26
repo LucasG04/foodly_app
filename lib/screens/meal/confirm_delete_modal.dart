@@ -8,7 +8,7 @@ import '../../widgets/main_button.dart';
 class ConfirmDeleteModal extends StatelessWidget {
   final Meal meal;
 
-  ConfirmDeleteModal(this.meal);
+  const ConfirmDeleteModal(this.meal);
 
   @override
   Widget build(BuildContext context) {
@@ -29,29 +29,30 @@ class ConfirmDeleteModal extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: kPadding),
               child: Text(
                 'delete'.tr().toUpperCase(),
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
             ),
           ),
           RichText(
             text: TextSpan(
-              style: Theme.of(context).textTheme.bodyText1.copyWith(
+              style: Theme.of(context).textTheme.bodyText1!.copyWith(
                     fontSize: 16.0,
                   ),
               children: <TextSpan>[
-                TextSpan(text: 'modal_delete_sure_leading'.tr() + ' '),
+                TextSpan(text: '${'modal_delete_sure_leading'.tr()} '),
                 TextSpan(
                   text: '"${meal.name}"',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 TextSpan(
-                  text: ' ' + 'modal_delete_sure_trailing'.tr(),
+                  text: ' ${'modal_delete_sure_trailing'.tr()}',
                 ),
               ],
             ),
           ),
-          SizedBox(height: kPadding * 2),
+          const SizedBox(height: kPadding * 2),
           Center(
             child: MainButton(
               text: 'modal_delete_delete'.tr(),
@@ -59,7 +60,7 @@ class ConfirmDeleteModal extends StatelessWidget {
               color: Theme.of(context).errorColor,
             ),
           ),
-          SizedBox(height: kPadding * 2),
+          const SizedBox(height: kPadding * 2),
         ],
       ),
     );

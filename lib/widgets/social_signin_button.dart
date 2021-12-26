@@ -22,12 +22,12 @@ class _SocialButton extends StatelessWidget {
   final kTextHeadlineColor = Color(0xFF333333);
 
   _SocialButton({
-    @required this.text,
-    @required this.onTap,
+    required this.text,
+    required this.onTap,
     this.width = 300.0,
     this.height = 60.0,
-    @required this.icon,
-    @required this.color,
+    required this.icon,
+    required this.color,
   });
 
   @override
@@ -50,7 +50,7 @@ class _SocialButton extends StatelessWidget {
               text,
               style: Theme.of(context)
                   .textTheme
-                  .button
+                  .button!
                   .copyWith(color: Colors.white),
             ),
           ],

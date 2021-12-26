@@ -9,9 +9,9 @@ class PageCard extends StatelessWidget {
   final double height;
 
   const PageCard({
-    Key key,
-    @required this.page,
-    @required this.height,
+    Key? key,
+    required this.page,
+    required this.height,
   }) : super(key: key);
 
   @override
@@ -41,7 +41,7 @@ class PageCard extends StatelessWidget {
 
   Widget _buildTitle(BuildContext context) {
     return Text(
-      page.title,
+      page.title!,
       style: TextStyle(
         color: page.primaryColor,
         fontWeight: FontWeight.w700,
@@ -67,7 +67,7 @@ class PageCard extends StatelessWidget {
       width: size,
       height: size,
       margin: EdgeInsets.only(top: 140),
-      child: Image.asset(page.assetPath),
+      child: Image.asset(page.assetPath!),
     );
   }
 }

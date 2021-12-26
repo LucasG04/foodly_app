@@ -1,60 +1,54 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:auto_route/auto_route_annotations.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:foodly/services/meal_stat_service.dart';
-import 'package:foodly/services/settings_service.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
 import '../../models/meal.dart';
 import '../../models/plan_meal.dart';
 import '../../providers/state_providers.dart';
+import '../../services/meal_stat_service.dart';
 import '../../services/plan_service.dart';
+import '../../services/settings_service.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/user_information.dart';
 import 'search_bar.dart';
 import 'select_meal_tile.dart';
 
 class MealSelectScreen extends StatefulWidget {
-  /// both are strings because the need to be extracted from the url
-  /// for better usage this widgets contains two getters: `date` & `isLunch`
-  final String dateString;
+  final DateTime date;
+  final bool isLunch;
 
-  final String isLunchString;
-
-  MealSelectScreen({
-    @QueryParam('date') this.dateString,
-    @QueryParam('isLunch') this.isLunchString,
-  });
+  const MealSelectScreen({required this.date, required this.isLunch, Key? key})
+      : super(key: key);
 
   @override
   _MealSelectScreenState createState() => _MealSelectScreenState();
 }
 
 class _MealSelectScreenState extends State<MealSelectScreen> {
-  List<Meal> searchedMeals;
-  bool _isSearching;
+  late List<Meal> searchedMeals;
+  bool? _isSearching;
 
-  ScrollController _scrollController;
-  Key _animationLimiterKey;
+  ScrollController? _scrollController;
+  Key? _animationLimiterKey;
 
   @override
   void initState() {
     searchedMeals = [];
     _isSearching = false;
-    _scrollController = new ScrollController();
+    _scrollController = ScrollController();
     _animationLimiterKey = UniqueKey();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final activePlan = context.read(planProvider).state;
+    final activePlan = context.read(planProvider).state!;
 
     return Scaffold(
       appBar: MainAppBar(text: 'meal_select_title'.tr()),
@@ -87,7 +81,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
               child: ListView.builder(
                 shrinkWrap: true,
                 padding: const EdgeInsets.symmetric(vertical: kPadding),
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 itemCount: searchedMeals.isEmpty
                     ? 3 // there could be a max amount of 3 items if none is found
                     : searchedMeals.length,
@@ -99,12 +93,12 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                       verticalOffset: 50.0,
                       child: FadeInAnimation(
                         child: searchedMeals.isEmpty
-                            ? _buildNoResultsForIndex(index, activePlan.id)
+                            ? _buildNoResultsForIndex(index, activePlan.id!)
                             : SelectMealTile(
                                 meal: searchedMeals[index],
                                 onAddMeal: () => _addMealToPlan(
-                                  searchedMeals[index].id,
-                                  activePlan.id,
+                                  searchedMeals[index].id!,
+                                  activePlan.id!,
                                 ),
                               ),
                       ),
@@ -119,25 +113,20 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     );
   }
 
-  DateTime get date =>
-      new DateTime.fromMillisecondsSinceEpoch(int.parse(widget.dateString));
-
-  bool get isLunch => widget.isLunchString == 'true';
-
   Widget _buildNoResultsForIndex(int index, String planId) {
     return (index == 0)
         ? _buildContainer(
-            EvaIcons.codeOutline,
+            EvaIcons.code,
             'meal_select_placeholder'.tr(),
             () => _showPlaceholderDialog(),
           )
         : (index == 1)
             ? _buildContainer(
-                EvaIcons.plusOutline,
+                EvaIcons.plus,
                 'meal_select_new'.tr(),
                 () => _createNewMeal(),
               )
-            : _isSearching
+            : _isSearching!
                 ? UserInformation(
                     'assets/images/undraw_empty.png',
                     'meal_select_no_results'.tr(),
@@ -145,22 +134,22 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                   )
                 : SettingsService.showSuggestions
                     ? _buildPreviewMeals(planId)
-                    : SizedBox();
+                    : const SizedBox();
   }
 
   Widget _buildPreviewMeals(String planId) {
     return FutureBuilder<List<Meal>>(
       future: MealStatService.getMealRecommendations(planId),
       builder: (context, snapshot) {
-        final meals = snapshot.hasData ? snapshot.data : [];
+        final meals = snapshot.hasData ? snapshot.data! : <Meal>[];
 
         return AnimationLimiter(
           key: _animationLimiterKey,
           child: ListView.builder(
             shrinkWrap: true,
             padding: const EdgeInsets.symmetric(vertical: kPadding),
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: meals.length == 0
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: meals.isEmpty
                 ? 0
                 : meals.length +
                     1, // +1 to make space for title and 0 to not show title
@@ -171,7 +160,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                     horizontal: kPadding,
                     vertical: kPadding / 4,
                   ),
-                  child: Text(
+                  child: const Text(
                     'meal_select_recommondations',
                     style: TextStyle(
                       fontSize: 18,
@@ -190,7 +179,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                   child: FadeInAnimation(
                     child: SelectMealTile(
                       meal: meals[index],
-                      onAddMeal: () => _addMealToPlan(meals[index].id, planId),
+                      onAddMeal: () => _addMealToPlan(meals[index].id!, planId),
                     ),
                   ),
                 ),
@@ -203,22 +192,23 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
   }
 
   Widget _buildContainer(IconData iconData, String text, Function action) {
-    double _height = 75.0;
-    double _width = MediaQuery.of(context).size.width * 0.9;
+    const double _height = 75.0;
+    final double _width = MediaQuery.of(context).size.width * 0.9;
     return Align(
+      // ignore: avoid_redundant_argument_values
       alignment: Alignment.center,
       child: Container(
         width: _width > 599 ? 600 : _width,
         height: _height,
         margin: const EdgeInsets.symmetric(vertical: kPadding / 2),
         decoration: BoxDecoration(
-          boxShadow: [kSmallShadow],
+          boxShadow: const [kSmallShadow],
           borderRadius: BorderRadius.circular(kRadius),
           color: Colors.white,
         ),
         child: Row(
           children: [
-            Container(
+            SizedBox(
               height: _height,
               width: _height,
               child: ClipRRect(
@@ -235,7 +225,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                   children: [
                     Text(
                       text,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w600,
                       ),
@@ -249,13 +239,13 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
               width: _height / 2,
               margin: const EdgeInsets.only(right: 20.0),
               child: OutlinedButton(
-                onPressed: action,
-                child:
-                    Icon(EvaIcons.arrowIosForwardOutline, color: Colors.black),
+                onPressed: action as void Function()?,
                 style: ButtonStyle(
                   padding: MaterialStateProperty.resolveWith(
-                      (states) => const EdgeInsets.all(0)),
+                      (states) => EdgeInsets.zero),
                 ),
+                child: const Icon(EvaIcons.arrowIosForwardOutline,
+                    color: Colors.black),
               ),
             ),
           ],
@@ -269,7 +259,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
       context: context,
       textFields: [
         DialogTextField(
-          validator: (value) => value.isEmpty
+          validator: (value) => value!.isEmpty
               ? 'meal_select_placeholder_dialog_placeholder'.tr()
               : null,
         ),
@@ -281,29 +271,29 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     if (texts != null && texts.isNotEmpty) {
       await _addMealToPlan(
         kPlaceholderSymbol + texts.first,
-        context.read(planProvider).state.id,
+        context.read(planProvider).state!.id!,
       );
-      ExtendedNavigator.root.pop();
+      AutoRouter.of(context).pop();
     }
   }
 
   Future _createNewMeal() async {
-    final meal = await ExtendedNavigator.root
-        .push(Routes.mealCreateScreen(id: 'create'));
+    final meal =
+        await AutoRouter.of(context).push(MealCreateScreenRoute(id: 'create'));
 
     if (meal != null && meal is Meal) {
-      await _addMealToPlan(meal.id, context.read(planProvider).state.id);
-      ExtendedNavigator.root.pop();
+      await _addMealToPlan(meal.id!, context.read(planProvider).state!.id!);
+      AutoRouter.of(context).pop();
     }
   }
 
   Future _addMealToPlan(String mealId, String planId) {
     return PlanService.addPlanMealToPlan(
       planId,
-      new PlanMeal(
-        date: date,
+      PlanMeal(
+        date: widget.date,
         meal: mealId,
-        type: isLunch ? MealType.LUNCH : MealType.DINNER,
+        type: widget.isLunch ? MealType.LUNCH : MealType.DINNER,
         upvotes: [],
         downvotes: [],
       ),
@@ -315,7 +305,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
         .where(
           (meal) =>
               meal.name.toLowerCase().contains(query.toLowerCase()) ||
-              meal.tags
+              meal.tags!
                   .any((t) => t.toLowerCase().contains(query.toLowerCase())),
         )
         .toList();

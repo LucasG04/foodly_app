@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 class MainAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String text;
   final bool showBack;
-  final List<Widget> actions;
-  final ScrollController scrollController;
+  final List<Widget>? actions;
+  final ScrollController? scrollController;
 
   MainAppBar({
-    @required this.text,
+    required this.text,
     this.showBack = true,
     this.actions,
     this.scrollController,
@@ -29,22 +29,22 @@ class _MainAppBarState extends State<MainAppBar> {
   @override
   void initState() {
     if (widget.scrollController != null) {
-      widget.scrollController.addListener(_scrollListener);
+      widget.scrollController!.addListener(_scrollListener);
     }
 
     super.initState();
   }
 
-  _scrollListener() {
-    if (widget.scrollController.offset <=
-        widget.scrollController.position.minScrollExtent) {
+  void _scrollListener() {
+    if (widget.scrollController!.offset <=
+        widget.scrollController!.position.minScrollExtent) {
       if (!_isScrollToTop) {
         setState(() {
           _isScrollToTop = true;
         });
       }
     } else {
-      if (widget.scrollController.offset > EMPTY_SPACE && _isScrollToTop) {
+      if (widget.scrollController!.offset > EMPTY_SPACE && _isScrollToTop) {
         setState(() {
           _isScrollToTop = false;
         });
@@ -55,7 +55,7 @@ class _MainAppBarState extends State<MainAppBar> {
   @override
   void dispose() {
     if (widget.scrollController != null) {
-      widget.scrollController.dispose();
+      widget.scrollController!.dispose();
     }
 
     super.dispose();
@@ -69,7 +69,7 @@ class _MainAppBarState extends State<MainAppBar> {
         style: TextStyle(
           fontWeight: FontWeight.w600,
           fontFamily: 'Poppins',
-          color: Theme.of(context).textTheme.bodyText1.color,
+          color: Theme.of(context).textTheme.bodyText1!.color,
         ),
         overflow: TextOverflow.fade,
       ),
@@ -80,7 +80,7 @@ class _MainAppBarState extends State<MainAppBar> {
           ? IconButton(
               icon: Icon(
                 _getIconData(Theme.of(context).platform),
-                color: Theme.of(context).textTheme.bodyText1.color,
+                color: Theme.of(context).textTheme.bodyText1!.color,
               ),
               tooltip: MaterialLocalizations.of(context).backButtonTooltip,
               onPressed: () {
@@ -93,7 +93,7 @@ class _MainAppBarState extends State<MainAppBar> {
   }
 
   /// Returns the appropriate "back" icon for the given `platform`.
-  IconData _getIconData(TargetPlatform platform) {
+  IconData? _getIconData(TargetPlatform platform) {
     switch (platform) {
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
@@ -104,7 +104,5 @@ class _MainAppBarState extends State<MainAppBar> {
       case TargetPlatform.macOS:
         return EvaIcons.arrowIosBackOutline;
     }
-    assert(false);
-    return null;
   }
 }

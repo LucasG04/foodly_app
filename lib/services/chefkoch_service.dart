@@ -6,33 +6,34 @@ import '../models/meal.dart';
 class ChefkochService {
   ChefkochService._();
 
-  static String _chefkochRecipeEndpoint = 'https://api.chefkoch.de/v2/recipes';
-  static Dio _dio = new Dio();
+  static const String _chefkochRecipeEndpoint =
+      'https://api.chefkoch.de/v2/recipes';
+  static final Dio _dio = Dio();
 
   static String get chefkochRecipeEndpoint => _chefkochRecipeEndpoint;
 
-  static Future<Meal> getMealFromChefkochUrl(String url) async {
+  static Future<Meal?> getMealFromChefkochUrl(String url) async {
     final recipeId = _extractRecipeIdFromChefkochUrl(url);
-    Response<dynamic> response;
+    late Response<dynamic> response;
 
     try {
-      response = await _dio.get('$_chefkochRecipeEndpoint/$recipeId');
+      response = await _dio.get<Map>('$_chefkochRecipeEndpoint/$recipeId');
     } catch (e) {
-      print(e);
+      return null;
     }
 
     if (response.data != null) {
-      Meal meal = Meal();
-      meal.name = response.data['title'];
-      meal.source = 'Chefkoch';
-      meal.instructions = response.data['instructions'];
-      meal.tags = List<String>.from(response.data['tags'])
-          .where((tag) => tag.toString().isNotEmpty)
+      final Meal meal = Meal(name: (response.data as Map)['title'] as String);
+      meal.source = url;
+      meal.instructions = (response.data as Map)['instructions'] as String;
+      meal.tags = List<String>.from((response.data as Map)['tags'] as List)
+          .where((tag) => tag.isNotEmpty)
           .toList();
-      meal.tags = meal.tags.toSet().toList(); // removes duplicates
-      meal.duration = response.data['totalTime'];
+      meal.tags = meal.tags!.toSet().toList(); // removes duplicates
+      meal.duration = (response.data as Map)['totalTime'] as int;
       meal.ingredients = _filterIngredientsFromChefkochIngredientGroups(
-          List<Map<String, dynamic>>.from(response.data['ingredientGroups']));
+          List<Map<String, dynamic>>.from(
+              (response.data as Map)['ingredientGroups'] as List));
       meal.imageUrl = await _getImageUrlByRecipeId(recipeId);
 
       return meal;
@@ -50,30 +51,31 @@ class ChefkochService {
   static List<Ingredient> _filterIngredientsFromChefkochIngredientGroups(
       List<Map<String, dynamic>> ingredientGroups) {
     return ingredientGroups
-        .map((group) => List<Map<String, dynamic>>.from(group['ingredients'])
-            .map((Map<String, dynamic> e) => Ingredient(
-                  name: e['name'],
-                  amount: e['amount'],
-                  unit: e['unit'],
-                  productGroup: e['productGroup'],
-                ))
-            .toList())
+        .map((group) =>
+            List<Map<String, dynamic>>.from(group['ingredients'] as List)
+                .map((Map<String, dynamic> e) => Ingredient(
+                      name: e['name'] as String,
+                      amount: e['amount'] as double,
+                      unit: e['unit'] as String,
+                      productGroup: e['productGroup'] as String,
+                    ))
+                .toList())
         .toList()
         .expand((i) => i)
         .toList();
   }
 
-  static Future<String> _getImageUrlByRecipeId(String recipeId) async {
+  static Future<String?> _getImageUrlByRecipeId(String recipeId) async {
     try {
       final imagesResponse =
-          await _dio.get('$_chefkochRecipeEndpoint/$recipeId/images');
+          await _dio.get<Map>('$_chefkochRecipeEndpoint/$recipeId/images');
 
-      final imageId = imagesResponse.data['results'][0]['id'];
+      final imageId = imagesResponse.data!['results'][0]['id'] as String;
 
-      final imageResponse =
-          await _dio.get('$_chefkochRecipeEndpoint/$recipeId/images/$imageId');
+      final imageResponse = await _dio
+          .get<Map>('$_chefkochRecipeEndpoint/$recipeId/images/$imageId');
 
-      return imageResponse.data['urls'].entries.first.value['cdn'];
+      return imageResponse.data!['urls'].entries.first.value['cdn'] as String;
     } catch (e) {
       return '';
     }

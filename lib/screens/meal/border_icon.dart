@@ -6,13 +6,13 @@ import '../../constants.dart';
 
 class BorderIcon extends StatelessWidget {
   final Widget child;
-  final EdgeInsets padding;
-  final double width, height;
+  final EdgeInsets? padding;
+  final double? width, height;
   final bool withBorder;
 
   const BorderIcon({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
     this.width,
     this.height,
     this.padding,
@@ -21,7 +21,7 @@ class BorderIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new ClipRRect(
+    return ClipRRect(
       borderRadius: BorderRadius.circular(kRadius * 2),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),

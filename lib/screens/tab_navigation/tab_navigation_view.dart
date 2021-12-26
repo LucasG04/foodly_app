@@ -1,13 +1,14 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+// ignore: implementation_imports
 import 'package:flutter_riverpod/src/provider.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
-import 'package:foodly/providers/state_providers.dart';
-import 'package:foodly/services/shopping_list_service.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../app_router.gr.dart';
+import '../../providers/state_providers.dart';
+import '../../services/shopping_list_service.dart';
 import 'meal_list_view/meal_list_view.dart';
 import 'plan_view/plan_tab_view.dart';
 import 'settings_view/settings_view.dart';
@@ -15,16 +16,18 @@ import 'shopping_list_view/edit_grocery_modal.dart';
 import 'shopping_list_view/shopping_list_view.dart';
 
 class TabNavigationView extends StatefulWidget {
+  const TabNavigationView({Key? key}) : super(key: key);
+
   @override
   _TabNavigationViewState createState() => _TabNavigationViewState();
 }
 
 class _TabNavigationViewState extends State<TabNavigationView> {
-  PageController _pageController = new PageController(initialPage: 1);
+  final PageController _pageController = PageController(initialPage: 1);
   int _currentIndex = 1;
   bool _navbarAnimating = false;
 
-  String _activeListId;
+  String? _activeListId;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +35,7 @@ class _TabNavigationViewState extends State<TabNavigationView> {
       body: SafeArea(
         child: PageView(
           controller: _pageController,
-          physics: BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           onPageChanged: (value) {
             if (!_navbarAnimating) {
               setState(() {
@@ -43,14 +46,14 @@ class _TabNavigationViewState extends State<TabNavigationView> {
           children: [
             ShoppingListView(),
             PlanTabView(),
-            MealListView(),
+            const MealListView(),
             SettingsView(),
           ],
         ),
       ),
       floatingActionButton: _showActionButton()
           ? FloatingActionButton(
-              child: Icon(EvaIcons.plusOutline),
+              child: const Icon(EvaIcons.plus),
               onPressed: () {
                 switch (_currentIndex) {
                   case 0:
@@ -80,7 +83,7 @@ class _TabNavigationViewState extends State<TabNavigationView> {
           );
           _navbarAnimating = false;
         },
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(EvaIcons.shoppingBagOutline),
             label: 'shopping',
@@ -112,27 +115,25 @@ class _TabNavigationViewState extends State<TabNavigationView> {
 
   void _newGrocery() async {
     if (_activeListId == null) {
-      final planId = context.read(planProvider).state.id;
+      final planId = context.read(planProvider).state!.id!;
       final list = await ShoppingListService.getShoppingListByPlanId(planId);
       _activeListId = list.id;
     }
 
-    showBarModalBottomSheet(
-      shape: RoundedRectangleBorder(
+    showBarModalBottomSheet<void>(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
         ),
       ),
       context: context,
       builder: (modalContext) => EditGroceryModal(
-        shoppingListId: _activeListId,
+        shoppingListId: _activeListId!,
       ),
     );
   }
 
   void _openMealCreate() {
-    ExtendedNavigator.root.push(
-      Routes.mealCreateScreen(id: 'create'),
-    );
+    AutoRouter.of(context).push(MealCreateScreenRoute(id: 'create'));
   }
 }

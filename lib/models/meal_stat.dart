@@ -1,20 +1,20 @@
 class MealStat {
-  String id;
+  String? id;
   String mealId;
-  DateTime lastTimePlanned;
-  int plannedCount;
+  DateTime? lastTimePlanned;
+  int? plannedCount;
 
   MealStat({
     this.id,
-    this.mealId,
+    required this.mealId,
     this.lastTimePlanned,
     this.plannedCount,
   });
 
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       'mealId': mealId,
-      'lastTimePlanned': lastTimePlanned.millisecondsSinceEpoch,
+      'lastTimePlanned': lastTimePlanned!.millisecondsSinceEpoch,
       'plannedCount': plannedCount,
     };
   }
@@ -22,10 +22,10 @@ class MealStat {
   factory MealStat.fromMap(String id, Map<String, dynamic> map) {
     return MealStat(
       id: id,
-      mealId: map['mealId'],
+      mealId: map['mealId'] as String,
       lastTimePlanned:
-          DateTime.fromMillisecondsSinceEpoch(map['lastTimePlanned']),
-      plannedCount: map['plannedCount'],
+          DateTime.fromMillisecondsSinceEpoch(map['lastTimePlanned'] as int),
+      plannedCount: map['plannedCount'] as int?,
     );
   }
 

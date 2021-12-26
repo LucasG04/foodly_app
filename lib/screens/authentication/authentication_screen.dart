@@ -11,13 +11,13 @@ class AuthenticationScreen extends StatefulWidget {
 }
 
 class _AuthenticationScreenState extends State<AuthenticationScreen> {
-  PageController _pageController;
-  Plan _plan;
-  bool _isCreatingPlan;
+  PageController? _pageController;
+  Plan? _plan;
+  bool? _isCreatingPlan;
 
   @override
   void initState() {
-    _pageController = new PageController();
+    _pageController = PageController();
     _isCreatingPlan = false;
     super.initState();
   }
@@ -31,30 +31,32 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
         left: false,
         child: GestureDetector(
           onTap: () {
-            FocusScopeNode currentFocus = FocusScope.of(context);
+            final FocusScopeNode currentFocus = FocusScope.of(context);
             if (!currentFocus.hasPrimaryFocus) {
               currentFocus.unfocus();
             }
           },
           child: PageView(
             controller: _pageController,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             children: [
               CodeInputView((result, [planId]) {
                 setState(() {
                   _isCreatingPlan = result == CodeInputResult.NEW;
-                  _plan = result == CodeInputResult.JOIN
-                      ? new Plan(id: planId)
-                      : null;
+                  _plan =
+                      result == CodeInputResult.JOIN ? Plan(id: planId) : null;
                 });
-                _pageController.animateToPage(
+                _pageController!.animateToPage(
                   1,
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeIn,
                 );
               }),
-              _isCreatingPlan ? _buildPlanSettingsView() : _buildLoginView(),
-              _isCreatingPlan ? _buildLoginView() : SizedBox()
+              if (_isCreatingPlan!)
+                _buildPlanSettingsView()
+              else
+                _buildLoginView(),
+              if (_isCreatingPlan!) _buildLoginView() else const SizedBox()
             ],
           ),
         ),
@@ -66,7 +68,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
     return PlanSettingsView(
       plan: _plan,
       navigateBack: () {
-        _pageController.previousPage(
+        _pageController!.previousPage(
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeIn,
         );
@@ -75,7 +77,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
         setState(() {
           _plan = plan;
         });
-        _pageController.animateToPage(
+        _pageController!.animateToPage(
           2,
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeIn,
@@ -89,7 +91,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
       isCreatingPlan: _isCreatingPlan,
       plan: _plan,
       navigateBack: () {
-        _pageController.previousPage(
+        _pageController!.previousPage(
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeIn,
         );

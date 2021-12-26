@@ -10,9 +10,10 @@ import '../../../providers/state_providers.dart';
 import 'tag_filter_modal.dart';
 
 class MealListTitle extends StatefulWidget {
-  MealListTitle({
-    @required this.onSearch,
-  });
+  const MealListTitle({
+    required this.onSearch,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _MealListTitleState createState() => _MealListTitleState();
@@ -22,13 +23,13 @@ class MealListTitle extends StatefulWidget {
 
 class _MealListTitleState extends State<MealListTitle> {
   bool _searchActive = false;
-  TextEditingController _textEditingController;
+  TextEditingController? _textEditingController;
 
   @override
   void initState() {
     super.initState();
 
-    _textEditingController = new TextEditingController();
+    _textEditingController = TextEditingController();
   }
 
   @override
@@ -36,7 +37,7 @@ class _MealListTitleState extends State<MealListTitle> {
     return Align(
       alignment: Alignment.centerLeft,
       child: Center(
-        child: Container(
+        child: SizedBox(
           height: 50.0,
           width: MediaQuery.of(context).size.width > 599
               ? 600.0
@@ -49,40 +50,41 @@ class _MealListTitleState extends State<MealListTitle> {
                   child: _searchActive ? _buildSearchField() : _buildTitle(),
                 ),
               ),
-              SizedBox(width: kPadding),
-              SizedBox(width: kPadding / 2),
-              !_searchActive
-                  ? Consumer(
-                      builder: (context, watch, child) {
-                        final tagFilterLength =
-                            watch(mealTagFilterProvider).state.length;
-                        return Badge(
-                          animationDuration: const Duration(milliseconds: 250),
-                          position: BadgePosition.topEnd(top: 0, end: 3),
-                          animationType: BadgeAnimationType.scale,
-                          badgeColor: Theme.of(context).primaryColor,
-                          badgeContent: Text(
-                            tagFilterLength.toString(),
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          child: child,
-                        );
-                      },
-                      child: IconButton(
-                        icon: Icon(EvaIcons.options2Outline),
-                        onPressed: () => _openTagFilterModal(context),
-                        splashRadius: 25.0,
+              const SizedBox(width: kPadding),
+              const SizedBox(width: kPadding / 2),
+              if (!_searchActive)
+                Consumer(
+                  builder: (context, watch, child) {
+                    final tagFilterLength =
+                        watch(mealTagFilterProvider).state.length;
+                    return Badge(
+                      animationDuration: const Duration(milliseconds: 250),
+                      position: BadgePosition.topEnd(top: 0, end: 3),
+                      animationType: BadgeAnimationType.scale,
+                      badgeColor: Theme.of(context).primaryColor,
+                      badgeContent: Text(
+                        tagFilterLength.toString(),
+                        style: const TextStyle(color: Colors.white),
                       ),
-                    )
-                  : SizedBox(),
-              SizedBox(width: kPadding / 2),
+                      child: child,
+                    );
+                  },
+                  child: IconButton(
+                    icon: const Icon(EvaIcons.options2Outline),
+                    onPressed: () => _openTagFilterModal(context),
+                    splashRadius: 25.0,
+                  ),
+                )
+              else
+                const SizedBox(),
+              const SizedBox(width: kPadding / 2),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 250),
                 child: _searchActive
                     ? IconButton(
-                        icon: Icon(EvaIcons.closeOutline),
+                        icon: const Icon(EvaIcons.close),
                         onPressed: () {
-                          _textEditingController.clear();
+                          _textEditingController!.clear();
                           widget.onSearch('');
                           setState(() {
                             _searchActive = !_searchActive;
@@ -91,7 +93,7 @@ class _MealListTitleState extends State<MealListTitle> {
                         splashRadius: 25.0,
                       )
                     : IconButton(
-                        icon: Icon(EvaIcons.searchOutline),
+                        icon: const Icon(EvaIcons.searchOutline),
                         onPressed: () {
                           setState(() {
                             _searchActive = !_searchActive;
@@ -108,11 +110,11 @@ class _MealListTitleState extends State<MealListTitle> {
   }
 
   Widget _buildTitle() {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       child: AutoSizeText(
         'meal_list_title'.tr(),
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 32.0,
           fontWeight: FontWeight.w700,
           fontFamily: 'Poppins',
@@ -125,22 +127,21 @@ class _MealListTitleState extends State<MealListTitle> {
     return TextFormField(
       controller: _textEditingController,
       autofocus: true,
-      maxLines: 1,
       onChanged: widget.onSearch,
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 32.0,
         fontWeight: FontWeight.w700,
         fontFamily: 'Poppins',
       ),
       decoration: InputDecoration(
-        hintText: 'meal_list_search'.tr() + '...',
+        hintText: '${'meal_list_search'.tr()}...',
       ),
     );
   }
 
-  void _openTagFilterModal(context) {
+  void _openTagFilterModal(BuildContext context) {
     showModalBottomSheet<List<String>>(
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
         ),

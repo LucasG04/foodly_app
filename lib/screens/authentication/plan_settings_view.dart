@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -11,32 +10,33 @@ import '../../widgets/progress_button.dart';
 import '../../widgets/toggle_tab/flutter_toggle_tab.dart';
 
 class PlanSettingsView extends StatefulWidget {
-  final Plan plan;
+  final Plan? plan;
   final void Function() navigateBack;
   final void Function(Plan) navigateForward;
 
-  PlanSettingsView({
-    @required this.plan,
-    @required this.navigateBack,
-    @required this.navigateForward,
-  });
+  const PlanSettingsView({
+    required this.plan,
+    required this.navigateBack,
+    required this.navigateForward,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _PlanSettingsViewState createState() => _PlanSettingsViewState();
 }
 
 class _PlanSettingsViewState extends State<PlanSettingsView> {
-  ButtonState _buttonState;
+  ButtonState? _buttonState;
 
-  TextEditingController _nameController;
-  String _nameErrorText;
-  String _unknownErrorText;
+  TextEditingController? _nameController;
+  String? _nameErrorText;
+  String? _unknownErrorText;
 
   @override
   void initState() {
     _buttonState = ButtonState.normal;
 
-    _nameController = new TextEditingController();
+    _nameController = TextEditingController();
     super.initState();
   }
 
@@ -49,19 +49,18 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
         horizontal: (MediaQuery.of(context).size.width - contentWidth) / 2,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(height: kPadding + MediaQuery.of(context).padding.top),
           FlutterToggleTab(
             width: 80,
             borderRadius: 15,
             initialIndex: 0,
-            selectedTextStyle: TextStyle(
+            selectedTextStyle: const TextStyle(
               color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
-            unSelectedTextStyle: TextStyle(
+            unSelectedTextStyle: const TextStyle(
               color: Colors.grey,
               fontSize: 14,
               fontWeight: FontWeight.w400,
@@ -82,30 +81,31 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
               ),
             ),
           ),
-          SizedBox(height: kPadding),
+          const SizedBox(height: kPadding),
           MainTextField(
             controller: _nameController,
             title: 'plan_settings_name_title'.tr(),
             textInputAction: TextInputAction.go,
             errorText: _nameErrorText,
           ),
-          Container(
+          SizedBox(
             height: size.height * 0.2 +
                 MediaQuery.of(context).viewInsets.bottom / 4,
             child: _unknownErrorText != null
                 ? Row(
                     children: [
-                      Icon(EvaIcons.alertTriangleOutline, color: Colors.red),
-                      SizedBox(width: kPadding),
+                      const Icon(EvaIcons.alertTriangleOutline,
+                          color: Colors.red),
+                      const SizedBox(width: kPadding),
                       Expanded(
                         child: Text(
                           _unknownErrorText ?? '',
-                          style: TextStyle(color: Colors.red),
+                          style: const TextStyle(color: Colors.red),
                         ),
                       )
                     ],
                   )
-                : SizedBox(),
+                : const SizedBox(),
           ),
           LayoutBuilder(builder: (context, constraints) {
             return Row(
@@ -127,20 +127,20 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
               ],
             );
           }),
-          SizedBox(height: kPadding * 2),
+          const SizedBox(height: kPadding * 2),
         ],
       ),
     );
   }
 
-  TextStyle get _titleTextStyle => TextStyle(
+  TextStyle get _titleTextStyle => const TextStyle(
         fontSize: 22.0,
         fontWeight: FontWeight.w700,
       );
 
   bool _validateName() {
-    if (_nameController.text.isEmpty ||
-        _nameController.text.trim().length < 3) {
+    if (_nameController!.text.isEmpty ||
+        _nameController!.text.trim().length < 3) {
       setState(() {
         _nameErrorText = 'plan_settings_error_name'.tr();
       });
@@ -153,7 +153,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
     _resetErrors();
 
     if (_validateName()) {
-      final plan = new Plan(name: _nameController.text.trim());
+      final plan = Plan(name: _nameController!.text.trim());
       widget.navigateForward(plan);
     } else {
       setState(() {

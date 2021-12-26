@@ -1,31 +1,31 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:foodly/utils/basic_utils.dart';
 
 import '../../constants.dart';
 import '../../services/chefkoch_service.dart';
+import '../../utils/basic_utils.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
 
 class ChefkochImportModal extends StatefulWidget {
-  ChefkochImportModal();
+  const ChefkochImportModal();
 
   @override
   _ChefkochImportModalState createState() => _ChefkochImportModalState();
 }
 
 class _ChefkochImportModalState extends State<ChefkochImportModal> {
-  TextEditingController _linkController = new TextEditingController();
-  String _linkErrorText;
-  bool _linkError;
+  TextEditingController _linkController = TextEditingController();
+  String? _linkErrorText;
+  late bool _linkError;
 
-  ButtonState _buttonState;
+  ButtonState? _buttonState;
 
   @override
   void initState() {
-    _linkController = new TextEditingController();
+    _linkController = TextEditingController();
     _linkErrorText = null;
     _linkError = false;
     _buttonState = ButtonState.normal;
@@ -51,7 +51,8 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
               padding: const EdgeInsets.symmetric(vertical: kPadding),
               child: Text(
                 'import_modal_title'.tr().toUpperCase(),
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ).tr(),
             ),
@@ -64,29 +65,30 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
             errorText: _linkErrorText,
             onSubmit: _importMeal,
           ),
-          _linkError
-              ? Container(
-                  margin: const EdgeInsets.only(top: kPadding),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: kPadding, vertical: kPadding / 2),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(kRadius),
+          if (_linkError)
+            Container(
+              margin: const EdgeInsets.only(top: kPadding),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: kPadding, vertical: kPadding / 2),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(kRadius),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    EvaIcons.alertCircleOutline,
+                    color: Theme.of(context).errorColor,
                   ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        EvaIcons.alertCircleOutline,
-                        color: Theme.of(context).errorColor,
-                      ),
-                      SizedBox(width: kPadding),
-                      Expanded(
-                        child: Text('import_modal_error_not_found').tr(),
-                      )
-                    ],
-                  ),
-                )
-              : SizedBox(),
+                  SizedBox(width: kPadding),
+                  Expanded(
+                    child: Text('import_modal_error_not_found').tr(),
+                  )
+                ],
+              ),
+            )
+          else
+            SizedBox(),
           SizedBox(
             height: MediaQuery.of(context).viewInsets.bottom == 0
                 ? kPadding * 2
@@ -100,7 +102,7 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
               buttonState: _buttonState,
             ),
           ),
-          SizedBox(height: kPadding * 2),
+          const SizedBox(height: kPadding * 2),
         ],
       ),
     );

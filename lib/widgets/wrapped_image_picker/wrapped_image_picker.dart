@@ -9,17 +9,17 @@ import 'select_picker_dialog.dart';
 
 class WrappedImagePicker extends StatefulWidget {
   /// Returns the new image url
-  final Function(String) onPick;
+  final Function(String)? onPick;
 
   /// Determines the length of the widgets edges
   final double edgeLength;
 
   /// Used to display a already selected image
-  final String imageUrl;
+  final String? imageUrl;
 
   WrappedImagePicker({
-    Key key,
-    @required this.onPick,
+    Key? key,
+    required this.onPick,
     this.edgeLength = 200.0,
     this.imageUrl,
   }) : super(key: key);
@@ -29,11 +29,11 @@ class WrappedImagePicker extends StatefulWidget {
 }
 
 class _WrappedImagePickerState extends State<WrappedImagePicker> {
-  String _imageUrl;
+  String? _imageUrl;
 
   @override
   void initState() {
-    _imageUrl = widget.imageUrl != null && widget.imageUrl.isNotEmpty
+    _imageUrl = widget.imageUrl != null && widget.imageUrl!.isNotEmpty
         ? widget.imageUrl
         : null;
 
@@ -54,7 +54,7 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
         child: _imageUrl != null
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(kRadius),
-                child: FoodlyNetworkImage(_imageUrl),
+                child: FoodlyNetworkImage(_imageUrl!),
               )
             : Center(
                 child: Row(
@@ -77,7 +77,7 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
   }
 
   void _selectImage() async {
-    final result = await showDialog(
+    final String? result = await showDialog<String>(
       context: context,
       builder: (_) => Dialog(child: SelectPickerDialog()),
     );
@@ -88,12 +88,12 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
         setState(() {
           _imageUrl = storageUrl;
         });
-        widget.onPick(result);
-      } else if (Uri.tryParse(result).isAbsolute) {
+        widget.onPick!(result);
+      } else if (Uri.tryParse(result)!.isAbsolute) {
         setState(() {
           _imageUrl = result;
         });
-        widget.onPick(result);
+        widget.onPick!(result);
       }
     }
   }

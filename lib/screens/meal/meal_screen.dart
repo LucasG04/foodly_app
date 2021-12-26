@@ -1,12 +1,10 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:auto_route/auto_route_annotations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodly/services/meal_stat_service.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -14,11 +12,13 @@ import '../../models/ingredient.dart';
 import '../../models/meal.dart';
 import '../../providers/state_providers.dart';
 import '../../services/meal_service.dart';
+import '../../services/meal_stat_service.dart';
 import '../../services/plan_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/convert_util.dart';
 import '../../widgets/foodly_network_image.dart';
 import '../../widgets/full_screen_loader.dart';
+import '../../widgets/link_preview.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import 'border_icon.dart';
 import 'confirm_delete_modal.dart';
@@ -26,16 +26,14 @@ import 'confirm_delete_modal.dart';
 class MealScreen extends StatefulWidget {
   final String id;
 
-  const MealScreen({
-    @PathParam() this.id,
-  });
+  const MealScreen({required this.id, Key? key}) : super(key: key);
 
   @override
   _MealScreenState createState() => _MealScreenState();
 }
 
 class _MealScreenState extends State<MealScreen> {
-  bool _isDeleting;
+  late bool _isDeleting;
 
   @override
   void initState() {
@@ -46,17 +44,17 @@ class _MealScreenState extends State<MealScreen> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    final sidePadding = const EdgeInsets.symmetric(horizontal: kPadding);
-    final currentPlanId = context.read(planProvider).state.id;
+    const sidePadding = EdgeInsets.symmetric(horizontal: kPadding);
+    final currentPlanId = context.read(planProvider).state!.id;
 
     return Scaffold(
       body: Stack(
         children: [
-          FutureBuilder<Meal>(
+          FutureBuilder<Meal?>(
             future: MealService.getMealById(widget.id),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                final meal = snapshot.data;
+                final meal = snapshot.data!;
                 return CustomScrollView(
                   slivers: [
                     SliverAppBar(
@@ -66,20 +64,25 @@ class _MealScreenState extends State<MealScreen> {
                       elevation: 4,
                       stretch: true,
                       flexibleSpace: FlexibleSpaceBar(
-                        stretchModes: <StretchMode>[StretchMode.zoomBackground],
-                        titlePadding: const EdgeInsets.all(0),
+                        // ignore: avoid_redundant_argument_values
+                        stretchModes: const <StretchMode>[
+                          StretchMode.zoomBackground
+                        ],
+                        titlePadding: EdgeInsets.zero,
                         background: Stack(
                           children: [
-                            meal.imageUrl != null && meal.imageUrl.isNotEmpty
-                                ? Positioned.fill(
-                                    child: FoodlyNetworkImage(meal.imageUrl),
-                                  )
-                                : Positioned.fill(
-                                    child: Image.asset(
-                                      'assets/images/food_fallback.png',
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
+                            if (meal.imageUrl != null &&
+                                meal.imageUrl!.isNotEmpty)
+                              Positioned.fill(
+                                child: FoodlyNetworkImage(meal.imageUrl!),
+                              )
+                            else
+                              Positioned.fill(
+                                child: Image.asset(
+                                  'assets/images/food_fallback.png',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             Positioned(
                               width: size.width,
                               top: kPadding / 2 +
@@ -94,7 +97,7 @@ class _MealScreenState extends State<MealScreen> {
                                       onTap: () {
                                         Navigator.pop(context);
                                       },
-                                      child: BorderIcon(
+                                      child: const BorderIcon(
                                         height: 50,
                                         width: 50,
                                         child: Icon(
@@ -103,46 +106,46 @@ class _MealScreenState extends State<MealScreen> {
                                         ),
                                       ),
                                     ),
-                                    meal.planId == currentPlanId
-                                        ? BorderIcon(
-                                            height: 50,
-                                            width: 50,
-                                            child: PopupMenuButton(
-                                              padding: const EdgeInsets.all(0),
-                                              onSelected: (value) =>
-                                                  _onMenuSelected(
-                                                value,
-                                                meal,
-                                                currentPlanId,
+                                    if (meal.planId == currentPlanId)
+                                      BorderIcon(
+                                        height: 50,
+                                        width: 50,
+                                        child: PopupMenuButton(
+                                          padding: EdgeInsets.zero,
+                                          onSelected: (String value) =>
+                                              _onMenuSelected(
+                                            value,
+                                            meal,
+                                            currentPlanId,
+                                          ),
+                                          itemBuilder: (context) => [
+                                            PopupMenuItem(
+                                              value: 'edit',
+                                              child: ListTile(
+                                                title: const Text(
+                                                  'meal_details_edit',
+                                                ).tr(),
+                                                leading: const Icon(
+                                                  EvaIcons.edit2Outline,
+                                                ),
                                               ),
-                                              itemBuilder: (context) => [
-                                                PopupMenuItem(
-                                                  value: 'edit',
-                                                  child: ListTile(
-                                                    title: Text(
-                                                      'meal_details_edit',
-                                                    ).tr(),
-                                                    leading: Icon(
-                                                      EvaIcons.edit2Outline,
-                                                    ),
-                                                  ),
-                                                ),
-                                                PopupMenuItem(
-                                                  value: 'delete',
-                                                  child: ListTile(
-                                                    title: Text(
-                                                      'meal_details_delete',
-                                                    ).tr(),
-                                                    leading: Icon(
-                                                      EvaIcons
-                                                          .minusCircleOutline,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
                                             ),
-                                          )
-                                        : SizedBox(),
+                                            PopupMenuItem(
+                                              value: 'delete',
+                                              child: ListTile(
+                                                title: const Text(
+                                                  'meal_details_delete',
+                                                ).tr(),
+                                                leading: const Icon(
+                                                  EvaIcons.minusCircleOutline,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    else
+                                      const SizedBox(),
                                   ],
                                 ),
                               ),
@@ -150,10 +153,10 @@ class _MealScreenState extends State<MealScreen> {
                           ],
                         ),
                       ),
-                      title: SizedBox(),
-                      leading: SizedBox(),
+                      title: const SizedBox(),
+                      leading: const SizedBox(),
                     ),
-                    SliverToBoxAdapter(
+                    const SliverToBoxAdapter(
                       child: SizedBox(height: kPadding),
                     ),
                     SliverToBoxAdapter(
@@ -176,17 +179,20 @@ class _MealScreenState extends State<MealScreen> {
                                       children: [
                                         AutoSizeText(
                                           meal.name,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 26.0,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        SizedBox(height: 5.0),
+                                        const SizedBox(height: 5.0),
                                         Text(
                                           meal.source != null &&
-                                                  meal.source.isNotEmpty
-                                              ? 'meal_details_source_known'
-                                                  .tr(args: [meal.source])
+                                                  meal.source!.isNotEmpty
+                                              ? 'meal_details_source_known'.tr(
+                                                  args: [
+                                                      _formatSourceString(
+                                                          meal.source!)
+                                                    ])
                                               : 'meal_details_source_unknown'
                                                   .tr(),
                                           style: TextStyle(
@@ -194,8 +200,8 @@ class _MealScreenState extends State<MealScreen> {
                                             fontWeight: FontWeight.bold,
                                             color: Theme.of(context)
                                                 .textTheme
-                                                .bodyText1
-                                                .color
+                                                .bodyText1!
+                                                .color!
                                                 .withOpacity(0.5),
                                           ),
                                         ),
@@ -203,69 +209,82 @@ class _MealScreenState extends State<MealScreen> {
                                     ),
                                   ),
                                   BorderIcon(
-                                    child: Text(
-                                      'meal_details_duration_trailing'
-                                          .tr(args: [meal.duration.toString()]),
-                                      style: TextStyle(
-                                        fontSize: 20.0,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
                                     padding: const EdgeInsets.symmetric(
                                       vertical: 15,
                                       horizontal: 15,
                                     ),
                                     withBorder: true,
+                                    child: Text(
+                                      'meal_details_duration_trailing'
+                                          .tr(args: [meal.duration.toString()]),
+                                      style: const TextStyle(
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                            SizedBox(height: kPadding),
+                            if (meal.source != null &&
+                                meal.source!.isNotEmpty) ...[
+                              const SizedBox(height: kPadding),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: kPadding),
+                                child: LinkPreview(meal.source!),
+                              ),
+                            ],
+                            const SizedBox(height: kPadding),
                             SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
-                              physics: BouncingScrollPhysics(),
+                              physics: const BouncingScrollPhysics(),
                               child: Row(
                                 children: [
-                                  ...meal.tags.map((e) => TagTile(e)).toList(),
-                                  SizedBox(width: kPadding),
+                                  ...meal.tags!.map((e) => TagTile(e)).toList(),
+                                  const SizedBox(width: kPadding),
                                 ],
                               ),
                             ),
-                            SizedBox(height: kPadding),
-                            ..._buildSection(
-                              'meal_details_ingredient'.tr(),
-                              Container(
-                                child: ListView.separated(
+                            if (meal.ingredients != null &&
+                                meal.ingredients!.isNotEmpty) ...[
+                              const SizedBox(height: kPadding),
+                              ..._buildSection(
+                                'meal_details_ingredient'.tr(),
+                                ListView.separated(
                                   shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  itemCount: meal.ingredients.length,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: meal.ingredients!.length,
                                   separatorBuilder: (context, index) =>
-                                      Divider(),
+                                      const Divider(),
                                   itemBuilder: (context, index) =>
                                       _buildIngredientTile(
-                                    meal.ingredients[index],
+                                    meal.ingredients![index],
                                   ),
-                                  padding: const EdgeInsets.all(0),
+                                  padding: EdgeInsets.zero,
                                 ),
-                              ),
-                            ),
-                            SizedBox(height: kPadding),
-                            ..._buildSection(
-                              'meal_details_instructions'.tr(),
-                              MarkdownBody(
-                                data: meal.instructions ?? '',
-                                styleSheet: MarkdownStyleSheet.fromTheme(
-                                  ThemeData(
-                                    textTheme: TextTheme(
-                                      bodyText1: TextStyle(fontSize: 16),
-                                      bodyText2: TextStyle(fontSize: 16),
+                              )
+                            ],
+                            if (meal.instructions != null &&
+                                meal.instructions!.isNotEmpty) ...[
+                              const SizedBox(height: kPadding),
+                              ..._buildSection(
+                                'meal_details_instructions'.tr(),
+                                MarkdownBody(
+                                  data: meal.instructions ?? '',
+                                  styleSheet: MarkdownStyleSheet.fromTheme(
+                                    ThemeData(
+                                      textTheme: const TextTheme(
+                                        bodyText1: TextStyle(fontSize: 16),
+                                        bodyText2: TextStyle(fontSize: 16),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(height: kPadding),
-                            SizedBox(height: 100.0),
+                            ],
+                            const SizedBox(height: kPadding),
+                            const SizedBox(height: 100.0),
                           ]
                               .map(
                                 (child) => SizedBox(
@@ -287,11 +306,12 @@ class _MealScreenState extends State<MealScreen> {
               }
             },
           ),
-          _isDeleting
-              ? FullScreenLoader(
-                  backgroundColor: Colors.black45,
-                )
-              : SizedBox(),
+          if (_isDeleting)
+            const FullScreenLoader(
+              backgroundColor: Colors.black45,
+            )
+          else
+            const SizedBox(),
         ],
       ),
     );
@@ -310,7 +330,7 @@ class _MealScreenState extends State<MealScreen> {
               child: Text(
                 ConvertUtil.amountToString(ingredient.amount, ingredient.unit),
                 textAlign: TextAlign.end,
-                style: TextStyle(fontSize: 18.0),
+                style: const TextStyle(fontSize: 18.0),
               ),
             ),
             SizedBox(
@@ -318,7 +338,7 @@ class _MealScreenState extends State<MealScreen> {
               child: Text(
                 ingredient.name.toString(),
                 textAlign: TextAlign.start,
-                style: TextStyle(fontSize: 18.0),
+                style: const TextStyle(fontSize: 18.0),
               ),
             ),
           ],
@@ -328,29 +348,37 @@ class _MealScreenState extends State<MealScreen> {
   }
 
   List<Widget> _buildSection(String title, Widget content) {
-    final sidePadding = EdgeInsets.symmetric(horizontal: kPadding);
+    const sidePadding = EdgeInsets.symmetric(horizontal: kPadding);
     return [
       Padding(
         padding: sidePadding,
         child: Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 22.0,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
-      SizedBox(height: kPadding),
+      const SizedBox(height: kPadding),
       Padding(padding: sidePadding, child: content),
     ];
   }
 
-  void _onMenuSelected(String value, Meal meal, String planId) async {
-    if (meal.planId != planId) return;
+  String _formatSourceString(String source) {
+    return BasicUtils.isValidUri(source)
+        ? Uri.parse(source).host.replaceAll('www.', '')
+        : source;
+  }
+
+  void _onMenuSelected(String value, Meal meal, String? planId) async {
+    if (meal.planId != planId) {
+      return;
+    }
     switch (value) {
       case 'edit':
-        final result = await ExtendedNavigator.root.push(
-          Routes.mealCreateScreen(id: meal.id),
+        final result = await AutoRouter.of(context).push(
+          MealCreateScreenRoute(id: meal.id!),
         );
 
         if (result != null && result is Meal) {
@@ -366,7 +394,7 @@ class _MealScreenState extends State<MealScreen> {
 
   void _openConfirmDelete(Meal meal) async {
     final result = await showModalBottomSheet<bool>(
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
         ),
@@ -380,17 +408,17 @@ class _MealScreenState extends State<MealScreen> {
       setState(() {
         _isDeleting = true;
       });
-      await MealService.deleteMeal(meal.id);
-      final plan = context.read(planProvider).state;
+      await MealService.deleteMeal(meal.id!);
+      final plan = context.read(planProvider).state!;
       await MealStatService.deleteStatByMealId(plan.id, meal.id);
 
-      if (plan.meals != null && plan.meals.length > 0) {
-        for (var planMeal in plan.meals.where((e) => e.meal == meal.id)) {
+      if (plan.meals != null && plan.meals!.isNotEmpty) {
+        for (final planMeal in plan.meals!.where((e) => e.meal == meal.id)) {
           await PlanService.deletePlanMealFromPlan(plan.id, planMeal.id);
         }
       }
 
-      ExtendedNavigator.root.pop();
+      AutoRouter.of(context).pop();
       _isDeleting = false;
     }
   }
@@ -399,19 +427,23 @@ class _MealScreenState extends State<MealScreen> {
 class TagTile extends StatelessWidget {
   final String text;
 
-  const TagTile(this.text);
+  const TagTile(
+    this.text, {
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(left: 25),
       child: Column(
+        // ignore: avoid_redundant_argument_values
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           BorderIcon(
             height: 50.0,
-            child: Text(text, style: TextStyle(fontSize: 16.0)),
             withBorder: true,
+            child: Text(text, style: const TextStyle(fontSize: 16.0)),
           ),
         ],
       ),

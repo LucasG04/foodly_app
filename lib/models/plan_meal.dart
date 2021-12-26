@@ -1,43 +1,43 @@
 class PlanMeal {
-  String id;
+  String? id;
   DateTime date;
   String meal;
   MealType type;
-  List<String> upvotes;
-  List<String> downvotes;
+  List<String>? upvotes;
+  List<String>? downvotes;
 
   PlanMeal({
     this.id,
-    this.date,
-    this.meal,
-    this.type,
+    required this.date,
+    required this.meal,
+    required this.type,
     this.upvotes,
     this.downvotes,
   });
 
   Map<String, dynamic> toMap() {
-    return {
-      'date': date?.millisecondsSinceEpoch,
+    return <String, dynamic>{
+      'date': date.millisecondsSinceEpoch,
       'meal': meal,
-      'type': type?.toString(),
+      'type': type.toString(),
       'upvotes': upvotes,
       'downvotes': downvotes,
     };
   }
 
   factory PlanMeal.fromMap(String id, Map<String, dynamic> map) {
-    if (map == null) return null;
-
     return PlanMeal(
       id: id,
-      date: DateTime.fromMillisecondsSinceEpoch(map['date']),
-      meal: map['meal'],
+      date: DateTime.fromMillisecondsSinceEpoch(map['date'] as int),
+      meal: map['meal'] as String,
       type: MealType.values.firstWhere(
         (e) => e.toString() == map['type'],
         orElse: () => MealType.LUNCH,
       ),
-      upvotes: List<String>.from(map['upvotes'] ?? []),
-      downvotes: List<String>.from(map['downvotes'] ?? []),
+      upvotes:
+          List<String>.from((map['upvotes'] as List<dynamic>?) ?? <String>[]),
+      downvotes:
+          List<String>.from((map['downvotes'] as List<dynamic>?) ?? <String>[]),
     );
   }
 

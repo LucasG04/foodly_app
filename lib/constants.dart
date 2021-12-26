@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:io' show Platform;
+
+import 'package:flutter/material.dart';
 
 /// General constants
 final kAppName = Platform.isIOS ? 'Foodster' : 'Foodly';

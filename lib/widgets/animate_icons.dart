@@ -7,10 +7,10 @@ import 'package:flutter/material.dart';
 class AnimateIcons extends StatefulWidget {
   const AnimateIcons({
     /// The IconData that will be visible before animation Starts
-    @required this.startIcon,
+    required this.startIcon,
 
     /// The IconData that will be visible after animation ends
-    @required this.endIcon,
+    required this.endIcon,
 
     /// On icon tap.
     this.onTap,
@@ -36,14 +36,14 @@ class AnimateIcons extends StatefulWidget {
     /// This is the tooltip that will be used for the [endIcon]
     this.endTooltip = '',
   });
-  final IconData startIcon, endIcon;
+  final IconData? startIcon, endIcon;
   final Duration duration;
   final bool clockwise;
   final double size;
-  final Color color;
-  final AnimateIconController controller;
+  final Color? color;
+  final AnimateIconController? controller;
   final String startTooltip, endTooltip;
-  final void Function() onTap;
+  final void Function()? onTap;
 
   @override
   _AnimateIconsState createState() => _AnimateIconsState();
@@ -51,7 +51,7 @@ class AnimateIcons extends StatefulWidget {
 
 class _AnimateIconsState extends State<AnimateIcons>
     with SingleTickerProviderStateMixin {
-  AnimationController _controller;
+  late AnimationController _controller;
 
   @override
   void initState() {
@@ -72,22 +72,22 @@ class _AnimateIconsState extends State<AnimateIcons>
 
   @override
   void dispose() {
-    this._controller.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
-  initControllerFunctions() {
+  void initControllerFunctions() {
     if (widget.controller != null) {
-      widget.controller.animateToEnd = () {
+      widget.controller!.animateToEnd = () {
         _controller.forward();
         return true;
       };
-      widget.controller.animateToStart = () {
+      widget.controller!.animateToStart = () {
         _controller.reverse();
         return true;
       };
-      widget.controller.isStart = () => _controller.value == 0.0;
-      widget.controller.isEnd = () => _controller.value == 1.0;
+      widget.controller!.isStart = () => _controller.value == 0.0;
+      widget.controller!.isEnd = () => _controller.value == 1.0;
     }
   }
 
@@ -101,18 +101,18 @@ class _AnimateIconsState extends State<AnimateIcons>
 
   @override
   Widget build(BuildContext context) {
-    double x = _controller.value ?? 0.0;
-    double y = 1.0 - _controller.value ?? 0.0;
+    double x = _controller.value;
+    double y = 1.0 - _controller.value;
     double angleX = math.pi / 180 * (180 * x);
     double angleY = math.pi / 180 * (180 * y);
 
     Widget first() {
       return Transform.rotate(
-        angle: (widget.clockwise ?? false) ? angleX : -angleX,
+        angle: (widget.clockwise) ? angleX : -angleX,
         child: Opacity(
           opacity: y,
           child: Icon(
-            widget.startIcon != null ? widget.startIcon : EvaIcons.closeOutline,
+            widget.startIcon != null ? widget.startIcon : EvaIcons.close,
             size: widget.size,
             color: widget.startIcon != null ? widget.color : Colors.transparent,
           ),
@@ -122,11 +122,11 @@ class _AnimateIconsState extends State<AnimateIcons>
 
     Widget second() {
       return Transform.rotate(
-        angle: (widget.clockwise ?? false) ? -angleY : angleY,
+        angle: (widget.clockwise) ? -angleY : angleY,
         child: Opacity(
-          opacity: x ?? 0.0,
+          opacity: x,
           child: Icon(
-            widget.endIcon != null ? widget.endIcon : EvaIcons.closeOutline,
+            widget.endIcon != null ? widget.endIcon : EvaIcons.close,
             size: widget.size,
             color: widget.endIcon != null ? widget.color : Colors.transparent,
           ),
@@ -148,6 +148,6 @@ class _AnimateIconsState extends State<AnimateIcons>
 }
 
 class AnimateIconController {
-  bool Function() animateToStart, animateToEnd;
-  bool Function() isStart, isEnd;
+  bool Function()? animateToStart, animateToEnd;
+  bool Function()? isStart, isEnd;
 }

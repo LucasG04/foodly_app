@@ -7,36 +7,36 @@ import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 
 class EditIngredientModal extends StatefulWidget {
-  final Ingredient ingredient;
+  final Ingredient? ingredient;
 
-  EditIngredientModal({this.ingredient});
+  const EditIngredientModal({this.ingredient});
 
   @override
   _EditIngredientModalState createState() => _EditIngredientModalState();
 }
 
 class _EditIngredientModalState extends State<EditIngredientModal> {
-  bool _isCreating;
-  TextEditingController _nameController;
-  TextEditingController _amountController;
-  TextEditingController _unitController;
-  FocusNode _amountFocusNode;
-  FocusNode _unitFocusNode;
+  late bool _isCreating;
+  TextEditingController? _nameController;
+  TextEditingController? _amountController;
+  TextEditingController? _unitController;
+  FocusNode? _amountFocusNode;
+  FocusNode? _unitFocusNode;
 
-  String _nameErrorText;
+  String? _nameErrorText;
 
   @override
   void initState() {
     _isCreating = widget.ingredient == null;
-    _nameController = new TextEditingController(text: widget.ingredient?.name);
-    _amountController = new TextEditingController(
+    _nameController = TextEditingController(text: widget.ingredient?.name);
+    _amountController = TextEditingController(
         text: widget.ingredient?.amount == null
             ? ''
             : widget.ingredient?.amount.toString());
-    _unitController = new TextEditingController(text: widget.ingredient?.unit);
+    _unitController = TextEditingController(text: widget.ingredient?.unit);
 
-    _amountFocusNode = new FocusNode();
-    _unitFocusNode = new FocusNode();
+    _amountFocusNode = FocusNode();
+    _unitFocusNode = FocusNode();
 
     super.initState();
   }
@@ -62,7 +62,8 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
                 _isCreating
                     ? 'ingredient_modal_title_add'.tr().toUpperCase()
                     : 'ingredient_modal_title_edit'.tr().toUpperCase(),
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -73,7 +74,7 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
             placeholder: 'ingredient_modal_name_placeholder'.tr(),
             errorText: _nameErrorText,
             textInputAction: TextInputAction.next,
-            onSubmit: () => (_amountFocusNode.requestFocus()),
+            onSubmit: () => _amountFocusNode!.requestFocus(),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -87,7 +88,7 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
                   placeholder: '1',
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
-                  onSubmit: () => (_unitFocusNode.requestFocus()),
+                  onSubmit: () => _unitFocusNode!.requestFocus(),
                 ),
               ),
               SizedBox(
@@ -102,7 +103,7 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
               ),
             ],
           ),
-          SizedBox(height: kPadding * 2),
+          const SizedBox(height: kPadding * 2),
           Center(
             child: MainButton(
               text: 'save'.tr(),
@@ -120,26 +121,22 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
   }
 
   void _saveIngredient() async {
-    final ingredient = _isCreating ? Ingredient() : widget.ingredient;
-    ingredient.name = _nameController.text.trim();
+    final ingredient = _isCreating ? Ingredient() : widget.ingredient!;
+    ingredient.name = _nameController!.text.trim();
     ingredient.amount =
-        double.tryParse(_amountController.text.trim().replaceAll(',', '.'));
-    ingredient.unit = _unitController.text.trim();
+        double.tryParse(_amountController!.text.trim().replaceAll(',', '.'));
+    ingredient.unit = _unitController!.text.trim();
 
-    if (ingredient.name.isEmpty) {
+    if (ingredient.name!.isEmpty) {
       setState(() {
         _nameErrorText = 'ingredient_modal_error_name'.tr();
       });
       return;
     }
 
-    if (ingredient.amount == null) {
-      ingredient.amount = 0;
-    }
+    ingredient.amount ??= 0;
 
-    if (ingredient.unit == null) {
-      ingredient.unit = '';
-    }
+    ingredient.unit ??= '';
 
     setState(() {
       _nameErrorText = null;

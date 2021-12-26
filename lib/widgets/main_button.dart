@@ -4,19 +4,19 @@ import 'progress_button.dart';
 
 class MainButton extends StatelessWidget {
   final void Function() onTap;
-  final String text;
-  final IconData iconData;
+  final String? text;
+  final IconData? iconData;
   final double width;
   final double height;
   final bool isSecondary;
   final bool isProgress;
-  final ButtonState buttonState;
-  final Color color;
+  final ButtonState? buttonState;
+  final Color? color;
 
   final kTextHeadlineColor = Color(0xFF333333);
 
   MainButton({
-    @required this.onTap,
+    required this.onTap,
     this.text,
     this.iconData,
     this.width = 300,
@@ -50,13 +50,13 @@ class MainButton extends StatelessWidget {
               child: Center(
                 child: text != null
                     ? Text(
-                        text,
+                        text!,
                         style: !isSecondary
                             ? Theme.of(context)
                                 .textTheme
-                                .button
+                                .button!
                                 .copyWith(color: Colors.white)
-                            : Theme.of(context).textTheme.bodyText1.copyWith(
+                            : Theme.of(context).textTheme.bodyText1!.copyWith(
                                   color: kTextHeadlineColor,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -85,13 +85,13 @@ class MainButton extends StatelessWidget {
                       border: Border.all(color: _color),
                     ),
               child: Text(
-                text,
+                text!,
                 style: !isSecondary
                     ? Theme.of(context)
                         .textTheme
-                        .button
+                        .button!
                         .copyWith(color: Colors.white)
-                    : Theme.of(context).textTheme.bodyText1.copyWith(
+                    : Theme.of(context).textTheme.bodyText1!.copyWith(
                           color: kTextHeadlineColor,
                           fontWeight: FontWeight.bold,
                         ),

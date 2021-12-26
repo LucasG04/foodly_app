@@ -1,14 +1,15 @@
+// ignore: avoid_classes_with_only_static_members
 class ConvertUtil {
   /// Splits an array into multiple arrays with the length specified by `splitAt`.
   static List<List<dynamic>> splitArray(List<dynamic> array,
       [int splitAt = 10]) {
-    var result = [[]];
+    final List<List<dynamic>> result = [<dynamic>[]];
     var currentIndex = 0;
 
     for (var i = 0; i < array.length; i++) {
       result[currentIndex].add(array[i]);
       if ((i + 1) % splitAt == 0) {
-        result.add([]);
+        result.add(<dynamic>[]);
         currentIndex++;
       }
     }
@@ -17,7 +18,7 @@ class ConvertUtil {
   }
 
   /// Converts the amount and the unit (optional) to a good readable string
-  static String amountToString(double amount, [String unit = '']) {
+  static String amountToString(double? amount, [String? unit = '']) {
     String number = amount.toString();
     if (number.endsWith('0')) {
       number = number.substring(0, number.indexOf('.'));

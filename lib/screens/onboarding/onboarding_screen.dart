@@ -17,48 +17,51 @@ class OnboardingScreen extends StatelessWidget {
       assetPath: 'assets/onboarding/welcome.png',
       title: 'onboarding_one_title'.tr(args: [kAppName]),
       subtitle: 'onboarding_one_subtitle'.tr(args: [kAppName]),
-      background: Color(0xFFeb3b5a),
+      background: const Color(0xFFeb3b5a),
     ),
     PageData(
       assetPath: 'assets/onboarding/scrum.png',
       title: 'onboarding_two_title'.tr(),
       subtitle: 'onboarding_two_subtitle'.tr(),
-      background: Color(0xFF2d98da),
+      background: const Color(0xFF2d98da),
     ),
     PageData(
       assetPath: 'assets/onboarding/shopping.png',
       title: 'onboarding_three_title'.tr(),
       subtitle: 'onboarding_three_subtitle'.tr(),
-      background: Color(0xFF0043D0),
+      background: const Color(0xFF0043D0),
     ),
     PageData(
       assetPath: 'assets/onboarding/cooking.png',
       title: 'onboarding_four_title'.tr(),
       subtitle: 'onboarding_four_subtitle'.tr(),
-      background: Color(0xFFf7b731),
+      background: const Color(0xFFf7b731),
     ),
     PageData(
       assetPath: 'assets/onboarding/rocket.png',
       title: 'onboarding_five_title'.tr(),
       subtitle: 'onboarding_five_subtitle'.tr(args: [kAppName]),
-      background: Color(0xFF20bf6b),
+      background: const Color(0xFF20bf6b),
     ),
   ];
+
+  OnboardingScreen({Key? key}) : super(key: key);
 
   List<Color> get _colors => pages.map((p) => p.background).toList();
 
   @override
   Widget build(BuildContext context) {
-    final heightMultiplier = 0.75;
+    const heightMultiplier = 0.75;
     return Scaffold(
       body: ConcentricPageView(
         colors: _colors,
         radius: 30,
         curve: Curves.ease,
-        duration: Duration(seconds: 1),
+        duration: const Duration(seconds: 1),
+        // ignore: avoid_redundant_argument_values
         verticalPosition: heightMultiplier,
         onFinish: () => _finishOnboarding(context),
-        buttonChild: Center(
+        buttonChild: const Center(
           child: Icon(
             EvaIcons.arrowForwardOutline,
             color: Colors.white,
@@ -75,18 +78,19 @@ class OnboardingScreen extends StatelessWidget {
     );
   }
 
-  void _finishOnboarding(context) {
+  void _finishOnboarding(BuildContext context) {
     if (SettingsService.isFirstUsage) {
       SettingsService.setFirstUsageFalse();
     }
 
     if (AuthenticationService.currentUser == null) {
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
-        ConcentricPageRoute(builder: (_) => AuthenticationScreen()),
+        ConcentricPageRoute<AuthenticationScreen>(
+            builder: (_) => AuthenticationScreen()),
       );
     } else {
-      ExtendedNavigator.root.pop();
+      AutoRouter.of(context).pop();
     }
   }
 }

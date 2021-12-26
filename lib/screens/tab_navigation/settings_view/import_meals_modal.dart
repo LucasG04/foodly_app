@@ -11,7 +11,7 @@ import '../../../services/plan_service.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 
 class ImportMealsModal extends StatelessWidget {
-  final List<String> planIds;
+  final List<String?> planIds;
 
   ImportMealsModal(this.planIds);
 
@@ -46,9 +46,9 @@ class ImportMealsModal extends StatelessWidget {
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
-                  itemCount: snapshot.data.length,
+                  itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) =>
-                      CopyPlanMealsTile(snapshot.data[index]),
+                      CopyPlanMealsTile(snapshot.data![index]),
                 );
               } else if (snapshot.connectionState == ConnectionState.done) {
                 return SizedBox(
@@ -59,7 +59,8 @@ class ImportMealsModal extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize:
-                            Theme.of(context).textTheme.bodyText1.fontSize + 2,
+                            Theme.of(context).textTheme.bodyText1!.fontSize! +
+                                2,
                       ),
                     ).tr(),
                   ),
@@ -98,8 +99,8 @@ class _CopyPlanMealsTileState extends State<CopyPlanMealsTile> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(EvaIcons.minusOutline),
-      title: Text(widget.plan.name),
+      leading: Icon(EvaIcons.minus),
+      title: Text(widget.plan.name!),
       trailing: IconButton(
         icon: AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
@@ -114,7 +115,7 @@ class _CopyPlanMealsTileState extends State<CopyPlanMealsTile> {
                     ),
         ),
         onPressed: () => _copyMeals(
-          context.read(planProvider).state.id,
+          context.read(planProvider).state!.id!,
         ),
       ),
     );
@@ -125,13 +126,13 @@ class _CopyPlanMealsTileState extends State<CopyPlanMealsTile> {
       _buttonState = CopyButtonState.LOADING;
     });
 
-    final copiedMeals = await MealService.getAllMeals(widget.plan.id);
+    final copiedMeals = await MealService.getAllMeals(widget.plan.id!);
     await MealService.addMeals(currentPlanId, copiedMeals);
 
     setState(() {
       _buttonState = CopyButtonState.DONE;
     });
-    await Future.delayed(const Duration(seconds: 2));
+    await Future<void>.delayed(const Duration(seconds: 1));
     setState(() {
       _buttonState = CopyButtonState.NORMAL;
     });

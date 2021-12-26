@@ -40,20 +40,20 @@ class _ShoppingListViewState extends State<ShoppingListView>
                 future: ShoppingListService.getShoppingListByPlanId(planId),
                 builder: (_, shoppingListSnap) {
                   if (shoppingListSnap.hasData) {
-                    final listId = shoppingListSnap.data.id;
+                    final listId = shoppingListSnap.data!.id!;
                     return StreamBuilder<List<Grocery>>(
                       stream: ShoppingListService.streamShoppingList(listId),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           final List<Grocery> todoItems =
-                              snapshot.data.where((e) => !e.bought).toList();
+                              snapshot.data!.where((e) => !e.bought!).toList();
                           final List<Grocery> boughtItems =
-                              snapshot.data.where((e) => e.bought).toList();
+                              snapshot.data!.where((e) => e.bought!).toList();
 
                           return SingleChildScrollView(
                             child: Column(
                               children: [
-                                SizedBox(height: kPadding),
+                                const SizedBox(height: kPadding),
                                 Padding(
                                   padding: const EdgeInsets.only(left: 5.0),
                                   child: PageTitle(
@@ -61,7 +61,7 @@ class _ShoppingListViewState extends State<ShoppingListView>
                                     actions: [
                                       IconButton(
                                         onPressed: () => _shareList(todoItems),
-                                        icon: Icon(EvaIcons.shareOutline),
+                                        icon: const Icon(EvaIcons.shareOutline),
                                       ),
                                     ],
                                   ),
@@ -81,7 +81,7 @@ class _ShoppingListViewState extends State<ShoppingListView>
                                     },
                                   ),
                                 ),
-                                SizedBox(height: kPadding),
+                                const SizedBox(height: kPadding),
                                 SizedBox(
                                   width: BasicUtils.contentWidth(
                                     context,
@@ -105,38 +105,35 @@ class _ShoppingListViewState extends State<ShoppingListView>
                                               listId, item);
                                         },
                                       ),
-                                      boughtItems.isNotEmpty
-                                          ? Center(
-                                              child: TextButton(
-                                                onPressed: () =>
-                                                    ShoppingListService
-                                                        .deleteAllBoughtGrocery(
-                                                            listId),
-                                                child: Text(
-                                                  'shopping_list_remove_all',
-                                                  style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .errorColor,
-                                                  ),
-                                                ).tr(),
-                                                style: ButtonStyle(
-                                                  shadowColor:
-                                                      MaterialStateProperty.all<
-                                                          Color>(
-                                                    Theme.of(context)
-                                                        .errorColor,
-                                                  ),
-                                                  overlayColor:
-                                                      MaterialStateProperty.all<
-                                                          Color>(
-                                                    Theme.of(context)
-                                                        .errorColor
-                                                        .withOpacity(0.1),
-                                                  ),
-                                                ),
+                                      if (boughtItems.isNotEmpty)
+                                        Center(
+                                          child: TextButton(
+                                            onPressed: () => ShoppingListService
+                                                .deleteAllBoughtGrocery(listId),
+                                            style: ButtonStyle(
+                                              shadowColor: MaterialStateProperty
+                                                  .all<Color>(
+                                                Theme.of(context).errorColor,
                                               ),
-                                            )
-                                          : SizedBox(),
+                                              overlayColor:
+                                                  MaterialStateProperty.all<
+                                                      Color>(
+                                                Theme.of(context)
+                                                    .errorColor
+                                                    .withOpacity(0.1),
+                                              ),
+                                            ),
+                                            child: Text(
+                                              'shopping_list_remove_all',
+                                              style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .errorColor,
+                                              ),
+                                            ).tr(),
+                                          ),
+                                        )
+                                      else
+                                        const SizedBox(),
                                     ],
                                   ),
                                 ),
@@ -162,9 +159,9 @@ class _ShoppingListViewState extends State<ShoppingListView>
     );
   }
 
-  void _editGrocery(String listId, [Grocery grocery]) {
-    showBarModalBottomSheet(
-      shape: RoundedRectangleBorder(
+  void _editGrocery(String listId, [Grocery? grocery]) {
+    showBarModalBottomSheet<void>(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
         ),
@@ -178,7 +175,7 @@ class _ShoppingListViewState extends State<ShoppingListView>
   }
 
   void _shareList(List<Grocery> groceries) {
-    if (groceries == null || groceries.isEmpty) {
+    if (groceries.isEmpty) {
       return;
     }
     final list = groceries
@@ -191,5 +188,3 @@ class _ShoppingListViewState extends State<ShoppingListView>
     Share.share(list.join());
   }
 }
-
-// 1 Stk Apfel

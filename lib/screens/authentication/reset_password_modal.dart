@@ -12,23 +12,24 @@ import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
 
 class ResetPasswordModal extends StatefulWidget {
-  final String email;
+  final String? email;
 
-  ResetPasswordModal([this.email]);
+  // ignore: use_key_in_widget_constructors
+  const ResetPasswordModal([this.email]);
 
   @override
   _ResetPasswordModalState createState() => _ResetPasswordModalState();
 }
 
 class _ResetPasswordModalState extends State<ResetPasswordModal> {
-  TextEditingController _emailController;
-  ButtonState _buttonState;
-  String _errorText;
+  TextEditingController? _emailController;
+  ButtonState? _buttonState;
+  String? _errorText;
   bool _showSuccess = false;
 
   @override
   void initState() {
-    _emailController = new TextEditingController(text: widget.email ?? '');
+    _emailController = TextEditingController(text: widget.email ?? '');
     _buttonState = ButtonState.normal;
 
     super.initState();
@@ -56,14 +57,14 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
                 children: [
                   AutoSizeText(
                     'modal_password_reset_title'.tr().toUpperCase(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   GestureDetector(
-                    child: Icon(EvaIcons.closeOutline),
+                    child: const Icon(EvaIcons.close),
                     onTap: () => Navigator.maybePop(context),
                   ),
                 ],
@@ -77,24 +78,26 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
             errorText: _errorText,
             onSubmit: _resetPassword,
           ),
-          SizedBox(height: kPadding),
-          _showSuccess
-              ? Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      EvaIcons.checkmarkCircle2Outline,
-                      color: kSuccessColor,
-                    ),
-                    SizedBox(width: kPadding),
-                    Flexible(
-                      child: Text(
-                        'modal_password_reset_result_msg',
-                      ).tr(),
-                    ),
-                  ],
-                )
-              : SizedBox(),
+          const SizedBox(height: kPadding),
+          if (_showSuccess)
+            Row(
+              // ignore: avoid_redundant_argument_values
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Icon(
+                  EvaIcons.checkmarkCircle2Outline,
+                  color: kSuccessColor,
+                ),
+                const SizedBox(width: kPadding),
+                Flexible(
+                  child: const Text(
+                    'modal_password_reset_result_msg',
+                  ).tr(),
+                ),
+              ],
+            )
+          else
+            const SizedBox(),
           SizedBox(
             height: kPadding * 2 + MediaQuery.of(context).viewInsets.bottom,
           ),
@@ -106,22 +109,20 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
               onTap: _resetPassword,
             ),
           ),
-          SizedBox(height: kPadding * 2),
+          const SizedBox(height: kPadding * 2),
         ],
       ),
     );
   }
 
   void _resetPassword() async {
-    if (_emailController.text != null &&
-        EmailValidator.validate(_emailController.text) &&
-        !_showSuccess) {
+    if (EmailValidator.validate(_emailController!.text) && !_showSuccess) {
       setState(() {
         _buttonState = ButtonState.inProgress;
       });
 
       try {
-        await AuthenticationService.resetPassword(_emailController.text);
+        await AuthenticationService.resetPassword(_emailController!.text);
       } catch (e) {
         _handleFirebaseResetException(e);
         return;
@@ -133,7 +134,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
         _showSuccess = true;
       });
 
-      await Future.delayed(const Duration(seconds: 30));
+      await Future<void>.delayed(const Duration(seconds: 30));
 
       setState(() {
         _showSuccess = false;
