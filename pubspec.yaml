@@ -40,11 +40,11 @@ dependencies:
   metadata_fetch: ^0.4.1
 
   # Firebase
-  firebase_core: ^1.0.0
-  cloud_firestore: ^1.0.0
-  firebase_auth: ^1.0.0
-  firebase_auth_web: ^1.0.0
-  firebase_storage: ^8.0.0
+  firebase_core: ^1.10.6
+  cloud_firestore: ^3.1.5
+  firebase_auth: ^3.3.4
+  firebase_auth_web: ^3.3.5
+  firebase_storage: ^10.2.4
 
   # Widgets
   flutter_snake_navigationbar: ^0.5.0
