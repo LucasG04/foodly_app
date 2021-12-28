@@ -27,7 +27,7 @@ class AppRouter extends _i8.RootStackRouter {
   final Map<String, _i8.PageFactory> pagesMap = {
     HomeScreenRoute.name: (routeData) {
       return _i8.CupertinoPageX<dynamic>(
-          routeData: routeData, child: _i1.HomeScreen());
+          routeData: routeData, child: const _i1.HomeScreen());
     },
     AuthenticationScreenRoute.name: (routeData) {
       return _i8.CupertinoPageX<dynamic>(
@@ -55,7 +55,7 @@ class AppRouter extends _i8.RootStackRouter {
     },
     UnknownRouteScreenRoute.name: (routeData) {
       return _i8.CupertinoPageX<dynamic>(
-          routeData: routeData, child: _i7.UnknownRouteScreen());
+          routeData: routeData, child: const _i7.UnknownRouteScreen());
     }
   };
 

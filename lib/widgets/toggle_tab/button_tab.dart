@@ -68,7 +68,7 @@ class _ButtonsTabState extends State<ButtonsTab> {
         onPressed: widget.onPressed as void Function()?,
         style: ButtonStyle(
           shape: MaterialStateProperty.all(
-            new RoundedRectangleBorder(
+            RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(widget.radius!)),
           ),
           padding: MaterialStateProperty.all(EdgeInsets.zero),
@@ -76,17 +76,15 @@ class _ButtonsTabState extends State<ButtonsTab> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            widget.icons != null
-                ? Icon(
+            if (widget.icons != null) Icon(
                     widget.icons,
                     color: widget.isSelected!
                         ? widget.selectedTextStyle!.color
                         : widget.unSelectedTextStyle!.color,
-                  )
-                : Container(),
+                  ) else Container(),
             Visibility(
               visible: widget.icons != null,
-              child: SizedBox(
+              child: const SizedBox(
                 width: 4,
               ),
             ),

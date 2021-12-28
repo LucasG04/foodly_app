@@ -21,7 +21,7 @@ class ProgressButton extends StatefulWidget {
   final double errorAnimationSwingFactor;
   final int errorAnimationSwingCount;
 
-  ProgressButton({
+  const ProgressButton({
     Key? key,
     required this.buttonState,
     required this.onPressed,
@@ -71,11 +71,11 @@ class _ProgressButtonState extends State<ProgressButton>
   void initState() {
     super.initState();
 
-    _errorAnimationController = new AnimationController(
+    _errorAnimationController = AnimationController(
         vsync: this,
         duration: Duration(milliseconds: widget.errorAnimationDuration));
 
-    _progressAnimationController = new AnimationController(
+    _progressAnimationController = AnimationController(
         vsync: this,
         duration: Duration(milliseconds: widget.progressAnimationDuration));
 
@@ -93,13 +93,13 @@ class _ProgressButtonState extends State<ProgressButton>
 
     final startSwing = TweenSequenceItem<Offset>(
         tween: Tween(
-            begin: Offset(0, 0),
+            begin: const Offset(0, 0),
             end: Offset(widget.errorAnimationSwingFactor, 0)),
         weight: 1);
     final endSwing = TweenSequenceItem<Offset>(
         tween: Tween(
             begin: Offset(-widget.errorAnimationSwingFactor, 0),
-            end: Offset(0, 0)),
+            end: const Offset(0, 0)),
         weight: 1);
 
     final fullSwing = [
@@ -185,7 +185,7 @@ class _ProgressButtonState extends State<ProgressButton>
           parent: _progressAnimationController, curve: Curves.linear),
     );
 
-    var maxWidth = MediaQuery.of(context).size.width - kPadding * 2;
+    final maxWidth = MediaQuery.of(context).size.width - kPadding * 2;
     _widthAnimation = Tween<double>(
       begin: constraints.maxWidth > maxWidth ? 300 : constraints.maxWidth,
       end: buttonHeight, // Circular progress must be contained in a square
@@ -203,7 +203,7 @@ class _ProgressButtonState extends State<ProgressButton>
         height: buttonHeight,
         width: buttonHeight, // needs to be a square container
         child: Padding(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
           child: SmallCircularProgressIndicator(
             color: progressColor,
           ),

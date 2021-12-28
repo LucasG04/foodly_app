@@ -29,7 +29,7 @@ class _TagFilterModalState extends State<TagFilterModal> {
 
   @override
   void initState() {
-    _scrollController = new ScrollController();
+    _scrollController = ScrollController();
     _scrollController!.addListener(_scrollListener);
 
     super.initState();
@@ -43,7 +43,7 @@ class _TagFilterModalState extends State<TagFilterModal> {
         ? 700.0
         : MediaQuery.of(context).size.width * 0.9;
 
-    return Container(
+    return SizedBox(
       height: MediaQuery.of(context).size.height * 0.8,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -58,7 +58,7 @@ class _TagFilterModalState extends State<TagFilterModal> {
                 controller: _scrollController,
                 child: Column(
                   children: [
-                    SizedBox(height: kPadding / 2),
+                    const SizedBox(height: kPadding / 2),
                     Consumer(builder: (context, watch, _) {
                       final selectedTags = watch(mealTagFilterProvider).state;
                       return Wrap(
@@ -77,7 +77,7 @@ class _TagFilterModalState extends State<TagFilterModal> {
                         ).toList(),
                       );
                     }),
-                    SizedBox(height: kPadding),
+                    const SizedBox(height: kPadding),
                   ],
                 ),
               ),
@@ -109,10 +109,10 @@ class _TagFilterModalState extends State<TagFilterModal> {
     return Card(
       margin: const EdgeInsets.all(0),
       color: Theme.of(context).scaffoldBackgroundColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: new BorderRadius.only(
-          topLeft: const Radius.circular(10.0),
-          topRight: const Radius.circular(10.0),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10.0),
+          topRight: Radius.circular(10.0),
         ),
       ),
       elevation: _isScrollToTop ? 0 : 4.0,
@@ -123,19 +123,19 @@ class _TagFilterModalState extends State<TagFilterModal> {
         ),
         child: Row(
           children: [
-            Text(
+            const Text(
               'FILTER',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            Spacer(),
+            const Spacer(),
             IconButton(
-              icon: Icon(EvaIcons.trash2Outline),
-              onPressed: () => (context.read(mealTagFilterProvider).state = []),
+              icon: const Icon(EvaIcons.trash2Outline),
+              onPressed: () => context.read(mealTagFilterProvider).state = [],
             ),
-            SizedBox(width: kPadding / 2),
+            const SizedBox(width: kPadding / 2),
             IconButton(
-              icon: Icon(EvaIcons.arrowIosDownwardOutline),
+              icon: const Icon(EvaIcons.arrowIosDownwardOutline),
               onPressed: () => Navigator.pop(context),
             ),
           ],

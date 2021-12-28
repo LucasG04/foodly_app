@@ -329,7 +329,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         ),
       ),
       context: context,
-      builder: (_) => ChefkochImportModal(),
+      builder: (_) => const ChefkochImportModal(),
     );
 
     if (result != null) {

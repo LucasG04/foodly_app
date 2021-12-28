@@ -17,7 +17,7 @@ class WrappedImagePicker extends StatefulWidget {
   /// Used to display a already selected image
   final String? imageUrl;
 
-  WrappedImagePicker({
+  const WrappedImagePicker({
     Key? key,
     required this.onPick,
     this.edgeLength = 200.0,
@@ -46,7 +46,7 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
       width: widget.edgeLength,
       height: widget.edgeLength,
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.black, width: 1.0),
+        border: Border.all(),
         borderRadius: BorderRadius.circular(kRadius),
       ),
       child: InkWell(

@@ -1,20 +1,20 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../constants.dart';
-import 'meal_stat_service.dart';
 import 'package:logging/logging.dart';
 
+import '../constants.dart';
 import '../models/plan.dart';
 import '../models/plan_meal.dart';
 import '../utils/convert_util.dart';
 import 'authentication_service.dart';
+import 'meal_stat_service.dart';
 import 'shopping_list_service.dart';
 
 class PlanService {
   static final log = Logger('PlanService');
 
-  static FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   PlanService._();
 
@@ -44,7 +44,7 @@ class PlanService {
     log.finer('Call getPlansByIds with ${ids.toString()}');
     final List<DocumentSnapshot> documents = [];
 
-    for (var idList in ConvertUtil.splitArray(ids)) {
+    for (final idList in ConvertUtil.splitArray(ids)) {
       final results = await _firestore
           .collection('plans')
           .where(FieldPath.documentId, whereIn: idList)
@@ -92,9 +92,9 @@ class PlanService {
   }
 
   static int _generateCode() {
-    int min = 10000000;
-    int max = 99999999;
-    var randomizer = Random();
+    const int min = 10000000;
+    const int max = 99999999;
+    final randomizer = Random();
     return min + randomizer.nextInt(max - min);
   }
 
@@ -219,10 +219,10 @@ class PlanService {
 
 extension DateTimeExtensions on DateTime {
   Duration differenceTimeZoneOffset(DateTime other) {
-    if (this.isUtc) {
-      return this.difference(other);
+    if (isUtc) {
+      return difference(other);
     } else {
-      return this.add(this.timeZoneOffset).difference(other);
+      return add(timeZoneOffset).difference(other);
     }
   }
 }

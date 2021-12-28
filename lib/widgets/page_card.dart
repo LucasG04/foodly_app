@@ -66,7 +66,7 @@ class PageCard extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      margin: EdgeInsets.only(top: 140),
+      margin: const EdgeInsets.only(top: 140),
       child: Image.asset(page.assetPath!),
     );
   }

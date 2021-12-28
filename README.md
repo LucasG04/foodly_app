@@ -1,10 +1,10 @@
 # Foodly/Foodster - Meal Planning
 
-[![CodeFactor](https://www.codefactor.io/repository/github/lucasg04/foodly_app/badge)](https://www.codefactor.io/repository/github/lucasg04/foodly_app)
-
 ![Flutter](https://img.shields.io/badge/Framework-Flutter-3cc6fd?logo=flutter)
 ![Dart](https://img.shields.io/badge/Language-Dart-0c458b?logo=dart)
 ![Firebase](https://img.shields.io/badge/Cloud-Firebase-f5ba23?logo=Firebase)
+
+[![style: lint](https://img.shields.io/badge/style-lint-B80C50.svg)](https://pub.dev/packages/lint)
 
 **Meal planning with calendar, shopping list and cookbook.**
 

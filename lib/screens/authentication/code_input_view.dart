@@ -137,8 +137,8 @@ class _CodeInputViewState extends State<CodeInputView> {
       decoration: InputDecoration(
         hintText: '81726354',
         suffix: _loadingCode
-            ? Padding(
-                padding: const EdgeInsets.only(right: 10.0),
+            ? const Padding(
+                padding: EdgeInsets.only(right: 10.0),
                 child: SmallCircularProgressIndicator(),
               )
             : IconButton(

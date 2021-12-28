@@ -13,9 +13,9 @@ class MainButton extends StatelessWidget {
   final ButtonState? buttonState;
   final Color? color;
 
-  final kTextHeadlineColor = Color(0xFF333333);
+  final kTextHeadlineColor = const Color(0xFF333333);
 
-  MainButton({
+  const MainButton({
     required this.onTap,
     this.text,
     this.iconData,
@@ -62,13 +62,13 @@ class MainButton extends StatelessWidget {
                                 ),
                       )
                     : Icon(
-                        this.iconData,
+                        iconData,
                         color: isSecondary ? kTextHeadlineColor : Colors.white,
                       ),
               ),
             ),
           )
-        : Container(
+        : SizedBox(
             width: buttonState != ButtonState.inProgress ? width : null,
             height: height,
             child: ProgressButton(
@@ -84,6 +84,10 @@ class MainButton extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: _color),
                     ),
+              progressColor: !isSecondary
+                  ? Colors.white
+                  // ? Theme.of(context).textTheme.button.color
+                  : kTextHeadlineColor,
               child: Text(
                 text!,
                 style: !isSecondary
@@ -96,10 +100,6 @@ class MainButton extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
               ),
-              progressColor: !isSecondary
-                  ? Colors.white
-                  // ? Theme.of(context).textTheme.button.color
-                  : kTextHeadlineColor,
             ),
           );
   }

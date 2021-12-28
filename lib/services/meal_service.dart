@@ -1,16 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
-import 'meal_stat_service.dart';
-import '../utils/convert_util.dart';
 import 'package:logging/logging.dart';
 
 import '../models/meal.dart';
+import '../utils/convert_util.dart';
 import '../utils/secrets.dart';
+import 'meal_stat_service.dart';
 
 class MealService {
   static final log = Logger('MealService');
 
-  static FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   MealService._();
 
@@ -18,8 +18,8 @@ class MealService {
     log.finer('Call getMeals with $count');
     final docs = await _firestore.collection('meals').limit(count).get();
 
-    List<Meal> meals = [];
-    for (var doc in docs.docs) {
+    final List<Meal> meals = [];
+    for (final doc in docs.docs) {
       meals.add(Meal.fromMap(doc.id, doc.data()));
     }
     return meals;
@@ -33,7 +33,7 @@ class MealService {
 
     final List<DocumentSnapshot> documents = [];
 
-    for (var idList in ConvertUtil.splitArray(ids)) {
+    for (final idList in ConvertUtil.splitArray(ids)) {
       final results = await _firestore
           .collection('meals')
           .where(FieldPath.documentId, whereIn: idList)
@@ -60,7 +60,7 @@ class MealService {
 
   static Future<List<Meal>> getAllMeals(String planId) async {
     log.finer('Call getAllMeals with $planId');
-    List<Meal> meals = [];
+    final List<Meal> meals = [];
     try {
       final snapsInPlan = await _firestore
           .collection('meals')
@@ -77,7 +77,7 @@ class MealService {
         ...{...allSnaps}
       ];
 
-      for (var snap in allSnaps) {
+      for (final snap in allSnaps) {
         meals.add(Meal.fromMap(snap.id, snap.data()));
       }
     } catch (e) {
@@ -119,7 +119,7 @@ class MealService {
     }
 
     try {
-      final id = new DateTime.now().microsecondsSinceEpoch.toString();
+      final id = DateTime.now().microsecondsSinceEpoch.toString();
       await _firestore.collection('meals').doc(id).set(meal.toMap());
       meal.id = id;
       await MealStatService.bumpStat(meal.planId!, meal.id!);
@@ -155,10 +155,12 @@ class MealService {
     log.finer(
         'Call addMeals with PlanId: $planId | Meals: ${meals.toString()}');
     try {
-      meals.forEach((meal) => meal.planId = planId);
+      for (final meal in meals) {
+        meal.planId = planId;
+      }
       await Future.wait(
         meals.map((meal) {
-          final id = new DateTime.now().microsecondsSinceEpoch.toString();
+          final id = DateTime.now().microsecondsSinceEpoch.toString();
           return _firestore.collection('meals').doc(id).set(meal.toMap());
         }),
       );
@@ -169,7 +171,7 @@ class MealService {
   }
 
   static Future<List<String?>> _getMealPhotos(String mealName) async {
-    List<String?> urls = [];
+    final List<String?> urls = [];
     final Response<dynamic> response = await Dio().get<dynamic>(
       'https://pixabay.com/api/',
       queryParameters: <String, dynamic>{
@@ -182,7 +184,7 @@ class MealService {
     );
 
     if (response.data != null && response.data['totalHits'] != 0) {
-      for (var item in response.data['hits']) {
+      for (final item in response.data['hits']) {
         urls.add(item['webformatURL'] as String);
       }
     }

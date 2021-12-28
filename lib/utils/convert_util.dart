@@ -28,7 +28,7 @@ class ConvertUtil {
       number = '';
     }
 
-    String result = '$number $unit';
+    final String result = '$number $unit';
     result.trim();
 
     return result;

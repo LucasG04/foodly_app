@@ -28,10 +28,9 @@ class MainSnackbar {
     Flushbar<dynamic>(
       margin: const EdgeInsets.all(8),
       borderRadius: BorderRadius.circular(15.0),
-      flushbarStyle: FlushbarStyle.FLOATING,
-      title: this.title,
-      message: this.message,
-      duration: Duration(seconds: this.seconds),
+      title: title,
+      message: message,
+      duration: Duration(seconds: seconds),
       icon: isSuccess
           ? Icon(
               EvaIcons.checkmarkCircle2Outline,
@@ -48,7 +47,7 @@ class MainSnackbar {
                   size: 28.0,
                   color: Colors.grey,
                 ),
-      mainButton: this.button,
-    )..show(context);
+      mainButton: button,
+    ).show(context);
   }
 }

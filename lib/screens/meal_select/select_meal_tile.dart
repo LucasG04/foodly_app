@@ -2,12 +2,12 @@ import 'package:auto_route/auto_route.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import '../../widgets/skeleton_container.dart';
 
 import '../../constants.dart';
 import '../../models/meal.dart';
 import '../../widgets/card_list_tile.dart';
 import '../../widgets/foodly_network_image.dart';
+import '../../widgets/skeleton_container.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
 class SelectMealTile extends StatefulWidget {
@@ -15,7 +15,7 @@ class SelectMealTile extends StatefulWidget {
   final Function()? onAddMeal;
   final bool isLoading;
 
-  SelectMealTile({
+  const SelectMealTile({
     this.meal,
     this.onAddMeal,
     this.isLoading = false,
@@ -31,12 +31,11 @@ class _SelectMealTileState extends State<SelectMealTile> {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment.center,
       child: CardListTile(
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(kRadius),
           child: widget.isLoading
-              ? SkeletonContainer(
+              ? const SkeletonContainer(
                   height: double.infinity,
                   width: double.infinity,
                 )
@@ -63,7 +62,7 @@ class _SelectMealTileState extends State<SelectMealTile> {
                       widget.meal!.name,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w600,
                       ),
@@ -76,10 +75,10 @@ class _SelectMealTileState extends State<SelectMealTile> {
             : AnimatedSwitcher(
                 duration: const Duration(milliseconds: 375),
                 child: _buttonState == _ButtonState.DEFAULT
-                    ? Icon(EvaIcons.plus)
+                    ? const Icon(EvaIcons.plus)
                     : _buttonState == _ButtonState.LOADING
-                        ? SmallCircularProgressIndicator()
-                        : Icon(
+                        ? const SmallCircularProgressIndicator()
+                        : const Icon(
                             EvaIcons.checkmark,
                             color: Colors.green,
                           ),

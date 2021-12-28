@@ -13,7 +13,7 @@ import '../../../widgets/small_circular_progress_indicator.dart';
 class ImportMealsModal extends StatelessWidget {
   final List<String?> planIds;
 
-  ImportMealsModal(this.planIds);
+  const ImportMealsModal(this.planIds);
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class ImportMealsModal extends StatelessWidget {
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: kPadding),
-              child: Text(
+              child: const Text(
                 'settings_import_title',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
@@ -45,7 +45,7 @@ class ImportMealsModal extends StatelessWidget {
               if (snapshot.hasData) {
                 return ListView.builder(
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) =>
                       CopyPlanMealsTile(snapshot.data![index]),
@@ -66,7 +66,7 @@ class ImportMealsModal extends StatelessWidget {
                   ),
                 );
               } else {
-                return SizedBox(
+                return const SizedBox(
                   height: 200,
                   child: Center(
                     child: SmallCircularProgressIndicator(),
@@ -87,7 +87,7 @@ class ImportMealsModal extends StatelessWidget {
 class CopyPlanMealsTile extends StatefulWidget {
   final Plan plan;
 
-  CopyPlanMealsTile(this.plan);
+  const CopyPlanMealsTile(this.plan);
 
   @override
   _CopyPlanMealsTileState createState() => _CopyPlanMealsTileState();
@@ -99,7 +99,7 @@ class _CopyPlanMealsTileState extends State<CopyPlanMealsTile> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(EvaIcons.minus),
+      leading: const Icon(EvaIcons.minus),
       title: Text(widget.plan.name!),
       trailing: IconButton(
         icon: AnimatedSwitcher(

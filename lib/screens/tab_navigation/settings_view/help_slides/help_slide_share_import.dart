@@ -14,19 +14,19 @@ class HelpSlideShareImport extends StatelessWidget {
       assetPath: 'assets/onboarding/welcome.png',
       title: 'settings_help_share_one_title'.tr(),
       subtitle: 'settings_help_share_one_subtitle'.tr(),
-      background: Color(0xFFf05945),
+      background: const Color(0xFFf05945),
     ),
     PageData(
       assetPath: 'assets/help_slide/share-button.png',
       title: 'settings_help_share_two_title'.tr(),
       subtitle: 'settings_help_share_two_subtitle'.tr(),
-      background: Color(0xFF5eaaa8),
+      background: const Color(0xFF5eaaa8),
     ),
     PageData(
       assetPath: 'assets/help_slide/share-app.png',
       title: 'settings_help_share_three_title'.tr(),
       subtitle: 'settings_help_share_three_subtitle'.tr(args: [kAppName]),
-      background: Color(0xFFffb037),
+      background: const Color(0xFFffb037),
     ),
   ];
 
@@ -34,16 +34,15 @@ class HelpSlideShareImport extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final heightMultiplier = 0.75;
+    const heightMultiplier = 0.75;
     return Scaffold(
       body: ConcentricPageView(
         colors: _colors,
         radius: 30,
         curve: Curves.ease,
-        duration: Duration(seconds: 1),
-        verticalPosition: heightMultiplier,
+        duration: const Duration(seconds: 1),
         onFinish: () => AutoRouter.of(context).pop(),
-        buttonChild: Center(
+        buttonChild: const Center(
           child: Icon(
             EvaIcons.arrowForwardOutline,
             color: Colors.white,

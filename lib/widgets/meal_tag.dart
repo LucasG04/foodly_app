@@ -16,7 +16,7 @@ class MealTag extends StatelessWidget {
       ),
       child: Text(
         tag,
-        style: TextStyle(fontSize: 12.0),
+        style: const TextStyle(fontSize: 12.0),
       ),
     );
   }

@@ -80,15 +80,15 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
                     EvaIcons.alertCircleOutline,
                     color: Theme.of(context).errorColor,
                   ),
-                  SizedBox(width: kPadding),
+                  const SizedBox(width: kPadding),
                   Expanded(
-                    child: Text('import_modal_error_not_found').tr(),
+                    child: const Text('import_modal_error_not_found').tr(),
                   )
                 ],
               ),
             )
           else
-            SizedBox(),
+            const SizedBox(),
           SizedBox(
             height: MediaQuery.of(context).viewInsets.bottom == 0
                 ? kPadding * 2

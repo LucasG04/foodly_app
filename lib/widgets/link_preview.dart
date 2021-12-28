@@ -190,7 +190,7 @@ class LinkPreview extends StatelessWidget {
       ),
       child: Row(
         children: [
-          SkeletonContainer(
+          const SkeletonContainer(
             height: height,
             width: height,
           ),

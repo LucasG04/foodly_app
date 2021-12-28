@@ -302,7 +302,7 @@ class _MealScreenState extends State<MealScreen> {
                   ],
                 );
               } else {
-                return Center(child: SmallCircularProgressIndicator());
+                return const Center(child: SmallCircularProgressIndicator());
               }
             },
           ),

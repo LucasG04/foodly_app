@@ -12,14 +12,13 @@ class MealListTile extends StatelessWidget {
   final height = 75.0;
   final Meal meal;
 
-  MealListTile(this.meal);
+  const MealListTile(this.meal);
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
 
     return Align(
-      alignment: Alignment.center,
       child: GestureDetector(
         onTap: () => AutoRouter.of(context).push(MealScreenRoute(id: meal.id!)),
         child: Container(
@@ -27,13 +26,13 @@ class MealListTile extends StatelessWidget {
           height: height,
           margin: const EdgeInsets.symmetric(vertical: kPadding / 2),
           decoration: BoxDecoration(
-            boxShadow: [kSmallShadow],
+            boxShadow: const [kSmallShadow],
             borderRadius: BorderRadius.circular(kRadius),
             color: Colors.white,
           ),
           child: Row(
             children: [
-              Container(
+              SizedBox(
                 height: height,
                 width: height,
                 child: ClipRRect(
@@ -57,23 +56,21 @@ class MealListTile extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 5.0),
                         child: AutoSizeText(
                           meal.name,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w600,
                           ),
                           maxLines: 2,
                         ),
                       ),
-                      meal.tags!.isNotEmpty
-                          ? Container(
+                      if (meal.tags!.isNotEmpty) SizedBox(
                               height: MealTag.tagHeight,
                               child: Wrap(
                                 clipBehavior: Clip.hardEdge,
                                 children:
                                     meal.tags!.map((e) => MealTag(e)).toList(),
                               ),
-                            )
-                          : SizedBox(),
+                            ) else const SizedBox(),
                     ],
                   ),
                 ),

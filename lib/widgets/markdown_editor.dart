@@ -10,7 +10,7 @@ class MarkdownEditor extends StatefulWidget {
   final TextEditingController? textEditingController;
   final void Function(String)? onChange;
 
-  MarkdownEditor({
+  const MarkdownEditor({
     Key? key,
     this.initialValue,
     this.textEditingController,
@@ -31,7 +31,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
   @override
   void initState() {
     super.initState();
-    _tabController = new TabController(vsync: this, length: 2);
+    _tabController = TabController(vsync: this, length: 2);
   }
 
   @override
@@ -44,7 +44,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
   Widget build(BuildContext context) {
     _content = widget.initialValue ?? '';
     final textColor = Theme.of(context).textTheme.bodyText1!.color;
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width > 599
           ? 600.0
           : MediaQuery.of(context).size.width * 0.9,
@@ -65,7 +65,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: <Widget>[
                     Icon(EvaIcons.editOutline, color: textColor),
-                    SizedBox(width: 8.0),
+                    const SizedBox(width: 8.0),
                     Text('markdown_edit', style: TextStyle(color: textColor))
                         .tr(),
                   ],
@@ -77,7 +77,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: <Widget>[
                     Icon(EvaIcons.eyeOutline, color: textColor),
-                    SizedBox(width: 8.0),
+                    const SizedBox(width: 8.0),
                     Text('markdown_preview', style: TextStyle(color: textColor))
                         .tr(),
                   ],
@@ -90,7 +90,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
               controller: _tabController,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     vertical: 5.0,
                     horizontal: 20.0,
                   ),
@@ -99,12 +99,10 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                     child: TextFormField(
                       initialValue:
                           widget.initialValue != null ? _content : null,
-                      controller: widget.textEditingController != null
-                          ? widget.textEditingController
-                          : null,
+                      controller: widget.textEditingController,
                       maxLines: null,
                       onChanged: onContentChanged,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText:
                             '# Title\n## Subtitle\n- The quick brown fox jumps over the lazy dog\n- Lorem ipsum dolor sit amet, ...',
@@ -114,7 +112,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     vertical: 5.0,
                     horizontal: 20.0,
                   ),
@@ -135,18 +133,17 @@ class _MarkdownEditorState extends State<MarkdownEditor>
             ),
           ),
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               border: Border(
-                top: BorderSide(width: 1.0, color: Colors.black38),
+                top: BorderSide(color: Colors.black38),
               ),
             ),
             child: GestureDetector(
               onTap: () => linkOnTapHandler('https://commonmark.org/help/'),
               child: Padding(
-                padding: EdgeInsets.all(10.0),
+                padding: const EdgeInsets.all(10.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Flexible(
                       child: AutoSizeText(

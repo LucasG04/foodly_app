@@ -6,8 +6,8 @@ class SocialSignInButton {
     return _SocialButton(
         text: 'Sign in with Apple',
         onTap: onTap,
-        color: Color(0xFF242424),
-        icon: FaIcon(FontAwesomeIcons.apple, color: Colors.white));
+        color: const Color(0xFF242424),
+        icon: const FaIcon(FontAwesomeIcons.apple, color: Colors.white));
   }
 }
 
@@ -19,9 +19,9 @@ class _SocialButton extends StatelessWidget {
   final Widget icon;
   final Color color;
 
-  final kTextHeadlineColor = Color(0xFF333333);
+  final kTextHeadlineColor = const Color(0xFF333333);
 
-  _SocialButton({
+  const _SocialButton({
     required this.text,
     required this.onTap,
     this.width = 300.0,
@@ -43,7 +43,6 @@ class _SocialButton extends StatelessWidget {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             icon,
             Text(

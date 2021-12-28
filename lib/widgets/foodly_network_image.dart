@@ -9,7 +9,7 @@ class FoodlyNetworkImage extends StatelessWidget {
   final String imageUrl;
   final BoxFit boxFit;
 
-  FoodlyNetworkImage(this.imageUrl, {this.boxFit = BoxFit.cover});
+  const FoodlyNetworkImage(this.imageUrl, {this.boxFit = BoxFit.cover});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class FoodlyNetworkImage extends StatelessWidget {
             builder: (context, snapshot) {
               return snapshot.data != null && snapshot.data!.isNotEmpty
                   ? _buildCachedNetworkImage(snapshot.data!)
-                  : SkeletonContainer(
+                  : const SkeletonContainer(
                       width: double.infinity,
                       height: double.infinity,
                     );
@@ -33,7 +33,7 @@ class FoodlyNetworkImage extends StatelessWidget {
     return CachedNetworkImage(
       imageUrl: url,
       fit: BoxFit.cover,
-      placeholder: (_, __) => SkeletonContainer(
+      placeholder: (_, __) => const SkeletonContainer(
         width: double.infinity,
         height: double.infinity,
       ),
