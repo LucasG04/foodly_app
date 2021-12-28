@@ -10,17 +10,22 @@ import 'meal_stat_service.dart';
 class MealService {
   static final log = Logger('MealService');
 
-  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final CollectionReference<Meal> _firestore =
+      FirebaseFirestore.instance.collection('meals').withConverter<Meal>(
+            fromFirestore: (snapshot, _) =>
+                Meal.fromMap(snapshot.id, snapshot.data()!),
+            toFirestore: (model, _) => model.toMap(),
+          );
 
   MealService._();
 
   static Future<List<Meal>> getMeals([int count = 10]) async {
     log.finer('Call getMeals with $count');
-    final docs = await _firestore.collection('meals').limit(count).get();
+    final docs = await _firestore.limit(count).get();
 
     final List<Meal> meals = [];
     for (final doc in docs.docs) {
-      meals.add(Meal.fromMap(doc.id, doc.data()));
+      meals.add(doc.data());
     }
     return meals;
   }
@@ -31,27 +36,25 @@ class MealService {
       return [];
     }
 
-    final List<DocumentSnapshot> documents = [];
+    final List<DocumentSnapshot<Meal>> documents = [];
 
     for (final idList in ConvertUtil.splitArray(ids)) {
-      final results = await _firestore
-          .collection('meals')
-          .where(FieldPath.documentId, whereIn: idList)
-          .get();
+      final results =
+          await _firestore.where(FieldPath.documentId, whereIn: idList).get();
       documents.addAll(results.docs);
     }
 
     // remove non existing documents
     documents.removeWhere((e) => !e.exists);
-    return documents.map((e) => Meal.fromMap(e.id, e.data()!)).toList();
+    return documents.map((e) => e.data()!).toList();
   }
 
   static Future<Meal?> getMealById(String mealId) async {
     log.finer('Call getMeals with $mealId');
     try {
-      final doc = await _firestore.collection('meals').doc(mealId).get();
+      final doc = await _firestore.doc(mealId).get();
 
-      return doc.exists ? Meal.fromMap(doc.id, doc.data()!) : null;
+      return doc.exists ? doc.data() : null;
     } catch (e) {
       log.severe('ERR: getMeals with $mealId', e);
       return null;
@@ -62,15 +65,11 @@ class MealService {
     log.finer('Call getAllMeals with $planId');
     final List<Meal> meals = [];
     try {
-      final snapsInPlan = await _firestore
-          .collection('meals')
-          .where('planId', isEqualTo: planId)
-          .get();
+      final snapsInPlan =
+          await _firestore.where('planId', isEqualTo: planId).get();
 
-      final snapsPublic = await _firestore
-          .collection('meals')
-          .where('isPublic', isEqualTo: true)
-          .get();
+      final snapsPublic =
+          await _firestore.where('isPublic', isEqualTo: true).get();
 
       var allSnaps = [...snapsInPlan.docs, ...snapsPublic.docs];
       allSnaps = [
@@ -78,7 +77,7 @@ class MealService {
       ];
 
       for (final snap in allSnaps) {
-        meals.add(Meal.fromMap(snap.id, snap.data()));
+        meals.add(snap.data());
       }
     } catch (e) {
       log.severe('ERR: getAllMeals with $planId', e);
@@ -90,21 +89,17 @@ class MealService {
   static Stream<List<Meal>> streamPlanMeals(String planId) {
     log.finer('Call streamPlanMeals with $planId');
     return _firestore
-        .collection('meals')
         .where('planId', isEqualTo: planId)
         .snapshots()
-        .map((event) =>
-            event.docs.map((e) => Meal.fromMap(e.id, e.data())).toList());
+        .map((event) => event.docs.map((e) => e.data()).toList());
   }
 
   static Stream<List<Meal>> streamPublicMeals() {
     log.finer('Call streamPublicMeals');
     return _firestore
-        .collection('meals')
         .where('isPublic', isEqualTo: true)
         .snapshots()
-        .map((event) =>
-            event.docs.map((e) => Meal.fromMap(e.id, e.data())).toList());
+        .map((event) => event.docs.map((e) => e.data()).toList());
   }
 
   static Future<Meal?> createMeal(Meal meal) async {
@@ -120,7 +115,7 @@ class MealService {
 
     try {
       final id = DateTime.now().microsecondsSinceEpoch.toString();
-      await _firestore.collection('meals').doc(id).set(meal.toMap());
+      await _firestore.doc(id).set(meal);
       meal.id = id;
       await MealStatService.bumpStat(meal.planId!, meal.id!);
 
@@ -134,7 +129,7 @@ class MealService {
   static Future<Meal?> updateMeal(Meal meal) async {
     log.finer('Call updateMeal with ${meal.toMap()}');
     try {
-      await _firestore.collection('meals').doc(meal.id).update(meal.toMap());
+      await _firestore.doc(meal.id).update(meal.toMap());
       return meal;
     } catch (e) {
       log.severe('ERR: updateMeal with ${meal.toMap()}', e);
@@ -145,7 +140,7 @@ class MealService {
   static Future<void> deleteMeal(String mealId) async {
     log.finer('Call deleteMeal with $mealId');
     try {
-      await _firestore.collection('meals').doc(mealId).delete();
+      await _firestore.doc(mealId).delete();
     } catch (e) {
       log.severe('ERR: deleteMeal with $mealId', e);
     }
@@ -161,7 +156,7 @@ class MealService {
       await Future.wait(
         meals.map((meal) {
           final id = DateTime.now().microsecondsSinceEpoch.toString();
-          return _firestore.collection('meals').doc(id).set(meal.toMap());
+          return _firestore.doc(id).set(meal);
         }),
       );
     } catch (e) {
@@ -183,9 +178,10 @@ class MealService {
       },
     );
 
-    if (response.data != null && response.data['totalHits'] != 0) {
-      for (final item in response.data['hits']) {
-        urls.add(item['webformatURL'] as String);
+    final Map<String, dynamic> data = response.data as Map<String, dynamic>;
+    if (response.data != null && data['totalHits'] != 0) {
+      for (final item in data['hits']) {
+        urls.add((item as Map<String, dynamic>)['webformatURL'] as String);
       }
     }
 

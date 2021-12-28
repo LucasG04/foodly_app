@@ -14,7 +14,12 @@ import 'shopping_list_service.dart';
 class PlanService {
   static final log = Logger('PlanService');
 
-  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final CollectionReference<Plan> _firestore =
+      FirebaseFirestore.instance.collection('plans').withConverter<Plan>(
+            fromFirestore: (snapshot, _) =>
+                Plan.fromMap(snapshot.id, snapshot.data()!),
+            toFirestore: (model, _) => model.toMap(),
+          );
 
   PlanService._();
 
@@ -25,7 +30,6 @@ class PlanService {
 
     final currentUserId = AuthenticationService.currentUser!.uid;
     final querySnaps = await _firestore
-        .collection('plans')
         .where('users', arrayContains: currentUserId)
         .limit(1)
         .get();
@@ -35,34 +39,32 @@ class PlanService {
 
   static Future<Plan?> getPlanById(String? id) async {
     log.finer('Call getPlanById with $id');
-    final doc = await _firestore.collection('plans').doc(id).get();
+    final doc = await _firestore.doc(id).get();
 
-    return doc.exists ? Plan.fromMap(id, doc.data()!) : null;
+    return doc.exists ? doc.data() : null;
   }
 
   static Future<List<Plan>> getPlansByIds(List<String?> ids) async {
     log.finer('Call getPlansByIds with ${ids.toString()}');
-    final List<DocumentSnapshot> documents = [];
+    final List<DocumentSnapshot<Plan>> documents = [];
 
     for (final idList in ConvertUtil.splitArray(ids)) {
-      final results = await _firestore
-          .collection('plans')
-          .where(FieldPath.documentId, whereIn: idList)
-          .get();
+      final results =
+          await _firestore.where(FieldPath.documentId, whereIn: idList).get();
       documents.addAll(results.docs);
     }
 
     documents.removeWhere((e) => !e.exists);
-    return documents.map((e) => Plan.fromMap(e.id, e.data()!)).toList();
+    return documents.map((e) => e.data()!).toList();
   }
 
   static Stream<Plan> streamPlanById(String id) {
     log.finer('Call streamPlanById with $id');
     return _firestore
-        .collection('plans')
         .doc(id)
         .snapshots()
-        .map((snap) => Plan.fromMap(snap.id, snap.data()!));
+        .where((e) => e.exists)
+        .map((snap) => snap.data()!);
   }
 
   static Future<Plan> createPlan(String? name) async {
@@ -83,7 +85,7 @@ class PlanService {
     log.finest('createPlan: Plan is: ${plan.toMap()}');
 
     final id = DateTime.now().microsecondsSinceEpoch.toString();
-    await _firestore.collection('plans').doc(id).set(plan.toMap());
+    await _firestore.doc(id).set(plan);
     plan.id = id;
 
     await ShoppingListService.createShoppingListWithPlanId(id);
@@ -101,23 +103,18 @@ class PlanService {
   static Future<Plan?> getPlanByCode(String code,
       {bool withMeals = true}) async {
     log.finer('Call getPlanByCode with $code');
-    final snaps = await _firestore
-        .collection('plans')
-        .where('code', isEqualTo: code)
-        .limit(1)
-        .get();
+    final snaps =
+        await _firestore.where('code', isEqualTo: code).limit(1).get();
 
-    if (snaps.docs.isEmpty) return null;
+    if (snaps.docs.isEmpty) {
+      return null;
+    }
     log.finest('getPlanByCode: Query result: ${snaps.docs.toString()}');
 
-    final plan = Plan.fromMap(snaps.docs.first.id, snaps.docs.first.data());
+    final plan = snaps.docs.first.data();
 
     if (!withMeals) {
-      final snapMeals = await _firestore
-          .collection('plans')
-          .doc(plan.id)
-          .collection('meals')
-          .get();
+      final snapMeals = await _firestore.doc(plan.id).collection('meals').get();
 
       log.finest(
           'getPlanByCode: Query meals result: ${snapMeals.docs.toString()}');
@@ -132,18 +129,13 @@ class PlanService {
 
   static Future<void> updatePlan(Plan plan) {
     log.finer('Call updatePlan with ${plan.toMap()}');
-    return _firestore.collection('plans').doc(plan.id).update(plan.toMap());
+    return _firestore.doc(plan.id).update(plan.toMap());
   }
 
   static Stream<List<PlanMeal>> streamPlanMealsByPlanId(String? id) {
     log.finer('Call streamPlanMealsByPlanId with $id');
-    return _firestore
-        .collection('plans')
-        .doc(id)
-        .collection('meals')
-        .snapshots()
-        .map((snap) =>
-            snap.docs.map((e) => PlanMeal.fromMap(e.id, e.data())).toList());
+    return _firestore.doc(id).collection('meals').snapshots().map((snap) =>
+        snap.docs.map((e) => PlanMeal.fromMap(e.id, e.data())).toList());
   }
 
   static Future<void> addPlanMealToPlan(
@@ -154,18 +146,13 @@ class PlanService {
       await MealStatService.bumpStat(planId, planMeal.meal,
           bumpCount: true, bumpLastPlanned: true);
     }
-    await _firestore
-        .collection('plans')
-        .doc(planId)
-        .collection('meals')
-        .add(planMeal.toMap());
+    await _firestore.doc(planId).collection('meals').add(planMeal.toMap());
   }
 
   static Future<void> updatePlanMealFromPlan(String? planId, PlanMeal meal) {
     log.finer(
         'Call updatePlanMealFromPlan with planId: $planId | planMeal: ${meal.toMap()}');
     return _firestore
-        .collection('plans')
         .doc(planId)
         .collection('meals')
         .doc(meal.id)
@@ -175,12 +162,7 @@ class PlanService {
   static Future<void> deletePlanMealFromPlan(String? planId, String? mealId) {
     log.finer(
         'Call deletePlanMealFromPlan with planId: $planId | mealId: $mealId');
-    return _firestore
-        .collection('plans')
-        .doc(planId)
-        .collection('meals')
-        .doc(mealId)
-        .delete();
+    return _firestore.doc(planId).collection('meals').doc(mealId).delete();
   }
 
   static Future<void> voteForPlanMeal(
@@ -196,7 +178,6 @@ class PlanService {
     }
 
     return _firestore
-        .collection('plans')
         .doc(planId)
         .collection('meals')
         .doc(planMeal.id)
@@ -210,7 +191,6 @@ class PlanService {
     if (plan != null && plan.users != null && plan.users!.contains(userId)) {
       plan.users!.remove(userId);
       _firestore
-          .collection('plans')
           .doc(planId)
           .update(<String, List<String>>{'users': plan.users ?? []});
     }
