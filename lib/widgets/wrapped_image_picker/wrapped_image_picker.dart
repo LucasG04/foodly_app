@@ -1,5 +1,6 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../constants.dart';
 import '../../services/storage_service.dart';
@@ -77,9 +78,14 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
   }
 
   void _selectImage() async {
-    final String? result = await showDialog<String>(
+    final String? result = await showBarModalBottomSheet<String?>(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(10.0),
+        ),
+      ),
       context: context,
-      builder: (_) => Dialog(child: SelectPickerDialog()),
+      builder: (_) => const SelectPickerDialog(),
     );
 
     if (result != null) {

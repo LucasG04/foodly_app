@@ -11,6 +11,8 @@ import '../main_text_field.dart';
 import '../small_circular_progress_indicator.dart';
 
 class SelectPickerDialog extends StatefulWidget {
+  const SelectPickerDialog({Key? key}) : super(key: key);
+
   @override
   _SelectPickerDialogState createState() => _SelectPickerDialogState();
 }
@@ -94,20 +96,23 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
                         placeholder: 'http://food.com/images/23342',
                       ),
                       const SizedBox(height: kPadding / 2),
-                      if (_showLinkError) Row(
-                              children: [
-                                Icon(
-                                  EvaIcons.alertCircleOutline,
-                                  color: Theme.of(context).errorColor,
-                                ),
-                                const SizedBox(height: kPadding / 2),
-                                Expanded(
-                                  child: const Text(
-                                    'image_picker_dialog_error_link',
-                                  ).tr(),
-                                ),
-                              ],
-                            ) else const SizedBox(),
+                      if (_showLinkError)
+                        Row(
+                          children: [
+                            Icon(
+                              EvaIcons.alertCircleOutline,
+                              color: Theme.of(context).errorColor,
+                            ),
+                            const SizedBox(height: kPadding / 2),
+                            Expanded(
+                              child: const Text(
+                                'image_picker_dialog_error_link',
+                              ).tr(),
+                            ),
+                          ],
+                        )
+                      else
+                        const SizedBox(),
                     ],
                   ),
       ),
@@ -120,11 +125,6 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
       height: 80.0,
       width: 80.0,
       margin: const EdgeInsets.all(kPadding / 2),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        boxShadow: const [kSmallShadow],
-        borderRadius: BorderRadius.circular(kRadius),
-      ),
       child: InkWell(
         onTap: onTap,
         child: Column(
