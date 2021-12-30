@@ -7,19 +7,24 @@ class FoodlyUserService {
   FoodlyUserService._();
 
   static final log = Logger('FoodlyUserService');
-  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final CollectionReference<FoodlyUser> _firestore =
+      FirebaseFirestore.instance.collection('users').withConverter<FoodlyUser>(
+            fromFirestore: (snapshot, _) =>
+                FoodlyUser.fromMap(snapshot.id, snapshot.data()!),
+            toFirestore: (model, _) => model.toMap(),
+          );
 
   static Future<FoodlyUser> createUserWithId(String userId) async {
     log.finer('Call createUserWithId with $userId');
     final user = FoodlyUser(id: userId, oldPlans: []);
-    await _firestore.collection('users').doc(userId).set(user.toMap());
+    await _firestore.doc(userId).set(user);
     return user;
   }
 
   static Future<FoodlyUser?> getUserById(String userId) async {
     log.finer('Call getUserById with $userId');
-    final doc = await _firestore.collection('users').doc(userId).get();
-    return doc.exists ? FoodlyUser.fromMap(doc.id, doc.data()!) : null;
+    final doc = await _firestore.doc(userId).get();
+    return doc.exists ? doc.data() : null;
   }
 
   static Future<void> addOldPlanIdToUser(String userId, String? planId) async {
@@ -31,7 +36,6 @@ class FoodlyUserService {
         !user.oldPlans!.contains(planId)) {
       user.oldPlans!.add(planId);
       return _firestore
-          .collection('users')
           .doc(userId)
           .update(<String, List<String?>>{'oldPlans': user.oldPlans ?? []});
     }

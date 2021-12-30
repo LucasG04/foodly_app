@@ -3,3 +3,6 @@
 
 ### Fixed bugs
 - ...
+
+### Further improvements
+- ...

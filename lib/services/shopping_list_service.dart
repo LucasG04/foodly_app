@@ -7,7 +7,14 @@ import '../models/shopping_list.dart';
 class ShoppingListService {
   static final log = Logger('ShoppingListService');
 
-  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final CollectionReference<ShoppingList> _firestore = FirebaseFirestore
+      .instance
+      .collection('shoppinglists')
+      .withConverter<ShoppingList>(
+        fromFirestore: (snapshot, _) =>
+            ShoppingList.fromMap(snapshot.id, snapshot.data()!),
+        toFirestore: (model, _) => model.toMap(),
+      );
 
   ShoppingListService._();
 
@@ -17,7 +24,7 @@ class ShoppingListService {
     final list = ShoppingList(meals: [], planId: planId);
 
     final id = DateTime.now().microsecondsSinceEpoch.toString();
-    await _firestore.collection('shoppinglists').doc(id).set(list.toMap());
+    await _firestore.doc(id).set(list);
     list.id = id;
 
     return list;
@@ -25,23 +32,16 @@ class ShoppingListService {
 
   static Future<ShoppingList> getShoppingListByPlanId(String planId) async {
     log.finer('Call getShoppingListByPlanId with $planId');
-    final snaps = await _firestore
-        .collection('shoppinglists')
-        .where('planId', isEqualTo: planId)
-        .limit(1)
-        .get();
+    final snaps =
+        await _firestore.where('planId', isEqualTo: planId).limit(1).get();
 
-    return ShoppingList.fromMap(snaps.docs.first.id, snaps.docs.first.data());
+    return snaps.docs.first.data();
   }
 
   static Stream<List<Grocery>> streamShoppingList(String listId) {
     log.finer('Call streamShoppingList with $listId');
-    return _firestore
-        .collection('shoppinglists')
-        .doc(listId)
-        .collection('groceries')
-        .snapshots()
-        .map((event) =>
+    return _firestore.doc(listId).collection('groceries').snapshots().map(
+        (event) =>
             event.docs.map((e) => Grocery.fromMap(e.id, e.data())).toList());
   }
 
@@ -49,7 +49,6 @@ class ShoppingListService {
     log.finer(
         'Call updateGrocery with listId: $listId | Grocery: ${grocery.toMap()}');
     return _firestore
-        .collection('shoppinglists')
         .doc(listId)
         .collection('groceries')
         .doc(grocery.id)
@@ -64,18 +63,13 @@ class ShoppingListService {
       log.finest('addGrocery: adding prevented and existing one updated');
       return;
     }
-    await _firestore
-        .collection('shoppinglists')
-        .doc(listId)
-        .collection('groceries')
-        .add(grocery.toMap());
+    await _firestore.doc(listId).collection('groceries').add(grocery.toMap());
   }
 
   static Future<void> deleteGrocery(String listId, String groceryId) {
     log.finer(
         'Call deleteGrocery with listId: $listId | groceryId: $groceryId');
     return _firestore
-        .collection('shoppinglists')
         .doc(listId)
         .collection('groceries')
         .doc(groceryId)
@@ -85,7 +79,6 @@ class ShoppingListService {
   static Future<void> deleteAllBoughtGrocery(String listId) async {
     log.finer('Call deleteAllBoughtGrocery with $listId');
     final snaps = await _firestore
-        .collection('shoppinglists')
         .doc(listId)
         .collection('groceries')
         .where('bought', isEqualTo: true)
@@ -105,7 +98,6 @@ class ShoppingListService {
   static Future<bool> _checkForDuplicateGrocery(
       String listId, Grocery grocery) async {
     final groceriesSnap = await _firestore
-        .collection('shoppinglists')
         .doc(listId)
         .collection('groceries')
         .where('name', isEqualTo: grocery.name)
