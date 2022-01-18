@@ -40,8 +40,12 @@ class ShoppingListService {
 
   static Stream<List<Grocery>> streamShoppingList(String listId) {
     log.finer('Call streamShoppingList with $listId');
-    return _firestore.doc(listId).collection('groceries').snapshots().map(
-        (event) =>
+    return _firestore
+        .doc(listId)
+        .collection('groceries')
+        .orderBy('name')
+        .snapshots()
+        .map((event) =>
             event.docs.map((e) => Grocery.fromMap(e.id, e.data())).toList());
   }
 
