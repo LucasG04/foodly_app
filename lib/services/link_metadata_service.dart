@@ -30,7 +30,7 @@ class LinkMetadataService {
     final data = await MetadataFetch.extract(link);
 
     if (data == null) {
-      throw Exception('Metadata is not available');
+      return null;
     }
 
     final linkMetadata = _parseMetadata(data);
