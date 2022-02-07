@@ -39,9 +39,11 @@ class MealService {
     final List<DocumentSnapshot<Meal>> documents = [];
 
     for (final idList in ConvertUtil.splitArray(ids)) {
-      final results =
-          await _firestore.where(FieldPath.documentId, whereIn: idList).get();
-      documents.addAll(results.docs);
+      if (idList.isNotEmpty) {
+        final results =
+            await _firestore.where(FieldPath.documentId, whereIn: idList).get();
+        documents.addAll(results.docs);
+      }
     }
 
     // remove non existing documents
