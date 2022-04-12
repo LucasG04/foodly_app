@@ -38,6 +38,8 @@ dependencies:
   easy_localization: ^3.0.0
   flutter_localized_locales: ^2.0.3
   metadata_fetch: ^0.4.1
+  pdf: ^3.7.1
+  printing: ^5.7.2
 
   # Firebase
   firebase_core: ^1.10.6

@@ -147,5 +147,9 @@
     "image_picker_dialog_web": "Web",
     "image_picker_dialog_error_link": "Der Link konnte nicht aufgerufen werden. Bitte überprüfe ihn oder verwende die \"Gallerie\"-Funktion.",
     "image_picker_dialog_error_not_found": "Das Bild konnte leider nicht gespeichert werden. Wähle ein anderes Bild oder versuche es später erneut.",
-    "dummy": "dummy"
+    "dummy": "dummy",
+    "plan_download_modal_title": "Plan herunterladen",
+    "plan_download_modal_exclude_today": "Heute ausschließen",
+    "plan_download_modal_portrait": "Hochformat",
+    "plan_download_modal_cta": "Herunterladen"
 }
