@@ -9,10 +9,11 @@ import '../../../widgets/foodly_network_image.dart';
 import '../../../widgets/meal_tag.dart';
 
 class MealListTile extends StatelessWidget {
-  final height = 75.0;
   final Meal meal;
 
-  const MealListTile(this.meal);
+  const MealListTile(this.meal, {Key? key}) : super(key: key);
+
+  double get height => 75.0;
 
   @override
   Widget build(BuildContext context) {
@@ -63,14 +64,17 @@ class MealListTile extends StatelessWidget {
                           maxLines: 2,
                         ),
                       ),
-                      if (meal.tags!.isNotEmpty) SizedBox(
-                              height: MealTag.tagHeight,
-                              child: Wrap(
-                                clipBehavior: Clip.hardEdge,
-                                children:
-                                    meal.tags!.map((e) => MealTag(e)).toList(),
-                              ),
-                            ) else const SizedBox(),
+                      if (meal.tags!.isNotEmpty)
+                        SizedBox(
+                          height: MealTag.tagHeight,
+                          child: Wrap(
+                            clipBehavior: Clip.hardEdge,
+                            children:
+                                meal.tags!.map((e) => MealTag(e)).toList(),
+                          ),
+                        )
+                      else
+                        const SizedBox(),
                     ],
                   ),
                 ),

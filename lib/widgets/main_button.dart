@@ -13,7 +13,7 @@ class MainButton extends StatelessWidget {
   final ButtonState? buttonState;
   final Color? color;
 
-  final kTextHeadlineColor = const Color(0xFF333333);
+  Color get kTextHeadlineColor => const Color(0xFF333333);
 
   const MainButton({
     required this.onTap,
@@ -25,8 +25,10 @@ class MainButton extends StatelessWidget {
     this.isProgress = false,
     this.buttonState,
     this.color,
+    Key? key,
   })  : assert(isProgress && buttonState != null || !isProgress),
-        assert(text != null || iconData != null);
+        assert(text != null || iconData != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {

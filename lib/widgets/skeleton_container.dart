@@ -15,13 +15,14 @@ class SkeletonContainer extends StatelessWidget {
   const SkeletonContainer({
     required this.width,
     required this.height,
-    this.margin = const EdgeInsets.all(0),
+    this.margin = EdgeInsets.zero,
     this.shimmerColor = Colors.white54,
     this.gradientColor = const Color.fromARGB(0, 244, 244, 244),
     this.backgroundColor,
     this.curve = Curves.fastOutSlowIn,
     this.borderRadius = kRadius,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

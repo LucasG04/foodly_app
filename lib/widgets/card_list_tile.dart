@@ -53,7 +53,7 @@ class CardListTile extends StatelessWidget {
               onPressed: trailingAction,
               style: ButtonStyle(
                 padding: MaterialStateProperty.resolveWith(
-                  (states) => const EdgeInsets.all(0),
+                  (states) => EdgeInsets.zero,
                 ),
                 foregroundColor: MaterialStateProperty.resolveWith(
                   (states) => Colors.black,

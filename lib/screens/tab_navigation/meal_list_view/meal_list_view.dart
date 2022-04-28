@@ -23,7 +23,7 @@ class MealListView extends StatefulWidget {
 
 class _MealListViewState extends State<MealListView>
     with AutomaticKeepAliveClientMixin {
-  List<Meal>? _allMeals;
+  late List<Meal>? _allMeals;
   List<Meal>? _filteredMeals;
   String _searchInput = '';
 

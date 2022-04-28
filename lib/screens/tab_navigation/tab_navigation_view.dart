@@ -43,10 +43,10 @@ class _TabNavigationViewState extends State<TabNavigationView> {
               });
             }
           },
-          children: [
+          children: const [
             ShoppingListView(),
             PlanTabView(),
-            const MealListView(),
+            MealListView(),
             SettingsView(),
           ],
         ),

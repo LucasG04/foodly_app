@@ -87,7 +87,7 @@ class OnboardingScreen extends StatelessWidget {
       Navigator.push(
         context,
         ConcentricPageRoute<AuthenticationScreen>(
-            builder: (_) => AuthenticationScreen()),
+            builder: (_) => const AuthenticationScreen()),
       );
     } else {
       AutoRouter.of(context).pop();

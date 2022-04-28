@@ -17,6 +17,7 @@ import 'animated_shopping_list.dart';
 import 'edit_grocery_modal.dart';
 
 class ShoppingListView extends StatefulWidget {
+  const ShoppingListView({Key? key}) : super(key: key);
   @override
   _ShoppingListViewState createState() => _ShoppingListViewState();
 }

@@ -15,7 +15,8 @@ class EditGroceryModal extends StatefulWidget {
   const EditGroceryModal({
     required this.shoppingListId,
     this.grocery,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   _EditGroceryModalState createState() => _EditGroceryModalState();
@@ -71,7 +72,8 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
                 _isCreating
                     ? 'edit_grocery_modal_add'
                     : 'edit_grocery_modal_edit',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ).tr(),
             ),
@@ -152,6 +154,9 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
       setState(() {
         _buttonState = ButtonState.normal;
       });
+      if (!mounted) {
+        return;
+      }
       Navigator.pop(context);
     } else {
       setState(() {

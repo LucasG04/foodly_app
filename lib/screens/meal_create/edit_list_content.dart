@@ -8,11 +8,8 @@ class EditListContent extends StatefulWidget {
   final void Function(List<String>?)? onChanged;
   final String? title;
 
-  const EditListContent({
-    this.content,
-    this.onChanged,
-    this.title,
-  });
+  const EditListContent({this.content, this.onChanged, this.title, Key? key})
+      : super(key: key);
 
   @override
   _EditListContentState createState() => _EditListContentState();

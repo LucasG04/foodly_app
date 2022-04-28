@@ -26,7 +26,9 @@ class PlanService {
   static Future<String?> getCurrentPlanId() async {
     log.finer(
         'Call getCurrentPlanId for User: ${AuthenticationService.currentUser}');
-    if (AuthenticationService.currentUser == null) return '';
+    if (AuthenticationService.currentUser == null) {
+      return '';
+    }
 
     final currentUserId = AuthenticationService.currentUser!.uid;
     final querySnaps = await _firestore

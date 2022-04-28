@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+// ignore: avoid_classes_with_only_static_members
 class SocialSignInButton {
   static Widget apple(void Function() onTap) {
     return _SocialButton(
@@ -19,7 +20,7 @@ class _SocialButton extends StatelessWidget {
   final Widget icon;
   final Color color;
 
-  final kTextHeadlineColor = const Color(0xFF333333);
+  Color get kTextHeadlineColor => const Color(0xFF333333);
 
   const _SocialButton({
     required this.text,

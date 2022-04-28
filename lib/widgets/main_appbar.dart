@@ -7,12 +7,13 @@ class MainAppBar extends StatefulWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final ScrollController? scrollController;
 
-  const MainAppBar({
-    required this.text,
-    this.showBack = true,
-    this.actions,
-    this.scrollController,
-  });
+  const MainAppBar(
+      {required this.text,
+      this.showBack = true,
+      this.actions,
+      this.scrollController,
+      Key? key})
+      : super(key: key);
 
   @override
   _MainAppBarState createState() => _MainAppBarState();

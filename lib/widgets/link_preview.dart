@@ -87,7 +87,7 @@ class LinkPreview extends StatelessWidget {
   }
 
   Widget _buildSmallCard(LinkMetadata metadata, BuildContext context) {
-    const height = 75.0;
+    final height = _getSmallCardHeight(context);
     return GestureDetector(
       onTap: metadata.url != null ? () => launch(metadata.url!) : () {},
       child: Container(
@@ -179,7 +179,7 @@ class LinkPreview extends StatelessWidget {
 
   Widget _buildSmallSkeletonCard(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    const height = 75.0;
+    final height = _getSmallCardHeight(context);
     return Container(
       width: double.infinity,
       height: height,
@@ -190,7 +190,7 @@ class LinkPreview extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const SkeletonContainer(
+          SkeletonContainer(
             height: height,
             width: height,
           ),
@@ -203,7 +203,7 @@ class LinkPreview extends StatelessWidget {
                 children: [
                   SkeletonContainer(
                     width: size.width * 0.4,
-                    height: Theme.of(context).textTheme.bodyText1!.fontSize!,
+                    height: Theme.of(context).textTheme.bodyText1!.fontSize,
                   ),
                   SkeletonContainer(
                     width: size.width * 0.6,

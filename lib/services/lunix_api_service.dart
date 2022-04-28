@@ -31,7 +31,7 @@ class LunixApiService {
     return result.statusCode == 200;
   }
 
-  static Future<String?> printDocxForPlan({
+  static Future<String?> saveDocxForPlan({
     required Plan plan,
     bool vertical = true,
     bool colorful = true,
@@ -46,7 +46,7 @@ class LunixApiService {
     try {
       final dir = await getApplicationDocumentsDirectory();
       final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-      final planSavePath = '${dir.path}/plan-$timestamp.pdf';
+      final planSavePath = '${dir.path}/plan-$timestamp.docx';
       final Response response = await _dio.post<List<int>>(
         '$_lunixApiEndpoint/generate-plan-pdf',
         data: docxData.toJson(),
@@ -64,7 +64,6 @@ class LunixApiService {
       return planSavePath;
     } catch (e) {
       log.severe('ERR in printDocxForPlan()', e);
-      print(e);
       return null;
     }
   }

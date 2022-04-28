@@ -10,7 +10,7 @@ import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
 
 class ChefkochImportModal extends StatefulWidget {
-  const ChefkochImportModal();
+  const ChefkochImportModal({Key? key}) : super(key: key);
 
   @override
   _ChefkochImportModalState createState() => _ChefkochImportModalState();
@@ -127,11 +127,13 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
 
     try {
       final meal = await ChefkochService.getMealFromChefkochUrl(link);
-      FocusScope.of(context).unfocus();
       _buttonState = ButtonState.normal;
+      if (!mounted) {
+        return;
+      }
+      FocusScope.of(context).unfocus();
       Navigator.pop(context, meal);
     } catch (e) {
-      print(e);
       setState(() {
         _buttonState = ButtonState.error;
         _linkError = true;

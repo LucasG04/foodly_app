@@ -8,7 +8,8 @@ class UserInformation extends StatelessWidget {
   final String _title;
   final String _message;
 
-  const UserInformation(this._assetPath, this._title, this._message);
+  const UserInformation(this._assetPath, this._title, this._message, {Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

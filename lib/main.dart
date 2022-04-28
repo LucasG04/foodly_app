@@ -4,7 +4,7 @@ import 'dart:io' show Platform;
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart' as Foundation;
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,7 +40,7 @@ Future<void> main() async {
         supportedLocales: const [Locale('en'), Locale('de')],
         path: 'assets/translations',
         fallbackLocale: const Locale('en'),
-        child: FoodlyApp(),
+        child: const FoodlyApp(),
       ),
     ),
   );
@@ -55,6 +55,8 @@ Future<void> initializeHive() async {
 }
 
 class FoodlyApp extends StatefulWidget {
+  const FoodlyApp({foundation.Key? key}) : super(key: key);
+
   @override
   _FoodlyAppState createState() => _FoodlyAppState();
 }
@@ -65,10 +67,10 @@ class _FoodlyAppState extends State<FoodlyApp> {
   late StreamSubscription<LogRecord> _logStream;
   // ignore: cancel_subscriptions
   StreamSubscription<List<Meal>>? _privateMealsStream;
-  List<Meal>? _privateMealsStreamValue;
+  late List<Meal>? _privateMealsStreamValue;
   // ignore: cancel_subscriptions
   StreamSubscription<List<Meal>>? _publicMealsStream;
-  List<Meal>? _publicMealsStreamValue;
+  late List<Meal>? _publicMealsStreamValue;
 
   final _appRouter = AppRouter();
 
@@ -118,11 +120,8 @@ class _FoodlyAppState extends State<FoodlyApp> {
                 routeInformationParser: _appRouter.defaultRouteParser(),
                 debugShowCheckedModeBanner: false,
                 theme: ThemeData(
-                  // TODO: Nunito default font?
+                  // Nunito default font?
                   brightness: Brightness.light,
-                  // textTheme: MediaQuery.of(context).size.width < 500
-                  //     ? kSmallTextTheme
-                  //     : kTextTheme,
                 ),
                 localizationsDelegates: [
                   ...context.localizationDelegates,
@@ -147,6 +146,9 @@ class _FoodlyAppState extends State<FoodlyApp> {
 
       if (planId != null && planId.isNotEmpty) {
         final Plan newPlan = (await PlanService.getPlanById(planId))!;
+        if (!mounted) {
+          return;
+        }
         context.read(planProvider).state = newPlan;
       }
     }
@@ -157,14 +159,18 @@ class _FoodlyAppState extends State<FoodlyApp> {
     if (firebaseUser != null) {
       final FoodlyUser user =
           (await FoodlyUserService.getUserById(firebaseUser.uid))!;
+      if (!mounted) {
+        return;
+      }
       context.read(userProvider).state = user;
     }
   }
 
   void _initializeLogger() {
-    if (Foundation.kDebugMode) {
+    if (foundation.kDebugMode) {
       Logger.root.level = Level.ALL;
       Logger.root.onRecord.listen((record) {
+        // ignore: avoid_print
         print('${record.level.name}: ${record.loggerName}: ${record.message}');
       });
     } else {
