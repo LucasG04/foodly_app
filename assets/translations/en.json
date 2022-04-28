@@ -147,5 +147,9 @@
     "image_picker_dialog_web": "web",
     "image_picker_dialog_error_link": "The link could not be accessed. Please check it or use the \"Gallerie\" function.",
     "image_picker_dialog_error_not_found": "Sorry, the image could not be saved. Choose another image or try again later.",
-    "dummy":""
+    "dummy":"",
+    "plan_download_modal_title": "Plan download",
+    "plan_download_modal_exclude_today": "Exclude today",
+    "plan_download_modal_portrait": "Portrait format",
+    "plan_download_modal_cta": "Download"
 }

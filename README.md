@@ -24,4 +24,3 @@ Join plan|Weekly plan|Shopping list
 Cook book|Meal details|Settings
 :-:|:-:|:-:
 ![foodly-book](https://user-images.githubusercontent.com/42368417/112768150-d3afdf00-901a-11eb-9564-c2d9fdff4131.png)|![foodly-meal](https://user-images.githubusercontent.com/42368417/113592899-0880ef00-9636-11eb-9a88-9c3ef927e783.png)|![foodly-settings](https://user-images.githubusercontent.com/42368417/112768228-47ea8280-901b-11eb-9fc4-c0b69644b0d2.png)
-
