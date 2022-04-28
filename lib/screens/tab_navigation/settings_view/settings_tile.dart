@@ -4,19 +4,20 @@ import 'package:flutter/material.dart';
 import '../../../constants.dart';
 
 class SettingsTile extends StatelessWidget {
-  final IconData leadingIcon;
   final String text;
+  final IconData? leadingIcon;
   final Widget? trailing;
   final void Function()? onTap;
   final Color? color;
 
   const SettingsTile({
-    required this.leadingIcon,
     required this.text,
+    this.leadingIcon,
     this.trailing,
     this.onTap,
     this.color,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +30,10 @@ class SettingsTile extends StatelessWidget {
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(kRadius)),
         child: Row(
           children: [
-            Icon(leadingIcon, color: _color),
+            if (leadingIcon != null)
+              Icon(leadingIcon, color: _color)
+            else
+              const SizedBox(),
             const SizedBox(width: kPadding),
             Expanded(
               child: AutoSizeText(
@@ -39,7 +43,7 @@ class SettingsTile extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            trailing ?? Container(),
+            trailing ?? const SizedBox(),
           ],
         ),
       ),

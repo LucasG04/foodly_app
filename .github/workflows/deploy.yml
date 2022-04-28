@@ -21,10 +21,10 @@ jobs:
       - name: Install GNU sed
         run: |
           brew install gnu-sed
-      - name: Decrypt general secrets
-        run: sh ./.github/scripts/decrypt_general_secrets.sh
+      - name: Create general secrets
+        run: sh ./.github/scripts/create_general_secrets.sh
         env:
-          ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.ANDROID_KEYS_SECRET_PASSPHRASE }}
+          GENERAL_SECRETS_DART: ${{ secrets.GENERAL_SECRETS_DART }}
       - name: Create ios secrets
         run: sh ./.github/scripts/create_secret_files.sh
         env:
@@ -64,10 +64,10 @@ jobs:
         uses: subosito/flutter-action@v1
         with:
           channel: 'beta'
-      - name: Decrypt general secrets
-        run: sh ./.github/scripts/decrypt_general_secrets.sh
+      - name: Create general secrets
+        run: sh ./.github/scripts/create_general_secrets.sh
         env:
-          ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.ANDROID_KEYS_SECRET_PASSPHRASE }}
+          GENERAL_SECRETS_DART: ${{ secrets.GENERAL_SECRETS_DART }}
       - name: Decrypt Android keys
         run: sh ./.github/scripts/decrypt_android_keys.sh
         env:

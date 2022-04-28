@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../../constants.dart';
 import '../../../models/plan.dart';
@@ -14,6 +16,7 @@ import '../../../utils/basic_utils.dart';
 import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import 'plan_day_card.dart';
+import 'plan_download_modal.dart';
 
 class PlanTabView extends StatefulWidget {
   @override
@@ -40,7 +43,15 @@ class _PlanTabViewState extends State<PlanTabView>
                       const SizedBox(height: kPadding),
                       Padding(
                         padding: const EdgeInsets.only(left: 5.0),
-                        child: PageTitle(text: 'plan_title'.tr()),
+                        child: PageTitle(
+                          text: 'plan_title'.tr(),
+                          actions: [
+                            IconButton(
+                              onPressed: () => _openDownloadModal(activePlan),
+                              icon: const Icon(EvaIcons.downloadOutline),
+                            )
+                          ],
+                        ),
                       ),
                       SizedBox(
                         width: BasicUtils.contentWidth(context),
@@ -122,6 +133,20 @@ class _PlanTabViewState extends State<PlanTabView>
     }
 
     return days;
+  }
+
+  void _openDownloadModal(Plan plan) {
+    // TODO: sheet for downloading with options
+    // TODO: handle download
+    showBarModalBottomSheet<void>(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(10.0),
+        ),
+      ),
+      context: context,
+      builder: (_) => PlanDownloadModal(plan: plan),
+    );
   }
 }
 
