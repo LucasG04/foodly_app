@@ -82,14 +82,18 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
                 setState(() {
                   _buttonState = ButtonState.inProgress;
                 });
-                final path = await LunixApiService.printDocxForPlan(
+                final path = await LunixApiService.saveDocxForPlan(
                   plan: widget.plan,
                   languageTag: context.locale.toLanguageTag(),
                 );
                 setState(() {
                   _buttonState = ButtonState.normal;
                 });
-                _savePlanPdf(path);
+                await _savePlanPdf(path);
+                if (!mounted) {
+                  return;
+                }
+                Navigator.pop(context);
               },
             ),
           ),
@@ -116,7 +120,6 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
     }
 
     final params = SaveFileDialogParams(sourceFilePath: path);
-    final filePath = await FlutterFileDialog.saveFile(params: params);
-    print(filePath);
+    await FlutterFileDialog.saveFile(params: params);
   }
 }

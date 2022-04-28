@@ -8,9 +8,7 @@ import '../../widgets/animate_icons.dart';
 class SearchBar extends StatefulWidget {
   final void Function(String) onSearch;
 
-  const SearchBar({
-    required this.onSearch,
-  });
+  const SearchBar({required this.onSearch, Key? key}) : super(key: key);
 
   @override
   _SearchBarState createState() => _SearchBarState();
@@ -70,7 +68,9 @@ class _SearchBarState extends State<SearchBar> {
                   disabledBorder: InputBorder.none,
                 ),
                 onChanged: (text) {
-                  if (_debounce?.isActive ?? false) _debounce!.cancel();
+                  if (_debounce?.isActive ?? false) {
+                    _debounce!.cancel();
+                  }
                   _debounce = Timer(const Duration(milliseconds: 500), () {
                     widget.onSearch(text);
                   });
@@ -79,7 +79,9 @@ class _SearchBarState extends State<SearchBar> {
             ),
             SizedBox(
               height: 4.0,
-              child: _isLoading ? const LinearProgressIndicator() : const SizedBox(),
+              child: _isLoading
+                  ? const LinearProgressIndicator()
+                  : const SizedBox(),
             ),
           ],
         ),

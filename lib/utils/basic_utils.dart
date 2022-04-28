@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/state_providers.dart';
 
+// ignore: avoid_classes_with_only_static_members
 class BasicUtils {
   /// Clears all state providers.
   static void clearAllProvider(BuildContext context) {
@@ -16,7 +17,8 @@ class BasicUtils {
     try {
       final date = DateTime.fromMicrosecondsSinceEpoch(
           int.parse(image.split('.').first));
-      return !Uri.tryParse(image)!.isAbsolute && date.microsecondsSinceEpoch > 0;
+      return !Uri.tryParse(image)!.isAbsolute &&
+          date.microsecondsSinceEpoch > 0;
     } catch (e) {
       return false;
     }

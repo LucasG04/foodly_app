@@ -5,37 +5,40 @@ import 'package:flutter/material.dart';
 
 /// FROM: https://pub.dev/packages/animate_icons
 class AnimateIcons extends StatefulWidget {
-  const AnimateIcons({
-    /// The IconData that will be visible before animation Starts
-    required this.startIcon,
+  const AnimateIcons(
+      {
 
-    /// The IconData that will be visible after animation ends
-    required this.endIcon,
+      /// The IconData that will be visible before animation Starts
+      required this.startIcon,
 
-    /// On icon tap.
-    this.onTap,
+      /// The IconData that will be visible after animation ends
+      required this.endIcon,
 
-    /// The size of the icon that are to be shown.
-    this.size = 24.0,
+      /// On icon tap.
+      this.onTap,
 
-    /// AnimateIcons controller
-    this.controller,
+      /// The size of the icon that are to be shown.
+      this.size = 24.0,
 
-    /// The color of the icons that are to be shown
-    this.color,
+      /// AnimateIcons controller
+      this.controller,
 
-    /// The duration for which the animation runs
-    this.duration = const Duration(milliseconds: 300),
+      /// The color of the icons that are to be shown
+      this.color,
 
-    /// If the animation runs in the clockwise or anticlockwise direction
-    this.clockwise = false,
+      /// The duration for which the animation runs
+      this.duration = const Duration(milliseconds: 300),
 
-    /// This is the tooltip that will be used for the [startIcon]
-    this.startTooltip = '',
+      /// If the animation runs in the clockwise or anticlockwise direction
+      this.clockwise = false,
 
-    /// This is the tooltip that will be used for the [endIcon]
-    this.endTooltip = '',
-  });
+      /// This is the tooltip that will be used for the [startIcon]
+      this.startTooltip = '',
+
+      /// This is the tooltip that will be used for the [endIcon]
+      this.endTooltip = '',
+      Key? key})
+      : super(key: key);
   final IconData? startIcon, endIcon;
   final Duration duration;
   final bool clockwise;

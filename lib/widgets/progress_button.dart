@@ -93,13 +93,13 @@ class _ProgressButtonState extends State<ProgressButton>
 
     final startSwing = TweenSequenceItem<Offset>(
         tween: Tween(
-            begin: const Offset(0, 0),
+            begin: Offset.zero,
             end: Offset(widget.errorAnimationSwingFactor, 0)),
         weight: 1);
     final endSwing = TweenSequenceItem<Offset>(
         tween: Tween(
             begin: Offset(-widget.errorAnimationSwingFactor, 0),
-            end: const Offset(0, 0)),
+            end: Offset.zero),
         weight: 1);
 
     final fullSwing = [
@@ -173,7 +173,9 @@ class _ProgressButtonState extends State<ProgressButton>
       BuildContext context, BoxConstraints constraints) {
     var buttonHeight = constraints.maxHeight;
     // If there is no constraint on height, we should constrain it
-    if (buttonHeight == double.infinity) buttonHeight = 48;
+    if (buttonHeight == double.infinity) {
+      buttonHeight = 48;
+    }
 
     // These animation configurations can be tweaked to have
     // however you like it

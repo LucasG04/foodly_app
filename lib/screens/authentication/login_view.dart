@@ -311,13 +311,16 @@ class _LoginViewState extends State<LoginView> {
     foodlyUser.oldPlans!.add(plan!.id);
     await FoodlyUserService.addOldPlanIdToUser(userId, plan.id);
 
-    context.read(planProvider).state = plan;
-    context.read(userProvider).state = foodlyUser;
-
     setState(() {
       _buttonState = ButtonState.normal;
     });
 
+    if (!mounted) {
+      return;
+    }
+
+    context.read(planProvider).state = plan;
+    context.read(userProvider).state = foodlyUser;
     AutoRouter.of(context).replace(const HomeScreenRoute());
   }
 

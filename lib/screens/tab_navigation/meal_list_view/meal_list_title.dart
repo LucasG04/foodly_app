@@ -148,7 +148,7 @@ class _MealListTitleState extends State<MealListTitle> {
       ),
       isScrollControlled: true,
       context: context,
-      builder: (_) => TagFilterModal(),
+      builder: (_) => const TagFilterModal(),
     );
   }
 }

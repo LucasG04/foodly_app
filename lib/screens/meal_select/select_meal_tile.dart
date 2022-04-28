@@ -19,7 +19,9 @@ class SelectMealTile extends StatefulWidget {
     this.meal,
     this.onAddMeal,
     this.isLoading = false,
-  }) : assert(isLoading || (!isLoading && meal != null && onAddMeal != null));
+    Key? key,
+  })  : assert(isLoading || (!isLoading && meal != null && onAddMeal != null)),
+        super(key: key);
 
   @override
   _SelectMealTileState createState() => _SelectMealTileState();
@@ -100,6 +102,9 @@ class _SelectMealTileState extends State<SelectMealTile> {
         _buttonState = _ButtonState.DONE;
       });
 
+      if (!mounted) {
+        return;
+      }
       AutoRouter.of(context).pop();
     }
   }

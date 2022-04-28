@@ -4,7 +4,7 @@ class SmallCircularProgressIndicator extends StatelessWidget {
   final Color? color;
   final double additionalSize;
 
-  final double _iconHeight = 24.0;
+  double get _iconHeight => 24.0;
 
   const SmallCircularProgressIndicator({
     Key? key,

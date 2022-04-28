@@ -19,6 +19,7 @@ import 'plan_day_card.dart';
 import 'plan_download_modal.dart';
 
 class PlanTabView extends StatefulWidget {
+  const PlanTabView({Key? key}) : super(key: key);
   @override
   _PlanTabViewState createState() => _PlanTabViewState();
 }
@@ -136,8 +137,6 @@ class _PlanTabViewState extends State<PlanTabView>
   }
 
   void _openDownloadModal(Plan plan) {
-    // TODO: sheet for downloading with options
-    // TODO: handle download
     showBarModalBottomSheet<void>(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(

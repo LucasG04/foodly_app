@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class MealTag extends StatelessWidget {
-  const MealTag(this.tag);
+  const MealTag(this.tag, {Key? key}) : super(key: key);
 
   final String tag;
 

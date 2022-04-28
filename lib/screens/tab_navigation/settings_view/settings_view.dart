@@ -22,6 +22,7 @@ import 'loading_logout.dart';
 import 'settings_tile.dart';
 
 class SettingsView extends StatefulWidget {
+  const SettingsView({Key? key}) : super(key: key);
   @override
   State<SettingsView> createState() => _SettingsViewState();
 }
@@ -175,6 +176,9 @@ class _SettingsViewState extends State<SettingsView> {
                         onTap: () async {
                           await AuthenticationService.resetPassword(
                               firebaseUser!.email!);
+                          if (!mounted) {
+                            return;
+                          }
                           MainSnackbar(
                             message: 'settings_section_account_reset_msg'.tr(),
                             isSuccess: true,

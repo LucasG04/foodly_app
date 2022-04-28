@@ -297,8 +297,14 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
             : await MealService.updateMeal(_meal);
         _buttonState = ButtonState.normal;
         _mealSaved = true;
+        if (!mounted) {
+          return;
+        }
         AutoRouter.of(context).pop(newMeal);
       } catch (e) {
+        if (!mounted) {
+          return;
+        }
         MainSnackbar(
           message: 'meal_create_error_unknown'.tr(),
           isError: true,
@@ -306,6 +312,9 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         _buttonState = ButtonState.error;
       }
     } else {
+      if (!mounted) {
+        return;
+      }
       MainSnackbar(
         message: 'meal_create_error_missing_input'.tr(),
         isError: true,

@@ -405,22 +405,29 @@ class _MealScreenState extends State<MealScreen> {
     );
 
     if (result != null && result) {
-      setState(() {
-        _isDeleting = true;
-      });
-      await MealService.deleteMeal(meal.id!);
-      final plan = context.read(planProvider).state!;
-      await MealStatService.deleteStatByMealId(plan.id, meal.id);
+      await _deleteMeal(meal.id!);
 
-      if (plan.meals != null && plan.meals!.isNotEmpty) {
-        for (final planMeal in plan.meals!.where((e) => e.meal == meal.id)) {
-          await PlanService.deletePlanMealFromPlan(plan.id, planMeal.id);
-        }
+      if (!mounted) {
+        return;
       }
-
       AutoRouter.of(context).pop();
-      _isDeleting = false;
     }
+  }
+
+  Future<void> _deleteMeal(String mealId) async {
+    setState(() {
+      _isDeleting = true;
+    });
+    final plan = context.read(planProvider).state!;
+    await MealService.deleteMeal(mealId);
+    await MealStatService.deleteStatByMealId(plan.id, mealId);
+
+    if (plan.meals != null && plan.meals!.isNotEmpty) {
+      for (final planMeal in plan.meals!.where((e) => e.meal == mealId)) {
+        await PlanService.deletePlanMealFromPlan(plan.id, planMeal.id);
+      }
+    }
+    _isDeleting = false;
   }
 }
 

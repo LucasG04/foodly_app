@@ -9,7 +9,7 @@ import '../../widgets/main_text_field.dart';
 class EditIngredientModal extends StatefulWidget {
   final Ingredient? ingredient;
 
-  const EditIngredientModal({this.ingredient});
+  const EditIngredientModal({this.ingredient, Key? key}) : super(key: key);
 
   @override
   _EditIngredientModalState createState() => _EditIngredientModalState();

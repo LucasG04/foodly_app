@@ -1,11 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+
 import '../../../constants.dart';
 import '../../../services/authentication_service.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 
 class LoadingLogut extends StatefulWidget {
-  const LoadingLogut();
+  const LoadingLogut({Key? key}) : super(key: key);
 
   @override
   _LoadingLogutState createState() => _LoadingLogutState();

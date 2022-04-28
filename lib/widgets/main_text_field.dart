@@ -21,24 +21,25 @@ class MainTextField extends StatefulWidget {
   final String? errorText;
   final String Function(String?)? validator;
 
-  const MainTextField({
-    required this.controller,
-    this.focusNode,
-    this.title,
-    this.placeholder,
-    this.isMultiline = false,
-    this.textInputAction = TextInputAction.done,
-    this.keyboardType = TextInputType.text,
-    this.onSubmit,
-    this.onChange,
-    this.isDense = true,
-    this.obscureText = false,
-    this.autofocus = false,
-    this.textAlign = TextAlign.start,
-    this.suffix,
-    this.errorText,
-    this.validator,
-  });
+  const MainTextField(
+      {required this.controller,
+      this.focusNode,
+      this.title,
+      this.placeholder,
+      this.isMultiline = false,
+      this.textInputAction = TextInputAction.done,
+      this.keyboardType = TextInputType.text,
+      this.onSubmit,
+      this.onChange,
+      this.isDense = true,
+      this.obscureText = false,
+      this.autofocus = false,
+      this.textAlign = TextAlign.start,
+      this.suffix,
+      this.errorText,
+      this.validator,
+      Key? key})
+      : super(key: key);
 
   @override
   _MainTextFieldState createState() => _MainTextFieldState();
@@ -114,7 +115,8 @@ class _MainTextFieldState extends State<MainTextField> {
                     duration: const Duration(milliseconds: 125),
                     child: _obscureText
                         ? const Icon(EvaIcons.eyeOutline, size: kIconHeight)
-                        : const Icon(EvaIcons.eyeOff2Outline, size: kIconHeight),
+                        : const Icon(EvaIcons.eyeOff2Outline,
+                            size: kIconHeight),
                   ),
                 )
               : null,

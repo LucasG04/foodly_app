@@ -255,6 +255,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
   }
 
   Future _showPlaceholderDialog() async {
+    final planId = context.read(planProvider).state!.id!;
     final texts = await showTextInputDialog(
       context: context,
       textFields: [
@@ -271,18 +272,25 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     if (texts != null && texts.isNotEmpty) {
       await _addMealToPlan(
         kPlaceholderSymbol + texts.first,
-        context.read(planProvider).state!.id!,
+        planId,
       );
+      if (!mounted) {
+        return;
+      }
       AutoRouter.of(context).pop();
     }
   }
 
   Future _createNewMeal() async {
+    final planId = context.read(planProvider).state!.id!;
     final meal =
         await AutoRouter.of(context).push(MealCreateScreenRoute(id: 'create'));
 
     if (meal != null && meal is Meal) {
-      await _addMealToPlan(meal.id!, context.read(planProvider).state!.id!);
+      await _addMealToPlan(meal.id!, planId);
+      if (!mounted) {
+        return;
+      }
       AutoRouter.of(context).pop();
     }
   }

@@ -7,6 +7,7 @@ import '../../../models/meal.dart';
 import '../../../providers/state_providers.dart';
 
 class TagFilterModal extends StatefulWidget {
+  const TagFilterModal({Key? key}) : super(key: key);
   @override
   _TagFilterModalState createState() => _TagFilterModalState();
 }
@@ -107,7 +108,7 @@ class _TagFilterModalState extends State<TagFilterModal> {
 
   Card _buildModalHeader(BuildContext context, double width) {
     return Card(
-      margin: const EdgeInsets.all(0),
+      margin: EdgeInsets.zero,
       color: Theme.of(context).scaffoldBackgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
