@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../constants.dart';
@@ -13,9 +16,20 @@ import 'meal_service.dart';
 class LunixApiService {
   LunixApiService._();
 
+  static final log = Logger('LunixApiService');
+
   static const String _lunixApiEndpoint =
       'https://lunix-api.herokuapp.com/foodly';
-  static final Dio _dio = Dio();
+  static final Dio _dio = Dio(
+    BaseOptions(
+      headers: <String, dynamic>{'x-api-key': secretLunixApi},
+    ),
+  );
+
+  static Future<bool> lunixApiAvailable() async {
+    final result = await _dio.get<Map>(_lunixApiEndpoint);
+    return result.statusCode == 200;
+  }
 
   static Future<String?> printDocxForPlan({
     required Plan plan,
@@ -32,59 +46,60 @@ class LunixApiService {
     try {
       final dir = await getApplicationDocumentsDirectory();
       final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-      final planDownloadPath = '${dir.path}/plan-$timestamp.pdf';
-      await _dio.download(
+      final planSavePath = '${dir.path}/plan-$timestamp.pdf';
+      final Response response = await _dio.post<List<int>>(
         '$_lunixApiEndpoint/generate-plan-pdf',
-        planDownloadPath,
-        data: docxData,
+        data: docxData.toJson(),
         options: Options(
           headers: <String, dynamic>{'x-api-key': secretLunixApi},
+          responseType: ResponseType.bytes,
         ),
-        onReceiveProgress: (received, total) {
-          final progress = (received / total) * 100;
-          print('Rec: $received , Total: $total, $progress%');
-        },
       );
 
-      return planDownloadPath;
+      final File file = File(planSavePath);
+      final randomAccessFile = file.openSync(mode: FileMode.write);
+      randomAccessFile.writeFromSync(response.data as List<int>);
+      await randomAccessFile.close();
+
+      return planSavePath;
     } catch (e) {
+      log.severe('ERR in printDocxForPlan()', e);
+      print(e);
       return null;
     }
   }
 
   static Future<LunixDocxPlan> _getLunixDocxPlan(
       Plan plan, String languageTag) async {
-    final List<LunixDocxPlanDay> days = [];
-    if (plan.meals != null) {
-      final mealIds = plan.meals!.map((e) => e.meal).toList();
-      final meals = await MealService.getMealsByIds(mealIds);
-      // meals.addAll(_getPlaceholderMeals(mealIds));
-      print(plan.meals);
-      // print(meals);
+    if (plan.meals == null || plan.meals!.isEmpty) {
+      return LunixDocxPlan(name: plan.name, meals: []);
+    }
 
-      for (final meal in plan.meals!) {
-        final dayName = DateFormat('EEEE', languageTag).format(meal.date);
-        final dayIndex = days.indexWhere((m) => m.dayName == dayName);
-        print(meal.id);
-        print(dayName);
-        if (dayIndex == -1) {
-          if (meal.type == MealType.LUNCH) {
-            days.add(LunixDocxPlanDay(
-                dayName: dayName,
-                lunch: meals.firstWhere((m) => m.id == meal.id).name));
-          } else {
-            days.add(LunixDocxPlanDay(
-                dayName: dayName,
-                dinner: meals.firstWhere((m) => m.id == meal.id).name));
-          }
+    final List<LunixDocxPlanDay> days = [];
+    final mealIds = plan.meals!.map((e) => e.meal).toList();
+    final meals = await MealService.getMealsByIds(mealIds);
+    meals.addAll(_getPlaceholderMeals(mealIds));
+
+    for (final meal in plan.meals!) {
+      final dayName = DateFormat('EEEE', languageTag).format(meal.date);
+      final dayIndex = days.indexWhere((m) => m.dayName == dayName);
+      if (dayIndex == -1) {
+        if (meal.type == MealType.LUNCH) {
+          days.add(LunixDocxPlanDay(
+              dayName: dayName,
+              lunch: meals.firstWhere((m) => m.id == meal.meal).name));
         } else {
-          if (meal.type == MealType.LUNCH) {
-            days[dayIndex].lunch =
-                meals.firstWhere((m) => m.id == meal.id).name;
-          } else {
-            days[dayIndex].dinner =
-                meals.firstWhere((m) => m.id == meal.id).name;
-          }
+          days.add(LunixDocxPlanDay(
+              dayName: dayName,
+              dinner: meals.firstWhere((m) => m.id == meal.meal).name));
+        }
+      } else {
+        if (meal.type == MealType.LUNCH) {
+          days[dayIndex].lunch =
+              meals.firstWhere((m) => m.id == meal.meal).name;
+        } else {
+          days[dayIndex].dinner =
+              meals.firstWhere((m) => m.id == meal.meal).name;
         }
       }
     }

@@ -1,5 +1,6 @@
-import 'package:easy_localization/src/public_ext.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 
 import '../../../constants.dart';
 import '../../../models/plan.dart';
@@ -88,7 +89,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
                 setState(() {
                   _buttonState = ButtonState.normal;
                 });
-                print(path);
+                _savePlanPdf(path);
               },
             ),
           ),
@@ -107,5 +108,15 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
     setState(() {
       _portraitFormat = value ?? false;
     });
+  }
+
+  Future<void> _savePlanPdf(String? path) async {
+    if (path == null || path.isEmpty) {
+      return;
+    }
+
+    final params = SaveFileDialogParams(sourceFilePath: path);
+    final filePath = await FlutterFileDialog.saveFile(params: params);
+    print(filePath);
   }
 }
