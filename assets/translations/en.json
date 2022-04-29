@@ -4,7 +4,7 @@
     "add": "Add",
     "shopping_list_title": "Shopping list",
     "shopping_list_already_bought": "ALREADY PURCHASED",
-    "shopping_list_remove_all": "Remove all",
+    "shopping_list_remove_all": "Remove bought",
     "edit_grocery_modal_add": "ADD",
     "edit_grocery_modal_edit": "EDIT",
     "edit_grocery_modal_ctrl_name_title": "Title",
