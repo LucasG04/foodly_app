@@ -20,41 +20,51 @@ class MainTextField extends StatefulWidget {
   final Widget? suffix;
   final String? errorText;
   final String Function(String?)? validator;
+  final String? infoText;
 
-  const MainTextField(
-      {required this.controller,
-      this.focusNode,
-      this.title,
-      this.placeholder,
-      this.isMultiline = false,
-      this.textInputAction = TextInputAction.done,
-      this.keyboardType = TextInputType.text,
-      this.onSubmit,
-      this.onChange,
-      this.isDense = true,
-      this.obscureText = false,
-      this.autofocus = false,
-      this.textAlign = TextAlign.start,
-      this.suffix,
-      this.errorText,
-      this.validator,
-      Key? key})
-      : super(key: key);
+  const MainTextField({
+    required this.controller,
+    this.focusNode,
+    this.title,
+    this.placeholder,
+    this.isMultiline = false,
+    this.textInputAction = TextInputAction.done,
+    this.keyboardType = TextInputType.text,
+    this.onSubmit,
+    this.onChange,
+    this.isDense = true,
+    this.obscureText = false,
+    this.autofocus = false,
+    this.textAlign = TextAlign.start,
+    this.suffix,
+    this.errorText,
+    this.validator,
+    this.infoText,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _MainTextFieldState createState() => _MainTextFieldState();
 }
 
 class _MainTextFieldState extends State<MainTextField> {
-  bool _hasFocus = false;
   late bool _obscureText;
+  bool _showInfoText = true;
+  bool _hasFocus = false;
   FocusNode? _focusNode;
 
   @override
   void initState() {
     _obscureText = widget.obscureText;
     _focusNode = widget.focusNode ?? FocusNode();
+    widget.controller!.addListener(_onTextChanged);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    widget.controller!.removeListener(_onTextChanged);
+    super.dispose();
   }
 
   @override
@@ -77,9 +87,19 @@ class _MainTextFieldState extends State<MainTextField> {
                 ),
                 const SizedBox(height: 5),
                 _buildInput(),
+                if (widget.infoText != null && _showInfoText)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 5),
+                    child: Text(widget.infoText!),
+                  ),
               ]
             : [
                 _buildInput(),
+                if (widget.infoText != null && _showInfoText)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 5),
+                    child: Text(widget.infoText!),
+                  ),
               ],
       ),
     );
@@ -148,5 +168,14 @@ class _MainTextFieldState extends State<MainTextField> {
         });
       },
     );
+  }
+
+  void _onTextChanged() {
+    if (widget.controller!.text.isNotEmpty) {
+      setState(() {
+        _showInfoText = false;
+      });
+      widget.controller!.removeListener(_onTextChanged);
+    }
   }
 }

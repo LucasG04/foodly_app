@@ -21,11 +21,12 @@ import '../../widgets/main_appbar.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/markdown_editor.dart';
+import '../../widgets/meal_tag.dart';
 import '../../widgets/progress_button.dart';
 import '../../widgets/wrapped_image_picker/wrapped_image_picker.dart';
 import 'chefkoch_import_modal.dart';
 import 'edit_ingredients.dart';
-import 'edit_list_content.dart';
+import 'edit_list_content_modal.dart';
 
 class MealCreateScreen extends StatefulWidget {
   final String id;
@@ -49,6 +50,8 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   TextEditingController? _titleController;
   String? _updatedImage;
 
+  late List<String> _allMealTags;
+
   @override
   void initState() {
     _initialParseId();
@@ -56,6 +59,9 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     _buttonState = ButtonState.normal;
     _scrollController = ScrollController();
     _mealSaved = false;
+
+    MealService.getAllTags(context.read(planProvider).state!.id!)
+        .then<List<String>>((tags) => _allMealTags = tags);
     super.initState();
   }
 
@@ -188,13 +194,22 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                           child: LinkPreview(_sourceController!.text),
                         ),
                       const Divider(),
-                      if (!_isLoadingMeal)
-                        EditListContent(
-                          content: _meal.tags,
-                          onChanged: (list) => _meal.tags = list,
-                          title: 'meal_create_tags_title'.tr(),
+                      if (!_isLoadingMeal) ...[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('meal_create_tags_title'.tr()),
+                            IconButton(
+                              onPressed: _openMealTagEdit,
+                              icon: const Icon(EvaIcons.edit2Outline),
+                            )
+                          ],
+                        ),
+                        Wrap(
+                          clipBehavior: Clip.hardEdge,
+                          children: _meal.tags!.map((e) => MealTag(e)).toList(),
                         )
-                      else
+                      ] else
                         const SizedBox(),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: kPadding),
@@ -351,6 +366,29 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         _meal.ingredients = result.ingredients ?? [];
 
         _meal.tags = result.tags;
+      });
+    }
+  }
+
+  void _openMealTagEdit() async {
+    final result = await showBarModalBottomSheet<List<String>>(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(10.0),
+        ),
+      ),
+      context: context,
+      builder: (_) => EditListContentModal(
+        title: 'meal_create_tags_title'.tr(),
+        selectedContent: _meal.tags ?? [],
+        allContent: _allMealTags,
+        textFieldInfo: 'meal_create_edit_tags_info'.tr(),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        _meal.tags = result;
       });
     }
   }
