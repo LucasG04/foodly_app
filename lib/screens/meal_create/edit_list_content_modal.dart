@@ -30,7 +30,9 @@ class EditListContentModal extends StatefulWidget {
 class _EditListContentModalState extends State<EditListContentModal> {
   late List<String> _selectedContent;
   late List<String> _allContent;
+
   late AutoDisposeStateProvider<List<String>> _filteredList;
+  late AutoDisposeStateProvider<bool> _showInfoText;
 
   final TextEditingController _textEditingController = TextEditingController();
   final _debouncer = Debouncer(milliseconds: 500);
@@ -43,13 +45,21 @@ class _EditListContentModalState extends State<EditListContentModal> {
     _selectedContent = widget.selectedContent;
     _allContent = widget.allContent;
     _filteredList = StateProvider.autoDispose<List<String>>((_) => _allContent);
-    _textEditingController.addListener(() => _debouncer.run(_filterAllContent));
+    _showInfoText = StateProvider.autoDispose<bool>((_) => true);
+    _textEditingController.addListener(() {
+      _debouncer.run(_filterAllContent);
+      if (context.read(_showInfoText).state &&
+          _textEditingController.text.isNotEmpty) {
+        context.read(_showInfoText).state = false;
+      }
+    });
     super.initState();
   }
 
   @override
   void dispose() {
     _debouncer.dispose();
+    _textEditingController.dispose();
     super.dispose();
   }
 
@@ -86,10 +96,11 @@ class _EditListContentModalState extends State<EditListContentModal> {
               ),
             ),
           ),
-          MainTextField(
-            controller: _textEditingController,
-            infoText: widget.textFieldInfo,
-          ),
+          MainTextField(controller: _textEditingController),
+          Consumer(builder: (_, ref, __) {
+            final show = ref(_showInfoText).state;
+            return show ? Text(widget.textFieldInfo) : const SizedBox();
+          }),
           Consumer(builder: (ctx, ref, child) {
             final list = ref(_filteredList).state;
             return _allContent.isEmpty && _textEditingController.text.isEmpty

@@ -20,7 +20,6 @@ class MainTextField extends StatefulWidget {
   final Widget? suffix;
   final String? errorText;
   final String Function(String?)? validator;
-  final String? infoText;
 
   const MainTextField({
     required this.controller,
@@ -39,7 +38,6 @@ class MainTextField extends StatefulWidget {
     this.suffix,
     this.errorText,
     this.validator,
-    this.infoText,
     Key? key,
   }) : super(key: key);
 
@@ -49,7 +47,6 @@ class MainTextField extends StatefulWidget {
 
 class _MainTextFieldState extends State<MainTextField> {
   late bool _obscureText;
-  bool _showInfoText = true;
   bool _hasFocus = false;
   FocusNode? _focusNode;
 
@@ -57,14 +54,7 @@ class _MainTextFieldState extends State<MainTextField> {
   void initState() {
     _obscureText = widget.obscureText;
     _focusNode = widget.focusNode ?? FocusNode();
-    widget.controller!.addListener(_onTextChanged);
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    widget.controller!.removeListener(_onTextChanged);
-    super.dispose();
   }
 
   @override
@@ -87,19 +77,9 @@ class _MainTextFieldState extends State<MainTextField> {
                 ),
                 const SizedBox(height: 5),
                 _buildInput(),
-                if (widget.infoText != null && _showInfoText)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 5),
-                    child: Text(widget.infoText!),
-                  ),
               ]
             : [
                 _buildInput(),
-                if (widget.infoText != null && _showInfoText)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 5),
-                    child: Text(widget.infoText!),
-                  ),
               ],
       ),
     );
@@ -168,14 +148,5 @@ class _MainTextFieldState extends State<MainTextField> {
         });
       },
     );
-  }
-
-  void _onTextChanged() {
-    if (widget.controller!.text.isNotEmpty) {
-      setState(() {
-        _showInfoText = false;
-      });
-      widget.controller!.removeListener(_onTextChanged);
-    }
   }
 }

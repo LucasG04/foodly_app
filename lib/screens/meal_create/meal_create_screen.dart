@@ -50,7 +50,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   TextEditingController? _titleController;
   String? _updatedImage;
 
-  late List<String> _allMealTags;
+  List<String>? _allMealTags;
 
   @override
   void initState() {
@@ -175,8 +175,6 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                           ),
                           const SizedBox(width: kPadding / 2),
                           Flexible(
-                            // ignore: avoid_redundant_argument_values
-                            flex: 1,
                             child: MainTextField(
                               controller: _durationController,
                               title: 'meal_create_duration_title'.tr(),
@@ -205,12 +203,14 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                             )
                           ],
                         ),
-                        Wrap(
-                          clipBehavior: Clip.hardEdge,
-                          children: _meal.tags!.map((e) => MealTag(e)).toList(),
+                        SizedBox(
+                          child: Wrap(
+                            clipBehavior: Clip.hardEdge,
+                            children:
+                                _meal.tags!.map((e) => MealTag(e)).toList(),
+                          ),
                         )
-                      ] else
-                        const SizedBox(),
+                      ],
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: kPadding),
                         child: MainButton(
@@ -381,7 +381,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
       builder: (_) => EditListContentModal(
         title: 'meal_create_tags_title'.tr(),
         selectedContent: _meal.tags ?? [],
-        allContent: _allMealTags,
+        allContent: _allMealTags ?? [],
         textFieldInfo: 'meal_create_edit_tags_info'.tr(),
       ),
     );
