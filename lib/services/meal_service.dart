@@ -194,6 +194,7 @@ class MealService {
     final meals = await MealService.getAllMeals(planId);
     final tagsSeparated = meals.map((e) => e.tags);
     final tags = tagsSeparated.expand<String>((i) => i!).toList();
+    tags.sort((a, b) => a.compareTo(b));
     return tags.toSet().toList();
   }
 }
