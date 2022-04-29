@@ -3,7 +3,6 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '../../constants.dart';
 import '../../utils/debouncer.dart';
@@ -92,7 +91,6 @@ class _EditListContentModalState extends State<EditListContentModal> {
             infoText: widget.textFieldInfo,
           ),
           Consumer(builder: (ctx, ref, child) {
-            print('consume lsit');
             final list = ref(_filteredList).state;
             return _allContent.isEmpty && _textEditingController.text.isEmpty
                 ? UserInformation(
@@ -100,27 +98,15 @@ class _EditListContentModalState extends State<EditListContentModal> {
                     'meal_create_edit_tags_no_results'.tr(),
                     'meal_create_edit_tags_no_results_msg'.tr(),
                   )
-                : AnimationLimiter(
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      itemBuilder: (ctx, index) {
-                        return AnimationConfiguration.staggeredList(
-                          position: index,
-                          duration: const Duration(milliseconds: 250),
-                          child: SlideAnimation(
-                            verticalOffset: 50.0,
-                            child: FadeInAnimation(
-                              child: _buildListTile(list, index, ctx),
-                            ),
-                          ),
-                        );
-                      },
-                      separatorBuilder: (_, __) => const Divider(),
-                      itemCount:
-                          list.isEmpty && _textEditingController.text.isNotEmpty
-                              ? 1
-                              : list.length,
-                    ),
+                : ListView.separated(
+                    shrinkWrap: true,
+                    itemBuilder: (ctx, index) =>
+                        _buildListTile(list, index, ctx),
+                    separatorBuilder: (_, __) => const Divider(),
+                    itemCount:
+                        list.isEmpty && _textEditingController.text.isNotEmpty
+                            ? 1
+                            : list.length,
                   );
           }),
           const SizedBox(height: kPadding),
@@ -177,7 +163,10 @@ class _EditListContentModalState extends State<EditListContentModal> {
       _selectedContent.add(value);
     }
     _textEditingController.clear();
-    _updateFilteredList(_allContent);
+
+    // set to `[]`, to force state change, to correctly display selected items
+    context.read(_filteredList).state = [];
+    context.read(_filteredList).state = _allContent;
   }
 
   bool _isSelected(String value) {
@@ -189,17 +178,11 @@ class _EditListContentModalState extends State<EditListContentModal> {
     final filtered = _allContent
         .where((e) => e.toLowerCase().contains(filter.toLowerCase()))
         .toList();
-    _updateFilteredList(filtered);
+
+    context.read(_filteredList).state = filtered;
   }
 
   void _closeModal() {
     Navigator.of(context).pop(_selectedContent);
-  }
-
-  void _updateFilteredList(List<String> list) {
-    if (listEquals<String>(list, context.read(_filteredList).state)) {
-      return;
-    }
-    context.read(_filteredList).state = list;
   }
 }
