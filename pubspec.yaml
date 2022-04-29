@@ -31,7 +31,7 @@ dependencies:
   logging: ^1.0.0
   receive_sharing_intent: ^1.4.5
   image_picker: ^0.7.3
-  in_app_update: ^2.0.0
+  in_app_update: ^3.0.0
   path_provider: ^2.0.1
   sign_in_with_apple: ^3.2.0
   crypto: ^3.0.1

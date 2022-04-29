@@ -151,5 +151,8 @@
     "plan_download_modal_title": "Plan herunterladen",
     "plan_download_modal_exclude_today": "Heute ausschließen",
     "plan_download_modal_portrait": "Hochformat",
-    "plan_download_modal_cta": "Herunterladen"
+    "plan_download_modal_cta": "Herunterladen",
+    "meal_create_edit_tags_info": "Suche nach Kategorien oder erstelle eine Neue.",
+    "meal_create_edit_tags_no_results": "Keine Kategorien",
+    "meal_create_edit_tags_no_results_msg": "Es gibt noch keine Kategorien. Gib eine ein und klicke auf den Eintrag, der erscheint, um eine Neue zu erstellen."
 }
