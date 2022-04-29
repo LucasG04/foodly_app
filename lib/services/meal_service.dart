@@ -193,7 +193,9 @@ class MealService {
   static Future<List<String>> getAllTags(String planId) async {
     final meals = await MealService.getAllMeals(planId);
     final tagsSeparated = meals.map((e) => e.tags);
-    final tags = tagsSeparated.expand<String>((i) => i!).toList();
-    return tags.toSet().toList();
+    var tags = tagsSeparated.expand<String>((i) => i!).toList();
+    tags = tags.toSet().toList();
+    tags.sort((a, b) => a.compareTo(b));
+    return tags;
   }
 }
