@@ -85,7 +85,9 @@ class _EditListContentModalState extends State<EditListContentModal> {
                   Text(
                     widget.title.toUpperCase(),
                     style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   TextButton(
@@ -99,28 +101,34 @@ class _EditListContentModalState extends State<EditListContentModal> {
           MainTextField(controller: _textEditingController),
           Consumer(builder: (_, ref, __) {
             final show = ref(_showInfoText).state;
-            return show ? Text(widget.textFieldInfo) : const SizedBox();
-          }),
-          Consumer(builder: (ctx, ref, child) {
-            final list = ref(_filteredList).state;
-            return _allContent.isEmpty && _textEditingController.text.isEmpty
-                ? UserInformation(
-                    'assets/images/undraw_empty.png',
-                    'meal_create_edit_tags_no_results'.tr(),
-                    'meal_create_edit_tags_no_results_msg'.tr(),
+            return show
+                ? Padding(
+                    padding: const EdgeInsets.only(bottom: kPadding / 2),
+                    child: Text(widget.textFieldInfo),
                   )
-                : ListView.separated(
-                    shrinkWrap: true,
-                    itemBuilder: (ctx, index) =>
-                        _buildListTile(list, index, ctx),
-                    separatorBuilder: (_, __) => const Divider(),
-                    itemCount:
-                        list.isEmpty && _textEditingController.text.isNotEmpty
-                            ? 1
-                            : list.length,
-                  );
+                : const SizedBox();
           }),
-          const SizedBox(height: kPadding),
+          Flexible(
+            child: Consumer(builder: (ctx, ref, child) {
+              final list = ref(_filteredList).state;
+              return _allContent.isEmpty && _textEditingController.text.isEmpty
+                  ? UserInformation(
+                      'assets/images/undraw_empty.png',
+                      'meal_create_edit_tags_no_results'.tr(),
+                      'meal_create_edit_tags_no_results_msg'.tr(),
+                    )
+                  : ListView.separated(
+                      shrinkWrap: true,
+                      itemBuilder: (ctx, index) =>
+                          _buildListTile(list, index, ctx),
+                      separatorBuilder: (_, __) => const Divider(),
+                      itemCount:
+                          list.isEmpty && _textEditingController.text.isNotEmpty
+                              ? list.length + 1
+                              : list.length,
+                    );
+            }),
+          ),
         ],
       ),
     );
@@ -142,7 +150,6 @@ class _EditListContentModalState extends State<EditListContentModal> {
             )
           : const SizedBox(),
       selected: isSelected,
-      selectedTileColor: Theme.of(ctx).primaryColor.withOpacity(0.25),
       onTap: () => _selectValue(text),
       shape: _listTileShape,
       dense: true,
