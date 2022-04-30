@@ -203,16 +203,17 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                             )
                           ],
                         ),
-                        SizedBox(
-                          child: SizedBox(
+                        if (_meal.tags != null && _meal.tags!.isNotEmpty)
+                          SizedBox(
                             width: double.infinity,
                             child: Wrap(
                               clipBehavior: Clip.hardEdge,
                               children:
                                   _meal.tags!.map((e) => MealTag(e)).toList(),
                             ),
-                          ),
-                        )
+                          )
+                        else
+                          const Text('-')
                       ],
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: kPadding),
