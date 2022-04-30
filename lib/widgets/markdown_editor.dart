@@ -3,22 +3,17 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MarkdownEditor extends StatefulWidget {
-  final String? initialValue;
-  final TextEditingController? textEditingController;
-  final void Function(String)? onChange;
+  final TextEditingController textEditingController;
 
   const MarkdownEditor({
+    required this.textEditingController,
     Key? key,
-    this.initialValue,
-    this.textEditingController,
-    this.onChange,
-  })  : assert((initialValue != null && textEditingController == null) ||
-            (initialValue == null && textEditingController != null)),
-        super(key: key);
+  }) : super(key: key);
 
   @override
   _MarkdownEditorState createState() => _MarkdownEditorState();
@@ -28,24 +23,25 @@ class _MarkdownEditorState extends State<MarkdownEditor>
     with TickerProviderStateMixin {
   static final log = Logger('MarkdownEditor');
 
-  TabController? _tabController;
-  String? _content;
+  late AutoDisposeStateProvider<String> _$currentText;
+  late TabController _tabController;
 
   @override
   void initState() {
-    super.initState();
+    _$currentText = StateProvider.autoDispose<String>(
+        (_) => widget.textEditingController.text);
     _tabController = TabController(vsync: this, length: 2);
+    super.initState();
   }
 
   @override
   void dispose() {
-    _tabController!.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    _content = widget.initialValue ?? '';
     final textColor = Theme.of(context).textTheme.bodyText1!.color;
     return SizedBox(
       width: MediaQuery.of(context).size.width > 599
@@ -100,11 +96,10 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                   child: Scrollbar(
                     thickness: 2.5,
                     child: TextFormField(
-                      initialValue:
-                          widget.initialValue != null ? _content : null,
                       controller: widget.textEditingController,
                       maxLines: null,
-                      onChanged: onContentChanged,
+                      onChanged: (data) =>
+                          context.read(_$currentText).state = data,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText:
@@ -122,13 +117,14 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                   child: Scrollbar(
                     thickness: 2.5,
                     child: SingleChildScrollView(
-                      child: MarkdownBody(
-                        data: widget.initialValue != null
-                            ? _content!
-                            : widget.textEditingController!.text,
-                        selectable: true,
-                        onTapLink: (_, href, __) => linkOnTapHandler(href!),
-                      ),
+                      child: Consumer(builder: (context, ref, child) {
+                        final text = ref(_$currentText).state;
+                        return MarkdownBody(
+                          data: text,
+                          selectable: true,
+                          onTapLink: (_, href, __) => openLink(href!),
+                        );
+                      }),
                     ),
                   ),
                 ),
@@ -142,7 +138,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
               ),
             ),
             child: GestureDetector(
-              onTap: () => linkOnTapHandler('https://commonmark.org/help/'),
+              onTap: () => openLink('https://commonmark.org/help/'),
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Row(
@@ -165,16 +161,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
     );
   }
 
-  void onContentChanged(String data) {
-    if (widget.initialValue != null) {
-      setState(() {
-        _content = data;
-      });
-      widget.onChange!(data);
-    }
-  }
-
-  void linkOnTapHandler(String href) async {
+  void openLink(String href) async {
     if (await canLaunch(href)) {
       await launch(href);
     } else {

@@ -144,11 +144,11 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                       if (_isLoadingMeal)
                         MarkdownEditor(
                           key: UniqueKey(),
-                          initialValue: '',
+                          textEditingController: TextEditingController(),
                         )
                       else
                         MarkdownEditor(
-                          textEditingController: _instructionsController,
+                          textEditingController: _instructionsController!,
                         ),
                       const Divider(),
                       if (_isLoadingMeal)
