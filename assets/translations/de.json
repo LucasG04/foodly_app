@@ -2,6 +2,8 @@
     "save": "Speichern",
     "delete": "Löschen",
     "add": "Hinzufügen",
+    "create": "Erstellen",
+    "done": "Fertig",
     "shopping_list_title": "Einkaufsliste",
     "shopping_list_already_bought":"BEREITS GEKAUFT",
     "shopping_list_remove_all": "Gekaufte entfernen",
@@ -152,7 +154,8 @@
     "plan_download_modal_exclude_today": "Heute ausschließen",
     "plan_download_modal_portrait": "Hochformat",
     "plan_download_modal_cta": "Herunterladen",
-    "meal_create_edit_tags_info": "Suche nach Kategorien oder erstelle eine Neue.",
+    "meal_create_edit_tags_info": "Suche nach Kategorien oder erstelle eine Neue durch Eingabe.",
+    "meal_create_edit_tags_create_tile": "Tippe um zu erstellen",
     "meal_create_edit_tags_no_results": "Keine Kategorien",
     "meal_create_edit_tags_no_results_msg": "Es gibt noch keine Kategorien. Gib eine ein und klicke auf den Eintrag, der erscheint, um eine Neue zu erstellen."
 }

@@ -2,6 +2,8 @@
     "save": "Save",
     "delete": "Delete",
     "add": "Add",
+    "create": "Create",
+    "done": "Done",
     "shopping_list_title": "Shopping list",
     "shopping_list_already_bought": "ALREADY PURCHASED",
     "shopping_list_remove_all": "Remove bought",
@@ -152,7 +154,8 @@
     "plan_download_modal_exclude_today": "Exclude today",
     "plan_download_modal_portrait": "Portrait format",
     "plan_download_modal_cta": "Download",
-    "meal_create_edit_tags_info": "Search for tags or create a new one.",
+    "meal_create_edit_tags_info": "Search for tags or create a new one by searching.",
+    "meal_create_edit_tags_create_tile": "Tap to create",
     "meal_create_edit_tags_no_results": "No Tags",
     "meal_create_edit_tags_no_results_msg": "There are no tags yet. Enter one and click on the entry that appears to create a new one."
 }

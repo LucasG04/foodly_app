@@ -3,6 +3,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '../../constants.dart';
 import '../../utils/debouncer.dart';
@@ -33,6 +34,7 @@ class _EditListContentModalState extends State<EditListContentModal> {
 
   late AutoDisposeStateProvider<List<String>> _$filteredList;
   late AutoDisposeStateProvider<bool> _$showInfoText;
+  late Key _animationLimiterKey;
 
   final TextEditingController _textEditingController = TextEditingController();
   final _debouncer = Debouncer(milliseconds: 500);
@@ -42,6 +44,7 @@ class _EditListContentModalState extends State<EditListContentModal> {
 
   @override
   void initState() {
+    _animationLimiterKey = UniqueKey();
     _selectedContent = widget.selectedContent;
     _allContent = widget.allContent;
     _$filteredList =
@@ -93,7 +96,14 @@ class _EditListContentModalState extends State<EditListContentModal> {
                   ),
                   TextButton(
                     onPressed: _closeModal,
-                    child: const Text('save').tr(),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('done').tr(),
+                        const SizedBox(width: 5.0),
+                        const Icon(EvaIcons.doneAllOutline)
+                      ],
+                    ),
                   )
                 ],
               ),
@@ -118,15 +128,27 @@ class _EditListContentModalState extends State<EditListContentModal> {
                       'meal_create_edit_tags_no_results'.tr(),
                       'meal_create_edit_tags_no_results_msg'.tr(),
                     )
-                  : ListView.separated(
-                      shrinkWrap: true,
-                      itemBuilder: (ctx, index) =>
-                          _buildListTile(list, index, ctx),
-                      separatorBuilder: (_, __) => const Divider(),
-                      itemCount:
-                          list.isEmpty && _textEditingController.text.isNotEmpty
-                              ? list.length + 1
-                              : list.length,
+                  : AnimationLimiter(
+                      key: _animationLimiterKey,
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        itemBuilder: (ctx, index) =>
+                            AnimationConfiguration.staggeredList(
+                          position: index,
+                          duration: const Duration(milliseconds: 375),
+                          child: SlideAnimation(
+                            verticalOffset: 50.0,
+                            child: FadeInAnimation(
+                              child: _buildListTile(list, index, ctx),
+                            ),
+                          ),
+                        ),
+                        separatorBuilder: (_, __) => const Divider(),
+                        itemCount: list.isEmpty &&
+                                _textEditingController.text.isNotEmpty
+                            ? list.length + 1
+                            : list.length,
+                      ),
                     );
             }),
           ),
@@ -161,7 +183,7 @@ class _EditListContentModalState extends State<EditListContentModal> {
     final value = _textEditingController.text.trim();
     return ListTile(
       title: Text(value),
-      subtitle: Text('add'.tr()),
+      subtitle: Text('meal_create_edit_tags_create_tile'.tr()),
       onTap: () => _selectValue(value),
       trailing: Icon(
         EvaIcons.plusCircleOutline,
