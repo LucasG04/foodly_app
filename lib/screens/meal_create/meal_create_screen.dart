@@ -40,7 +40,7 @@ class MealCreateScreen extends StatefulWidget {
 class _MealCreateScreenState extends State<MealCreateScreen> {
   ButtonState? _buttonState;
   TextEditingController? _durationController;
-  TextEditingController? _instructionsController;
+  late TextEditingController _instructionsController;
   late bool _isCreatingMeal;
   late bool _isLoadingMeal;
   late bool _mealSaved;
@@ -144,7 +144,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                       if (_isLoadingMeal)
                         MarkdownEditor(
                           key: UniqueKey(),
-                          initialValue: '',
+                          textEditingController: TextEditingController(),
                         )
                       else
                         MarkdownEditor(
@@ -203,13 +203,17 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                             )
                           ],
                         ),
-                        SizedBox(
-                          child: Wrap(
-                            clipBehavior: Clip.hardEdge,
-                            children:
-                                _meal.tags!.map((e) => MealTag(e)).toList(),
-                          ),
-                        )
+                        if (_meal.tags != null && _meal.tags!.isNotEmpty)
+                          SizedBox(
+                            width: double.infinity,
+                            child: Wrap(
+                              clipBehavior: Clip.hardEdge,
+                              children:
+                                  _meal.tags!.map((e) => MealTag(e)).toList(),
+                            ),
+                          )
+                        else
+                          const Text('-')
                       ],
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: kPadding),
@@ -296,7 +300,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     _meal.name = _titleController!.text;
     _meal.source = _sourceController!.text;
     _meal.duration = int.tryParse(_durationController!.text) ?? 0;
-    _meal.instructions = _instructionsController!.text;
+    _meal.instructions = _instructionsController.text;
     _meal.createdBy = _isCreatingMeal
         ? AuthenticationService.currentUser!.uid
         : _meal.createdBy;
@@ -362,7 +366,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         _meal.imageUrl = result.imageUrl;
         _sourceController!.text = result.source!;
         _durationController!.text = result.duration.toString();
-        _instructionsController!.text = result.instructions!;
+        _instructionsController.text = result.instructions!;
         _meal.ingredients = result.ingredients ?? [];
 
         _meal.tags = result.tags;

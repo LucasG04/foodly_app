@@ -4,7 +4,7 @@
     "add": "Hinzufügen",
     "shopping_list_title": "Einkaufsliste",
     "shopping_list_already_bought":"BEREITS GEKAUFT",
-    "shopping_list_remove_all": "Alle entfernen",
+    "shopping_list_remove_all": "Gekaufte entfernen",
     "edit_grocery_modal_add": "HINZUFÜGEN",
     "edit_grocery_modal_edit": "BEARBEITEN",
     "edit_grocery_modal_ctrl_name_title": "Bezeichnung",
