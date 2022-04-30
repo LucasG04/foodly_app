@@ -1,3 +1,4 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -43,36 +44,36 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: widget.edgeLength,
       height: widget.edgeLength,
-      decoration: BoxDecoration(
-        border: Border.all(),
-        borderRadius: BorderRadius.circular(kRadius),
-      ),
-      child: InkWell(
-        onTap: _selectImage,
-        child: _imageUrl != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(kRadius),
-                child: FoodlyNetworkImage(_imageUrl!),
-              )
-            : Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      EvaIcons.plus,
-                      color: Theme.of(context).primaryColor,
-                      size: 12.0,
-                    ),
-                    Icon(
-                      EvaIcons.image2,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ],
+      child: DottedBorder(
+        dashPattern: const [10, 8],
+        radius: const Radius.circular(kRadius),
+        child: InkWell(
+          onTap: _selectImage,
+          child: _imageUrl != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(kRadius),
+                  child: FoodlyNetworkImage(_imageUrl!),
+                )
+              : Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        EvaIcons.plus,
+                        color: Theme.of(context).primaryColor,
+                        size: 12.0,
+                      ),
+                      Icon(
+                        EvaIcons.image2,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }

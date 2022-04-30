@@ -62,6 +62,7 @@ dependencies:
   concentric_transition:
     git:
       url: https://github.com/LucasG04/flutter-concentric-transition.git
+  dotted_border: ^2.0.0+2
 
   # Icons/Styles/Animations
   cupertino_icons: ^1.0.4
