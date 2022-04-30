@@ -40,7 +40,7 @@ class MealCreateScreen extends StatefulWidget {
 class _MealCreateScreenState extends State<MealCreateScreen> {
   ButtonState? _buttonState;
   TextEditingController? _durationController;
-  TextEditingController? _instructionsController;
+  late TextEditingController _instructionsController;
   late bool _isCreatingMeal;
   late bool _isLoadingMeal;
   late bool _mealSaved;
@@ -148,7 +148,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                         )
                       else
                         MarkdownEditor(
-                          textEditingController: _instructionsController!,
+                          textEditingController: _instructionsController,
                         ),
                       const Divider(),
                       if (_isLoadingMeal)
@@ -300,7 +300,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     _meal.name = _titleController!.text;
     _meal.source = _sourceController!.text;
     _meal.duration = int.tryParse(_durationController!.text) ?? 0;
-    _meal.instructions = _instructionsController!.text;
+    _meal.instructions = _instructionsController.text;
     _meal.createdBy = _isCreatingMeal
         ? AuthenticationService.currentUser!.uid
         : _meal.createdBy;
@@ -366,7 +366,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         _meal.imageUrl = result.imageUrl;
         _sourceController!.text = result.source!;
         _durationController!.text = result.duration.toString();
-        _instructionsController!.text = result.instructions!;
+        _instructionsController.text = result.instructions!;
         _meal.ingredients = result.ingredients ?? [];
 
         _meal.tags = result.tags;

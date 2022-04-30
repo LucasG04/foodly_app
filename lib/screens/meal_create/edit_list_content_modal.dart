@@ -31,8 +31,8 @@ class _EditListContentModalState extends State<EditListContentModal> {
   late List<String> _selectedContent;
   late List<String> _allContent;
 
-  late AutoDisposeStateProvider<List<String>> _filteredList;
-  late AutoDisposeStateProvider<bool> _showInfoText;
+  late AutoDisposeStateProvider<List<String>> _$filteredList;
+  late AutoDisposeStateProvider<bool> _$showInfoText;
 
   final TextEditingController _textEditingController = TextEditingController();
   final _debouncer = Debouncer(milliseconds: 500);
@@ -44,13 +44,14 @@ class _EditListContentModalState extends State<EditListContentModal> {
   void initState() {
     _selectedContent = widget.selectedContent;
     _allContent = widget.allContent;
-    _filteredList = StateProvider.autoDispose<List<String>>((_) => _allContent);
-    _showInfoText = StateProvider.autoDispose<bool>((_) => true);
+    _$filteredList =
+        StateProvider.autoDispose<List<String>>((_) => _allContent);
+    _$showInfoText = StateProvider.autoDispose<bool>((_) => true);
     _textEditingController.addListener(() {
       _debouncer.run(_filterAllContent);
-      if (context.read(_showInfoText).state &&
+      if (context.read(_$showInfoText).state &&
           _textEditingController.text.isNotEmpty) {
-        context.read(_showInfoText).state = false;
+        context.read(_$showInfoText).state = false;
       }
     });
     super.initState();
@@ -100,7 +101,7 @@ class _EditListContentModalState extends State<EditListContentModal> {
           ),
           MainTextField(controller: _textEditingController),
           Consumer(builder: (_, ref, __) {
-            final show = ref(_showInfoText).state;
+            final show = ref(_$showInfoText).state;
             return show
                 ? Padding(
                     padding: const EdgeInsets.only(bottom: kPadding / 2),
@@ -110,7 +111,7 @@ class _EditListContentModalState extends State<EditListContentModal> {
           }),
           Flexible(
             child: Consumer(builder: (ctx, ref, child) {
-              final list = ref(_filteredList).state;
+              final list = ref(_$filteredList).state;
               return _allContent.isEmpty && _textEditingController.text.isEmpty
                   ? UserInformation(
                       'assets/images/undraw_empty.png',
@@ -183,8 +184,8 @@ class _EditListContentModalState extends State<EditListContentModal> {
     _textEditingController.clear();
 
     // set to `[]`, to force state change, to correctly display selected items
-    context.read(_filteredList).state = [];
-    context.read(_filteredList).state = _allContent;
+    context.read(_$filteredList).state = [];
+    context.read(_$filteredList).state = _allContent;
   }
 
   bool _isSelected(String value) {
@@ -197,7 +198,7 @@ class _EditListContentModalState extends State<EditListContentModal> {
         .where((e) => e.toLowerCase().contains(filter.toLowerCase()))
         .toList();
 
-    context.read(_filteredList).state = filtered;
+    context.read(_$filteredList).state = filtered;
   }
 
   void _closeModal() {
