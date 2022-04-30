@@ -204,10 +204,13 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                           ],
                         ),
                         SizedBox(
-                          child: Wrap(
-                            clipBehavior: Clip.hardEdge,
-                            children:
-                                _meal.tags!.map((e) => MealTag(e)).toList(),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: Wrap(
+                              clipBehavior: Clip.hardEdge,
+                              children:
+                                  _meal.tags!.map((e) => MealTag(e)).toList(),
+                            ),
                           ),
                         )
                       ],
