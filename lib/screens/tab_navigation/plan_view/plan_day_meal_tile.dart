@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
@@ -19,6 +20,7 @@ import '../../../widgets/foodly_network_image.dart';
 import '../../../widgets/meal_tag.dart';
 import '../../../widgets/skeleton_container.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
+import 'plan_move_meal_modal.dart';
 
 class PlanDayMealTile extends StatefulWidget {
   final bool enableVoting;
@@ -52,6 +54,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                     return GestureDetector(
                       onTap: () => AutoRouter.of(context)
                           .push(MealScreenRoute(id: meal.id!)),
+                      onLongPress: openMoveModal,
                       child: _buildDataRow(context, meal: meal),
                     );
                   } else {
@@ -193,32 +196,30 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
               _onMenuSelected(val, context.read(planProvider).state!.id!),
           icon: const Icon(EvaIcons.moreVerticalOutline),
           itemBuilder: (BuildContext context) {
-            return widget.planMeal.meal.startsWith(kPlaceholderSymbol)
-                ? [
-                    PopupMenuItem(
-                      value: 'delete',
-                      child: ListTile(
-                        title: const Text('plan_day_tile_remove').tr(),
-                        leading: const Icon(EvaIcons.minusCircleOutline),
-                      ),
-                    ),
-                  ]
-                : [
-                    PopupMenuItem(
-                      value: 'tolist',
-                      child: ListTile(
-                        title: const Text('plan_ingredients_to_list').tr(),
-                        leading: const Icon(EvaIcons.fileAddOutline),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'delete',
-                      child: ListTile(
-                        title: const Text('plan_day_tile_remove').tr(),
-                        leading: const Icon(EvaIcons.minusCircleOutline),
-                      ),
-                    ),
-                  ];
+            return [
+              if (!widget.planMeal.meal.startsWith(kPlaceholderSymbol))
+                PopupMenuItem(
+                  value: 'tolist',
+                  child: ListTile(
+                    title: const Text('plan_ingredients_to_list').tr(),
+                    leading: const Icon(EvaIcons.fileAddOutline),
+                  ),
+                ),
+              PopupMenuItem(
+                value: 'move',
+                child: ListTile(
+                  title: const Text('plan_move').tr(),
+                  leading: const Icon(EvaIcons.cornerLeftUpOutline),
+                ),
+              ),
+              PopupMenuItem(
+                value: 'delete',
+                child: ListTile(
+                  title: const Text('plan_day_tile_remove').tr(),
+                  leading: const Icon(EvaIcons.minusCircleOutline),
+                ),
+              ),
+            ];
           },
         ),
       ],
@@ -256,6 +257,20 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
           ),
         );
       }
+    } else if (value == 'move') {
+      openMoveModal();
     }
+  }
+
+  Future<void> openMoveModal() async {
+    showBarModalBottomSheet<void>(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(10.0),
+        ),
+      ),
+      context: context,
+      builder: (_) => PlanMoveMealModal(planMeal: widget.planMeal),
+    );
   }
 }
