@@ -83,7 +83,7 @@ class _PlanMoveMealModalState extends State<PlanMoveMealModal> {
             onChanged: _changeDate,
             isExpanded: true,
           ),
-          const SizedBox(height: kPadding),
+          const SizedBox(height: kPadding / 2),
           RadioListTile(
             title: const Text('plan_move_lunch').tr(),
             value: MealType.LUNCH,
