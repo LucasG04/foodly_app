@@ -44,12 +44,12 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: widget.edgeLength,
-      height: widget.edgeLength,
-      child: DottedBorder(
-        dashPattern: const [10, 8],
-        radius: const Radius.circular(kRadius),
+    return DottedBorder(
+      dashPattern: const [10, 8],
+      radius: const Radius.circular(kRadius),
+      child: SizedBox(
+        width: widget.edgeLength,
+        height: widget.edgeLength,
         child: InkWell(
           onTap: _selectImage,
           child: _imageUrl != null

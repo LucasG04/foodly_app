@@ -9,9 +9,11 @@ class FoodlyNetworkImage extends StatelessWidget {
   final String imageUrl;
   final BoxFit boxFit;
 
-  const FoodlyNetworkImage(this.imageUrl,
-      {this.boxFit = BoxFit.cover, Key? key})
-      : super(key: key);
+  const FoodlyNetworkImage(
+    this.imageUrl, {
+    this.boxFit = BoxFit.cover,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -43,4 +43,11 @@ class BasicUtils {
   static bool isValidUri(String uri) {
     return Uri.tryParse(uri)?.isAbsolute ?? false;
   }
+
+  static List<DateTime> getPlanDateTimes(int hourDiffToUtc) {
+    final now = DateTime.now().toUtc().add(Duration(hours: hourDiffToUtc));
+    final today = DateTime(now.year, now.month, now.day);
+
+    return List.generate(8, (i) => today.add(Duration(days: i)));
+  }
 }
