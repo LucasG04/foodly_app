@@ -41,9 +41,12 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: kPadding / 2),
       child: widget.planMeal.meal.startsWith(kPlaceholderSymbol)
-          ? _buildDataRow(
-              context,
-              placeholder: widget.planMeal.meal.split(kPlaceholderSymbol)[1],
+          ? GestureDetector(
+              onLongPress: _openMoveModal,
+              child: _buildDataRow(
+                context,
+                placeholder: widget.planMeal.meal.split(kPlaceholderSymbol)[1],
+              ),
             )
           : FutureBuilder<Meal?>(
               future: MealService.getMealById(widget.planMeal.meal),
@@ -54,7 +57,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                     return GestureDetector(
                       onTap: () => AutoRouter.of(context)
                           .push(MealScreenRoute(id: meal.id!)),
-                      onLongPress: openMoveModal,
+                      onLongPress: _openMoveModal,
                       child: _buildDataRow(context, meal: meal),
                     );
                   } else {
@@ -258,11 +261,11 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
         );
       }
     } else if (value == 'move') {
-      openMoveModal();
+      _openMoveModal();
     }
   }
 
-  Future<void> openMoveModal() async {
+  Future<void> _openMoveModal() async {
     showBarModalBottomSheet<void>(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
