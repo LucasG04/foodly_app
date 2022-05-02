@@ -67,6 +67,8 @@ class _ChangePlanNameModalState extends State<ChangePlanNameModal> {
                 ? null
                 : 'settings_section_plan_change_name_error'.tr(),
             placeholder: 'settings_section_plan_change_name_placeholder'.tr(),
+            onSubmit: _save,
+            textInputAction: TextInputAction.go,
           ),
           const SizedBox(height: kPadding),
           Center(
@@ -77,7 +79,12 @@ class _ChangePlanNameModalState extends State<ChangePlanNameModal> {
               buttonState: _buttonState,
             ),
           ),
-          const SizedBox(height: kPadding * 2),
+          SizedBox(
+            height: kPadding +
+                (MediaQuery.of(context).viewInsets.bottom == 0
+                    ? 0
+                    : MediaQuery.of(context).viewInsets.bottom),
+          ),
         ],
       ),
     );
