@@ -49,8 +49,8 @@ class LunixApiService {
 
     try {
       final dir = await getApplicationDocumentsDirectory();
-      final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-      final planSavePath = '${dir.path}/plan-$timestamp.docx';
+      final todayString = DateTime.now().toIso8601String().split('T')[0];
+      final planSavePath = '${dir.path}/plan-$todayString.docx';
       final Response response = await _dio.post<List<int>>(
         '$_lunixApiEndpoint/generate-plan-pdf',
         data: docxData.toJson(),
