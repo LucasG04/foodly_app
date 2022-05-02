@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 
-import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' as foundation;
@@ -214,8 +213,8 @@ class _FoodlyAppState extends State<FoodlyApp> {
         ReceiveSharingIntent.getTextStream().listen((String value) {
       if (AuthenticationService.currentUser != null &&
           value.startsWith(kChefkochShareEndpoint)) {
-        AutoRouter.of(context)
-            .push(MealCreateScreenRoute(id: Uri.encodeComponent(value)));
+        _appRouter
+            .navigate(MealCreateScreenRoute(id: Uri.encodeComponent(value)));
       }
     }, onError: (dynamic err) {
       _log.severe('ERR in ReceiveSharingIntent.getTextStream()', err);
@@ -226,8 +225,8 @@ class _FoodlyAppState extends State<FoodlyApp> {
       if (AuthenticationService.currentUser != null &&
           value != null &&
           value.startsWith(kChefkochShareEndpoint)) {
-        AutoRouter.of(context)
-            .push(MealCreateScreenRoute(id: Uri.encodeComponent(value)));
+        _appRouter
+            .navigate(MealCreateScreenRoute(id: Uri.encodeComponent(value)));
       }
     });
   }
