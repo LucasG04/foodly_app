@@ -32,7 +32,11 @@ class _PlanMoveMealModalState extends State<PlanMoveMealModal> {
   @override
   void initState() {
     _dropdownValues = getDropdownValues();
-    _selectedDate = _dropdownValues[0];
+    _selectedDate = DateTime(
+      widget.planMeal.date.year,
+      widget.planMeal.date.month,
+      widget.planMeal.date.day,
+    );
     _selectedMealType = widget.planMeal.type;
     super.initState();
   }

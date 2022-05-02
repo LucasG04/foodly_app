@@ -9,7 +9,7 @@ import '../utils/basic_utils.dart';
 import 'foodly_network_image.dart';
 import 'skeleton_container.dart';
 
-class LinkPreview extends StatelessWidget {
+class LinkPreview extends StatefulWidget {
   final String link;
   final bool isSmall;
   const LinkPreview(
@@ -19,30 +19,35 @@ class LinkPreview extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<LinkPreview> createState() => _LinkPreviewState();
+}
+
+class _LinkPreviewState extends State<LinkPreview> {
+  @override
   Widget build(BuildContext context) {
-    if (!BasicUtils.isValidUri(link)) {
+    if (!BasicUtils.isValidUri(widget.link)) {
       return const SizedBox();
     }
     LinkMetadata? metadata;
-    if (LinkMetadataService.isCached(link)) {
-      metadata = LinkMetadataService.getFromCache(link);
+    if (LinkMetadataService.isCached(widget.link)) {
+      metadata = LinkMetadataService.getFromCache(widget.link);
     }
     return metadata != null
-        ? isSmall
+        ? widget.isSmall
             ? _buildSmallCard(metadata, context)
             : _buildLargeCard(metadata, context)
         : FutureBuilder<LinkMetadata?>(
-            future: LinkMetadataService.getFromApi(link),
+            future: LinkMetadataService.getFromApi(widget.link),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return isSmall
+                return widget.isSmall
                     ? _buildSmallSkeletonCard(context)
                     : _buildLargeSkeletonCard(context);
               } else if (!snapshot.hasData) {
                 return const SizedBox();
               }
 
-              return isSmall
+              return widget.isSmall
                   ? _buildSmallCard(snapshot.data!, context)
                   : _buildLargeCard(snapshot.data!, context);
             },
