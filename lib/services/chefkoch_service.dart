@@ -56,10 +56,10 @@ class ChefkochService {
         .map((group) =>
             List<Map<String, dynamic>>.from(group['ingredients'] as List)
                 .map((Map<String, dynamic> e) => Ingredient(
-                      name: e['name'] as String,
-                      amount: e['amount'] as double,
-                      unit: e['unit'] as String,
-                      productGroup: e['productGroup'] as String,
+                      name: e['name'] as String? ?? '',
+                      amount: e['amount'] as double? ?? 0,
+                      unit: e['unit'] as String? ?? '',
+                      productGroup: e['productGroup'] as String? ?? '',
                     ))
                 .toList())
         .toList()
