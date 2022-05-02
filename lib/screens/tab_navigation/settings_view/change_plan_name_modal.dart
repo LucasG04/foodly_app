@@ -1,0 +1,109 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../constants.dart';
+import '../../../providers/state_providers.dart';
+import '../../../services/plan_service.dart';
+import '../../../widgets/main_button.dart';
+import '../../../widgets/main_text_field.dart';
+import '../../../widgets/progress_button.dart';
+
+class ChangePlanNameModal extends StatefulWidget {
+  const ChangePlanNameModal({Key? key}) : super(key: key);
+
+  @override
+  State<ChangePlanNameModal> createState() => _ChangePlanNameModalState();
+}
+
+class _ChangePlanNameModalState extends State<ChangePlanNameModal> {
+  final TextEditingController _textEditingController = TextEditingController();
+  ButtonState _buttonState = ButtonState.normal;
+  bool _nameValid = true;
+
+  @override
+  void initState() {
+    final currentName = context.read(planProvider).state!.name;
+    _textEditingController.text = currentName!;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width > 599
+        ? 580.0
+        : MediaQuery.of(context).size.width * 0.8;
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: (MediaQuery.of(context).size.width - width) / 2,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(top: kPadding),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'settings_section_plan_change_name'.tr().toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  )
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: kPadding),
+          MainTextField(
+            controller: _textEditingController,
+            errorText: _nameValid
+                ? null
+                : 'settings_section_plan_change_name_error'.tr(),
+            placeholder: 'settings_section_plan_change_name_placeholder'.tr(),
+          ),
+          const SizedBox(height: kPadding),
+          Center(
+            child: MainButton(
+              text: 'save'.tr(),
+              onTap: _save,
+              isProgress: true,
+              buttonState: _buttonState,
+            ),
+          ),
+          const SizedBox(height: kPadding * 2),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _save() async {
+    final newName = _textEditingController.text.trim();
+    if (newName.isEmpty) {
+      setState(() {
+        _nameValid = false;
+        _buttonState = ButtonState.error;
+      });
+      return;
+    }
+    setState(() {
+      _buttonState = ButtonState.inProgress;
+    });
+    final newPlan = context.read(planProvider).state!;
+    newPlan.name = newName;
+    await PlanService.updatePlan(newPlan);
+    setState(() {
+      _buttonState = ButtonState.normal;
+    });
+    if (!mounted) {
+      return;
+    }
+    Navigator.pop(context);
+  }
+}

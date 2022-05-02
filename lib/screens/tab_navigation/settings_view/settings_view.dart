@@ -16,6 +16,7 @@ import '../../../utils/basic_utils.dart';
 import '../../../utils/main_snackbar.dart';
 import '../../../widgets/page_title.dart';
 import '../../onboarding/onboarding_screen.dart';
+import 'change_plan_name_modal.dart';
 import 'help_slides/help_slide_share_import.dart';
 import 'import_meals_modal.dart';
 import 'loading_logout.dart';
@@ -108,6 +109,12 @@ class _SettingsViewState extends State<SettingsView> {
                     ], context),
                     _buildSectionTitle('settings_section_plan'.tr()),
                     _buildSection([
+                      SettingsTile(
+                        onTap: _openChangePlanNameModal,
+                        leadingIcon: Icons.abc_rounded,
+                        text: 'settings_section_plan_change_name'.tr(),
+                        trailing: const Icon(EvaIcons.arrowIosForwardOutline),
+                      ),
                       SettingsTile(
                         onTap: () => _shareCode(plan.code!),
                         leadingIcon: EvaIcons.shareOutline,
@@ -279,6 +286,18 @@ class _SettingsViewState extends State<SettingsView> {
       ),
       context: context,
       builder: (context) => ImportMealsModal(planIds),
+    );
+  }
+
+  void _openChangePlanNameModal() {
+    showBarModalBottomSheet<void>(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(10.0),
+        ),
+      ),
+      context: context,
+      builder: (_) => const ChangePlanNameModal(),
     );
   }
 }

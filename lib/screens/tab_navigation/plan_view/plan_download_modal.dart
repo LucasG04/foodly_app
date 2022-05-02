@@ -34,7 +34,6 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
         horizontal: (MediaQuery.of(context).size.width - width) / 2,
       ),
       child: Column(
-        // crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Center(
@@ -50,8 +49,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: kPadding),
+          Flexible(
             child: Image.asset(
               'assets/images/template-plan-${_portraitFormat ? 'vertical' : 'horizontal'}-color.png',
             ),
@@ -85,6 +83,8 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
                 final path = await LunixApiService.saveDocxForPlan(
                   plan: widget.plan,
                   languageTag: context.locale.toLanguageTag(),
+                  excludeToday: _excludeToday,
+                  vertical: _portraitFormat,
                 );
                 setState(() {
                   _buttonState = ButtonState.normal;
