@@ -22,8 +22,15 @@ class ShareViewController: SLComposeServiceViewController {
     let fileURLType = kUTTypeFileURL as String;
 
     override func isContentValid() -> Bool {
-        // Do validation of contentText and/or NSExtensionContext attachments here
-        return true
+        // Should only allow content that contais "chefkoch."
+        // Unfortunately allows all...
+        if !sharedText.isEmpty {
+            let containsChefkoch = sharedText.filter { $0.contains("chefkoch.") }.count != 0
+            if containsChefkoch {
+                return true
+            }
+        }
+        return false
     }
 
     override func viewDidLoad() {
