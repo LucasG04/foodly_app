@@ -209,26 +209,28 @@ class _FoodlyAppState extends State<FoodlyApp> {
 
   void _listenForShareIntent() {
     // For sharing or opening urls/text coming from outside the app while the app is in the memory
-    _intentDataStreamSubscription =
-        ReceiveSharingIntent.getTextStream().listen((String value) {
-      if (AuthenticationService.currentUser != null &&
-          value.startsWith(kChefkochShareEndpoint)) {
-        _appRouter
-            .navigate(MealCreateScreenRoute(id: Uri.encodeComponent(value)));
-      }
-    }, onError: (dynamic err) {
+    _intentDataStreamSubscription = ReceiveSharingIntent.getTextStream()
+        .listen(_handleReceivedMealShare, onError: (dynamic err) {
       _log.severe('ERR in ReceiveSharingIntent.getTextStream()', err);
     });
 
     // For sharing or opening urls/text coming from outside the app while the app is closed
-    ReceiveSharingIntent.getInitialText().then((String? value) {
-      if (AuthenticationService.currentUser != null &&
-          value != null &&
-          value.startsWith(kChefkochShareEndpoint)) {
+    ReceiveSharingIntent.getInitialText().then(_handleReceivedMealShare);
+  }
+
+  void _handleReceivedMealShare(String? value) {
+    if (AuthenticationService.currentUser != null && value != null) {
+      if (value.startsWith(kChefkochShareEndpoint)) {
         _appRouter
             .navigate(MealCreateScreenRoute(id: Uri.encodeComponent(value)));
+      } else if (value.contains(kChefkochShareEndpoint)) {
+        final startIndex = value.indexOf(kChefkochShareEndpoint);
+        final extractedLink =
+            value.substring(startIndex, value.length).split(' ')[0];
+        _appRouter.navigate(
+            MealCreateScreenRoute(id: Uri.encodeComponent(extractedLink)));
       }
-    });
+    }
   }
 
   void _checkForUpdate() async {
