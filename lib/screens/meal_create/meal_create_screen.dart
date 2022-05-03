@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:keyboard_service/keyboard_service.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../constants.dart';
@@ -82,156 +83,159 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         ? 700.0
         : MediaQuery.of(context).size.width * 0.8;
 
-    return Scaffold(
-      appBar: MainAppBar(
-        text: _isCreatingMeal
-            ? 'meal_create_title_add'.tr()
-            : 'meal_create_title_edit'.tr(),
-        scrollController: _scrollController,
-        actions: [
-          IconButton(
-            icon: Icon(
-              EvaIcons.downloadOutline,
-              color: Theme.of(context).textTheme.bodyText1!.color,
+    return KeyboardAutoDismiss(
+      scaffold: Scaffold(
+        appBar: MainAppBar(
+          text: _isCreatingMeal
+              ? 'meal_create_title_add'.tr()
+              : 'meal_create_title_edit'.tr(),
+          scrollController: _scrollController,
+          actions: [
+            IconButton(
+              icon: Icon(
+                EvaIcons.downloadOutline,
+                color: Theme.of(context).textTheme.bodyText1!.color,
+              ),
+              onPressed: () => _openChefkochImport(),
             ),
-            onPressed: () => _openChefkochImport(),
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          SafeArea(
-            bottom: false,
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              child: Center(
-                child: SizedBox(
-                  width: fullWidth,
-                  child: Column(
-                    // ignore: avoid_redundant_argument_values
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      MainTextField(
-                        controller: _titleController,
-                        title: 'meal_create_title_title'.tr(),
-                      ),
-                      const Divider(),
-                      if (_isLoadingMeal)
-                        EditIngredients(
-                          key: UniqueKey(),
-                          content: const [],
-                          onChanged: null,
-                          title: 'meal_create_ingredients_title'.tr(),
-                        )
-                      else
-                        EditIngredients(
-                          content: _meal.ingredients ?? [],
-                          onChanged: (results) {
-                            setState(() {
-                              _meal.ingredients = results;
-                            });
-                          },
-                          title: 'meal_create_ingredients_title'.tr(),
+          ],
+        ),
+        body: Stack(
+          children: [
+            SafeArea(
+              bottom: false,
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: Center(
+                  child: SizedBox(
+                    width: fullWidth,
+                    child: Column(
+                      // ignore: avoid_redundant_argument_values
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        MainTextField(
+                          controller: _titleController,
+                          title: 'meal_create_title_title'.tr(),
                         ),
-                      const Divider(),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Text(
-                          'meal_create_instruction_title',
-                          style: Theme.of(context).textTheme.bodyText1,
-                        ).tr(),
-                      ),
-                      if (_isLoadingMeal)
-                        MarkdownEditor(
-                          key: UniqueKey(),
-                          textEditingController: TextEditingController(),
-                        )
-                      else
-                        MarkdownEditor(
-                          textEditingController: _instructionsController,
-                        ),
-                      const Divider(),
-                      if (_isLoadingMeal)
-                        WrappedImagePicker(
-                          key: UniqueKey(),
-                          onPick: null,
-                        )
-                      else
-                        WrappedImagePicker(
-                          imageUrl: _meal.imageUrl,
-                          onPick: (value) => _updatedImage = value,
-                        ),
-                      const Divider(),
-                      Row(
-                        children: [
-                          Flexible(
-                            flex: 2,
-                            child: MainTextField(
-                              controller: _sourceController,
-                              title: 'meal_create_source_title'.tr(),
-                              placeholder:
-                                  'meal_create_source_placeholder'.tr(),
-                            ),
-                          ),
-                          const SizedBox(width: kPadding / 2),
-                          Flexible(
-                            child: MainTextField(
-                              controller: _durationController,
-                              title: 'meal_create_duration_title'.tr(),
-                              placeholder: '10',
-                              textAlign: TextAlign.end,
-                              keyboardType: TextInputType.number,
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (!_isLoadingMeal)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: kPadding / 2),
-                          child: LinkPreview(_sourceController!.text),
-                        ),
-                      const Divider(),
-                      if (!_isLoadingMeal) ...[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('meal_create_tags_title'.tr()),
-                            IconButton(
-                              onPressed: _openMealTagEdit,
-                              icon: const Icon(EvaIcons.edit2Outline),
-                            )
-                          ],
-                        ),
-                        if (_meal.tags != null && _meal.tags!.isNotEmpty)
-                          SizedBox(
-                            width: double.infinity,
-                            child: Wrap(
-                              clipBehavior: Clip.hardEdge,
-                              children:
-                                  _meal.tags!.map((e) => MealTag(e)).toList(),
-                            ),
+                        const Divider(),
+                        if (_isLoadingMeal)
+                          EditIngredients(
+                            key: UniqueKey(),
+                            content: const [],
+                            onChanged: null,
+                            title: 'meal_create_ingredients_title'.tr(),
                           )
                         else
-                          const Text('-')
-                      ],
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: kPadding),
-                        child: MainButton(
-                          text: 'save'.tr(),
-                          onTap: _saveMeal,
-                          isProgress: true,
-                          buttonState: _buttonState,
+                          EditIngredients(
+                            content: _meal.ingredients ?? [],
+                            onChanged: (results) {
+                              setState(() {
+                                _meal.ingredients = results;
+                              });
+                            },
+                            title: 'meal_create_ingredients_title'.tr(),
+                          ),
+                        const Divider(),
+                        SizedBox(
+                          width: double.infinity,
+                          child: Text(
+                            'meal_create_instruction_title',
+                            style: Theme.of(context).textTheme.bodyText1,
+                          ).tr(),
                         ),
-                      ),
-                    ],
+                        if (_isLoadingMeal)
+                          MarkdownEditor(
+                            key: UniqueKey(),
+                            textEditingController: TextEditingController(),
+                          )
+                        else
+                          MarkdownEditor(
+                            textEditingController: _instructionsController,
+                          ),
+                        const Divider(),
+                        if (_isLoadingMeal)
+                          WrappedImagePicker(
+                            key: UniqueKey(),
+                            onPick: null,
+                          )
+                        else
+                          WrappedImagePicker(
+                            imageUrl: _meal.imageUrl,
+                            onPick: (value) => _updatedImage = value,
+                          ),
+                        const Divider(),
+                        Row(
+                          children: [
+                            Flexible(
+                              flex: 2,
+                              child: MainTextField(
+                                controller: _sourceController,
+                                title: 'meal_create_source_title'.tr(),
+                                placeholder:
+                                    'meal_create_source_placeholder'.tr(),
+                              ),
+                            ),
+                            const SizedBox(width: kPadding / 2),
+                            Flexible(
+                              child: MainTextField(
+                                controller: _durationController,
+                                title: 'meal_create_duration_title'.tr(),
+                                placeholder: '10',
+                                textAlign: TextAlign.end,
+                                keyboardType: TextInputType.number,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (!_isLoadingMeal)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: kPadding / 2),
+                            child: LinkPreview(_sourceController!.text),
+                          ),
+                        const Divider(),
+                        if (!_isLoadingMeal) ...[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('meal_create_tags_title'.tr()),
+                              IconButton(
+                                onPressed: _openMealTagEdit,
+                                icon: const Icon(EvaIcons.edit2Outline),
+                              )
+                            ],
+                          ),
+                          if (_meal.tags != null && _meal.tags!.isNotEmpty)
+                            SizedBox(
+                              width: double.infinity,
+                              child: Wrap(
+                                clipBehavior: Clip.hardEdge,
+                                children:
+                                    _meal.tags!.map((e) => MealTag(e)).toList(),
+                              ),
+                            )
+                          else
+                            const Text('-')
+                        ],
+                        Padding(
+                          padding:
+                              const EdgeInsets.symmetric(vertical: kPadding),
+                          child: MainButton(
+                            text: 'save'.tr(),
+                            onTap: _saveMeal,
+                            isProgress: true,
+                            buttonState: _buttonState,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          if (_isLoadingMeal) const FullScreenLoader() else const SizedBox(),
-        ],
+            if (_isLoadingMeal) const FullScreenLoader() else const SizedBox(),
+          ],
+        ),
       ),
     );
   }
