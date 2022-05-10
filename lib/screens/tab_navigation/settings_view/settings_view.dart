@@ -14,12 +14,12 @@ import '../../../services/plan_service.dart';
 import '../../../services/settings_service.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/main_snackbar.dart';
+import '../../../widgets/loading_logout.dart';
 import '../../../widgets/page_title.dart';
 import '../../onboarding/onboarding_screen.dart';
 import 'change_plan_name_modal.dart';
 import 'help_slides/help_slide_share_import.dart';
 import 'import_meals_modal.dart';
-import 'loading_logout.dart';
 import 'settings_tile.dart';
 
 class SettingsView extends StatefulWidget {

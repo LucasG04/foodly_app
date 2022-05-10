@@ -163,5 +163,7 @@
     "meal_create_edit_tags_info": "Suche nach Kategorien oder erstelle eine Neue durch Eingabe.",
     "meal_create_edit_tags_create_tile": "Tippe um zu erstellen",
     "meal_create_edit_tags_no_results": "Keine Kategorien",
-    "meal_create_edit_tags_no_results_msg": "Es gibt noch keine Kategorien. Gib eine ein und klicke auf den Eintrag, der erscheint, um eine Neue zu erstellen."
+    "meal_create_edit_tags_no_results_msg": "Es gibt noch keine Kategorien. Gib eine ein und klicke auf den Eintrag, der erscheint, um eine Neue zu erstellen.",
+    "help_loading_logout": "Es scheint, als würde es Probleme beim Laden geben. Bitte melde dich ab und wieder neu an oder versuche es später erneut.",
+    "help_loading_logout_mail": "Support kontaktieren"
 }
