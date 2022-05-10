@@ -176,6 +176,17 @@ class _SettingsViewState extends State<SettingsView> {
                         text: 'settings_section_help_import'.tr(),
                         trailing: const Icon(EvaIcons.arrowIosForwardOutline),
                       ),
+                      SettingsTile(
+                        onTap: () => Navigator.push(
+                          context,
+                          ConcentricPageRoute<HelpSlideShareImport>(
+                            builder: (_) => HelpSlideShareImport(),
+                          ),
+                        ),
+                        leadingIcon: EvaIcons.questionMarkCircleOutline,
+                        text: 'settings_section_help_import'.tr(),
+                        trailing: const Icon(EvaIcons.arrowIosForwardOutline),
+                      ),
                     ], context),
                     _buildSectionTitle('settings_section_account'.tr()),
                     _buildSection([
