@@ -163,5 +163,7 @@
     "meal_create_edit_tags_info": "Search for tags or create a new one by searching.",
     "meal_create_edit_tags_create_tile": "Tap to create",
     "meal_create_edit_tags_no_results": "No Tags",
-    "meal_create_edit_tags_no_results_msg": "There are no tags yet. Enter one and click on the entry that appears to create a new one."
+    "meal_create_edit_tags_no_results_msg": "There are no tags yet. Enter one and click on the entry that appears to create a new one.",
+    "help_loading_logout": "It seems that there are problems while loading. Please log out and log back in or try again later.",
+    "help_loading_logout_mail": "Contact support"
 }

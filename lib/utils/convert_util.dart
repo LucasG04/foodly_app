@@ -1,4 +1,9 @@
-// ignore: avoid_classes_with_only_static_members
+// ignore_for_file: avoid_classes_with_only_static_members
+
+import 'dart:convert';
+
+import 'package:logging/logging.dart';
+
 class ConvertUtil {
   /// Splits an array into multiple arrays with the length specified by `splitAt`.
   static List<List<dynamic>> splitArray(List<dynamic> array,
@@ -32,5 +37,19 @@ class ConvertUtil {
     result.trim();
 
     return result;
+  }
+
+  /// Maps a LogRecord to a Map<String, dynamic>
+  static Map<String, dynamic> logRecordToMap(LogRecord record) {
+    return <String, dynamic>{
+      'level': record.level.value,
+      'message': record.message,
+      'object': jsonEncode(record.object),
+      'loggerName': jsonEncode(record.loggerName),
+      'time': record.time.toIso8601String(),
+      'sequenceNumber': record.sequenceNumber,
+      'error': jsonEncode(record.error),
+      'stackTrace': jsonEncode(record.stackTrace),
+    };
   }
 }

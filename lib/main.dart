@@ -23,6 +23,7 @@ import 'providers/state_providers.dart';
 import 'services/authentication_service.dart';
 import 'services/foodly_user_service.dart';
 import 'services/link_metadata_service.dart';
+import 'services/log_record_service.dart';
 import 'services/meal_service.dart';
 import 'services/plan_service.dart';
 import 'services/settings_service.dart';
@@ -85,6 +86,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
   @override
   void initState() {
     _initializeLogger();
+    LogRecordService.startPeriodicLogging();
 
     _privateMealsStreamValue = [];
     _publicMealsStreamValue = [];
@@ -173,7 +175,16 @@ class _FoodlyAppState extends State<FoodlyApp> {
         print('${record.level.name}: ${record.loggerName}: ${record.message}');
       });
     } else {
-      Logger.root.level = Level.OFF;
+      Logger.root.level = Level.SEVERE;
+      Logger.root.onRecord.listen((record) {
+        final userId = context.read(userProvider).state?.id;
+        final planId = context.read(planProvider).state?.id;
+        LogRecordService.saveLog(
+          userId: userId,
+          planId: planId,
+          logRecord: record,
+        );
+      });
     }
   }
 
