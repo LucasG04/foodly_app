@@ -13,6 +13,7 @@ import '../../../models/plan_meal.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/plan_service.dart';
 import '../../../utils/basic_utils.dart';
+import '../../../widgets/loading_logout.dart';
 import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import 'plan_day_card.dart';
@@ -86,7 +87,7 @@ class _PlanTabViewState extends State<PlanTabView>
                   ),
                 ),
               )
-            : const Center(child: SmallCircularProgressIndicator());
+            : const LoadingLogut();
       },
     );
   }

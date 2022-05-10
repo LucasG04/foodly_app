@@ -153,7 +153,7 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
       }
       Navigator.pop(context, result.ref.name);
     } catch (e) {
-      _log.severe('ERR: StorageService.uploadFile');
+      _log.severe('ERR: StorageService.uploadFile', e);
       setState(() {
         _isLoading = false;
       });

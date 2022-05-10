@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:image_picker/image_picker.dart';
 
 class StorageService {
@@ -25,7 +24,11 @@ class StorageService {
     if (kIsWeb) {
       uploadTask = ref.putData(await file.readAsBytes());
     } else {
-      uploadTask = ref.putFile(File(file.path));
+      final compressed = await FlutterNativeImage.compressImage(
+        file.path,
+        quality: 25,
+      );
+      uploadTask = ref.putFile(compressed);
     }
 
     return Future.value(uploadTask);
