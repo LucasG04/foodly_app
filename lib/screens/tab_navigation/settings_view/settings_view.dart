@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:concentric_transition/page_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share/share.dart';
 
+import '../../../app_router.gr.dart';
 import '../../../constants.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/authentication_service.dart';
@@ -177,14 +179,10 @@ class _SettingsViewState extends State<SettingsView> {
                         trailing: const Icon(EvaIcons.arrowIosForwardOutline),
                       ),
                       SettingsTile(
-                        onTap: () => Navigator.push(
-                          context,
-                          ConcentricPageRoute<HelpSlideShareImport>(
-                            builder: (_) => HelpSlideShareImport(),
-                          ),
-                        ),
-                        leadingIcon: EvaIcons.questionMarkCircleOutline,
-                        text: 'settings_section_help_import'.tr(),
+                        onTap: () => AutoRouter.of(context)
+                            .push(const FeedbackScreenRoute()),
+                        leadingIcon: EvaIcons.paperPlaneOutline,
+                        text: 'settings_section_help_support'.tr(),
                         trailing: const Icon(EvaIcons.arrowIosForwardOutline),
                       ),
                     ], context),

@@ -31,6 +31,7 @@
     "settings_section_help": "Hilfe",
     "settings_section_help_intro": "Einführung anzeigen",
     "settings_section_help_import": "Rezepte importieren",
+    "settings_section_help_support": "Feedback senden",
     "settings_section_account": "Account",
     "settings_section_account_reset_msg": "Wir haben dir eine E-Mail zum Zurücksetzen von deinem Passwort geschickt.",
     "settings_section_account_reset": "Passwort zurücksetzen",
@@ -165,5 +166,11 @@
     "meal_create_edit_tags_no_results": "Keine Kategorien",
     "meal_create_edit_tags_no_results_msg": "Es gibt noch keine Kategorien. Gib eine ein und klicke auf den Eintrag, der erscheint, um eine Neue zu erstellen.",
     "help_loading_logout": "Es scheint, als würde es Probleme beim Laden geben. Bitte melde dich ab und wieder neu an oder versuche es später erneut.",
-    "help_loading_logout_mail": "Support kontaktieren"
+    "help_loading_logout_mail": "Support kontaktieren",
+    "feedback_title": "Feedback",
+    "feedback_title_title": "Titel",
+    "feedback_email_title": "Deine E-Mail",
+    "feedback_text_title": "Beschreibung",
+    "feedback_text_error": "Bitte trag eine Beschreibung ein.",
+    "feedback_cta": "Senden"
 }

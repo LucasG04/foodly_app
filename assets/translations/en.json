@@ -31,6 +31,7 @@
     "settings_section_help": "Help",
     "settings_section_help_intro": "Show Introduction",
     "settings_section_help_import": "Import Recipes",
+    "settings_section_help_support": "Send Feedback",
     "settings_section_account": "Account",
     "settings_section_account_reset_msg": "We have sent you an email to reset your password.",
     "settings_section_account_reset": "Reset Password",
@@ -165,5 +166,11 @@
     "meal_create_edit_tags_no_results": "No Tags",
     "meal_create_edit_tags_no_results_msg": "There are no tags yet. Enter one and click on the entry that appears to create a new one.",
     "help_loading_logout": "It seems that there are problems while loading. Please log out and log back in or try again later.",
-    "help_loading_logout_mail": "Contact support"
+    "help_loading_logout_mail": "Contact support",
+    "feedback_title": "Feedback",
+    "feedback_title_title": "Title",
+    "feedback_email_title": "Your E-Mail",
+    "feedback_text_title": "Description",
+    "feedback_text_error": "Please enter a description.",
+    "feedback_cta": "Send"
 }

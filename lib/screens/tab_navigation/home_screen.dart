@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } else if (_currentUser != null) {
       return const TabNavigationView();
     } else if (SettingsService.isFirstUsage) {
-      AutoRouter.of(context).replace(const OnboardingScreenRoute());
+      AutoRouter.of(context).replace(OnboardingScreenRoute());
       return const Scaffold();
     } else {
       AutoRouter.of(context).replace(const AuthenticationScreenRoute());
