@@ -20,6 +20,7 @@ class MainTextField extends StatefulWidget {
   final Widget? suffix;
   final String? errorText;
   final String Function(String?)? validator;
+  final bool required;
 
   const MainTextField({
     required this.controller,
@@ -38,6 +39,7 @@ class MainTextField extends StatefulWidget {
     this.suffix,
     this.errorText,
     this.validator,
+    this.required = false,
     Key? key,
   }) : super(key: key);
 
@@ -72,7 +74,9 @@ class _MainTextFieldState extends State<MainTextField> {
         children: widget.title != null
             ? [
                 Text(
-                  widget.title ?? '',
+                  widget.required
+                      ? '${widget.title} *'.trim()
+                      : widget.title ?? '',
                   style: const TextStyle(color: Colors.black),
                 ),
                 const SizedBox(height: 5),

@@ -116,6 +116,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                         MainTextField(
                           controller: _titleController,
                           title: 'meal_create_title_title'.tr(),
+                          required: true,
                         ),
                         const Divider(),
                         if (_isLoadingMeal)
@@ -133,7 +134,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                                 _meal.ingredients = results;
                               });
                             },
-                            title: 'meal_create_ingredients_title'.tr(),
+                            title: '${'meal_create_ingredients_title'.tr()} *',
                           ),
                         const Divider(),
                         SizedBox(
