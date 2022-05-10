@@ -40,6 +40,7 @@ dependencies:
   metadata_fetch: ^0.4.1
   flutter_file_dialog: ^2.3.0
   keyboard_service: ^2.0.1
+  flutter_native_image: ^0.0.6+1
 
   # Firebase
   firebase_core: ^1.14.1
