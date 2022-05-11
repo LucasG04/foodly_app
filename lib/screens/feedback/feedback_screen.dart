@@ -8,6 +8,7 @@ import '../../constants.dart';
 import '../../models/foodly_feedback.dart';
 import '../../providers/state_providers.dart';
 import '../../services/feedback_service.dart';
+import '../../utils/main_snackbar.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
@@ -143,6 +144,14 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       email: _emailController.text.trim(),
       description: _textController.text.trim(),
     ));
+
+    // display "thanks" and close
+    if (!mounted) {
+      return;
+    }
+    MainSnackbar(message: 'feedback_thanks'.tr(), isSuccess: true, seconds: 1)
+        .show(context);
+    await Future<int?>.delayed(const Duration(seconds: 1));
 
     if (!mounted) {
       return;

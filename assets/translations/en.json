@@ -172,5 +172,6 @@
     "feedback_email_title": "Your E-Mail",
     "feedback_text_title": "Description",
     "feedback_text_error": "Please enter a description.",
-    "feedback_cta": "Send"
+    "feedback_cta": "Send",
+    "feedback_thanks": "Thank you 🙂"
 }
