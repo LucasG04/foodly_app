@@ -7,8 +7,8 @@ import 'package:logging/logging.dart';
 import '../../constants.dart';
 import '../../services/storage_service.dart';
 import '../../utils/main_snackbar.dart';
-import '../main_text_field.dart';
 import '../small_circular_progress_indicator.dart';
+import 'image_link_picker.dart';
 
 class SelectPickerDialog extends StatefulWidget {
   const SelectPickerDialog({Key? key}) : super(key: key);
@@ -23,8 +23,6 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
   late bool _isLoading;
   late ImagePicker _imagePicker;
   late bool _showUrlInput;
-  TextEditingController? _linkController;
-  late bool _showLinkError;
 
   @override
   void initState() {
@@ -32,8 +30,7 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
     _isLoading = false;
     _imagePicker = ImagePicker();
     _showUrlInput = false;
-    _linkController = TextEditingController();
-    _showLinkError = false;
+
     super.initState();
   }
 
@@ -71,49 +68,9 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
                       ),
                     ],
                   )
-                : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: const Icon(EvaIcons.arrowBackOutline),
-                            onPressed: () => setState(
-                              () => _showUrlInput = false,
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(EvaIcons.checkmark),
-                            onPressed: _setWebImageUrl,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: kPadding / 2),
-                      MainTextField(
-                        controller: _linkController,
-                        onSubmit: _setWebImageUrl,
-                        placeholder: 'http://food.com/images/23342',
-                      ),
-                      const SizedBox(height: kPadding / 2),
-                      if (_showLinkError)
-                        Row(
-                          children: [
-                            Icon(
-                              EvaIcons.alertCircleOutline,
-                              color: Theme.of(context).errorColor,
-                            ),
-                            const SizedBox(height: kPadding / 2),
-                            Expanded(
-                              child: const Text(
-                                'image_picker_dialog_error_link',
-                              ).tr(),
-                            ),
-                          ],
-                        )
-                      else
-                        const SizedBox(),
-                    ],
+                : ImageLinkPicker(
+                    onClose: () => _showUrlInput = false,
+                    onPick: _setWebImageUrl,
                   ),
       ),
     );
@@ -164,16 +121,9 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
     }
   }
 
-  void _setWebImageUrl() {
-    _showLinkError = false;
-
-    final String url = _linkController!.text.trim();
+  void _setWebImageUrl(String url) {
     if (Uri.tryParse(url)!.isAbsolute) {
       Navigator.pop(context, url);
-    } else {
-      setState(() {
-        _showLinkError = true;
-      });
     }
   }
 }
