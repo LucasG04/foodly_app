@@ -117,6 +117,9 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                           controller: _titleController,
                           title: 'meal_create_title_title'.tr(),
                           required: true,
+                          onChange: (newText) => context
+                              .read(initSearchWebImagePickerProvider)
+                              .state = newText,
                         ),
                         const Divider(),
                         if (_isLoadingMeal)

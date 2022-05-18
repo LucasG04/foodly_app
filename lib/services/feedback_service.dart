@@ -6,7 +6,7 @@ import 'package:logging/logging.dart';
 import '../models/foodly_feedback.dart';
 
 class FeedbackService {
-  static final _log = Logger('LogRecordService');
+  static final _log = Logger('FeedbackService');
   static final CollectionReference<Map<String, dynamic>> _firestore =
       FirebaseFirestore.instance.collection('feedbacks');
 
