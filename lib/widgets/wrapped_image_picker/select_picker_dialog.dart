@@ -22,14 +22,14 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
 
   late bool _isLoading;
   late ImagePicker _imagePicker;
-  late bool _showUrlInput;
+  late bool _showWebPicker;
 
   @override
   void initState() {
     _log = Logger('SelectPickerDialog');
     _isLoading = false;
     _imagePicker = ImagePicker();
-    _showUrlInput = false;
+    _showWebPicker = false;
 
     super.initState();
   }
@@ -46,11 +46,16 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
                 width: MediaQuery.of(context).size.width * 0.7,
                 child: const Center(child: SmallCircularProgressIndicator()),
               )
-            : !_showUrlInput
+            : !_showWebPicker
                 ? Wrap(
                     alignment: WrapAlignment.center,
                     spacing: kPadding / 2,
                     children: [
+                      _buildPickerTypeTile(
+                        EvaIcons.globe2Outline,
+                        'image_picker_dialog_web'.tr(),
+                        () => setState(() => _showWebPicker = true),
+                      ),
                       _buildPickerTypeTile(
                         EvaIcons.cameraOutline,
                         'image_picker_dialog_camera'.tr(),
@@ -61,15 +66,10 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
                         'image_picker_dialog_gallery'.tr(),
                         () => _uploadLocalImage(ImageSource.gallery),
                       ),
-                      _buildPickerTypeTile(
-                        EvaIcons.globe2Outline,
-                        'image_picker_dialog_web'.tr(),
-                        () => setState(() => _showUrlInput = true),
-                      ),
                     ],
                   )
                 : ImageLinkPicker(
-                    onClose: () => _showUrlInput = false,
+                    onClose: () => setState(() => _showWebPicker = false),
                     onPick: _setWebImageUrl,
                   ),
       ),
@@ -122,7 +122,8 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
   }
 
   void _setWebImageUrl(String url) {
-    if (Uri.tryParse(url)!.isAbsolute) {
+    final parsedUri = Uri.tryParse(url);
+    if (parsedUri != null && parsedUri.isAbsolute) {
       Navigator.pop(context, url);
     }
   }
