@@ -295,7 +295,7 @@ class _WebImagePickerState extends State<WebImagePicker> {
       final response = await LunixApiService.searchImages(
         search,
         _imagePage,
-        _getPlatformLanguage(),
+        _getSearchLanguage(),
       );
 
       setState(() {
@@ -337,7 +337,7 @@ class _WebImagePickerState extends State<WebImagePicker> {
     final response = await LunixApiService.searchImages(
       search,
       _imagePage,
-      _getPlatformLanguage(),
+      _getSearchLanguage(),
     );
 
     setState(() {
@@ -351,7 +351,7 @@ class _WebImagePickerState extends State<WebImagePicker> {
   /// If the in-app language is "en" the platform language will be retuned.
   ///
   /// Helps to improve the results of the image search.
-  String _getPlatformLanguage() {
+  String _getSearchLanguage() {
     return context.locale.languageCode == 'en'
         ? Platform.localeName.split('_')[0]
         : context.locale.languageCode;
