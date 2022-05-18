@@ -8,7 +8,7 @@ import '../../constants.dart';
 import '../../services/storage_service.dart';
 import '../../utils/main_snackbar.dart';
 import '../small_circular_progress_indicator.dart';
-import 'image_link_picker.dart';
+import 'web_image_picker.dart';
 
 class SelectPickerDialog extends StatefulWidget {
   const SelectPickerDialog({Key? key}) : super(key: key);
@@ -68,7 +68,7 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
                       ),
                     ],
                   )
-                : ImageLinkPicker(
+                : WebImagePicker(
                     onClose: () => setState(() => _showWebPicker = false),
                     onPick: _setWebImageUrl,
                   ),

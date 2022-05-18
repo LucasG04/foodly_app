@@ -13,21 +13,21 @@ import '../skeleton_container.dart';
 import '../small_circular_progress_indicator.dart';
 import '../user_information.dart';
 
-class ImageLinkPicker extends StatefulWidget {
+class WebImagePicker extends StatefulWidget {
   final Function(String) onPick;
   final Function() onClose;
 
-  const ImageLinkPicker({
+  const WebImagePicker({
     required this.onPick,
     required this.onClose,
     Key? key,
   }) : super(key: key);
 
   @override
-  State<ImageLinkPicker> createState() => _ImageLinkPickerState();
+  State<WebImagePicker> createState() => _WebImagePickerState();
 }
 
-class _ImageLinkPickerState extends State<ImageLinkPicker> {
+class _WebImagePickerState extends State<WebImagePicker> {
   final _log = Logger('LogRecordService');
 
   final TextEditingController _inputController = TextEditingController();
