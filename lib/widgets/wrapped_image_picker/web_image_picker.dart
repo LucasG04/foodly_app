@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -292,7 +295,7 @@ class _WebImagePickerState extends State<WebImagePicker> {
       final response = await LunixApiService.searchImages(
         search,
         _imagePage,
-        context.locale.languageCode,
+        _getPlatformLanguage(),
       );
 
       setState(() {
@@ -334,13 +337,24 @@ class _WebImagePickerState extends State<WebImagePicker> {
     final response = await LunixApiService.searchImages(
       search,
       _imagePage,
-      context.locale.languageCode,
+      _getPlatformLanguage(),
     );
 
     setState(() {
       _images.addAll(response.images.map((e) => e.url));
       _isLoadingMore = false;
     });
+  }
+
+  /// Retuns the current language (e.g., "en").
+  /// If the in-app language is not "en" it will be returned.
+  /// If the in-app language is "en" the platform language will be retuned.
+  ///
+  /// Helps to improve the results of the image search.
+  String _getPlatformLanguage() {
+    return context.locale.languageCode == 'en'
+        ? Platform.localeName.split('_')[0]
+        : context.locale.languageCode;
   }
 
   void _selectImage(String url) {
