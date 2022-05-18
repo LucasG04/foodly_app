@@ -10,8 +10,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:logging/logging.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:version/version.dart';
 
 import 'app_router.gr.dart';
 import 'constants.dart';
@@ -27,6 +29,8 @@ import 'services/log_record_service.dart';
 import 'services/meal_service.dart';
 import 'services/plan_service.dart';
 import 'services/settings_service.dart';
+import 'services/version_service.dart';
+import 'widgets/new_version_modal.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,8 +54,11 @@ Future<void> initializeHive() async {
   final dir = await getApplicationDocumentsDirectory();
   Hive.init(dir.path);
   Hive.registerAdapter(LinkMetadataAdapter());
-  await SettingsService.initialize();
-  await LinkMetadataService.initialize();
+  await Future.wait<dynamic>([
+    SettingsService.initialize(),
+    LinkMetadataService.initialize(),
+    VersionService.initialize(),
+  ]);
 }
 
 class FoodlyApp extends StatefulWidget {
@@ -92,6 +99,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
     _publicMealsStreamValue = [];
 
     _listenForShareIntent();
+    _checkForNewFeaturesNotification();
     _checkForUpdate();
 
     super.initState();
@@ -244,11 +252,35 @@ class _FoodlyAppState extends State<FoodlyApp> {
     }
   }
 
-  void _checkForUpdate() async {
-    if (!Platform.isAndroid) {
+  void _checkForNewFeaturesNotification() async {
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    final String? lastCheckedVersionString = VersionService.lastCheckedVersion;
+
+    if (lastCheckedVersionString == null) {
       return;
     }
 
+    final Version currentVersion = Version.parse(packageInfo.version);
+    final Version lastCheckedVersion = Version.parse(lastCheckedVersionString);
+
+    if (lastCheckedVersion >= currentVersion) {
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
+    NewFeaturesModalUtils.open(context);
+  }
+
+  void _checkForUpdate() async {
+    if (Platform.isAndroid) {
+      _checkForUpdateAndroid();
+    } else if (Platform.isIOS) {
+      // _checkForUpdateIOS();
+    }
+  }
+
+  void _checkForUpdateAndroid() async {
     final updateInfo =
         await InAppUpdate.checkForUpdate().catchError((dynamic err) {
       _log.severe('ERR in InAppUpdate.checkForUpdate()', err);
