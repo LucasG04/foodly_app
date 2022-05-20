@@ -179,5 +179,9 @@
     "feedback_text_title": "Description",
     "feedback_text_error": "Please enter a description.",
     "feedback_cta": "Send",
-    "feedback_thanks": "Thank you 🙂"
+    "feedback_thanks": "Thank you 🙂",
+    "new_version_modal_title": "New Features",
+    "new_version_modal_version": "Version",
+    "new_version_modal_where_to_find": "Changes to the version can be found in the settings under \"Help\".",
+    "new_version_modal_continue": "Continue"
 }

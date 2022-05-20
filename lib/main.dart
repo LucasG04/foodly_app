@@ -10,10 +10,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:logging/logging.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
-import 'package:version/version.dart';
 
 import 'app_router.gr.dart';
 import 'constants.dart';
@@ -30,7 +28,6 @@ import 'services/meal_service.dart';
 import 'services/plan_service.dart';
 import 'services/settings_service.dart';
 import 'services/version_service.dart';
-import 'widgets/new_version_modal.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -99,7 +96,6 @@ class _FoodlyAppState extends State<FoodlyApp> {
     _publicMealsStreamValue = [];
 
     _listenForShareIntent();
-    _checkForNewFeaturesNotification();
     _checkForUpdate();
 
     super.initState();
@@ -250,26 +246,6 @@ class _FoodlyAppState extends State<FoodlyApp> {
             MealCreateScreenRoute(id: Uri.encodeComponent(extractedLink)));
       }
     }
-  }
-
-  void _checkForNewFeaturesNotification() async {
-    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    final String? lastCheckedVersionString = VersionService.lastCheckedVersion;
-
-    if (lastCheckedVersionString == null) {
-      return;
-    }
-
-    final Version currentVersion = Version.parse(packageInfo.version);
-    final Version lastCheckedVersion = Version.parse(lastCheckedVersionString);
-
-    if (lastCheckedVersion >= currentVersion) {
-      return;
-    }
-    if (!mounted) {
-      return;
-    }
-    NewFeaturesModalUtils.open(context);
   }
 
   void _checkForUpdate() async {
