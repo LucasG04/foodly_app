@@ -5,7 +5,6 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../../constants.dart';
 import '../../../models/plan.dart';
@@ -13,6 +12,7 @@ import '../../../models/plan_meal.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/plan_service.dart';
 import '../../../utils/basic_utils.dart';
+import '../../../utils/widget_utils.dart';
 import '../../../widgets/loading_logout.dart';
 import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
@@ -138,12 +138,7 @@ class _PlanTabViewState extends State<PlanTabView>
   }
 
   void _openDownloadModal(Plan plan) {
-    showBarModalBottomSheet<void>(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(10.0),
-        ),
-      ),
+    WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) => PlanDownloadModal(plan: plan),
     );

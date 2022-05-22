@@ -4,7 +4,6 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:keyboard_service/keyboard_service.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../constants.dart';
 import '../../models/meal.dart';
@@ -16,6 +15,7 @@ import '../../services/meal_service.dart';
 import '../../services/storage_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
+import '../../utils/widget_utils.dart';
 import '../../widgets/full_screen_loader.dart';
 import '../../widgets/link_preview.dart';
 import '../../widgets/main_appbar.dart';
@@ -358,12 +358,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   }
 
   void _openChefkochImport() async {
-    final result = await showBarModalBottomSheet<Meal>(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(10.0),
-        ),
-      ),
+    final result = await WidgetUtils.showFoodlyBottomSheet<Meal>(
       context: context,
       builder: (_) => const ChefkochImportModal(),
     );
@@ -383,12 +378,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   }
 
   void _openMealTagEdit() async {
-    final result = await showBarModalBottomSheet<List<String>>(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(10.0),
-        ),
-      ),
+    final result = await WidgetUtils.showFoodlyBottomSheet<List<String>>(
       context: context,
       builder: (_) => EditListContentModal(
         title: 'meal_create_tags_title'.tr(),

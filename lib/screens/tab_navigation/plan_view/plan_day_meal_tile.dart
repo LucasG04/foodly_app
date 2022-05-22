@@ -4,7 +4,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
@@ -16,6 +15,7 @@ import '../../../services/authentication_service.dart';
 import '../../../services/meal_service.dart';
 import '../../../services/plan_service.dart';
 import '../../../services/shopping_list_service.dart';
+import '../../../utils/widget_utils.dart';
 import '../../../widgets/foodly_network_image.dart';
 import '../../../widgets/meal_tag.dart';
 import '../../../widgets/skeleton_container.dart';
@@ -266,12 +266,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
   }
 
   Future<void> _openMoveModal() async {
-    showBarModalBottomSheet<void>(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(10.0),
-        ),
-      ),
+    WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) => PlanMoveMealModal(planMeal: widget.planMeal),
     );

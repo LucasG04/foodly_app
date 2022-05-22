@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share/share.dart';
 
 import '../../../constants.dart';
@@ -11,6 +10,7 @@ import '../../../models/shopping_list.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/shopping_list_service.dart';
 import '../../../utils/basic_utils.dart';
+import '../../../utils/widget_utils.dart';
 import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import 'animated_shopping_list.dart';
@@ -161,14 +161,9 @@ class _ShoppingListViewState extends State<ShoppingListView>
   }
 
   void _editGrocery(String listId, [Grocery? grocery]) {
-    showBarModalBottomSheet<void>(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(10.0),
-        ),
-      ),
+    WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
-      builder: (modalContext) => EditGroceryModal(
+      builder: (_) => EditGroceryModal(
         shoppingListId: listId,
         grocery: grocery,
       ),

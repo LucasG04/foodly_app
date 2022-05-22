@@ -1,11 +1,11 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../constants.dart';
 import '../../services/storage_service.dart';
 import '../../utils/basic_utils.dart';
+import '../../utils/widget_utils.dart';
 import '../foodly_network_image.dart';
 import 'select_picker_dialog.dart';
 
@@ -79,12 +79,7 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
   }
 
   void _selectImage() async {
-    final String? result = await showBarModalBottomSheet<String?>(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(10.0),
-        ),
-      ),
+    final String? result = await WidgetUtils.showFoodlyBottomSheet<String?>(
       context: context,
       builder: (_) => const SelectPickerDialog(),
     );
