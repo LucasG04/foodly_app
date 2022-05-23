@@ -1,14 +1,13 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
-import 'package:in_app_update/in_app_update.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
@@ -96,7 +95,6 @@ class _FoodlyAppState extends State<FoodlyApp> {
     _publicMealsStreamValue = [];
 
     _listenForShareIntent();
-    _checkForUpdate();
 
     super.initState();
   }
@@ -245,31 +243,6 @@ class _FoodlyAppState extends State<FoodlyApp> {
         _appRouter.navigate(
             MealCreateScreenRoute(id: Uri.encodeComponent(extractedLink)));
       }
-    }
-  }
-
-  void _checkForUpdate() async {
-    if (Platform.isAndroid) {
-      _checkForUpdateAndroid();
-    } else if (Platform.isIOS) {
-      // _checkForUpdateIOS();
-    }
-  }
-
-  void _checkForUpdateAndroid() async {
-    final updateInfo =
-        await InAppUpdate.checkForUpdate().catchError((dynamic err) {
-      _log.severe('ERR in InAppUpdate.checkForUpdate()', err);
-    });
-
-    if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
-      InAppUpdate.startFlexibleUpdate().then((_) {
-        InAppUpdate.completeFlexibleUpdate().catchError((dynamic err) {
-          _log.severe('ERR in InAppUpdate.completeFlexibleUpdate()', err);
-        });
-      }).catchError((dynamic err) {
-        _log.severe('ERR in InAppUpdate.startFlexibleUpdate()', err);
-      });
     }
   }
 }

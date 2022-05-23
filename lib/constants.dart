@@ -43,3 +43,6 @@ const kCardSubtitle = TextStyle(
   fontSize: 16,
   fontWeight: FontWeight.w500,
 );
+
+/// AppStore
+const kAppBundleId = '1590739803';
