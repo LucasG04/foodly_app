@@ -138,4 +138,15 @@ class LunixApiService {
 
     return LunixImageResponse.fromMap(response.data as Map<String, dynamic>);
   }
+
+  static Future<List<String>> getAllPublishedVersions() async {
+    final Response response = await _dio.get<List<String>>(
+      '$_lunixApiEndpoint/published-versions',
+      options: Options(
+        headers: <String, dynamic>{'x-api-key': secretLunixApi},
+      ),
+    );
+
+    return response.data != null ? response.data as List<String> : [];
+  }
 }

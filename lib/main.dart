@@ -27,6 +27,7 @@ import 'services/log_record_service.dart';
 import 'services/meal_service.dart';
 import 'services/plan_service.dart';
 import 'services/settings_service.dart';
+import 'services/version_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,8 +51,11 @@ Future<void> initializeHive() async {
   final dir = await getApplicationDocumentsDirectory();
   Hive.init(dir.path);
   Hive.registerAdapter(LinkMetadataAdapter());
-  await SettingsService.initialize();
-  await LinkMetadataService.initialize();
+  await Future.wait<dynamic>([
+    SettingsService.initialize(),
+    LinkMetadataService.initialize(),
+    VersionService.initialize(),
+  ]);
 }
 
 class FoodlyApp extends StatefulWidget {
@@ -245,10 +249,14 @@ class _FoodlyAppState extends State<FoodlyApp> {
   }
 
   void _checkForUpdate() async {
-    if (!Platform.isAndroid) {
-      return;
+    if (Platform.isAndroid) {
+      _checkForUpdateAndroid();
+    } else if (Platform.isIOS) {
+      // _checkForUpdateIOS();
     }
+  }
 
+  void _checkForUpdateAndroid() async {
     final updateInfo =
         await InAppUpdate.checkForUpdate().catchError((dynamic err) {
       _log.severe('ERR in InAppUpdate.checkForUpdate()', err);
