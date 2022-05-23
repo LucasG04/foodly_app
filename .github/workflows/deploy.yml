@@ -30,7 +30,7 @@ jobs:
         env:
           GOOGLE_SERVICES_IOS: ${{ secrets.GOOGLE_SERVICES_IOS }}
       - name: Set version to version in commit
-        run: bash ./.github/scripts/update_version_ios.sh "${{ github.event.head_commit.message }}" ${{ toJson(github.run_number) }}
+        run: bash ./.github/scripts/update_version_ios.sh '${{ github.event.head_commit.message }}' '${{ github.run_number }}'
       - name: Build app
         run: flutter build ios --release --no-codesign
       - name: Deploy iOS Beta to TestFlight via Fastlane
@@ -75,7 +75,7 @@ jobs:
       - name: Install Flutter dependencies
         run: flutter pub get
       - name: Set version to version in commit
-        run: bash ./.github/scripts/update_version.sh "${{ github.event.head_commit.message }}" ${{ toJson(github.run_number) }}
+        run: bash ./.github/scripts/update_version.sh '${{ github.event.head_commit.message }}' '${{ github.run_number }}'
       - name: Build the AAB
         run: flutter build appbundle
       - name: Run Fastlane
