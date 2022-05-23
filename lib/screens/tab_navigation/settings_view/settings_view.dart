@@ -5,7 +5,6 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share/share.dart';
 
 import '../../../app_router.gr.dart';
@@ -16,6 +15,7 @@ import '../../../services/plan_service.dart';
 import '../../../services/settings_service.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/main_snackbar.dart';
+import '../../../utils/widget_utils.dart';
 import '../../../widgets/loading_logout.dart';
 import '../../../widgets/page_title.dart';
 import '../../onboarding/onboarding_screen.dart';
@@ -287,24 +287,14 @@ class _SettingsViewState extends State<SettingsView> {
   }
 
   void _importMeals(List<String?> planIds, BuildContext context) {
-    showBarModalBottomSheet<void>(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(10.0),
-        ),
-      ),
+    WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
-      builder: (context) => ImportMealsModal(planIds),
+      builder: (_) => ImportMealsModal(planIds),
     );
   }
 
   void _openChangePlanNameModal() {
-    showBarModalBottomSheet<void>(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(10.0),
-        ),
-      ),
+    WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) => const ChangePlanNameModal(),
     );

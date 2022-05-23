@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../constants.dart';
 import '../models/lunix_docx.dart';
+import '../models/lunix_image.dart';
 import '../models/meal.dart';
 import '../models/plan.dart';
 import '../models/plan_meal.dart';
@@ -116,5 +117,36 @@ class LunixApiService {
         .where((m) => m.startsWith(kPlaceholderSymbol))
         .map((e) => Meal(id: e, name: e.replaceAll(kPlaceholderSymbol, '')))
         .toList();
+  }
+
+  static Future<LunixImageResponse> searchImages(
+    String text,
+    int page,
+    String langCode,
+  ) async {
+    final Response response = await _dio.get<Map<String, dynamic>>(
+      '$_lunixApiEndpoint/search-image',
+      queryParameters: <String, dynamic>{
+        'q': text,
+        'page': page,
+        'hl': langCode,
+      },
+      options: Options(
+        headers: <String, dynamic>{'x-api-key': secretLunixApi},
+      ),
+    );
+
+    return LunixImageResponse.fromMap(response.data as Map<String, dynamic>);
+  }
+
+  static Future<List<String>> getAllPublishedVersions() async {
+    final Response response = await _dio.get<List<String>>(
+      '$_lunixApiEndpoint/published-versions',
+      options: Options(
+        headers: <String, dynamic>{'x-api-key': secretLunixApi},
+      ),
+    );
+
+    return response.data != null ? response.data as List<String> : [];
   }
 }

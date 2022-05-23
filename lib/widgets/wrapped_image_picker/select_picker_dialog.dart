@@ -7,8 +7,8 @@ import 'package:logging/logging.dart';
 import '../../constants.dart';
 import '../../services/storage_service.dart';
 import '../../utils/main_snackbar.dart';
-import '../main_text_field.dart';
 import '../small_circular_progress_indicator.dart';
+import 'web_image_picker.dart';
 
 class SelectPickerDialog extends StatefulWidget {
   const SelectPickerDialog({Key? key}) : super(key: key);
@@ -22,18 +22,15 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
 
   late bool _isLoading;
   late ImagePicker _imagePicker;
-  late bool _showUrlInput;
-  TextEditingController? _linkController;
-  late bool _showLinkError;
+  late bool _showWebPicker;
 
   @override
   void initState() {
     _log = Logger('SelectPickerDialog');
     _isLoading = false;
     _imagePicker = ImagePicker();
-    _showUrlInput = false;
-    _linkController = TextEditingController();
-    _showLinkError = false;
+    _showWebPicker = false;
+
     super.initState();
   }
 
@@ -49,11 +46,16 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
                 width: MediaQuery.of(context).size.width * 0.7,
                 child: const Center(child: SmallCircularProgressIndicator()),
               )
-            : !_showUrlInput
+            : !_showWebPicker
                 ? Wrap(
                     alignment: WrapAlignment.center,
                     spacing: kPadding / 2,
                     children: [
+                      _buildPickerTypeTile(
+                        EvaIcons.globe2Outline,
+                        'image_picker_dialog_web'.tr(),
+                        () => setState(() => _showWebPicker = true),
+                      ),
                       _buildPickerTypeTile(
                         EvaIcons.cameraOutline,
                         'image_picker_dialog_camera'.tr(),
@@ -64,56 +66,11 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
                         'image_picker_dialog_gallery'.tr(),
                         () => _uploadLocalImage(ImageSource.gallery),
                       ),
-                      _buildPickerTypeTile(
-                        EvaIcons.globe2Outline,
-                        'image_picker_dialog_web'.tr(),
-                        () => setState(() => _showUrlInput = true),
-                      ),
                     ],
                   )
-                : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: const Icon(EvaIcons.arrowBackOutline),
-                            onPressed: () => setState(
-                              () => _showUrlInput = false,
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(EvaIcons.checkmark),
-                            onPressed: _setWebImageUrl,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: kPadding / 2),
-                      MainTextField(
-                        controller: _linkController,
-                        onSubmit: _setWebImageUrl,
-                        placeholder: 'http://food.com/images/23342',
-                      ),
-                      const SizedBox(height: kPadding / 2),
-                      if (_showLinkError)
-                        Row(
-                          children: [
-                            Icon(
-                              EvaIcons.alertCircleOutline,
-                              color: Theme.of(context).errorColor,
-                            ),
-                            const SizedBox(height: kPadding / 2),
-                            Expanded(
-                              child: const Text(
-                                'image_picker_dialog_error_link',
-                              ).tr(),
-                            ),
-                          ],
-                        )
-                      else
-                        const SizedBox(),
-                    ],
+                : WebImagePicker(
+                    onClose: () => setState(() => _showWebPicker = false),
+                    onPick: _setWebImageUrl,
                   ),
       ),
     );
@@ -164,16 +121,10 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
     }
   }
 
-  void _setWebImageUrl() {
-    _showLinkError = false;
-
-    final String url = _linkController!.text.trim();
-    if (Uri.tryParse(url)!.isAbsolute) {
+  void _setWebImageUrl(String url) {
+    final parsedUri = Uri.tryParse(url);
+    if (parsedUri != null && parsedUri.isAbsolute) {
       Navigator.pop(context, url);
-    } else {
-      setState(() {
-        _showLinkError = true;
-      });
     }
   }
 }

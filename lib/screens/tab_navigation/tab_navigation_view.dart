@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 // ignore: implementation_imports
 import 'package:flutter_riverpod/src/provider.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../../app_router.gr.dart';
 import '../../providers/state_providers.dart';
 import '../../services/shopping_list_service.dart';
+import '../../utils/widget_utils.dart';
 import 'meal_list_view/meal_list_view.dart';
 import 'plan_view/plan_tab_view.dart';
 import 'settings_view/settings_view.dart';
@@ -120,14 +120,9 @@ class _TabNavigationViewState extends State<TabNavigationView> {
       _activeListId = list.id;
     }
 
-    showBarModalBottomSheet<void>(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(10.0),
-        ),
-      ),
+    WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
-      builder: (modalContext) => EditGroceryModal(
+      builder: (_) => EditGroceryModal(
         shoppingListId: _activeListId!,
       ),
     );
