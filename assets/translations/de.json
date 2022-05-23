@@ -182,6 +182,7 @@
     "feedback_thanks": "Danke 🙂",
     "new_version_modal_title": "Neue Funktionen",
     "new_version_modal_version": "Version",
+    "new_version_modal_version_pl": "Versionen",
     "new_version_modal_where_to_find": "Änderung zur Version findest du in den Einstellungen unter dem Menüpunkt \"Hilfe\".",
     "new_version_modal_continue": "Weiter"
 }

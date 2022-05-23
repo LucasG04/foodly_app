@@ -89,9 +89,12 @@ class _HomeScreenState extends State<HomeScreen> {
     if (lastCheckedVersion >= currentVersion) {
       return;
     }
+
     if (!mounted) {
       return;
     }
-    NewVersionModal.open(context);
+    await NewVersionModal.open(context);
+
+    VersionService.lastCheckedVersion = packageInfo.version;
   }
 }

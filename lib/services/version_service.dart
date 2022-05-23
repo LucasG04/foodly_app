@@ -35,17 +35,19 @@ class VersionService {
     _settingsBox.put('lastCheckedVersion', version);
   }
 
-  static Future<FoodlyVersion?> getNotesForVersionAndLanguage(
-      String version, String languageCode) async {
-    _log.fine('getNotesForVersionAndLanguage with $version and $languageCode');
-    final snaps = await _firestore.where('version', isEqualTo: version).get();
+  static Future<List<FoodlyVersion>?> getNotesForVersionsAndLanguage(
+      List<String> versions, String languageCode) async {
+    _log.fine('getNotesForVersionAndLanguage with $versions and $languageCode');
+    final snaps = await _firestore.where('version', whereIn: versions).get();
 
     if (snaps.size < 1) {
       return null;
     }
 
-    final requestedVersion = snaps.docs.first.data();
-    requestedVersion.notes.removeWhere((e) => e.language != languageCode);
-    return requestedVersion;
+    final requestedVersions = snaps.docs.map((e) => e.data()).toList();
+    for (final version in requestedVersions) {
+      version.notes.removeWhere((e) => e.language != languageCode);
+    }
+    return requestedVersions;
   }
 }
