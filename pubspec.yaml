@@ -43,6 +43,7 @@ dependencies:
   flutter_native_image: ^0.0.6+1
   version: ^2.0.0
   package_info_plus: ^1.4.2
+  update_available: ^2.1.0
 
   # Firebase
   firebase_core: ^1.14.1

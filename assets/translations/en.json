@@ -184,5 +184,10 @@
     "new_version_modal_version": "Version",
     "new_version_modal_version_pl": "Versions",
     "new_version_modal_where_to_find": "Changes to the version can be found in the settings under \"Help\".",
-    "new_version_modal_continue": "Continue"
+    "new_version_modal_continue": "Continue",
+    "update_dialog_title": "Update {}?",
+    "update_dialog_description": "A new version with new features and improvements is available.",
+    "update_dialog_question": "You better download it now!",
+    "update_dialog_action_later": "Later",
+    "update_dialog_action_update": "Update Now"
 }
