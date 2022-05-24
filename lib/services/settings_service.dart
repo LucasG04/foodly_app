@@ -33,4 +33,8 @@ class SettingsService {
   static Future<void> setShowSuggestions(bool value) async {
     await _settingsBox.put('showSuggestions', value);
   }
+
+  static Stream<BoxEvent> streamMultipleMealsPerTime() {
+    return _settingsBox.watch(key: 'multipleMealsPerTime');
+  }
 }

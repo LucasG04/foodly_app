@@ -1,8 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import '../../../app_router.gr.dart';
 
+import '../../../app_router.gr.dart';
 import '../../../constants.dart';
 import '../../../models/plan_meal.dart';
 import '../../../services/settings_service.dart';
@@ -60,10 +60,11 @@ class PlanDayCard extends StatelessWidget {
                         enableVoting: lunchList.length > 1,
                       ))
                   .toList(),
-              if (_showAddButton(context, lunchList))
-                _buildAddButton(context, isLunch: true)
-              else
-                const SizedBox(),
+              _buildAddButton(
+                context,
+                isLunch: true,
+                mealsAtTime: lunchList.length,
+              ),
               const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Divider(),
@@ -75,10 +76,11 @@ class PlanDayCard extends StatelessWidget {
                         enableVoting: dinnerList.length > 1,
                       ))
                   .toList(),
-              if (_showAddButton(context, dinnerList))
-                _buildAddButton(context, isLunch: false)
-              else
-                const SizedBox(),
+              _buildAddButton(
+                context,
+                isLunch: false,
+                mealsAtTime: dinnerList.length,
+              ),
             ],
           ),
         ),
@@ -86,42 +88,49 @@ class PlanDayCard extends StatelessWidget {
     );
   }
 
-  bool _showAddButton(BuildContext context, Iterable<dynamic> meals) {
-    return meals.isEmpty || SettingsService.multipleMealsPerTime;
-  }
-
-  Widget _buildAddButton(BuildContext context, {required bool isLunch}) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: OutlinedButton(
-          onPressed: () => AutoRouter.of(context).push(
-            MealSelectScreenRoute(date: date, isLunch: isLunch),
-          ),
-          style: ButtonStyle(
-            padding: MaterialStateProperty.resolveWith(
-              (_) => const EdgeInsets.all(15.0),
-            ),
-            side: MaterialStateProperty.resolveWith(
-              (_) => const BorderSide(width: 0.0),
-            ),
-            foregroundColor: MaterialStateProperty.resolveWith(
-              (_) => Theme.of(context).primaryColor,
-            ),
-            shape: MaterialStateProperty.resolveWith(
-              (_) => RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(kRadius / 2),
-              ),
-            ),
-          ),
-          child: const Text(
-            'add',
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-            ),
-          ).tr(),
-        ),
-      ),
+  Widget _buildAddButton(
+    BuildContext context, {
+    required bool isLunch,
+    required int mealsAtTime,
+  }) {
+    return StreamBuilder<dynamic>(
+      stream: SettingsService.streamMultipleMealsPerTime(),
+      builder: (context, _) {
+        return _showAddButton(context, mealsAtTime)
+            ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: OutlinedButton(
+                    onPressed: () => AutoRouter.of(context).push(
+                      MealSelectScreenRoute(date: date, isLunch: isLunch),
+                    ),
+                    style: ButtonStyle(
+                      padding: MaterialStateProperty.resolveWith(
+                        (_) => const EdgeInsets.all(15.0),
+                      ),
+                      side: MaterialStateProperty.resolveWith(
+                        (_) => const BorderSide(width: 0.0),
+                      ),
+                      foregroundColor: MaterialStateProperty.resolveWith(
+                        (_) => Theme.of(context).primaryColor,
+                      ),
+                      shape: MaterialStateProperty.resolveWith(
+                        (_) => RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(kRadius / 2),
+                        ),
+                      ),
+                    ),
+                    child: const Text(
+                      'add',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ).tr(),
+                  ),
+                ),
+              )
+            : const SizedBox();
+      },
     );
   }
 
@@ -136,5 +145,9 @@ class PlanDayCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  bool _showAddButton(BuildContext context, int mealsAtTime) {
+    return mealsAtTime < 1 || SettingsService.multipleMealsPerTime;
   }
 }
