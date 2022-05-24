@@ -311,6 +311,9 @@ class _SettingsViewState extends State<SettingsView> {
   }
 
   void _openLogView() {
+    if (!kLogViewEnabled) {
+      return;
+    }
     Navigator.of(context).push(
       MaterialPageRoute<LogView>(
         builder: (context) => const LogView(),
