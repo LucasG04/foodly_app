@@ -136,6 +136,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final available =
         availability.foldElse(available: () => true, orElse: () => false);
 
+    _log.fine('_checkForUpdateIOS() resulted in "$available"');
+
     if (!available) {
       return;
     }
