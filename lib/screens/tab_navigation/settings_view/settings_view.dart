@@ -311,7 +311,7 @@ class _SettingsViewState extends State<SettingsView> {
   }
 
   void _openLogView() {
-    if (!kLogViewAvailable) {
+    if (!kLogViewEnabled) {
       return;
     }
     Navigator.of(context).push(

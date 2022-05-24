@@ -195,7 +195,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
   }
 
   void _addLogToProvider(LogRecord record) {
-    if (kLogViewAvailable) {
+    if (kLogViewEnabled) {
       context.read(logsProvider).state = [
         ...context.read(logsProvider).state,
         record

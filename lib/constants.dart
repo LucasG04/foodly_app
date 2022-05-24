@@ -48,4 +48,4 @@ const kCardSubtitle = TextStyle(
 const kAppBundleId = '1590739803';
 
 /// If LogView should be available
-const kLogViewAvailable = false;
+const kLogViewEnabled = false;
