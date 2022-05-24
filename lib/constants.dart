@@ -46,3 +46,6 @@ const kCardSubtitle = TextStyle(
 
 /// AppStore
 const kAppBundleId = '1590739803';
+
+/// If LogView should be available
+const kLogViewAvailable = false;

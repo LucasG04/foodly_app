@@ -173,6 +173,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
     if (foundation.kDebugMode) {
       Logger.root.level = Level.ALL;
       Logger.root.onRecord.listen((record) {
+        _addLogToProvider(record);
         // ignore: avoid_print
         print('${record.level.name}: ${record.loggerName}: ${record.message}');
       });
@@ -194,10 +195,12 @@ class _FoodlyAppState extends State<FoodlyApp> {
   }
 
   void _addLogToProvider(LogRecord record) {
-    context.read(logsProvider).state = [
-      ...context.read(logsProvider).state,
-      record
-    ];
+    if (kLogViewAvailable) {
+      context.read(logsProvider).state = [
+        ...context.read(logsProvider).state,
+        record
+      ];
+    }
   }
 
   void _streamMeals() {
