@@ -18,7 +18,7 @@ import 'meal_service.dart';
 class LunixApiService {
   LunixApiService._();
 
-  static final log = Logger('LunixApiService');
+  static final _log = Logger('LunixApiService');
 
   static const String _lunixApiEndpoint =
       'https://lunix-api.herokuapp.com/foodly';
@@ -40,8 +40,9 @@ class LunixApiService {
     bool colorful = true,
     bool excludeToday = false,
   }) async {
-    log.finer(
-        'Call saveDocxForPlan with plan: ${plan.id}, langTag: $languageTag, vertical: $vertical, colorful: $colorful, excludeToday: $excludeToday');
+    _log.finer(
+      'Call saveDocxForPlan with plan: ${plan.id}, langTag: $languageTag, vertical: $vertical, colorful: $colorful, excludeToday: $excludeToday',
+    );
     final docxData = LunixDocx(
       vertical: vertical,
       colorful: colorful,
@@ -68,7 +69,7 @@ class LunixApiService {
 
       return planSavePath;
     } catch (e) {
-      log.severe('ERR in printDocxForPlan()', e);
+      _log.severe('ERR in printDocxForPlan()', e);
       return null;
     }
   }
@@ -124,6 +125,7 @@ class LunixApiService {
     int page,
     String langCode,
   ) async {
+    _log.finer('Call searchImages() with $text, $page, $langCode');
     final Response response = await _dio.get<Map<String, dynamic>>(
       '$_lunixApiEndpoint/search-image',
       queryParameters: <String, dynamic>{
@@ -140,13 +142,18 @@ class LunixApiService {
   }
 
   static Future<List<String>> getAllPublishedVersions() async {
-    final Response response = await _dio.get<List<String>>(
+    _log.finer('Call getAllPublishedVersions()');
+    final Response response = await _dio.get<List<dynamic>>(
       '$_lunixApiEndpoint/published-versions',
       options: Options(
         headers: <String, dynamic>{'x-api-key': secretLunixApi},
       ),
     );
 
-    return response.data != null ? response.data as List<String> : [];
+    final List<String> data = (response.data as List<dynamic>)
+        .map((dynamic e) => e.toString())
+        .toList();
+
+    return response.data != null ? data : [];
   }
 }

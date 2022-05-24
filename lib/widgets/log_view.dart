@@ -13,24 +13,26 @@ class LogView extends StatelessWidget {
       appBar: const MainAppBar(
         text: 'Logs',
       ),
-      body: Consumer(builder: (context, ref, child) {
-        final logs = context.read(logsProvider).state;
-        return ListView.builder(
-          itemBuilder: (context, index) => ListTile(
-            title: Text(logs[index].loggerName),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(logs[index].message),
-                Text(logs[index].level.name),
-              ],
+      body: Consumer(
+        builder: (_, ref, __) {
+          final logs = context.read(logsProvider).state;
+          return ListView.builder(
+            itemBuilder: (_, index) => ListTile(
+              title: Text(logs[index].loggerName),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(logs[index].message),
+                  Text(logs[index].level.name),
+                ],
+              ),
+              isThreeLine: true,
+              dense: true,
             ),
-            isThreeLine: true,
-            dense: true,
-          ),
-          itemCount: logs.length,
-        );
-      }),
+            itemCount: logs.length,
+          );
+        },
+      ),
     );
   }
 }

@@ -84,7 +84,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final String? lastCheckedVersionString = VersionService.lastCheckedVersion;
 
     _log.fine(
-        '_checkForNewFeaturesNotification() with currentVersion: ${packageInfo.version} and lastcheckedversion: $lastCheckedVersionString');
+      '_checkForNewFeaturesNotification() with currentVersion: ${packageInfo.version} and lastcheckedversion: $lastCheckedVersionString',
+    );
 
     if (lastCheckedVersionString == null) {
       VersionService.lastCheckedVersion = packageInfo.version;
@@ -101,9 +102,9 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!mounted) {
       return;
     }
-    await NewVersionModal.open(context);
-
-    VersionService.lastCheckedVersion = packageInfo.version;
+    NewVersionModal.open(context).then((_) {
+      VersionService.lastCheckedVersion = packageInfo.version;
+    });
   }
 
   void _checkForUpdate() async {
