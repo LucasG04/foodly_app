@@ -173,19 +173,29 @@ class _FoodlyAppState extends State<FoodlyApp> {
     if (foundation.kDebugMode) {
       Logger.root.level = Level.ALL;
       Logger.root.onRecord.listen((record) {
+        context.read(logsProvider).state = [
+          ...context.read(logsProvider).state,
+          record
+        ];
         // ignore: avoid_print
         print('${record.level.name}: ${record.loggerName}: ${record.message}');
       });
     } else {
-      Logger.root.level = Level.SEVERE;
+      Logger.root.level = Level.ALL;
       Logger.root.onRecord.listen((record) {
-        final userId = context.read(userProvider).state?.id;
-        final planId = context.read(planProvider).state?.id;
-        LogRecordService.saveLog(
-          userId: userId,
-          planId: planId,
-          logRecord: record,
-        );
+        context.read(logsProvider).state = [
+          ...context.read(logsProvider).state,
+          record
+        ];
+        if (record.level >= Level.SEVERE) {
+          final userId = context.read(userProvider).state?.id;
+          final planId = context.read(planProvider).state?.id;
+          LogRecordService.saveLog(
+            userId: userId,
+            planId: planId,
+            logRecord: record,
+          );
+        }
       });
     }
   }

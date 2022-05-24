@@ -17,6 +17,7 @@ import '../../../utils/basic_utils.dart';
 import '../../../utils/main_snackbar.dart';
 import '../../../utils/widget_utils.dart';
 import '../../../widgets/loading_logout.dart';
+import '../../../widgets/log_view.dart';
 import '../../../widgets/page_title.dart';
 import '../../onboarding/onboarding_screen.dart';
 import 'change_plan_name_modal.dart';
@@ -33,208 +34,217 @@ class SettingsView extends StatefulWidget {
 class _SettingsViewState extends State<SettingsView> {
   @override
   Widget build(BuildContext context) {
-    return Consumer(builder: (context, watch, _) {
-      final plan = watch(planProvider).state;
-      final foodlyUser = watch(userProvider).state;
-      final firebaseUser = AuthenticationService.currentUser;
-      return plan != null && foodlyUser != null
-          ? SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: (MediaQuery.of(context).size.width -
-                          BasicUtils.contentWidth(context)) /
-                      2,
-                ),
-                child: Column(
-                  children: [
-                    const SizedBox(height: kPadding),
-                    PageTitle(text: 'settings_title'.tr()),
-                    _buildSectionTitle('settings_section_general'.tr()),
-                    _buildSection([
-                      SettingsTile(
-                        onTap: () => Navigator.push(
-                          context,
-                          ConcentricPageRoute<OnboardingScreen>(
-                              builder: (_) => OnboardingScreen()),
-                        ),
-                        leadingIcon: EvaIcons.listOutline,
-                        text: 'settings_section_general_multiple_meals'.tr(),
-                        trailing: Consumer(builder: (context, watch, _) {
-                          return Switch.adaptive(
-                            value: SettingsService.multipleMealsPerTime,
-                            onChanged: (value) {
-                              setState(() {
-                                SettingsService.setMultipleMealsPerTime(value);
-                              });
-                            },
-                          );
-                        }),
-                      ),
-                      SettingsTile(
-                        onTap: () => Navigator.push(
-                          context,
-                          ConcentricPageRoute<OnboardingScreen>(
-                              builder: (_) => OnboardingScreen()),
-                        ),
-                        leadingIcon: EvaIcons.trendingUpOutline,
-                        text: 'settings_section_general_suggestions'.tr(),
-                        trailing: Consumer(builder: (context, watch, _) {
-                          return Switch.adaptive(
-                            value: SettingsService.showSuggestions,
-                            onChanged: (value) {
-                              setState(() {
-                                SettingsService.setShowSuggestions(value);
-                              });
-                            },
-                          );
-                        }),
-                      ),
-                      SettingsTile(
-                        leadingIcon: EvaIcons.globe2Outline,
-                        text: 'settings_section_general_language'.tr(),
-                        trailing: DropdownButton<Locale>(
-                          value: context.locale,
-                          items: context.supportedLocales
-                              .map((locale) => DropdownMenuItem<Locale>(
-                                    value: locale,
-                                    child: Text(
-                                      LocaleNames.of(context)!
-                                          .nameOf(locale.languageCode)!,
-                                    ),
-                                  ))
-                              .toList(),
-                          onChanged: (Locale? locale) async {
-                            await context.setLocale(locale!);
-                          },
-                        ),
-                      ),
-                    ], context),
-                    _buildSectionTitle('settings_section_plan'.tr()),
-                    _buildSection([
-                      SettingsTile(
-                        onTap: _openChangePlanNameModal,
-                        leadingIcon: Icons.abc_rounded,
-                        text: 'settings_section_plan_change_name'.tr(),
-                        trailing: const Icon(EvaIcons.arrowIosForwardOutline),
-                      ),
-                      SettingsTile(
-                        onTap: () => _shareCode(plan.code!),
-                        leadingIcon: EvaIcons.shareOutline,
-                        text: 'settings_section_plan_share'
-                            .tr(args: [plan.code!]),
-                        trailing: const Icon(EvaIcons.arrowIosForwardOutline),
-                      ),
-                      SettingsTile(
-                        onTap: () => _leavePlan(plan.id, context),
-                        leadingIcon: EvaIcons.closeCircleOutline,
-                        text: 'settings_section_plan_leave'.tr(),
-                        trailing: const Icon(
-                          EvaIcons.arrowIosForwardOutline,
-                          color: Colors.red,
-                        ),
-                        color: Colors.red,
-                      ),
-                    ], context),
-                    if (foodlyUser.oldPlans!.length > 1)
-                      _buildSectionTitle('settings_section_meals'.tr())
-                    else
-                      const SizedBox(),
-                    if (foodlyUser.oldPlans!.length > 1)
+    return Consumer(
+      builder: (context, watch, _) {
+        final plan = watch(planProvider).state;
+        final foodlyUser = watch(userProvider).state;
+        final firebaseUser = AuthenticationService.currentUser;
+        return plan != null && foodlyUser != null
+            ? SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: (MediaQuery.of(context).size.width -
+                            BasicUtils.contentWidth(context)) /
+                        2,
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: kPadding),
+                      PageTitle(text: 'settings_title'.tr()),
+                      _buildSectionTitle('settings_section_general'.tr()),
                       _buildSection([
                         SettingsTile(
-                          onTap: () => _importMeals(
-                            foodlyUser.oldPlans!
-                                .where((id) => id != plan.id)
-                                .toList(),
+                          onTap: () => Navigator.push(
                             context,
+                            ConcentricPageRoute<OnboardingScreen>(
+                                builder: (_) => OnboardingScreen()),
                           ),
-                          leadingIcon: EvaIcons.downloadOutline,
-                          text: 'settings_section_meals_import'.tr(),
+                          leadingIcon: EvaIcons.listOutline,
+                          text: 'settings_section_general_multiple_meals'.tr(),
+                          trailing: Consumer(builder: (context, watch, _) {
+                            return Switch.adaptive(
+                              value: SettingsService.multipleMealsPerTime,
+                              onChanged: (value) {
+                                setState(() {
+                                  SettingsService.setMultipleMealsPerTime(
+                                      value);
+                                });
+                              },
+                            );
+                          }),
+                        ),
+                        SettingsTile(
+                          onTap: () => Navigator.push(
+                            context,
+                            ConcentricPageRoute<OnboardingScreen>(
+                                builder: (_) => OnboardingScreen()),
+                          ),
+                          leadingIcon: EvaIcons.trendingUpOutline,
+                          text: 'settings_section_general_suggestions'.tr(),
+                          trailing: Consumer(builder: (context, watch, _) {
+                            return Switch.adaptive(
+                              value: SettingsService.showSuggestions,
+                              onChanged: (value) {
+                                setState(() {
+                                  SettingsService.setShowSuggestions(value);
+                                });
+                              },
+                            );
+                          }),
+                        ),
+                        SettingsTile(
+                          leadingIcon: EvaIcons.globe2Outline,
+                          text: 'settings_section_general_language'.tr(),
+                          trailing: DropdownButton<Locale>(
+                            value: context.locale,
+                            items: context.supportedLocales
+                                .map((locale) => DropdownMenuItem<Locale>(
+                                      value: locale,
+                                      child: Text(
+                                        LocaleNames.of(context)!
+                                            .nameOf(locale.languageCode)!,
+                                      ),
+                                    ))
+                                .toList(),
+                            onChanged: (Locale? locale) async {
+                              await context.setLocale(locale!);
+                            },
+                          ),
+                        ),
+                      ], context),
+                      _buildSectionTitle('settings_section_plan'.tr()),
+                      _buildSection([
+                        SettingsTile(
+                          onTap: _openChangePlanNameModal,
+                          leadingIcon: Icons.abc_rounded,
+                          text: 'settings_section_plan_change_name'.tr(),
                           trailing: const Icon(EvaIcons.arrowIosForwardOutline),
                         ),
-                      ], context)
-                    else
-                      const SizedBox(),
-                    _buildSectionTitle('settings_section_help'.tr()),
-                    _buildSection([
-                      SettingsTile(
-                        onTap: () => Navigator.push(
-                          context,
-                          ConcentricPageRoute<OnboardingScreen>(
-                              builder: (_) => OnboardingScreen()),
+                        SettingsTile(
+                          onTap: () => _shareCode(plan.code!),
+                          leadingIcon: EvaIcons.shareOutline,
+                          text: 'settings_section_plan_share'
+                              .tr(args: [plan.code!]),
+                          trailing: const Icon(EvaIcons.arrowIosForwardOutline),
                         ),
-                        leadingIcon: EvaIcons.questionMarkCircleOutline,
-                        text: 'settings_section_help_intro'.tr(),
-                        trailing: const Icon(EvaIcons.arrowIosForwardOutline),
-                      ),
-                      SettingsTile(
-                        onTap: () => Navigator.push(
-                          context,
-                          ConcentricPageRoute<HelpSlideShareImport>(
-                            builder: (_) => HelpSlideShareImport(),
+                        SettingsTile(
+                          onTap: () => _leavePlan(plan.id, context),
+                          leadingIcon: EvaIcons.closeCircleOutline,
+                          text: 'settings_section_plan_leave'.tr(),
+                          trailing: const Icon(
+                            EvaIcons.arrowIosForwardOutline,
+                            color: Colors.red,
                           ),
-                        ),
-                        leadingIcon: EvaIcons.questionMarkCircleOutline,
-                        text: 'settings_section_help_import'.tr(),
-                        trailing: const Icon(EvaIcons.arrowIosForwardOutline),
-                      ),
-                      SettingsTile(
-                        onTap: () => AutoRouter.of(context)
-                            .push(const FeedbackScreenRoute()),
-                        leadingIcon: EvaIcons.paperPlaneOutline,
-                        text: 'settings_section_help_support'.tr(),
-                        trailing: const Icon(EvaIcons.arrowIosForwardOutline),
-                      ),
-                    ], context),
-                    _buildSectionTitle('settings_section_account'.tr()),
-                    _buildSection([
-                      SettingsTile(
-                        onTap: () async {
-                          await AuthenticationService.resetPassword(
-                              firebaseUser!.email!);
-                          if (!mounted) {
-                            return;
-                          }
-                          MainSnackbar(
-                            message: 'settings_section_account_reset_msg'.tr(),
-                            isSuccess: true,
-                          ).show(context);
-                        },
-                        leadingIcon: EvaIcons.lockOutline,
-                        text: 'settings_section_account_reset'.tr(),
-                        trailing: const Icon(EvaIcons.arrowIosForwardOutline),
-                      ),
-                      SettingsTile(
-                        onTap: () => AuthenticationService.signOut(),
-                        leadingIcon: EvaIcons.logOutOutline,
-                        text: 'settings_section_account_logout'.tr(),
-                        trailing: const Icon(
-                          EvaIcons.arrowIosForwardOutline,
                           color: Colors.red,
                         ),
-                        color: Colors.red,
-                      ),
-                    ], context),
-                    RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        style: Theme.of(context).textTheme.bodyText1,
-                        children: <TextSpan>[
-                          TextSpan(text: 'settings_sign_in_as'.tr()),
-                          TextSpan(
-                            text: '\n${firebaseUser!.email!}',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                      ], context),
+                      if (foodlyUser.oldPlans!.length > 1)
+                        _buildSectionTitle('settings_section_meals'.tr())
+                      else
+                        const SizedBox(),
+                      if (foodlyUser.oldPlans!.length > 1)
+                        _buildSection([
+                          SettingsTile(
+                            onTap: () => _importMeals(
+                              foodlyUser.oldPlans!
+                                  .where((id) => id != plan.id)
+                                  .toList(),
+                              context,
+                            ),
+                            leadingIcon: EvaIcons.downloadOutline,
+                            text: 'settings_section_meals_import'.tr(),
+                            trailing:
+                                const Icon(EvaIcons.arrowIosForwardOutline),
                           ),
-                        ],
+                        ], context)
+                      else
+                        const SizedBox(),
+                      _buildSectionTitle('settings_section_help'.tr()),
+                      _buildSection([
+                        SettingsTile(
+                          onTap: () => Navigator.push(
+                            context,
+                            ConcentricPageRoute<OnboardingScreen>(
+                                builder: (_) => OnboardingScreen()),
+                          ),
+                          leadingIcon: EvaIcons.questionMarkCircleOutline,
+                          text: 'settings_section_help_intro'.tr(),
+                          trailing: const Icon(EvaIcons.arrowIosForwardOutline),
+                        ),
+                        SettingsTile(
+                          onTap: () => Navigator.push(
+                            context,
+                            ConcentricPageRoute<HelpSlideShareImport>(
+                              builder: (_) => HelpSlideShareImport(),
+                            ),
+                          ),
+                          leadingIcon: EvaIcons.questionMarkCircleOutline,
+                          text: 'settings_section_help_import'.tr(),
+                          trailing: const Icon(EvaIcons.arrowIosForwardOutline),
+                        ),
+                        SettingsTile(
+                          onTap: () => AutoRouter.of(context)
+                              .push(const FeedbackScreenRoute()),
+                          leadingIcon: EvaIcons.paperPlaneOutline,
+                          text: 'settings_section_help_support'.tr(),
+                          trailing: const Icon(EvaIcons.arrowIosForwardOutline),
+                        ),
+                      ], context),
+                      _buildSectionTitle('settings_section_account'.tr()),
+                      _buildSection([
+                        SettingsTile(
+                          onTap: () async {
+                            await AuthenticationService.resetPassword(
+                                firebaseUser!.email!);
+                            if (!mounted) {
+                              return;
+                            }
+                            MainSnackbar(
+                              message:
+                                  'settings_section_account_reset_msg'.tr(),
+                              isSuccess: true,
+                            ).show(context);
+                          },
+                          leadingIcon: EvaIcons.lockOutline,
+                          text: 'settings_section_account_reset'.tr(),
+                          trailing: const Icon(EvaIcons.arrowIosForwardOutline),
+                        ),
+                        SettingsTile(
+                          onTap: () => AuthenticationService.signOut(),
+                          leadingIcon: EvaIcons.logOutOutline,
+                          text: 'settings_section_account_logout'.tr(),
+                          trailing: const Icon(
+                            EvaIcons.arrowIosForwardOutline,
+                            color: Colors.red,
+                          ),
+                          color: Colors.red,
+                        ),
+                      ], context),
+                      GestureDetector(
+                        onDoubleTap: _openLogView,
+                        child: RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: Theme.of(context).textTheme.bodyText1,
+                            children: <TextSpan>[
+                              TextSpan(text: 'settings_sign_in_as'.tr()),
+                              TextSpan(
+                                text: '\n${firebaseUser!.email!}',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: kPadding),
-                  ],
+                      const SizedBox(height: kPadding),
+                    ],
+                  ),
                 ),
-              ),
-            )
-          : const LoadingLogut();
-    });
+              )
+            : const LoadingLogut();
+      },
+    );
   }
 
   Widget _buildSection(List<Widget> widgets, BuildContext context) {
@@ -297,6 +307,14 @@ class _SettingsViewState extends State<SettingsView> {
     WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) => const ChangePlanNameModal(),
+    );
+  }
+
+  void _openLogView() {
+    Navigator.of(context).push(
+      MaterialPageRoute<LogView>(
+        builder: (context) => const LogView(),
+      ),
     );
   }
 }

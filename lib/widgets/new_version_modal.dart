@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
 import 'package:version/version.dart';
 
 import '../constants.dart';
@@ -14,6 +15,8 @@ import 'main_button.dart';
 class NewVersionModal extends StatefulWidget {
   final List<String> versions;
   final List<VersionNote> versionNotes;
+
+  static final Logger _log = Logger('NewVersionModal');
 
   const NewVersionModal({
     required this.versions,
@@ -28,6 +31,10 @@ class NewVersionModal extends StatefulWidget {
     final Version lastCheckedVersion =
         Version.parse(VersionService.lastCheckedVersion);
     final publishedVersions = await _getPublishedVersions();
+    final versionStrings = publishedVersions.map<String>((e) => e.toString());
+    _log.fine(
+      'open() with lastCheckedVersion: ${lastCheckedVersion.toString()} and publishedVersions: $versionStrings',
+    );
 
     final newVersions = publishedVersions.where((v) => v > lastCheckedVersion);
 
@@ -43,6 +50,10 @@ class NewVersionModal extends StatefulWidget {
 
     // get every single note and flatten the list
     final versionNotes = versions.map((e) => e.notes).expand((i) => i).toList();
+
+    _log.finest(
+      'open() with versionNotes: ${versionNotes.map((e) => '${e.title}(${e.language})')}',
+    );
 
     return WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
