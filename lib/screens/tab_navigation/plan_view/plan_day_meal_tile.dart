@@ -42,6 +42,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
       margin: const EdgeInsets.symmetric(vertical: kPadding / 2),
       child: widget.planMeal.meal.startsWith(kPlaceholderSymbol)
           ? GestureDetector(
+              onTap: _editPlaceholder,
               onLongPress: _openMoveModal,
               child: _buildDataRow(
                 context,
@@ -270,5 +271,25 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
       context: context,
       builder: (_) => PlanMoveMealModal(planMeal: widget.planMeal),
     );
+  }
+
+  Future<void> _editPlaceholder() async {
+    final planId = context.read(planProvider).state!.id!;
+    final text = await WidgetUtils.showPlacholderEditDialog(
+      context,
+      initialText: widget.planMeal.meal.split(kPlaceholderSymbol)[1],
+      required: false,
+    );
+
+    if (text == null) {
+      return;
+    }
+
+    if (text.isNotEmpty) {
+      widget.planMeal.meal = kPlaceholderSymbol + text;
+      await PlanService.updatePlanMealFromPlan(planId, widget.planMeal);
+    } else {
+      await PlanService.deletePlanMealFromPlan(planId, widget.planMeal.id);
+    }
   }
 }
