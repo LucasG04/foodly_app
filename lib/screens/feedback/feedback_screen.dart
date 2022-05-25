@@ -3,6 +3,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:keyboard_service/keyboard_service.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../constants.dart';
 import '../../models/foodly_feedback.dart';
@@ -136,14 +137,23 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       _buttonState = ButtonState.inProgress;
     });
 
-    await FeedbackService.create(FoodlyFeedback(
+    final appInfo = await PackageInfo.fromPlatform();
+
+    if (!mounted) {
+      return;
+    }
+
+    final feedback = FoodlyFeedback(
       userId: context.read(userProvider).state!.id!,
       planId: context.read(planProvider).state!.id!,
       date: DateTime.now(),
       title: _titleController.text.trim(),
       email: _emailController.text.trim(),
       description: _textController.text.trim(),
-    ));
+      version: appInfo.version,
+    );
+
+    await FeedbackService.create(feedback);
 
     // display "thanks" and close
     if (!mounted) {
