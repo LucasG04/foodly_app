@@ -108,11 +108,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _checkForUpdate() async {
+    if (!_shouldCheckForUpdate()) {
+      return;
+    }
+    VersionService.lastCheckedForUpdate = DateTime.now();
+
     if (Platform.isAndroid) {
       _checkForUpdateAndroid();
     } else if (Platform.isIOS) {
       _checkForUpdateIOS();
     }
+  }
+
+  bool _shouldCheckForUpdate() {
+    final lastChecked = VersionService.lastCheckedForUpdate;
+    if (lastChecked == null) {
+      return true;
+    }
+    return DateTime.now().difference(lastChecked).inHours > 1;
   }
 
   void _checkForUpdateAndroid() async {

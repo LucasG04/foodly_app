@@ -35,6 +35,13 @@ class VersionService {
     _settingsBox.put('lastCheckedVersion', version);
   }
 
+  static DateTime? get lastCheckedForUpdate =>
+      _settingsBox.get('lastCheckedForUpdate') as DateTime?;
+
+  static set lastCheckedForUpdate(DateTime? date) {
+    _settingsBox.put('lastCheckedForUpdate', date);
+  }
+
   static Future<List<FoodlyVersion>?> getNotesForVersionsAndLanguage(
       List<String> versions, String languageCode) async {
     _log.fine('getNotesForVersionAndLanguage with $versions and $languageCode');
