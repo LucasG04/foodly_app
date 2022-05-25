@@ -1,4 +1,3 @@
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -14,6 +13,7 @@ import '../../providers/state_providers.dart';
 import '../../services/meal_stat_service.dart';
 import '../../services/plan_service.dart';
 import '../../services/settings_service.dart';
+import '../../utils/widget_utils.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/user_information.dart';
 import 'search_bar.dart';
@@ -254,34 +254,25 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     );
   }
 
-  Future _showPlaceholderDialog() async {
+  Future<void> _showPlaceholderDialog() async {
     final planId = context.read(planProvider).state!.id!;
-    final texts = await showTextInputDialog(
-      context: context,
-      textFields: [
-        DialogTextField(
-          validator: (value) => value!.isEmpty
-              ? 'meal_select_placeholder_dialog_placeholder'.tr()
-              : null,
-        ),
-      ],
-      title: 'meal_select_placeholder_dialog_title'.tr(),
-      cancelLabel: 'meal_select_placeholder_dialog_cancel'.tr(),
-    );
+    final text = await WidgetUtils.showPlacholderEditDialog(context);
 
-    if (texts != null && texts.isNotEmpty) {
-      await _addMealToPlan(
-        kPlaceholderSymbol + texts.first,
-        planId,
-      );
-      if (!mounted) {
-        return;
-      }
-      AutoRouter.of(context).pop();
+    if (text == null || text.isEmpty) {
+      return;
     }
+
+    await _addMealToPlan(
+      kPlaceholderSymbol + text,
+      planId,
+    );
+    if (!mounted) {
+      return;
+    }
+    AutoRouter.of(context).pop();
   }
 
-  Future _createNewMeal() async {
+  Future<void> _createNewMeal() async {
     final planId = context.read(planProvider).state!.id!;
     final meal =
         await AutoRouter.of(context).push(MealCreateScreenRoute(id: 'create'));
@@ -295,7 +286,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     }
   }
 
-  Future _addMealToPlan(String mealId, String planId) {
+  Future<void> _addMealToPlan(String mealId, String planId) {
     return PlanService.addPlanMealToPlan(
       planId,
       PlanMeal(
