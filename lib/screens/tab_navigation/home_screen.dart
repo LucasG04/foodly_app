@@ -5,6 +5,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:logging/logging.dart';
@@ -121,6 +122,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   bool _shouldCheckForUpdate() {
+    if (foundation.kDebugMode) {
+      return false;
+    }
     final lastChecked = VersionService.lastCheckedForUpdate;
     if (lastChecked == null) {
       return true;
