@@ -70,15 +70,12 @@ class _FoodlyAppState extends State<FoodlyApp> {
   late StreamSubscription<LogRecord> _logStream;
   // ignore: cancel_subscriptions
   StreamSubscription<List<Meal>>? _privateMealsStream;
-  // ignore: cancel_subscriptions
-  StreamSubscription<List<Meal>>? _publicMealsStream;
 
   final _appRouter = AppRouter();
 
   @override
   void dispose() {
     _privateMealsStream!.cancel();
-    _publicMealsStream!.cancel();
     _logStream.cancel();
     _intentDataStreamSubscription.cancel();
     super.dispose();
