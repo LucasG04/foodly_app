@@ -51,7 +51,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   TextEditingController? _titleController;
   String? _updatedImage;
 
-  List<String>? _allMealTags;
+  List<String>? _existingMealTags;
 
   @override
   void initState() {
@@ -62,7 +62,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     _mealSaved = false;
 
     MealService.getAllTags(context.read(planProvider).state!.id!)
-        .then<List<String>>((tags) => _allMealTags = tags);
+        .then<List<String>>((tags) => _existingMealTags = tags);
     super.initState();
   }
 
@@ -378,12 +378,16 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   }
 
   void _openMealTagEdit() async {
+    final allTags = [
+      ..._existingMealTags ?? <String>[],
+      ..._getMissingTagsInExisting()
+    ];
     final result = await WidgetUtils.showFoodlyBottomSheet<List<String>>(
       context: context,
       builder: (_) => EditListContentModal(
         title: 'meal_create_tags_title'.tr(),
         selectedContent: _meal.tags ?? [],
-        allContent: _allMealTags ?? [],
+        allContent: allTags,
         textFieldInfo: 'meal_create_edit_tags_info'.tr(),
       ),
     );
@@ -393,5 +397,17 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         _meal.tags = result;
       });
     }
+  }
+
+  List<String> _getMissingTagsInExisting() {
+    if (_meal.tags == null || _meal.tags!.isEmpty) {
+      return [];
+    }
+    if (_existingMealTags == null || _existingMealTags!.isEmpty) {
+      return _meal.tags!;
+    }
+    return _meal.tags!
+        .where((tag) => !_existingMealTags!.contains(tag))
+        .toList();
   }
 }
