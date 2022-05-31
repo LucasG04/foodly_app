@@ -51,8 +51,23 @@ class _MealListViewState extends State<MealListView>
             Consumer(
               builder: (context, watch, _) {
                 watch(allMealsProvider);
+                final isLoadingMeals = watch(initLoadingMealsProvider).state;
                 final tagFilter = watch(mealTagFilterProvider).state;
                 _filteredMeals = _filterMeals(_searchInput, tagFilter);
+
+                if (isLoadingMeals) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: kPadding / 2),
+                    child: ListView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      children: List.generate(
+                        10,
+                        (_) => const MealListTile(null),
+                      ),
+                    ),
+                  );
+                }
 
                 return _filteredMeals.isNotEmpty
                     ? tagFilter.isEmpty

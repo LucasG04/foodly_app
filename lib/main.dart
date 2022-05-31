@@ -202,10 +202,12 @@ class _FoodlyAppState extends State<FoodlyApp> {
       MealService.getMealsPaginated(planId).then((value) {
         if (context.read(allMealsProvider).state.isEmpty) {
           context.read(allMealsProvider).state = value;
+          context.read(initLoadingMealsProvider).state = false;
         }
       });
       _privateMealsStream = MealService.streamPlanMeals(planId).listen((meals) {
         context.read(allMealsProvider).state = meals;
+        context.read(initLoadingMealsProvider).state = false;
         _log.finest('Private meals updated: $meals');
       });
     }
