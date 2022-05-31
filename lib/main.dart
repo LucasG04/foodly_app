@@ -70,10 +70,8 @@ class _FoodlyAppState extends State<FoodlyApp> {
   late StreamSubscription<LogRecord> _logStream;
   // ignore: cancel_subscriptions
   StreamSubscription<List<Meal>>? _privateMealsStream;
-  late List<Meal>? _privateMealsStreamValue;
   // ignore: cancel_subscriptions
   StreamSubscription<List<Meal>>? _publicMealsStream;
-  late List<Meal>? _publicMealsStreamValue;
 
   final _appRouter = AppRouter();
 
@@ -90,12 +88,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
   void initState() {
     _initializeLogger();
     LogRecordService.startPeriodicLogging();
-
-    _privateMealsStreamValue = [];
-    _publicMealsStreamValue = [];
-
     _listenForShareIntent();
-
     super.initState();
   }
 
@@ -115,7 +108,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
                   'PlanProvider Update', context.read(planProvider).state?.id);
 
               if (context.read(planProvider).state != null) {
-                _streamMeals();
+                _preloadAndStreamMeals();
               }
 
               return MaterialApp.router(
@@ -203,34 +196,19 @@ class _FoodlyAppState extends State<FoodlyApp> {
     }
   }
 
-  void _streamMeals() {
+  void _preloadAndStreamMeals() {
     if (_privateMealsStream == null && _publicMealsStream == null) {
-      _privateMealsStream =
-          MealService.streamPlanMeals(context.read(planProvider).state!.id!)
-              .listen((meals) {
-        _privateMealsStreamValue = meals;
-        mergeMealsIntoProvider();
+      final planId = context.read(planProvider).state!.id!;
+      MealService.getMealsPaginated(planId).then((value) {
+        if (context.read(allMealsProvider).state.isEmpty) {
+          context.read(allMealsProvider).state = value;
+        }
+      });
+      _privateMealsStream = MealService.streamPlanMeals(planId).listen((meals) {
+        context.read(allMealsProvider).state = meals;
         _log.finest('Private meals updated: $meals');
       });
-      _publicMealsStream = MealService.streamPublicMeals().listen((meals) {
-        _publicMealsStreamValue = meals;
-        mergeMealsIntoProvider();
-        _log.finest('Public meals updated: $meals');
-      });
     }
-  }
-
-  void mergeMealsIntoProvider() {
-    _log.finer('Call mergeMealsIntoProvider');
-
-    var updatedMeals = [
-      ..._privateMealsStreamValue!,
-      ..._publicMealsStreamValue!
-    ];
-    updatedMeals = [
-      ...{...updatedMeals}
-    ];
-    context.read(allMealsProvider).state = updatedMeals;
   }
 
   void _listenForShareIntent() {

@@ -23,8 +23,7 @@ class MealListView extends StatefulWidget {
 
 class _MealListViewState extends State<MealListView>
     with AutomaticKeepAliveClientMixin {
-  late List<Meal>? _allMeals;
-  List<Meal>? _filteredMeals;
+  List<Meal> _filteredMeals = [];
   String _searchInput = '';
 
   @override
@@ -43,56 +42,64 @@ class _MealListViewState extends State<MealListView>
                 setState(() {
                   _searchInput = search;
                   _filterMeals(
-                      search, context.read(mealTagFilterProvider).state);
+                    search,
+                    context.read(mealTagFilterProvider).state,
+                  );
                 });
               },
             ),
-            Consumer(builder: (context, watch, _) {
-              _allMeals = watch(allMealsProvider).state;
-              final tagFilter = watch(mealTagFilterProvider).state;
-              _filteredMeals = _filterMeals(_searchInput, tagFilter);
+            Consumer(
+              builder: (context, watch, _) {
+                watch(allMealsProvider);
+                final tagFilter = watch(mealTagFilterProvider).state;
+                _filteredMeals = _filterMeals(_searchInput, tagFilter);
 
-              return _filteredMeals != null && _filteredMeals!.isNotEmpty
-                  ? tagFilter.isEmpty
-                      ? _buildRawMealList(_filteredMeals!)
-                      : _buildGroupedTagList(
-                          _groupMealsByTags(
-                            _filteredMeals ?? [],
-                            tagFilter,
-                          ),
-                        )
-                  : Column(
-                      children: [
-                        UserInformation(
-                          'assets/images/undraw_empty.png',
-                          'meal_list_empty_title'.tr(),
-                          'meal_list_empty_subtitle'.tr(),
-                        ),
-                        const SizedBox(height: kPadding),
-                        TextButton.icon(
-                          onPressed: () => Navigator.push(
-                            context,
-                            ConcentricPageRoute<HelpSlideShareImport>(
-                              builder: (_) => HelpSlideShareImport(),
+                return _filteredMeals.isNotEmpty
+                    ? tagFilter.isEmpty
+                        ? _buildRawMealList(_filteredMeals)
+                        : _buildGroupedTagList(
+                            _groupMealsByTags(
+                              _filteredMeals,
+                              tagFilter,
                             ),
-                          ),
-                          icon: const Icon(EvaIcons.questionMarkCircleOutline),
-                          label: const Text('meal_list_help_import').tr(),
-                        ),
-                        const SizedBox(height: kPadding),
-                        IconButton(
-                          onPressed: _refreshMeals,
-                          icon: Icon(
-                            EvaIcons.refreshOutline,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        ),
-                      ],
-                    );
-            })
+                          )
+                    : _buildEmptyMeals();
+              },
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  Column _buildEmptyMeals() {
+    return Column(
+      children: [
+        UserInformation(
+          'assets/images/undraw_empty.png',
+          'meal_list_empty_title'.tr(),
+          'meal_list_empty_subtitle'.tr(),
+        ),
+        const SizedBox(height: kPadding),
+        TextButton.icon(
+          onPressed: () => Navigator.push(
+            context,
+            ConcentricPageRoute<HelpSlideShareImport>(
+              builder: (_) => HelpSlideShareImport(),
+            ),
+          ),
+          icon: const Icon(EvaIcons.questionMarkCircleOutline),
+          label: const Text('meal_list_help_import').tr(),
+        ),
+        const SizedBox(height: kPadding),
+        IconButton(
+          onPressed: _refreshMeals,
+          icon: Icon(
+            EvaIcons.refreshOutline,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+      ],
     );
   }
 
@@ -156,7 +163,7 @@ class _MealListViewState extends State<MealListView>
   }
 
   List<Meal> _filterMeals(String query, List<String> tagList) {
-    final mealsCopy = [..._allMeals!];
+    final mealsCopy = [...context.read(allMealsProvider).state];
     mealsCopy.sort((m1, m2) => m1.name.compareTo(m2.name));
 
     if (query.isNotEmpty) {
