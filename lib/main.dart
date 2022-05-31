@@ -103,11 +103,10 @@ class _FoodlyAppState extends State<FoodlyApp> {
           _loadActiveUser(context);
           return Consumer(
             builder: (context, watch, _) {
-              watch(planProvider);
-              _log.finer(
-                  'PlanProvider Update', context.read(planProvider).state?.id);
+              final plan = watch(planProvider).state;
+              _log.finer('PlanProvider Update: ${plan?.id}');
 
-              if (context.read(planProvider).state != null) {
+              if (plan != null) {
                 _preloadAndStreamMeals();
               }
 
@@ -197,20 +196,24 @@ class _FoodlyAppState extends State<FoodlyApp> {
   }
 
   void _preloadAndStreamMeals() {
-    if (_privateMealsStream == null && _publicMealsStream == null) {
-      final planId = context.read(planProvider).state!.id!;
-      MealService.getMealsPaginated(planId).then((value) {
-        if (context.read(allMealsProvider).state.isEmpty) {
-          context.read(allMealsProvider).state = value;
-          context.read(initLoadingMealsProvider).state = false;
-        }
-      });
-      _privateMealsStream = MealService.streamPlanMeals(planId).listen((meals) {
-        context.read(allMealsProvider).state = meals;
-        context.read(initLoadingMealsProvider).state = false;
-        _log.finest('Private meals updated: $meals');
-      });
+    final planId = context.read(planProvider).state?.id;
+
+    if (planId == null) {
+      return;
     }
+    _privateMealsStream?.cancel();
+    _privateMealsStream = null;
+    MealService.getMealsPaginated(planId).then((value) {
+      if (context.read(allMealsProvider).state.isEmpty) {
+        context.read(allMealsProvider).state = value;
+        context.read(initLoadingMealsProvider).state = false;
+      }
+    });
+    _privateMealsStream = MealService.streamPlanMeals(planId).listen((meals) {
+      context.read(allMealsProvider).state = meals;
+      context.read(initLoadingMealsProvider).state = false;
+      _log.finest('Private meals updated: $meals');
+    });
   }
 
   void _listenForShareIntent() {
