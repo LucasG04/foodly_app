@@ -7,9 +7,10 @@ import '../../../constants.dart';
 import '../../../models/meal.dart';
 import '../../../widgets/foodly_network_image.dart';
 import '../../../widgets/meal_tag.dart';
+import '../../../widgets/skeleton_container.dart';
 
 class MealListTile extends StatelessWidget {
-  final Meal meal;
+  final Meal? meal;
 
   const MealListTile(this.meal, {Key? key}) : super(key: key);
 
@@ -17,11 +18,77 @@ class MealListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    return _buildWrapper(
+      context: context,
+      child: Row(
+        children: [
+          _buildImageWrapper(
+            child: meal == null
+                ? _buildLoadingImage()
+                : meal!.imageUrl != null && meal!.imageUrl!.isNotEmpty
+                    ? FoodlyNetworkImage(meal!.imageUrl!)
+                    : Image.asset(
+                        'assets/images/food_fallback.png',
+                        fit: BoxFit.cover,
+                      ),
+          ),
+          _buildTileContent(
+            title: meal == null
+                ? _buildLoadingTitle()
+                : AutoSizeText(
+                    meal!.name,
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 2,
+                  ),
+            subtitle: meal != null && meal!.tags!.isNotEmpty
+                ? SizedBox(
+                    height: MealTag.tagHeight,
+                    child: Wrap(
+                      clipBehavior: Clip.hardEdge,
+                      children: meal!.tags!.map((e) => MealTag(e)).toList(),
+                    ),
+                  )
+                : const SizedBox(),
+          ),
+        ],
+      ),
+    );
+  }
 
+  Expanded _buildTileContent({
+    required Widget title,
+    required Widget subtitle,
+  }) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5.0),
+              child: title,
+            ),
+            subtitle,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWrapper({
+    required BuildContext context,
+    required Widget child,
+  }) {
+    final width = MediaQuery.of(context).size.width;
     return Align(
       child: GestureDetector(
-        onTap: () => AutoRouter.of(context).push(MealScreenRoute(id: meal.id!)),
+        onTap: () =>
+            AutoRouter.of(context).push(MealScreenRoute(id: meal!.id!)),
         child: Container(
           width: width > 599 ? 600 : width * 0.9,
           height: height,
@@ -31,78 +98,34 @@ class MealListTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(kRadius),
             color: Colors.white,
           ),
-          child: Row(
-            children: [
-              SizedBox(
-                height: height,
-                width: height,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(kRadius),
-                  child: meal.imageUrl != null && meal.imageUrl!.isNotEmpty
-                      ? FoodlyNetworkImage(meal.imageUrl!)
-                      : Image.asset(
-                          'assets/images/food_fallback.png',
-                          fit: BoxFit.cover,
-                        ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        child: AutoSizeText(
-                          meal.name,
-                          style: const TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 2,
-                        ),
-                      ),
-                      if (meal.tags!.isNotEmpty)
-                        SizedBox(
-                          height: MealTag.tagHeight,
-                          child: Wrap(
-                            clipBehavior: Clip.hardEdge,
-                            children:
-                                meal.tags!.map((e) => MealTag(e)).toList(),
-                          ),
-                        )
-                      else
-                        const SizedBox(),
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                height: height / 2,
-                width: height / 2,
-                margin: const EdgeInsets.only(right: 20.0),
-                child: Container(),
-                // child: OutlineButton(
-                //   onPressed: () => _selectMeal(),
-                //   child: AnimatedSwitcher(
-                //     duration: const Duration(milliseconds: 375),
-                //     child: _buttonState == _ButtonState.DEFAULT
-                //         ? Icon(EvaIcons.plusOutline)
-                //         : _buttonState == _ButtonState.LOADING
-                //             ? SmallCircularProgressIndicator()
-                //             : Icon(
-                //                 EvaIcons.checkmarkOutline,
-                //                 color: Colors.green,
-                //               ),
-                //   ),
-                // ),
-              ),
-            ],
-          ),
+          child: child,
         ),
       ),
     );
+  }
+
+  Widget _buildImageWrapper({required Widget child}) {
+    return SizedBox(
+      height: height,
+      width: height,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(kRadius),
+        child: child,
+      ),
+    );
+  }
+
+  Widget _buildLoadingImage() {
+    return const SkeletonContainer(
+        width: double.infinity, height: double.infinity);
+  }
+
+  Widget _buildLoadingTitle() {
+    return LayoutBuilder(builder: (context, constraints) {
+      return SkeletonContainer(
+        height: Theme.of(context).textTheme.bodyText1?.fontSize ?? 16,
+        width: constraints.maxWidth * 0.7,
+      );
+    });
   }
 }
