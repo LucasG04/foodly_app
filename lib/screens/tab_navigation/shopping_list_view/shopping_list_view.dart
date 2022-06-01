@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share/share.dart';
@@ -79,6 +82,7 @@ class _ShoppingListViewState extends State<ShoppingListView>
                                       item.bought = true;
                                       ShoppingListService.updateGrocery(
                                           listId, item);
+                                      _checkBoughtItems(listId, boughtItems);
                                     },
                                   ),
                                 ),
@@ -182,5 +186,78 @@ class _ShoppingListViewState extends State<ShoppingListView>
                 : '\n- ${e.amount} ${e.unit} ${e.name}')
         .toList();
     Share.share(list.join());
+  }
+
+  void _checkBoughtItems(String listId, List<Grocery> boughtGroceries) {
+    if (boughtGroceries.length < 50) {
+      return;
+    }
+
+    showDialog<void>(
+      context: context,
+      builder: (_) => Platform.isIOS
+          ? _buildIOSAlertDialog(listId)
+          : _buildAlertDialog(listId),
+    );
+  }
+
+  CupertinoAlertDialog _buildIOSAlertDialog(String listId) {
+    return CupertinoAlertDialog(
+      title: Text('shopping_dialog_title'.tr()),
+      content: Column(
+        children: [
+          const SizedBox(height: kPadding / 2),
+          Text('shopping_dialog_description'.tr()),
+          const SizedBox(height: kPadding / 4),
+          Text('shopping_dialog_settings_info'.tr()),
+        ],
+      ),
+      actions: <Widget>[
+        CupertinoDialogAction(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text('shopping_dialog_action_cancel'.tr().toUpperCase()),
+        ),
+        CupertinoDialogAction(
+          onPressed: () {
+            ShoppingListService.deleteAllBoughtGrocery(listId);
+            Navigator.of(context).pop();
+          },
+          isDefaultAction: true,
+          child: Text('update_dialog_action_delete'.tr().toUpperCase()),
+        ),
+      ],
+    );
+  }
+
+  AlertDialog _buildAlertDialog(String listId) {
+    return AlertDialog(
+      title: Text('shopping_dialog_title'.tr()),
+      content: Column(
+        children: [
+          const SizedBox(height: kPadding / 2),
+          Text('shopping_dialog_description'.tr()),
+          const SizedBox(height: kPadding / 4),
+          Text('shopping_dialog_settings_info'.tr()),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: Text('shopping_dialog_action_cancel'.tr()),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        TextButton(
+          child: Text(
+            'update_dialog_action_delete'.tr(),
+            style: TextStyle(color: Theme.of(context).primaryColor),
+          ),
+          onPressed: () {
+            ShoppingListService.deleteAllBoughtGrocery(listId);
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
   }
 }

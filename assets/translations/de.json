@@ -189,5 +189,10 @@
     "update_dialog_description": "Eine neue Version mit neuen Funktionen und Verbesserungen ist verfügbar.",
     "update_dialog_question": "Lad sie dir am besten direkt runter!",
     "update_dialog_action_later": "Später",
-    "update_dialog_action_update": "Aktualisieren"
+    "update_dialog_action_update": "Aktualisieren",
+    "shopping_dialog_title": "Bereits gekaufte entfernen?",
+    "shopping_dialog_description": "Du hast schon über 50 Lebensmittel gekauft. Möchtest du diese entfernen?",
+    "shopping_dialog_settings_info": "Falls du gekaufte Lebensmittel direkt entfernen möchtest, aktiviere die Funktion in den Einstellungen.",
+    "shopping_dialog_action_cancel": "Behalten",
+    "update_dialog_action_delete": "Entfernen"
 }

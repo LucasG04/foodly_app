@@ -189,5 +189,10 @@
     "update_dialog_description": "A new version with new features and improvements is available.",
     "update_dialog_question": "You better download it now!",
     "update_dialog_action_later": "Later",
-    "update_dialog_action_update": "Update Now"
+    "update_dialog_action_update": "Update Now",
+    "shopping_dialog_title": "Remove bought groceries?",
+    "shopping_dialog_description": "You already bought more than 50 groceries. Do you want to remove them?",
+    "shopping_dialog_settings_info": "If you want to remove bought groceries immediately, enable the option in the settings.",
+    "shopping_dialog_action_cancel": "Keep",
+    "update_dialog_action_delete": "Remove"
 }
