@@ -13,6 +13,9 @@ final userProvider = StateProvider<FoodlyUser?>((_) => null);
 /// Provides the current filter for the meal list.
 final mealTagFilterProvider = StateProvider<List<String>>((_) => []);
 
+/// Provides the last locally changed meal
+final mealsChangedProvider = StateProvider<int>((_) => 0);
+
 /// Provides the current initial search for the WebImagePicker
 final initSearchWebImagePickerProvider = StateProvider<String>((_) => '');
 

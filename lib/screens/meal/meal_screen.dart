@@ -410,6 +410,7 @@ class _MealScreenState extends State<MealScreen> {
       if (!mounted) {
         return;
       }
+      BasicUtils.emitMealsChanged(context);
       AutoRouter.of(context).pop();
     }
   }

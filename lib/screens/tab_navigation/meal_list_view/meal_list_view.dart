@@ -48,6 +48,7 @@ class _MealListViewState extends State<MealListView>
 
     _loadNextMeals().then((_) => context.read(_$isLoading).state = false);
     _scrollController.addListener(_scrollListener);
+    _listenForMealsChange();
     super.initState();
   }
 
@@ -73,6 +74,7 @@ class _MealListViewState extends State<MealListView>
                 }
               },
               onSearchClose: () => context.read(_$isSearching).state = false,
+              onRefresh: _refreshMeals,
             ),
             Consumer(
               builder: (context, watch, _) {
@@ -255,6 +257,7 @@ class _MealListViewState extends State<MealListView>
       return;
     }
     context.read(_$isLoading).state = true;
+    context.read(mealTagFilterProvider).state = [];
     context.read(_$filteredMeals).state = await LunixApiService.searchMeals(
       context.read(planProvider).state!.id!,
       query,
@@ -306,6 +309,30 @@ class _MealListViewState extends State<MealListView>
         !context.read(_$isLoading).state &&
         !context.read(_$isSearching).state &&
         context.read(_$loadedMeals).state.isNotEmpty;
+  }
+
+  void _refreshMeals() async {
+    context.read(_$isLoading).state = true;
+    context.read(_$loadedMeals).state = [];
+    context.read(_$filteredMeals).state = [];
+    context.read(_$isLoadingPagination).state = false;
+    context.read(_$isSearching).state = false;
+    context.read(mealTagFilterProvider).state = [];
+    await _loadNextMeals();
+    if (!mounted) {
+      return;
+    }
+    context.read(_$isLoading).state = false;
+  }
+
+  void _listenForMealsChange() {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => context.read(mealsChangedProvider).addListener((state) {
+        if (state != 0) {
+          _refreshMeals();
+        }
+      }),
+    );
   }
 }
 

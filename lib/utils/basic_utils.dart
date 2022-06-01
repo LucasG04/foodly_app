@@ -49,4 +49,9 @@ class BasicUtils {
 
     return List.generate(8, (i) => today.add(Duration(days: i)));
   }
+
+  static void emitMealsChanged(BuildContext context) {
+    context.read(mealsChangedProvider).state =
+        DateTime.now().millisecondsSinceEpoch;
+  }
 }
