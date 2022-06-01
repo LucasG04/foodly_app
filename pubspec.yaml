@@ -16,7 +16,7 @@ dependencies:
 
   # Util
   flutter_riverpod: ^0.14.0
-  auto_route: ^3.2.0
+  auto_route: ^4.0.1
   intl: ^0.17.0
   hive: ^2.0.4
   # flutter_cache_manager_hive:
@@ -81,7 +81,7 @@ dev_dependencies:
   #   sdk: flutter
   # build runner via: `flutter packages pub run build_runner build`
   build_runner:
-  auto_route_generator: ^3.2.0
+  auto_route_generator: ^4.0.0
   hive_generator: ^1.1.1
   flutter_launcher_icons: ^0.9.0
 
