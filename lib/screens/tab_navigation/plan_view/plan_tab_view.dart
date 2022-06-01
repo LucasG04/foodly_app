@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -43,10 +42,6 @@ class _PlanTabViewState extends State<PlanTabView>
                 child: AnimationLimiter(
                   child: Column(
                     children: [
-                      TextButton(
-                        child: const Text('error'),
-                        onPressed: () => FirebaseCrashlytics.instance.crash(),
-                      ),
                       const SizedBox(height: kPadding),
                       Padding(
                         padding: const EdgeInsets.only(left: 5.0),
