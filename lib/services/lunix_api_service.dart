@@ -20,7 +20,7 @@ class LunixApiService {
 
   static final _log = Logger('LunixApiService');
   static const String _lunixApiEndpoint =
-      'https://lunix-api-dev.herokuapp.com/foodly';
+      'https://lunix-api.herokuapp.com/foodly';
   static final Dio _dio = Dio(
     BaseOptions(
       headers: <String, dynamic>{'x-api-key': secretLunixApi},
