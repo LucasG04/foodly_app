@@ -223,7 +223,7 @@ class LunixApiService {
 
     final List<Meal> data = (response.data as List<dynamic>)
         .map((dynamic e) =>
-            Meal.fromMap(e['id'] as String, e as Map<String, dynamic>))
+            Meal.fromMap((e as Map<String, dynamic>)['id'] as String, e))
         .toList();
 
     return data;

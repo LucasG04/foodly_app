@@ -16,7 +16,6 @@ import 'app_router.gr.dart';
 import 'constants.dart';
 import 'models/foodly_user.dart';
 import 'models/link_metadata.dart';
-import 'models/meal.dart';
 import 'models/plan.dart';
 import 'providers/state_providers.dart';
 import 'services/authentication_service.dart';
@@ -64,17 +63,14 @@ class FoodlyApp extends StatefulWidget {
 }
 
 class _FoodlyAppState extends State<FoodlyApp> {
-  late StreamSubscription<String> _intentDataStreamSubscription;
   final Logger _log = Logger('FoodlyApp');
+  late StreamSubscription<String> _intentDataStreamSubscription;
   late StreamSubscription<LogRecord> _logStream;
-  // ignore: cancel_subscriptions
-  StreamSubscription<List<Meal>>? _privateMealsStream;
 
   final _appRouter = AppRouter();
 
   @override
   void dispose() {
-    _privateMealsStream!.cancel();
     _logStream.cancel();
     _intentDataStreamSubscription.cancel();
     super.dispose();
