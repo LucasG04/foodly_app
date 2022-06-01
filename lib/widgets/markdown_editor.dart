@@ -162,8 +162,9 @@ class _MarkdownEditorState extends State<MarkdownEditor>
   }
 
   void openLink(String href) async {
-    if (await canLaunch(href)) {
-      await launch(href);
+    final url = Uri.parse(href);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
     } else {
       log.severe('ERR in linkOnTapHandler()! Could not launch $href');
     }

@@ -63,8 +63,8 @@ class _LoadingLogutState extends State<LoadingLogut> {
       path: 'lucasg04@yahoo.com',
     );
 
-    if (await canLaunch(uri.toString())) {
-      await launch(uri.toString());
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
     }
   }
 }

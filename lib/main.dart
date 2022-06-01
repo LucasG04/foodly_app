@@ -150,12 +150,15 @@ class _FoodlyAppState extends State<FoodlyApp> {
   Future<void> _loadActiveUser(BuildContext context) async {
     final firebaseUser = AuthenticationService.currentUser;
     if (firebaseUser != null) {
+      FirebaseCrashlytics.instance.setUserIdentifier(firebaseUser.uid);
       final FoodlyUser user =
           (await FoodlyUserService.getUserById(firebaseUser.uid))!;
       if (!mounted) {
         return;
       }
       context.read(userProvider).state = user;
+    } else {
+      FirebaseCrashlytics.instance.setUserIdentifier('');
     }
   }
 
