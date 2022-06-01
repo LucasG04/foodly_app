@@ -11,8 +11,10 @@ import '../../../constants.dart';
 import '../../../models/grocery.dart';
 import '../../../models/shopping_list.dart';
 import '../../../providers/state_providers.dart';
+import '../../../services/settings_service.dart';
 import '../../../services/shopping_list_service.dart';
 import '../../../utils/basic_utils.dart';
+import '../../../utils/main_snackbar.dart';
 import '../../../utils/widget_utils.dart';
 import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
@@ -27,9 +29,6 @@ class ShoppingListView extends StatefulWidget {
 
 class _ShoppingListViewState extends State<ShoppingListView>
     with AutomaticKeepAliveClientMixin {
-  List<Grocery> todoItems = [];
-  List<Grocery> boughtItems = [];
-
   @override
   bool get wantKeepAlive => true;
 
@@ -83,39 +82,35 @@ class _ShoppingListViewState extends State<ShoppingListView>
                               child: AnimatedShoppingList(
                                 groceries: todoItems,
                                 onEdit: (e) => _editGrocery(listId, e),
-                                onTap: (item) {
-                                  item.bought = true;
-                                  ShoppingListService.updateGrocery(
-                                      listId, item);
-                                  _checkBoughtItems(listId, boughtItems);
-                                },
+                                onTap: (item) => _removeBoughtGrocery(
+                                    listId, item, boughtItems),
                               ),
                             ),
                             const SizedBox(height: kPadding),
-                            SizedBox(
-                              width: BasicUtils.contentWidth(
-                                context,
-                                smallMultiplier: 1,
-                              ),
-                              child: ExpansionTile(
-                                title: Text(
-                                  'shopping_list_already_bought',
-                                  style: TextStyle(
-                                    color: Theme.of(context).primaryColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ).tr(),
-                                children: [
-                                  AnimatedShoppingList(
-                                    groceries: boughtItems,
-                                    onEdit: (e) => _editGrocery(listId, e),
-                                    onTap: (item) {
-                                      item.bought = false;
-                                      ShoppingListService.updateGrocery(
-                                          listId, item);
-                                    },
-                                  ),
-                                  if (boughtItems.isNotEmpty)
+                            if (boughtItems.isNotEmpty)
+                              SizedBox(
+                                width: BasicUtils.contentWidth(
+                                  context,
+                                  smallMultiplier: 1,
+                                ),
+                                child: ExpansionTile(
+                                  title: Text(
+                                    'shopping_list_already_bought',
+                                    style: TextStyle(
+                                      color: Theme.of(context).primaryColor,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ).tr(),
+                                  children: [
+                                    AnimatedShoppingList(
+                                      groceries: boughtItems,
+                                      onEdit: (e) => _editGrocery(listId, e),
+                                      onTap: (item) {
+                                        item.bought = false;
+                                        ShoppingListService.updateGrocery(
+                                            listId, item);
+                                      },
+                                    ),
                                     Center(
                                       child: TextButton(
                                         onPressed: () => ShoppingListService
@@ -140,9 +135,9 @@ class _ShoppingListViewState extends State<ShoppingListView>
                                         ).tr(),
                                       ),
                                     ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
                           ],
                         ),
                       );
@@ -183,6 +178,30 @@ class _ShoppingListViewState extends State<ShoppingListView>
                 : '\n- ${e.amount} ${e.unit} ${e.name}')
         .toList();
     Share.share(list.join());
+  }
+
+  void _removeBoughtGrocery(
+      String listId, Grocery grocery, List<Grocery> boughtItems) {
+    if (!SettingsService.removeBoughtImmediately) {
+      grocery.bought = true;
+      ShoppingListService.updateGrocery(listId, grocery);
+      _checkBoughtItems(listId, boughtItems);
+      return;
+    }
+
+    ShoppingListService.deleteGrocery(listId, grocery.id!);
+    MainSnackbar(
+      message: 'shopping_list_grocery_removed'.tr(args: [grocery.name!]),
+      seconds: 3,
+      isCountdown: true,
+      action: IconButton(
+        icon: Icon(EvaIcons.undoOutline, color: Theme.of(context).primaryColor),
+        onPressed: () {
+          ShoppingListService.addGrocery(listId, grocery);
+          Navigator.of(context).maybePop();
+        },
+      ),
+    ).show(context);
   }
 
   void _checkBoughtItems(String listId, List<Grocery> boughtGroceries) {
