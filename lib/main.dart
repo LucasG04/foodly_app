@@ -16,14 +16,12 @@ import 'app_router.gr.dart';
 import 'constants.dart';
 import 'models/foodly_user.dart';
 import 'models/link_metadata.dart';
-import 'models/meal.dart';
 import 'models/plan.dart';
 import 'providers/state_providers.dart';
 import 'services/authentication_service.dart';
 import 'services/foodly_user_service.dart';
 import 'services/link_metadata_service.dart';
 import 'services/log_record_service.dart';
-import 'services/meal_service.dart';
 import 'services/plan_service.dart';
 import 'services/settings_service.dart';
 import 'services/version_service.dart';
@@ -65,17 +63,14 @@ class FoodlyApp extends StatefulWidget {
 }
 
 class _FoodlyAppState extends State<FoodlyApp> {
-  late StreamSubscription<String> _intentDataStreamSubscription;
   final Logger _log = Logger('FoodlyApp');
+  late StreamSubscription<String> _intentDataStreamSubscription;
   late StreamSubscription<LogRecord> _logStream;
-  // ignore: cancel_subscriptions
-  StreamSubscription<List<Meal>>? _privateMealsStream;
 
   final _appRouter = AppRouter();
 
   @override
   void dispose() {
-    _privateMealsStream!.cancel();
     _logStream.cancel();
     _intentDataStreamSubscription.cancel();
     super.dispose();
@@ -102,10 +97,6 @@ class _FoodlyAppState extends State<FoodlyApp> {
             builder: (context, watch, _) {
               final plan = watch(planProvider).state;
               _log.finer('PlanProvider Update: ${plan?.id}');
-
-              if (plan != null) {
-                _preloadAndStreamMeals();
-              }
 
               return MaterialApp.router(
                 routerDelegate: _appRouter.delegate(),
@@ -190,27 +181,6 @@ class _FoodlyAppState extends State<FoodlyApp> {
         record
       ];
     }
-  }
-
-  void _preloadAndStreamMeals() {
-    final planId = context.read(planProvider).state?.id;
-
-    if (planId == null) {
-      return;
-    }
-    _privateMealsStream?.cancel();
-    _privateMealsStream = null;
-    MealService.getMealsPaginated(planId).then((value) {
-      if (context.read(allMealsProvider).state.isEmpty) {
-        context.read(allMealsProvider).state = value;
-        context.read(initLoadingMealsProvider).state = false;
-      }
-    });
-    _privateMealsStream = MealService.streamPlanMeals(planId).listen((meals) {
-      context.read(allMealsProvider).state = meals;
-      context.read(initLoadingMealsProvider).state = false;
-      _log.finest('Private meals updated: $meals');
-    });
   }
 
   void _listenForShareIntent() {

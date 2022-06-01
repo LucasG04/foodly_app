@@ -8,7 +8,9 @@ import 'package:group_list_view/group_list_view.dart';
 import '../../../constants.dart';
 import '../../../models/meal.dart';
 import '../../../providers/state_providers.dart';
+import '../../../services/lunix_api_service.dart';
 import '../../../services/meal_service.dart';
+import '../../../utils/debouncer.dart';
 import '../../../widgets/user_information.dart';
 import '../settings_view/help_slides/help_slide_share_import.dart';
 import 'meal_list_tile.dart';
@@ -23,62 +25,69 @@ class MealListView extends StatefulWidget {
 
 class _MealListViewState extends State<MealListView>
     with AutomaticKeepAliveClientMixin {
-  List<Meal> _filteredMeals = [];
-  String _searchInput = '';
+  late AutoDisposeStateProvider<bool> _$isLoading;
+  late StateProvider<bool> _$isLoadingPagination;
+  late StateProvider<bool> _$isSearching;
+  late StateProvider<List<Meal>> _$loadedMeals;
+  late StateProvider<List<Meal>> _$filteredMeals;
+
+  final ScrollController _scrollController = ScrollController();
+  final Debouncer _searchDebouncer = Debouncer(milliseconds: 500);
+  bool _paginationAtEnd = false;
 
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    _$isLoading = StateProvider.autoDispose<bool>((_) => true);
+    _$isLoadingPagination = StateProvider<bool>((_) => true);
+    _$isSearching = StateProvider<bool>((_) => false);
+    _$loadedMeals = StateProvider<List<Meal>>((_) => []);
+    _$filteredMeals = StateProvider<List<Meal>>((_) => []);
+
+    _loadNextMeals().then((_) => context.read(_$isLoading).state = false);
+    _scrollController.addListener(_scrollListener);
+    _listenForMealsChange();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
       body: SingleChildScrollView(
+        controller: _scrollController,
         child: Column(
           children: [
             const SizedBox(height: kPadding),
             MealListTitle(
-              onSearch: (search) {
-                setState(() {
-                  _searchInput = search;
-                  _filterMeals(
-                    search,
-                    context.read(mealTagFilterProvider).state,
-                  );
-                });
+              onSearch: (query) {
+                if (query.length > 2) {
+                  _searchDebouncer.run(() => _searchMeal(query));
+                }
               },
+              onSearchClose: () => context.read(_$isSearching).state = false,
+              onRefresh: _refreshMeals,
             ),
             Consumer(
               builder: (context, watch, _) {
-                watch(allMealsProvider);
-                final isLoadingMeals = watch(initLoadingMealsProvider).state;
-                final tagFilter = watch(mealTagFilterProvider).state;
-                _filteredMeals = _filterMeals(_searchInput, tagFilter);
+                final isLoading = watch(_$isLoading).state;
+                final selectedTags = watch(mealTagFilterProvider).state;
 
-                if (isLoadingMeals) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: kPadding / 2),
-                    child: ListView(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      children: List.generate(
-                        10,
-                        (_) => const MealListTile(null),
-                      ),
-                    ),
-                  );
+                if (isLoading) {
+                  return _buildLoadingMealList();
                 }
 
-                return _filteredMeals.isNotEmpty
-                    ? tagFilter.isEmpty
-                        ? _buildRawMealList(_filteredMeals)
-                        : _buildGroupedTagList(
-                            _groupMealsByTags(
-                              _filteredMeals,
-                              tagFilter,
-                            ),
-                          )
-                    : _buildEmptyMeals();
+                return selectedTags.isEmpty
+                    ? _buildMealList()
+                    : _buildGroupedTagList(selectedTags);
               },
             ),
           ],
@@ -87,34 +96,17 @@ class _MealListViewState extends State<MealListView>
     );
   }
 
-  Column _buildEmptyMeals() {
-    return Column(
-      children: [
-        UserInformation(
-          'assets/images/undraw_empty.png',
-          'meal_list_empty_title'.tr(),
-          'meal_list_empty_subtitle'.tr(),
+  Padding _buildLoadingMealList() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: kPadding / 2),
+      child: ListView(
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        children: List.generate(
+          10,
+          (_) => const MealListTile(null),
         ),
-        const SizedBox(height: kPadding),
-        TextButton.icon(
-          onPressed: () => Navigator.push(
-            context,
-            ConcentricPageRoute<HelpSlideShareImport>(
-              builder: (_) => HelpSlideShareImport(),
-            ),
-          ),
-          icon: const Icon(EvaIcons.questionMarkCircleOutline),
-          label: const Text('meal_list_help_import').tr(),
-        ),
-        const SizedBox(height: kPadding),
-        IconButton(
-          onPressed: _refreshMeals,
-          icon: Icon(
-            EvaIcons.refreshOutline,
-            color: Theme.of(context).primaryColor,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -137,32 +129,115 @@ class _MealListViewState extends State<MealListView>
     );
   }
 
-  Widget _buildRawMealList(List<Meal> meals) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: kPadding / 2),
-      child: ListView.builder(
-        itemCount: meals.length,
-        itemBuilder: (_, index) => MealListTile(meals[index]),
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-      ),
+  Widget _buildMealList() {
+    return Consumer(builder: (context, watch, _) {
+      final isSearching = watch(_$isSearching).state;
+      return isSearching ? _buildSearchedMealList() : _buildPaginatedMealList();
+    });
+  }
+
+  Consumer _buildSearchedMealList() {
+    return Consumer(builder: (context, watch, _) {
+      final filteredMeals = watch(_$filteredMeals).state;
+
+      if (filteredMeals.isEmpty) {
+        return _buildEmptySearchedMeals();
+      }
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: kPadding / 2),
+        child: ListView.builder(
+          itemCount: filteredMeals.length,
+          itemBuilder: (_, index) => MealListTile(filteredMeals[index]),
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+        ),
+      );
+    });
+  }
+
+  Consumer _buildPaginatedMealList() {
+    return Consumer(builder: (context, watch, _) {
+      final loadedMeals = watch(_$loadedMeals).state;
+
+      if (loadedMeals.isEmpty) {
+        return _buildEmptyMeals();
+      }
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: kPadding / 2),
+        child: ListView.builder(
+          itemCount: loadedMeals.length,
+          itemBuilder: (_, index) => MealListTile(loadedMeals[index]),
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+        ),
+      );
+    });
+  }
+
+  Widget _buildEmptyMeals() {
+    return Column(
+      children: [
+        UserInformation(
+          'assets/images/undraw_empty.png',
+          'meal_list_empty_title'.tr(),
+          'meal_list_empty_subtitle'.tr(),
+        ),
+        const SizedBox(height: kPadding),
+        TextButton.icon(
+          onPressed: () => Navigator.push(
+            context,
+            ConcentricPageRoute<HelpSlideShareImport>(
+              builder: (_) => HelpSlideShareImport(),
+            ),
+          ),
+          icon: const Icon(EvaIcons.questionMarkCircleOutline),
+          label: const Text('meal_list_help_import').tr(),
+        ),
+      ],
     );
   }
 
-  Widget _buildGroupedTagList(List<TagGroup> groups) {
-    return GroupListView(
-      itemBuilder: (_, item) => MealListTile(
-        groups[item.section].meals[item.index],
-      ),
-      sectionsCount: groups.length,
-      groupHeaderBuilder: (_, group) => _buildSubtitle(
-        context,
-        groups[group].tag,
-      ),
-      countOfItemInSection: (section) => groups[section].meals.length,
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
+  Widget _buildEmptySearchedMeals() {
+    return Column(
+      children: [
+        UserInformation(
+          'assets/images/undraw_empty.png',
+          'meal_list_empty_search_title'.tr(),
+          'meal_list_empty_search_subtitle'.tr(),
+        ),
+      ],
     );
+  }
+
+  Widget _buildGroupedTagList(List<String> selectedTags) {
+    return FutureBuilder<List<Meal>>(
+        future: LunixApiService.searchMealsByTags(
+          context.read(planProvider).state!.id!,
+          selectedTags,
+        ),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return _buildLoadingMealList();
+          }
+
+          final groups = _groupMealsByTags(snapshot.data!, selectedTags);
+
+          return GroupListView(
+            itemBuilder: (_, item) => MealListTile(
+              groups[item.section].meals[item.index],
+            ),
+            sectionsCount: groups.length,
+            groupHeaderBuilder: (_, group) => _buildSubtitle(
+              context,
+              groups[group].tag,
+            ),
+            countOfItemInSection: (section) => groups[section].meals.length,
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+          );
+        });
   }
 
   List<TagGroup> _groupMealsByTags(List<Meal> meals, List<String> tags) {
@@ -177,31 +252,87 @@ class _MealListViewState extends State<MealListView>
     return tagList;
   }
 
-  List<Meal> _filterMeals(String query, List<String> tagList) {
-    final mealsCopy = [...context.read(allMealsProvider).state];
-    mealsCopy.sort((m1, m2) => m1.name.compareTo(m2.name));
-
-    if (query.isNotEmpty) {
-      return <Meal>{
-        ...mealsCopy
-            .where((el) => el.name.toLowerCase().contains(query.toLowerCase()))
-            .toList(),
-        ...mealsCopy
-            .where((el) => el.tags!
-                .any((t) => t.toLowerCase().contains(query.toLowerCase())))
-            .toList(),
-        ...mealsCopy
-            .where((el) => el.tags!.any((tag) => tagList.contains(tag)))
-            .toList()
-      }.toList();
+  Future<void> _searchMeal(String query) async {
+    if (query.isEmpty) {
+      return;
     }
-    return mealsCopy;
+    context.read(_$isLoading).state = true;
+    context.read(mealTagFilterProvider).state = [];
+    context.read(_$filteredMeals).state = await LunixApiService.searchMeals(
+      context.read(planProvider).state!.id!,
+      query,
+    );
+
+    if (!mounted) {
+      return;
+    }
+    context.read(_$isSearching).state = true;
+    context.read(_$isLoading).state = false;
   }
 
-  void _refreshMeals() {
-    final activePlan = context.read(planProvider).state!;
-    MealService.getAllMeals(activePlan.id!)
-        .then((meals) => context.read(allMealsProvider).state = meals);
+  void _scrollListener() {
+    if (!_paginationActive() || _paginationAtEnd) {
+      return;
+    }
+    final loadNew = _scrollController.offset >=
+        _scrollController.position.maxScrollExtent * 0.7;
+
+    if (!loadNew) {
+      return;
+    }
+    _loadNextMeals();
+  }
+
+  Future<void> _loadNextMeals() async {
+    context.read(_$isLoadingPagination).state = true;
+    const pageSize = 30;
+    final currentMeals = context.read(_$loadedMeals).state;
+
+    final nextMeals = await MealService.getMealsPaginated(
+      context.read(planProvider).state!.id!,
+      lastMealId: currentMeals.isEmpty ? null : currentMeals.last.id,
+      amount: pageSize, // ignore: avoid_redundant_argument_values
+    );
+
+    _paginationAtEnd = nextMeals.length < pageSize;
+
+    if (!mounted) {
+      return;
+    }
+
+    context.read(_$loadedMeals).state = [...currentMeals, ...nextMeals];
+    context.read(_$isLoadingPagination).state = false;
+  }
+
+  bool _paginationActive() {
+    return context.read(mealTagFilterProvider).state.isEmpty &&
+        !context.read(_$isLoading).state &&
+        !context.read(_$isSearching).state &&
+        context.read(_$loadedMeals).state.isNotEmpty;
+  }
+
+  void _refreshMeals() async {
+    context.read(_$isLoading).state = true;
+    context.read(_$loadedMeals).state = [];
+    context.read(_$filteredMeals).state = [];
+    context.read(_$isLoadingPagination).state = false;
+    context.read(_$isSearching).state = false;
+    context.read(mealTagFilterProvider).state = [];
+    await _loadNextMeals();
+    if (!mounted) {
+      return;
+    }
+    context.read(_$isLoading).state = false;
+  }
+
+  void _listenForMealsChange() {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => context.read(mealsChangedProvider).addListener((state) {
+        if (state != 0) {
+          _refreshMeals();
+        }
+      }),
+    );
   }
 }
 

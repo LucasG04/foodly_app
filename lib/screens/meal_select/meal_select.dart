@@ -10,12 +10,14 @@ import '../../constants.dart';
 import '../../models/meal.dart';
 import '../../models/plan_meal.dart';
 import '../../providers/state_providers.dart';
+import '../../services/lunix_api_service.dart';
 import '../../services/meal_stat_service.dart';
 import '../../services/plan_service.dart';
 import '../../services/settings_service.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/user_information.dart';
+import '../tab_navigation/meal_list_view/meal_list_tile.dart';
 import 'search_bar.dart';
 import 'select_meal_tile.dart';
 
@@ -31,18 +33,15 @@ class MealSelectScreen extends StatefulWidget {
 }
 
 class _MealSelectScreenState extends State<MealSelectScreen> {
-  late List<Meal> searchedMeals;
-  bool? _isSearching;
+  late AutoDisposeStateProvider<bool> _$isSearching;
 
-  ScrollController? _scrollController;
-  Key? _animationLimiterKey;
+  final ScrollController _scrollController = ScrollController();
+
+  List<Meal> searchedMeals = [];
 
   @override
   void initState() {
-    searchedMeals = [];
-    _isSearching = false;
-    _scrollController = ScrollController();
-    _animationLimiterKey = UniqueKey();
+    _$isSearching = StateProvider.autoDispose<bool>((_) => false);
     super.initState();
   }
 
@@ -57,28 +56,16 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
         child: Column(
           children: [
             SearchBar(
-              onSearch: (String query) async {
-                if (query.isNotEmpty && query.length > 1) {
-                  setState(() {
-                    _animationLimiterKey = UniqueKey();
-                    _isSearching = true;
-                    searchedMeals = _searchForMeal(
-                        context.read(allMealsProvider).state, query);
-                  });
-                } else {
-                  setState(() {
-                    if (_isSearching == true) {
-                      _animationLimiterKey = UniqueKey();
-                    }
-                    _isSearching = false;
-                    searchedMeals = [];
-                  });
-                }
-              },
+              onSearch: _onSearchEvent,
             ),
-            AnimationLimiter(
-              key: _animationLimiterKey,
-              child: ListView.builder(
+            Consumer(builder: (context, watch, _) {
+              final isSearching = watch(_$isSearching).state;
+
+              if (isSearching) {
+                return _buildLoader();
+              }
+
+              return ListView.builder(
                 shrinkWrap: true,
                 padding: const EdgeInsets.symmetric(vertical: kPadding),
                 physics: const NeverScrollableScrollPhysics(),
@@ -105,11 +92,20 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                     ),
                   );
                 },
-              ),
-            ),
+              );
+            }),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildLoader() {
+    return ListView(
+      shrinkWrap: true,
+      padding: const EdgeInsets.symmetric(vertical: kPadding),
+      physics: const NeverScrollableScrollPhysics(),
+      children: List.generate(6, (_) => const MealListTile(null)),
     );
   }
 
@@ -126,7 +122,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                 'meal_select_new'.tr(),
                 () => _createNewMeal(),
               )
-            : _isSearching!
+            : context.read(_$isSearching).state
                 ? UserInformation(
                     'assets/images/undraw_empty.png',
                     'meal_select_no_results'.tr(),
@@ -143,49 +139,46 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
       builder: (context, snapshot) {
         final meals = snapshot.hasData ? snapshot.data! : <Meal>[];
 
-        return AnimationLimiter(
-          key: _animationLimiterKey,
-          child: ListView.builder(
-            shrinkWrap: true,
-            padding: const EdgeInsets.symmetric(vertical: kPadding),
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: meals.isEmpty
-                ? 0
-                : meals.length +
-                    1, // +1 to make space for title and 0 to not show title
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: kPadding,
-                    vertical: kPadding / 4,
+        return ListView.builder(
+          shrinkWrap: true,
+          padding: const EdgeInsets.symmetric(vertical: kPadding),
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: meals.isEmpty
+              ? 0
+              : meals.length +
+                  1, // +1 to make space for title and 0 to not show title
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: kPadding,
+                  vertical: kPadding / 4,
+                ),
+                child: const Text(
+                  'meal_select_recommondations',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
-                  child: const Text(
-                    'meal_select_recommondations',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.start,
-                  ).tr(),
-                );
-              }
-              index--;
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                duration: const Duration(milliseconds: 375),
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(
-                    child: SelectMealTile(
-                      meal: meals[index],
-                      onAddMeal: () => _addMealToPlan(meals[index].id!, planId),
-                    ),
+                  textAlign: TextAlign.start,
+                ).tr(),
+              );
+            }
+            index--;
+            return AnimationConfiguration.staggeredList(
+              position: index,
+              duration: const Duration(milliseconds: 375),
+              child: SlideAnimation(
+                verticalOffset: 50.0,
+                child: FadeInAnimation(
+                  child: SelectMealTile(
+                    meal: meals[index],
+                    onAddMeal: () => _addMealToPlan(meals[index].id!, planId),
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         );
       },
     );
@@ -254,6 +247,22 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     );
   }
 
+  void _onSearchEvent(String query) async {
+    if (query.isNotEmpty && query.length > 2) {
+      context.read(_$isSearching).state = true;
+      searchedMeals = await _searchMeal(query);
+      if (!mounted) {
+        return;
+      }
+      context.read(_$isSearching).state = false;
+    } else {
+      if (context.read(_$isSearching).state) {}
+      searchedMeals = [];
+      context.read(_$isSearching).state = false;
+      setState(() {});
+    }
+  }
+
   Future<void> _showPlaceholderDialog() async {
     final planId = context.read(planProvider).state!.id!;
     final text = await WidgetUtils.showPlacholderEditDialog(context);
@@ -299,14 +308,10 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     );
   }
 
-  List<Meal> _searchForMeal(List<Meal> meals, String query) {
-    return meals
-        .where(
-          (meal) =>
-              meal.name.toLowerCase().contains(query.toLowerCase()) ||
-              meal.tags!
-                  .any((t) => t.toLowerCase().contains(query.toLowerCase())),
-        )
-        .toList();
+  Future<List<Meal>> _searchMeal(String query) {
+    return LunixApiService.searchMeals(
+      context.read(planProvider).state!.id!,
+      query,
+    );
   }
 }

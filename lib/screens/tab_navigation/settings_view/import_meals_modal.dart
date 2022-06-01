@@ -8,6 +8,7 @@ import '../../../models/plan.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/meal_service.dart';
 import '../../../services/plan_service.dart';
+import '../../../utils/basic_utils.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 
 class ImportMealsModal extends StatelessWidget {
@@ -129,6 +130,10 @@ class _CopyPlanMealsTileState extends State<CopyPlanMealsTile> {
     final copiedMeals = await MealService.getAllMeals(widget.plan.id!);
     await MealService.addMeals(currentPlanId, copiedMeals);
 
+    if (!mounted) {
+      return;
+    }
+    BasicUtils.emitMealsChanged(context);
     setState(() {
       _buttonState = CopyButtonState.DONE;
     });

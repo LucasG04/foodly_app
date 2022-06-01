@@ -21,6 +21,7 @@ class Ingredient {
   }
 
   factory Ingredient.fromMap(Map<String, dynamic> map) {
+    map['amount'] = double.parse(map['amount'].toString());
     return Ingredient(
       name: map['name'] as String?,
       amount: map['amount'] as double?,
