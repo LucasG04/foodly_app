@@ -26,12 +26,19 @@ class SettingsService {
   static bool get showSuggestions =>
       _settingsBox.get('showSuggestions', defaultValue: true) as bool;
 
+  static bool get removeBoughtImmediately =>
+      _settingsBox.get('removeBoughtImmediately', defaultValue: false) as bool;
+
   static Future<void> setMultipleMealsPerTime(bool value) async {
     await _settingsBox.put('multipleMealsPerTime', value);
   }
 
   static Future<void> setShowSuggestions(bool value) async {
     await _settingsBox.put('showSuggestions', value);
+  }
+
+  static Future<void> setRemoveBoughtImmediately(bool value) async {
+    await _settingsBox.put('removeBoughtImmediately', value);
   }
 
   static Stream<BoxEvent> streamMultipleMealsPerTime() {
