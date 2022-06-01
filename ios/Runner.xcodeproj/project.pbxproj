@@ -198,6 +198,7 @@
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				12CB6ADF9D190E028C46F0FB /* [CP] Embed Pods Frameworks */,
 				A04D7E03282005CD000551F7 /* Embed App Extensions */,
+				A06CD2CE28481DDA00D00137 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -353,7 +354,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
+			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build\n";
+		};
+		A06CD2CE28481DDA00D00137 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "$PODS_ROOT/FirebaseCrashlytics/upload-symbols --build-phase --validate -ai \"1:1073670913430:ios:5117c23c8e12b3a959f1b7\"\n$PODS_ROOT/FirebaseCrashlytics/upload-symbols --build-phase -ai \"1:1073670913430:ios:5117c23c8e12b3a959f1b7\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -523,7 +541,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;

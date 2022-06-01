@@ -174,7 +174,6 @@ class MealService {
 
   static Future<List<Meal>> getMealsPaginated(String planId,
       {String? lastMealId, int amount = 30}) async {
-    print('STAAAAART');
     Query<Meal> query;
     if (lastMealId != null) {
       final startAfter = await _firestore.doc(lastMealId).get();
