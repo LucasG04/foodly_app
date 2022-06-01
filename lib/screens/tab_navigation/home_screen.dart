@@ -195,9 +195,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _openAppStore() async {
-    const url = 'https://apps.apple.com/app/id$kAppBundleId';
-    if (await canLaunch(url)) {
-      launch(url);
+    final url = Uri.parse('https://apps.apple.com/app/id$kAppBundleId');
+    if (await canLaunchUrl(url)) {
+      launchUrl(url);
     }
   }
 }

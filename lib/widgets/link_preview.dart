@@ -56,7 +56,9 @@ class _LinkPreviewState extends State<LinkPreview> {
 
   Widget _buildLargeCard(LinkMetadata metadata, BuildContext context) {
     return GestureDetector(
-      onTap: metadata.url != null ? () => launch(metadata.url!) : () {},
+      onTap: metadata.url != null
+          ? () => launchUrl(Uri.parse(metadata.url!))
+          : () {},
       child: Card(
         child: Column(
           children: [
@@ -94,7 +96,9 @@ class _LinkPreviewState extends State<LinkPreview> {
   Widget _buildSmallCard(LinkMetadata metadata, BuildContext context) {
     final height = _getSmallCardHeight(context);
     return GestureDetector(
-      onTap: metadata.url != null ? () => launch(metadata.url!) : () {},
+      onTap: metadata.url != null
+          ? () => launchUrl(Uri.parse(metadata.url!))
+          : () {},
       child: Container(
         width: double.infinity,
         height: height,
