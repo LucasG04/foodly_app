@@ -11,6 +11,7 @@ import '../../../providers/state_providers.dart';
 import '../../../services/lunix_api_service.dart';
 import '../../../services/meal_service.dart';
 import '../../../utils/debouncer.dart';
+import '../../../widgets/small_circular_progress_indicator.dart';
 import '../../../widgets/user_information.dart';
 import '../settings_view/help_slides/help_slide_share_import.dart';
 import 'meal_list_tile.dart';
@@ -90,6 +91,15 @@ class _MealListViewState extends State<MealListView>
                     : _buildGroupedTagList(selectedTags);
               },
             ),
+            Consumer(builder: (context, watch, _) {
+              final isLoadingPagination = watch(_$isLoadingPagination).state;
+              return isLoadingPagination
+                  ? const Padding(
+                      padding: EdgeInsets.symmetric(vertical: kPadding / 2),
+                      child: SmallCircularProgressIndicator(),
+                    )
+                  : const SizedBox();
+            }),
           ],
         ),
       ),
