@@ -9,7 +9,6 @@ class BasicUtils {
   static void clearAllProvider(BuildContext context) {
     context.read(planProvider).state = null;
     context.read(userProvider).state = null;
-    context.read(allMealsProvider).state = [];
   }
 
   /// Clears all state providers.
@@ -49,5 +48,10 @@ class BasicUtils {
     final today = DateTime(now.year, now.month, now.day);
 
     return List.generate(8, (i) => today.add(Duration(days: i)));
+  }
+
+  static void emitMealsChanged(BuildContext context) {
+    context.read(mealsChangedProvider).state =
+        DateTime.now().millisecondsSinceEpoch;
   }
 }

@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../constants.dart';
-import '../../../models/meal.dart';
 import '../../../providers/state_providers.dart';
+import '../../../services/lunix_api_service.dart';
+import '../../../widgets/small_circular_progress_indicator.dart';
 
 class TagFilterModal extends StatefulWidget {
   const TagFilterModal({Key? key}) : super(key: key);
+
   @override
   _TagFilterModalState createState() => _TagFilterModalState();
 }
@@ -38,8 +40,6 @@ class _TagFilterModalState extends State<TagFilterModal> {
 
   @override
   Widget build(BuildContext context) {
-    final allTags = _getAllTagsFromMeals(context.read(allMealsProvider).state);
-
     final width = MediaQuery.of(context).size.width > 700
         ? 700.0
         : MediaQuery.of(context).size.width * 0.9;
@@ -60,24 +60,38 @@ class _TagFilterModalState extends State<TagFilterModal> {
                 child: Column(
                   children: [
                     const SizedBox(height: kPadding / 2),
-                    Consumer(builder: (context, watch, _) {
-                      final selectedTags = watch(mealTagFilterProvider).state;
-                      return Wrap(
-                        runSpacing: kPadding / 2,
-                        spacing: kPadding / 2,
-                        children: allTags.map(
-                          (String tagText) {
-                            final bool isSelected =
-                                selectedTags.contains(tagText);
-                            return _buildFilterChip(
-                              tagText,
-                              isSelected,
-                              selectedTags,
+                    FutureBuilder<List<String>>(
+                        future: LunixApiService.getAllTagsInPlan(
+                          context.read(planProvider).state!.id!,
+                        ),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return _buildLoader();
+                          }
+
+                          final tags = snapshot.data ?? [];
+
+                          return Consumer(builder: (context, watch, _) {
+                            final selectedTags =
+                                watch(mealTagFilterProvider).state;
+                            return Wrap(
+                              runSpacing: kPadding / 2,
+                              spacing: kPadding / 2,
+                              children: tags.map(
+                                (String tagText) {
+                                  final bool isSelected =
+                                      selectedTags.contains(tagText);
+                                  return _buildFilterChip(
+                                    tagText,
+                                    isSelected,
+                                    selectedTags,
+                                  );
+                                },
+                              ).toList(),
                             );
-                          },
-                        ).toList(),
-                      );
-                    }),
+                          });
+                        }),
                     const SizedBox(height: kPadding),
                   ],
                 ),
@@ -89,21 +103,11 @@ class _TagFilterModalState extends State<TagFilterModal> {
     );
   }
 
-  void _scrollListener() {
-    if (_scrollController!.offset <=
-        _scrollController!.position.minScrollExtent) {
-      if (!_isScrollToTop) {
-        setState(() {
-          _isScrollToTop = true;
-        });
-      }
-    } else {
-      if (_scrollController!.offset > EMPTY_SPACE && _isScrollToTop) {
-        setState(() {
-          _isScrollToTop = false;
-        });
-      }
-    }
+  Widget _buildLoader() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: kPadding),
+      child: SmallCircularProgressIndicator(),
+    );
   }
 
   Card _buildModalHeader(BuildContext context, double width) {
@@ -164,17 +168,28 @@ class _TagFilterModalState extends State<TagFilterModal> {
             tagText
           ];
         } else {
-          context.read(mealTagFilterProvider).state.remove(tagText);
-          context.read(mealTagFilterProvider).state =
-              context.read(mealTagFilterProvider).state;
+          context.read(mealTagFilterProvider).state = [];
+          selectedTags.remove(tagText);
+          context.read(mealTagFilterProvider).state = selectedTags;
         }
       },
     );
   }
 
-  List<String> _getAllTagsFromMeals(List<Meal> meals) {
-    final result = meals.map((e) => e.tags).toList(); // get all tags
-    final flatResults = result.expand((e) => e!).toList(); // flatten the list
-    return flatResults.toSet().toList(); // remove duplicates
+  void _scrollListener() {
+    if (_scrollController!.offset <=
+        _scrollController!.position.minScrollExtent) {
+      if (!_isScrollToTop) {
+        setState(() {
+          _isScrollToTop = true;
+        });
+      }
+    } else {
+      if (_scrollController!.offset > EMPTY_SPACE && _isScrollToTop) {
+        setState(() {
+          _isScrollToTop = false;
+        });
+      }
+    }
   }
 }

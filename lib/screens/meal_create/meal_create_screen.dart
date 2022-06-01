@@ -327,6 +327,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         if (!mounted) {
           return;
         }
+        BasicUtils.emitMealsChanged(context);
         AutoRouter.of(context).pop(newMeal);
       } catch (e) {
         if (!mounted) {

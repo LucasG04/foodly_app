@@ -19,7 +19,6 @@ class LunixApiService {
   LunixApiService._();
 
   static final _log = Logger('LunixApiService');
-
   static const String _lunixApiEndpoint =
       'https://lunix-api.herokuapp.com/foodly';
   static final Dio _dio = Dio(
@@ -155,5 +154,78 @@ class LunixApiService {
         .toList();
 
     return response.data != null ? data : [];
+  }
+
+  static Future<List<Meal>> searchMeals(String planId, String query) async {
+    _log.finer('Call searchMeals() with $planId and "$query"');
+    final Response response = await _dio.get<List<dynamic>>(
+      '$_lunixApiEndpoint/search-meals',
+      queryParameters: <String, String>{
+        'planId': planId,
+        'query': query,
+      },
+      options: Options(
+        headers: <String, dynamic>{'x-api-key': secretLunixApi},
+      ),
+    );
+
+    if (response.data == null) {
+      return [];
+    }
+
+    final List<Meal> data = (response.data as List<dynamic>)
+        .map(
+          (dynamic e) =>
+              // ignore: avoid_dynamic_calls
+              Meal.fromMap(e['id'] as String, e as Map<String, dynamic>),
+        )
+        .toList();
+
+    return data;
+  }
+
+  static Future<List<String>> getAllTagsInPlan(String planId) async {
+    _log.finer('Call getAllTagsInPlan() for $planId');
+    final Response response = await _dio.get<List<dynamic>>(
+      '$_lunixApiEndpoint/tags-in-plan',
+      queryParameters: <String, String>{'planId': planId},
+      options: Options(
+        headers: <String, dynamic>{'x-api-key': secretLunixApi},
+      ),
+    );
+
+    final List<String> data = (response.data as List<dynamic>)
+        .map((dynamic e) => e.toString())
+        .toList();
+
+    return response.data != null ? data : [];
+  }
+
+  static Future<List<Meal>> searchMealsByTags(
+    String planId,
+    List<String> tags,
+  ) async {
+    _log.finer('Call searchMealByTags() with $planId and "$tags"');
+    final Response response = await _dio.post<List<dynamic>>(
+      '$_lunixApiEndpoint/search-meal-by-tags',
+      data: <String, dynamic>{
+        'planId': planId,
+        'tags': tags,
+      },
+      options: Options(
+        headers: <String, dynamic>{'x-api-key': secretLunixApi},
+      ),
+    );
+
+    if (response.data == null) {
+      return [];
+    }
+
+    final List<Meal> data = (response.data as List<dynamic>)
+        .map((dynamic e) =>
+            Meal.fromMap((e as Map<String, dynamic>)['id'] as String, e))
+        .toList();
+
+    return data;
   }
 }

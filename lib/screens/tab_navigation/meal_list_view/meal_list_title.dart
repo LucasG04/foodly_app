@@ -10,15 +10,19 @@ import '../../../providers/state_providers.dart';
 import 'tag_filter_modal.dart';
 
 class MealListTitle extends StatefulWidget {
+  final void Function(String) onSearch;
+  final void Function() onSearchClose;
+  final void Function() onRefresh;
+
   const MealListTitle({
     required this.onSearch,
+    required this.onSearchClose,
+    required this.onRefresh,
     Key? key,
   }) : super(key: key);
 
   @override
   _MealListTitleState createState() => _MealListTitleState();
-
-  final void Function(String) onSearch;
 }
 
 class _MealListTitleState extends State<MealListTitle> {
@@ -51,6 +55,12 @@ class _MealListTitleState extends State<MealListTitle> {
                 ),
               ),
               const SizedBox(width: kPadding),
+              if (!_searchActive)
+                IconButton(
+                  icon: const Icon(EvaIcons.refreshOutline),
+                  onPressed: widget.onRefresh,
+                  splashRadius: 25.0,
+                ),
               const SizedBox(width: kPadding / 2),
               if (!_searchActive)
                 Consumer(
@@ -87,8 +97,9 @@ class _MealListTitleState extends State<MealListTitle> {
                           _textEditingController!.clear();
                           widget.onSearch('');
                           setState(() {
-                            _searchActive = !_searchActive;
+                            _searchActive = false;
                           });
+                          widget.onSearchClose();
                         },
                         splashRadius: 25.0,
                       )
@@ -96,7 +107,7 @@ class _MealListTitleState extends State<MealListTitle> {
                         icon: const Icon(EvaIcons.searchOutline),
                         onPressed: () {
                           setState(() {
-                            _searchActive = !_searchActive;
+                            _searchActive = true;
                           });
                         },
                         splashRadius: 25.0,
