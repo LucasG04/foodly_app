@@ -9,7 +9,6 @@ class BasicUtils {
   static void clearAllProvider(BuildContext context) {
     context.read(planProvider).state = null;
     context.read(userProvider).state = null;
-    context.read(allMealsProvider).state = [];
   }
 
   /// Clears all state providers.

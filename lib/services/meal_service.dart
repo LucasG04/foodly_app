@@ -198,7 +198,8 @@ class MealService {
       query = _firestore
           .where('planId', isEqualTo: planId)
           .orderBy('name')
-          .startAfter([startAfter]).limit(amount);
+          .startAfterDocument(startAfter)
+          .limit(amount);
     } else {
       query = _firestore
           .where('planId', isEqualTo: planId)

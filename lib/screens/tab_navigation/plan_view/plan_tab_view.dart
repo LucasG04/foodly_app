@@ -36,9 +36,8 @@ class _PlanTabViewState extends State<PlanTabView>
     return Consumer(
       builder: (context, watch, _) {
         final activePlan = watch(planProvider).state;
-        final isLoadingMeals = watch(initLoadingMealsProvider).state;
 
-        return activePlan != null && !isLoadingMeals
+        return activePlan != null
             ? SingleChildScrollView(
                 child: AnimationLimiter(
                   child: Column(
