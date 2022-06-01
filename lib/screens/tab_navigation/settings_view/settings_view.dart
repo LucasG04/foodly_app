@@ -54,11 +54,6 @@ class _SettingsViewState extends State<SettingsView> {
                       _buildSectionTitle('settings_section_general'.tr()),
                       _buildSection([
                         SettingsTile(
-                          onTap: () => Navigator.push(
-                            context,
-                            ConcentricPageRoute<OnboardingScreen>(
-                                builder: (_) => OnboardingScreen()),
-                          ),
                           leadingIcon: EvaIcons.listOutline,
                           text: 'settings_section_general_multiple_meals'.tr(),
                           trailing: Consumer(builder: (context, watch, _) {
@@ -74,11 +69,6 @@ class _SettingsViewState extends State<SettingsView> {
                           }),
                         ),
                         SettingsTile(
-                          onTap: () => Navigator.push(
-                            context,
-                            ConcentricPageRoute<OnboardingScreen>(
-                                builder: (_) => OnboardingScreen()),
-                          ),
                           leadingIcon: EvaIcons.trendingUpOutline,
                           text: 'settings_section_general_suggestions'.tr(),
                           trailing: Consumer(builder: (context, watch, _) {
@@ -110,6 +100,21 @@ class _SettingsViewState extends State<SettingsView> {
                               await context.setLocale(locale!);
                             },
                           ),
+                        ),
+                        SettingsTile(
+                          leadingIcon: EvaIcons.trash2Outline,
+                          text: 'settings_section_general_remove_bought'.tr(),
+                          trailing: Consumer(builder: (context, watch, _) {
+                            return Switch.adaptive(
+                              value: SettingsService.removeBoughtImmediately,
+                              onChanged: (value) {
+                                setState(() {
+                                  SettingsService.setRemoveBoughtImmediately(
+                                      value);
+                                });
+                              },
+                            );
+                          }),
                         ),
                       ], context),
                       _buildSectionTitle('settings_section_plan'.tr()),

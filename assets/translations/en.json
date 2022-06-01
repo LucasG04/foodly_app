@@ -7,6 +7,7 @@
     "shopping_list_title": "Shopping list",
     "shopping_list_already_bought": "ALREADY PURCHASED",
     "shopping_list_remove_all": "Remove bought",
+    "shopping_list_grocery_removed": "{} removed",
     "edit_grocery_modal_add": "ADD",
     "edit_grocery_modal_edit": "EDIT",
     "edit_grocery_modal_ctrl_name_title": "Title",
@@ -20,6 +21,7 @@
     "settings_section_general_multiple_meals": "Multiple dishes per meal",
     "settings_section_general_language": "Language",
     "settings_section_general_suggestions": "Show suggestions",
+    "settings_section_general_remove_bought": "Remove bought groceries immediately",
     "settings_section_plan": "Plan",
     "settings_section_plan_change_name": "Change plan name",
     "settings_section_plan_change_name_error": "Enter a new name",
@@ -189,5 +191,10 @@
     "update_dialog_description": "A new version with new features and improvements is available.",
     "update_dialog_question": "You better download it now!",
     "update_dialog_action_later": "Later",
-    "update_dialog_action_update": "Update Now"
+    "update_dialog_action_update": "Update Now",
+    "shopping_dialog_title": "Remove bought groceries?",
+    "shopping_dialog_description": "You already bought more than 50 groceries. Do you want to remove them?",
+    "shopping_dialog_settings_info": "If you want to remove bought groceries immediately, enable the option in the settings.",
+    "shopping_dialog_action_cancel": "Keep",
+    "update_dialog_action_delete": "Remove"
 }

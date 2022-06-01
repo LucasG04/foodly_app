@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
@@ -27,20 +28,29 @@ import 'services/settings_service.dart';
 import 'services/version_service.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await EasyLocalization.ensureInitialized();
-  await Firebase.initializeApp();
-  await initializeHive();
+  runZonedGuarded<Future<void>>(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      await EasyLocalization.ensureInitialized();
+      await Firebase.initializeApp();
+      await initializeHive();
 
-  runApp(
-    ProviderScope(
-      child: EasyLocalization(
-        supportedLocales: const [Locale('en'), Locale('de')],
-        path: 'assets/translations',
-        fallbackLocale: const Locale('en'),
-        child: const FoodlyApp(),
-      ),
-    ),
+      FlutterError.onError =
+          FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+      runApp(
+        ProviderScope(
+          child: EasyLocalization(
+            supportedLocales: const [Locale('en'), Locale('de')],
+            path: 'assets/translations',
+            fallbackLocale: const Locale('en'),
+            child: const FoodlyApp(),
+          ),
+        ),
+      );
+    },
+    (error, stack) =>
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true),
   );
 }
 

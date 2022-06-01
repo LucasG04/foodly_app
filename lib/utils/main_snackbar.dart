@@ -6,10 +6,11 @@ import 'package:flutter/material.dart';
 class MainSnackbar {
   final String? title;
   final String message;
-  final TextButton? button;
+  final Widget? action;
   final int seconds;
   final bool isSuccess;
   final bool isError;
+  final bool isCountdown;
 
   /// Example Usage: `MainSnackbar(message: 'Hello there!').show(context);`
   ///
@@ -17,37 +18,90 @@ class MainSnackbar {
   MainSnackbar({
     required this.message,
     this.title,
-    this.button,
+    this.action,
     this.seconds = 5,
     this.isSuccess = false,
     this.isError = false,
-  }) : assert(!isSuccess || !isError);
+    this.isCountdown = false,
+  }) : assert(!isSuccess || !isError || !isCountdown);
 
   /// Show the snackbar.
   void show(BuildContext context) {
     Flushbar<dynamic>(
       margin: const EdgeInsets.all(8),
-      borderRadius: BorderRadius.circular(15.0),
+      borderRadius: BorderRadius.circular(10.0),
       title: title,
       message: message,
       duration: Duration(seconds: seconds),
-      icon: isSuccess
-          ? Icon(
-              EvaIcons.checkmarkCircle2Outline,
-              color: Colors.green[300],
-            )
-          : isError
+      icon: isCountdown
+          ? _buildCountdown()
+          : isSuccess
               ? Icon(
-                  EvaIcons.alertCircleOutline,
-                  size: 28.0,
-                  color: Colors.red[300],
+                  EvaIcons.checkmarkCircle2Outline,
+                  color: Colors.green[300],
                 )
-              : const Icon(
-                  EvaIcons.infoOutline,
-                  size: 28.0,
-                  color: Colors.grey,
-                ),
-      mainButton: button,
+              : isError
+                  ? Icon(
+                      EvaIcons.alertCircleOutline,
+                      size: 28.0,
+                      color: Colors.red[300],
+                    )
+                  : const Icon(
+                      EvaIcons.infoOutline,
+                      size: 28.0,
+                      color: Colors.grey,
+                    ),
+      mainButton: action,
     ).show(context);
+  }
+
+  Widget _buildCountdown() {
+    return Container(
+      constraints: const BoxConstraints(maxHeight: 22.0),
+      child: TweenAnimationBuilder(
+        tween: Tween<double>(begin: 0, end: seconds * 1000.toDouble()),
+        duration: Duration(seconds: seconds),
+        builder: (context, double value, child) {
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                height: 20.0,
+                width: 20.0,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.0,
+                  value: _getProgressValue(value),
+                  color: Colors.grey[850],
+                  backgroundColor: Theme.of(context).dialogBackgroundColor,
+                ),
+              ),
+              Center(
+                child: Text(
+                  _getCountdownText(value),
+                  textScaleFactor: 0.85,
+                  style: TextStyle(
+                    color: Theme.of(context).dialogBackgroundColor,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  double _getProgressValue(double value) {
+    return value / (seconds * 1000);
+
+    // Progress with steps:
+    // final step = 1 / seconds;
+    // final passedSeconds = value ~/ 1000;
+    // final newProgress = step * passedSeconds;
+    // return newProgress;
+  }
+
+  String _getCountdownText(double value) {
+    return ((seconds - (value / 1000)).toInt()).toString();
   }
 }
