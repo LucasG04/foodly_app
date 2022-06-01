@@ -77,24 +77,6 @@ class MealService {
     return meals;
   }
 
-  static Stream<List<Meal>> streamPlanMeals(String planId) {
-    log.finer('Call streamPlanMeals with $planId');
-    return _firestore
-        .where('planId', isEqualTo: planId)
-        .orderBy('name')
-        .snapshots()
-        .map((event) => event.docs.map((e) => e.data()).toList());
-  }
-
-  static Stream<List<Meal>> streamPublicMeals() {
-    log.finer('Call streamPublicMeals');
-    return _firestore
-        .where('isPublic', isEqualTo: true)
-        .orderBy('name')
-        .snapshots()
-        .map((event) => event.docs.map((e) => e.data()).toList());
-  }
-
   static Future<Meal?> createMeal(Meal meal) async {
     log.finer('Call createMeal with ${meal.toMap()}');
     if (meal.imageUrl == null || meal.imageUrl!.isEmpty) {
@@ -192,6 +174,7 @@ class MealService {
 
   static Future<List<Meal>> getMealsPaginated(String planId,
       {String? lastMealId, int amount = 30}) async {
+    print('STAAAAART');
     Query<Meal> query;
     if (lastMealId != null) {
       final startAfter = await _firestore.doc(lastMealId).get();
