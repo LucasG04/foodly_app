@@ -22,7 +22,6 @@ import 'providers/state_providers.dart';
 import 'services/authentication_service.dart';
 import 'services/foodly_user_service.dart';
 import 'services/link_metadata_service.dart';
-import 'services/log_record_service.dart';
 import 'services/plan_service.dart';
 import 'services/settings_service.dart';
 import 'services/version_service.dart';
@@ -89,7 +88,6 @@ class _FoodlyAppState extends State<FoodlyApp> {
   @override
   void initState() {
     _initializeLogger();
-    LogRecordService.startPeriodicLogging();
     _listenForShareIntent();
     super.initState();
   }
@@ -175,12 +173,12 @@ class _FoodlyAppState extends State<FoodlyApp> {
       Logger.root.onRecord.listen((record) {
         _addLogToProvider(record);
         if (record.level >= Level.SEVERE) {
-          final userId = context.read(userProvider).state?.id;
-          final planId = context.read(planProvider).state?.id;
-          LogRecordService.saveLog(
-            userId: userId,
-            planId: planId,
-            logRecord: record,
+          final message =
+              '${record.loggerName} (${record.level.name}): ${record.message}';
+          FirebaseCrashlytics.instance.recordError(
+            message,
+            record.stackTrace,
+            reason: record.error,
           );
         }
       });
