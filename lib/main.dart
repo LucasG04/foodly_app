@@ -73,23 +73,21 @@ class FoodlyApp extends StatefulWidget {
 
 class _FoodlyAppState extends State<FoodlyApp> {
   final Logger _log = Logger('FoodlyApp');
-  late StreamSubscription<String> _intentDataStreamSubscription;
-  late StreamSubscription<LogRecord> _logStream;
+  late StreamSubscription<String>? _intentDataStreamSubscription;
 
   final _appRouter = AppRouter();
-
-  @override
-  void dispose() {
-    _logStream.cancel();
-    _intentDataStreamSubscription.cancel();
-    super.dispose();
-  }
 
   @override
   void initState() {
     _initializeLogger();
     _listenForShareIntent();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _intentDataStreamSubscription?.cancel();
+    super.dispose();
   }
 
   @override

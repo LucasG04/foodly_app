@@ -27,6 +27,7 @@ class PlanService {
     _log.finer(
         'Call getCurrentPlanId for User: ${AuthenticationService.currentUser}');
     if (AuthenticationService.currentUser == null) {
+      _log.finer('getCurrentPlanId: currentUser is null');
       return '';
     }
 
