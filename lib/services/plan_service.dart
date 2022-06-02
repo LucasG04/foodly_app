@@ -1,12 +1,12 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:logging/logging.dart';
 
 import '../constants.dart';
 import '../models/plan.dart';
 import '../models/plan_meal.dart';
-import '../utils/convert_util.dart';
 import 'authentication_service.dart';
 import 'meal_stat_service.dart';
 import 'shopping_list_service.dart';
@@ -52,16 +52,19 @@ class PlanService {
 
   static Future<List<Plan>> getPlansByIds(List<String?> ids) async {
     _log.finer('Call getPlansByIds with ${ids.toString()}');
-    final List<DocumentSnapshot<Plan>> documents = [];
+    await FirebaseCrashlytics.instance
+        .recordError('whereIn getPlansByIds $ids', null);
+    return [];
+    // final List<DocumentSnapshot<Plan>> documents = [];
 
-    for (final idList in ConvertUtil.splitArray(ids)) {
-      final results =
-          await _firestore.where(FieldPath.documentId, whereIn: idList).get();
-      documents.addAll(results.docs);
-    }
+    // for (final idList in ConvertUtil.splitArray(ids)) {
+    //   final results =
+    //       await _firestore.where(FieldPath.documentId, whereIn: idList).get();
+    //   documents.addAll(results.docs);
+    // }
 
-    documents.removeWhere((e) => !e.exists);
-    return documents.map((e) => e.data()!).toList();
+    // documents.removeWhere((e) => !e.exists);
+    // return documents.map((e) => e.data()!).toList();
   }
 
   static Stream<Plan> streamPlanById(String id) {
