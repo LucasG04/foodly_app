@@ -25,6 +25,7 @@ import 'services/link_metadata_service.dart';
 import 'services/plan_service.dart';
 import 'services/settings_service.dart';
 import 'services/version_service.dart';
+import 'utils/basic_utils.dart';
 
 Future<void> main() async {
   runZonedGuarded<Future<void>>(
@@ -155,10 +156,11 @@ class _FoodlyAppState extends State<FoodlyApp> {
       context.read(userProvider).state = user;
     } else {
       FirebaseCrashlytics.instance.setUserIdentifier('');
+      BasicUtils.afterBuild(() => context.read(userProvider).state = null);
     }
 
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => context.read(initialUserLoadingProvider).state = false,
+    BasicUtils.afterBuild(
+      () => context.read(initialUserLoadingProvider).state = false,
     );
   }
 
