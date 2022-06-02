@@ -177,24 +177,23 @@ class MealService {
   static Future<List<Meal>> getMealsPaginated(String planId,
       {String? lastMealId, int amount = 30}) async {
     _log.finer('Call getMealsPaginated with $planId, $lastMealId, $amount');
-    // Query<Meal> query;
-    // if (lastMealId != null) {
-    //   final startAfter = await _firestore.doc(lastMealId).get();
-    //   query = _firestore
-    //       .where('planId', isEqualTo: planId)
-    //       .orderBy('name')
-    //       .startAfterDocument(startAfter)
-    //       .limit(amount);
-    // } else {
-    //   query = _firestore
-    //       .where('planId', isEqualTo: planId)
-    //       .orderBy('name')
-    //       .limit(amount);
-    // }
+    Query<Meal> query;
+    if (lastMealId != null) {
+      final startAfter = await _firestore.doc(lastMealId).get();
+      query = _firestore
+          .where('planId', isEqualTo: planId)
+          .orderBy('name')
+          .startAfterDocument(startAfter)
+          .limit(amount);
+    } else {
+      query = _firestore
+          .where('planId', isEqualTo: planId)
+          .orderBy('name')
+          .limit(amount);
+    }
 
-    // final snaps = await query.get();
+    final snaps = await query.get();
 
-    // return snaps.docs.map((e) => e.data()).toList();
-    return MealService.getAllMeals(planId);
+    return snaps.docs.map((e) => e.data()).toList();
   }
 }
