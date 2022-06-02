@@ -82,6 +82,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
   void initState() {
     _initializeLogger();
     _listenForShareIntent();
+    _initCrashlytics();
     super.initState();
   }
 
@@ -184,6 +185,12 @@ class _FoodlyAppState extends State<FoodlyApp> {
           );
         }
       });
+    }
+  }
+
+  void _initCrashlytics() async {
+    if (foundation.kDebugMode) {
+      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
     }
   }
 
