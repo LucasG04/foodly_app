@@ -205,16 +205,19 @@ class _ShoppingListViewState extends State<ShoppingListView>
   }
 
   void _checkBoughtItems(String listId, List<Grocery> boughtGroceries) {
-    if (boughtGroceries.length < 50) {
-      return;
+    print(boughtGroceries.length);
+    if (_shouldAskForRemovingOfBought(boughtGroceries.length)) {
+      showDialog<void>(
+        context: context,
+        builder: (_) => Platform.isIOS
+            ? _buildIOSAlertDialog(listId)
+            : _buildAlertDialog(listId),
+      );
     }
+  }
 
-    showDialog<void>(
-      context: context,
-      builder: (_) => Platform.isIOS
-          ? _buildIOSAlertDialog(listId)
-          : _buildAlertDialog(listId),
-    );
+  bool _shouldAskForRemovingOfBought(int amount) {
+    return amount > 49 && amount % 10 == 0;
   }
 
   CupertinoAlertDialog _buildIOSAlertDialog(String listId) {

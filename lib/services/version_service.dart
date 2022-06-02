@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:hive/hive.dart';
 import 'package:logging/logging.dart';
 
@@ -46,20 +45,21 @@ class VersionService {
   static Future<List<FoodlyVersion>?> getNotesForVersionsAndLanguage(
       List<String> versions, String languageCode) async {
     _log.fine('getNotesForVersionAndLanguage with $versions and $languageCode');
-    await FirebaseCrashlytics.instance.recordError(
-        'whereIn getNotesForVersionAndLanguage with $versions and $languageCode',
-        null);
-    return [];
-    // final snaps = await _firestore.where('version', whereIn: versions).get();
 
-    // if (snaps.size < 1) {
-    //   return null;
-    // }
+    if (versions.isEmpty || languageCode.isEmpty) {
+      return [];
+    }
 
-    // final requestedVersions = snaps.docs.map((e) => e.data()).toList();
-    // for (final version in requestedVersions) {
-    //   version.notes.removeWhere((e) => e.language != languageCode);
-    // }
-    // return requestedVersions;
+    final snaps = await _firestore.where('version', whereIn: versions).get();
+
+    if (snaps.size < 1) {
+      return null;
+    }
+
+    final requestedVersions = snaps.docs.map((e) => e.data()).toList();
+    for (final version in requestedVersions) {
+      version.notes.removeWhere((e) => e.language != languageCode);
+    }
+    return requestedVersions;
   }
 }
