@@ -136,7 +136,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
       final String? planId = await PlanService.getCurrentPlanId();
 
       if (planId != null && planId.isNotEmpty) {
-        final Plan newPlan = (await PlanService.getPlanById(planId))!;
+        final Plan? newPlan = await PlanService.getPlanById(planId);
         if (!mounted) {
           return;
         }
