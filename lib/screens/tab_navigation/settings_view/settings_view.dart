@@ -17,7 +17,6 @@ import '../../../utils/basic_utils.dart';
 import '../../../utils/main_snackbar.dart';
 import '../../../utils/widget_utils.dart';
 import '../../../widgets/loading_logout.dart';
-import '../../../widgets/log_view.dart';
 import '../../../widgets/page_title.dart';
 import '../../onboarding/onboarding_screen.dart';
 import 'change_plan_name_modal.dart';
@@ -225,21 +224,18 @@ class _SettingsViewState extends State<SettingsView> {
                           color: Colors.red,
                         ),
                       ], context),
-                      GestureDetector(
-                        onDoubleTap: _openLogView,
-                        child: RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            style: Theme.of(context).textTheme.bodyText1,
-                            children: <TextSpan>[
-                              TextSpan(text: 'settings_sign_in_as'.tr()),
-                              TextSpan(
-                                text: '\n${firebaseUser!.email!}',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          style: Theme.of(context).textTheme.bodyText1,
+                          children: <TextSpan>[
+                            TextSpan(text: 'settings_sign_in_as'.tr()),
+                            TextSpan(
+                              text: '\n${firebaseUser!.email!}',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: kPadding),
@@ -312,17 +308,6 @@ class _SettingsViewState extends State<SettingsView> {
     WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) => const ChangePlanNameModal(),
-    );
-  }
-
-  void _openLogView() {
-    if (!kLogViewEnabled) {
-      return;
-    }
-    Navigator.of(context).push(
-      MaterialPageRoute<LogView>(
-        builder: (context) => const LogView(),
-      ),
     );
   }
 }

@@ -164,14 +164,12 @@ class _FoodlyAppState extends State<FoodlyApp> {
     if (foundation.kDebugMode) {
       Logger.root.level = Level.ALL;
       Logger.root.onRecord.listen((record) {
-        _addLogToProvider(record);
         // ignore: avoid_print
         print('${record.level.name}: ${record.loggerName}: ${record.message}');
       });
     } else {
       Logger.root.level = Level.ALL;
       Logger.root.onRecord.listen((record) {
-        _addLogToProvider(record);
         if (record.level >= Level.SEVERE) {
           final message =
               '${record.loggerName} (${record.level.name}): ${record.message}';
@@ -182,15 +180,6 @@ class _FoodlyAppState extends State<FoodlyApp> {
           );
         }
       });
-    }
-  }
-
-  void _addLogToProvider(LogRecord record) {
-    if (kLogViewEnabled) {
-      context.read(logsProvider).state = [
-        ...context.read(logsProvider).state,
-        record
-      ];
     }
   }
 

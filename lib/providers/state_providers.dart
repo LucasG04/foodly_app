@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logging/logging.dart';
 
 import '../models/foodly_user.dart';
 import '../models/plan.dart';
@@ -18,6 +17,3 @@ final mealsChangedProvider = StateProvider<int>((_) => 0);
 
 /// Provides the current initial search for the WebImagePicker
 final initSearchWebImagePickerProvider = StateProvider<String>((_) => '');
-
-/// Logs for log view
-final logsProvider = StateProvider<List<LogRecord>>((_) => []);
