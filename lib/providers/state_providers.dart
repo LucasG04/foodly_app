@@ -9,6 +9,9 @@ final planProvider = StateProvider<Plan?>((_) => null);
 /// Provides the active foodly user object.
 final userProvider = StateProvider<FoodlyUser?>((_) => null);
 
+/// Provides if the top level stream is loading the user
+final initialUserLoadingProvider = StateProvider<bool>((_) => true);
+
 /// Provides the current filter for the meal list.
 final mealTagFilterProvider = StateProvider<List<String>>((_) => []);
 

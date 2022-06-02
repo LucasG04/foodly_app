@@ -1,12 +1,11 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -16,7 +15,7 @@ import 'package:version/version.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
-import '../../services/authentication_service.dart';
+import '../../providers/state_providers.dart';
 import '../../services/settings_service.dart';
 import '../../services/version_service.dart';
 import '../../widgets/new_version_modal.dart';
@@ -32,52 +31,33 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final Logger _log = Logger('HomeScreen');
-  late StreamSubscription<User?> _authStream;
-
-  late bool _isLoading;
-  User? _currentUser;
 
   @override
   void initState() {
-    _isLoading = true;
-    _authStream = AuthenticationService.authenticationStream().listen((user) {
-      setStateIfMounted(() {
-        _currentUser = user;
-        _isLoading = false;
-      });
-    });
     _checkForNewFeaturesNotification();
     _checkForUpdate();
     super.initState();
   }
 
   @override
-  void dispose() {
-    _authStream.cancel();
-    super.dispose();
-  }
-
-  void setStateIfMounted(void Function() f) {
-    if (mounted) {
-      setState(f);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: SmallCircularProgressIndicator()),
-      );
-    } else if (_currentUser != null) {
-      return const TabNavigationView();
-    } else if (SettingsService.isFirstUsage) {
-      AutoRouter.of(context).replace(OnboardingScreenRoute());
-      return const Scaffold();
-    } else {
-      AutoRouter.of(context).replace(const AuthenticationScreenRoute());
-      return const Scaffold();
-    }
+    return Consumer(builder: (context, watch, _) {
+      final initialUserLoading = watch(initialUserLoadingProvider).state;
+      final user = watch(userProvider).state;
+      if (initialUserLoading) {
+        return const Scaffold(
+          body: Center(child: SmallCircularProgressIndicator()),
+        );
+      } else if (user != null) {
+        return const TabNavigationView();
+      } else if (SettingsService.isFirstUsage) {
+        AutoRouter.of(context).replace(OnboardingScreenRoute());
+        return const Scaffold();
+      } else {
+        AutoRouter.of(context).replace(const AuthenticationScreenRoute());
+        return const Scaffold();
+      }
+    });
   }
 
   void _checkForNewFeaturesNotification() async {

@@ -156,6 +156,10 @@ class _FoodlyAppState extends State<FoodlyApp> {
     } else {
       FirebaseCrashlytics.instance.setUserIdentifier('');
     }
+
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => context.read(initialUserLoadingProvider).state = false,
+    );
   }
 
   void _initializeLogger() {
