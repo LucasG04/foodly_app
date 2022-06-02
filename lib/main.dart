@@ -82,6 +82,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
   void initState() {
     _initializeLogger();
     _listenForShareIntent();
+    _configureCrashlytics();
     super.initState();
   }
 
@@ -135,7 +136,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
       final String? planId = await PlanService.getCurrentPlanId();
 
       if (planId != null && planId.isNotEmpty) {
-        final Plan newPlan = (await PlanService.getPlanById(planId))!;
+        final Plan? newPlan = await PlanService.getPlanById(planId);
         if (!mounted) {
           return;
         }
@@ -187,6 +188,12 @@ class _FoodlyAppState extends State<FoodlyApp> {
     }
   }
 
+  void _configureCrashlytics() async {
+    if (foundation.kDebugMode) {
+      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
+    }
+  }
+
   void _listenForShareIntent() {
     // For sharing or opening urls/text coming from outside the app while the app is in the memory
     _intentDataStreamSubscription = ReceiveSharingIntent.getTextStream()
@@ -199,17 +206,19 @@ class _FoodlyAppState extends State<FoodlyApp> {
   }
 
   void _handleReceivedMealShare(String? value) {
-    if (AuthenticationService.currentUser != null && value != null) {
-      if (value.startsWith(kChefkochShareEndpoint)) {
-        _appRouter
-            .navigate(MealCreateScreenRoute(id: Uri.encodeComponent(value)));
-      } else if (value.contains(kChefkochShareEndpoint)) {
-        final startIndex = value.indexOf(kChefkochShareEndpoint);
-        final extractedLink =
-            value.substring(startIndex, value.length).split(' ')[0];
-        _appRouter.navigate(
-            MealCreateScreenRoute(id: Uri.encodeComponent(extractedLink)));
-      }
+    if (AuthenticationService.currentUser == null || value == null) {
+      return;
+    }
+
+    if (value.startsWith(kChefkochShareEndpoint)) {
+      _appRouter
+          .navigate(MealCreateScreenRoute(id: Uri.encodeComponent(value)));
+    } else if (value.contains(kChefkochShareEndpoint)) {
+      final startIndex = value.indexOf(kChefkochShareEndpoint);
+      final extractedLink =
+          value.substring(startIndex, value.length).split(' ')[0];
+      _appRouter.navigate(
+          MealCreateScreenRoute(id: Uri.encodeComponent(extractedLink)));
     }
   }
 }

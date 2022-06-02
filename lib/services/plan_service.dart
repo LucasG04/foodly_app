@@ -42,9 +42,12 @@ class PlanService {
 
   static Future<Plan?> getPlanById(String? id) async {
     _log.finer('Call getPlanById with $id');
+    if (id == null || id.isEmpty) {
+      return null;
+    }
     final doc = await _firestore.doc(id).get();
 
-    return doc.exists ? doc.data() : null;
+    return doc.exists && doc.data() != null ? doc.data() : null;
   }
 
   static Future<List<Plan>> getPlansByIds(List<String?> ids) async {
@@ -189,6 +192,9 @@ class PlanService {
 
   static Future<void> leavePlan(String? planId, String userId) async {
     _log.finer('Call leavePlan with planId: $planId | userId: $userId');
+    if (planId == null) {
+      return;
+    }
     final plan = await getPlanById(planId);
 
     if (plan != null && plan.users != null && plan.users!.contains(userId)) {
