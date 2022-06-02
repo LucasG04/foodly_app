@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:logging/logging.dart';
 
 import '../models/meal.dart';
+import '../utils/convert_util.dart';
 import '../utils/secrets.dart';
 import 'meal_stat_service.dart';
 
@@ -21,26 +21,23 @@ class MealService {
 
   static Future<List<Meal>> getMealsByIds(List<String>? ids) async {
     _log.finer('Call getMealsByIds with $ids');
-    await FirebaseCrashlytics.instance
-        .recordError('whereIn getMealsByIds $ids', null);
-    return [];
-    // if (ids == null || ids.isEmpty) {
-    //   return [];
-    // }
+    if (ids == null || ids.isEmpty) {
+      return [];
+    }
 
-    // final List<DocumentSnapshot<Meal>> documents = [];
+    final List<DocumentSnapshot<Meal>> documents = [];
 
-    // for (final idList in ConvertUtil.splitArray(ids)) {
-    //   if (idList.isNotEmpty) {
-    //     final results =
-    //         await _firestore.where(FieldPath.documentId, whereIn: idList).get();
-    //     documents.addAll(results.docs);
-    //   }
-    // }
+    for (final idList in ConvertUtil.splitArray(ids)) {
+      if (idList.isNotEmpty) {
+        final results =
+            await _firestore.where(FieldPath.documentId, whereIn: idList).get();
+        documents.addAll(results.docs);
+      }
+    }
 
-    // // remove non existing documents
-    // documents.removeWhere((e) => !e.exists);
-    // return documents.map((e) => e.data()!).toList();
+    // remove non existing documents
+    documents.removeWhere((e) => !e.exists);
+    return documents.map((e) => e.data()!).toList();
   }
 
   static Future<Meal?> getMealById(String mealId) async {
