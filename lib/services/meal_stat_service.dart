@@ -7,14 +7,14 @@ import '../models/meal_stat.dart';
 import 'meal_service.dart';
 
 class MealStatService {
-  static final log = Logger('MealStatService');
+  static final _log = Logger('MealStatService');
 
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   MealStatService._();
 
   static Future<List<MealStat>> getStatsOfPlan(String planId) async {
-    log.finer('Call getStatsOfPlan from $planId');
+    _log.finer('Call getStatsOfPlan from $planId');
     final querySnapshot = await _firestore
         .collection('plans')
         .doc(planId)
@@ -27,7 +27,7 @@ class MealStatService {
   }
 
   static Future<List<Meal>> getMealRecommendations(String planId) async {
-    log.finer('Call getMealRecommendations for $planId');
+    _log.finer('Call getMealRecommendations for $planId');
     try {
       final stats = await Future.wait(
           [getLeastPlanned(planId), getLongestNotPlanned(planId)]);
@@ -37,7 +37,7 @@ class MealStatService {
       mealIds = [
         ...{...mealIds}
       ];
-      log.finest('getMealRecommendations mealIds: $mealIds');
+      _log.finest('getMealRecommendations mealIds: $mealIds');
 
       final meals = await MealService.getMealsByIds(mealIds);
 
@@ -45,14 +45,14 @@ class MealStatService {
           ? meals.where((meal) => mealIds.contains(meal.id)).toList()
           : [];
     } catch (e) {
-      log.severe('Failed getMealRecommendations for $planId', e);
+      _log.severe('Failed getMealRecommendations for $planId', e);
       return [];
     }
   }
 
   static Future<List<MealStat>> getLeastPlanned(String? planId,
       [int limit = 5]) async {
-    log.finer('Call getLeastPlanned from $planId');
+    _log.finer('Call getLeastPlanned from $planId');
     final querySnapshot = await _firestore
         .collection('plans')
         .doc(planId)
@@ -68,7 +68,7 @@ class MealStatService {
 
   static Future<List<MealStat>> getLongestNotPlanned(String? planId,
       [int limit = 5]) async {
-    log.finer('Call getLongestNotPlanned from $planId');
+    _log.finer('Call getLongestNotPlanned from $planId');
     final querySnapshot = await _firestore
         .collection('plans')
         .doc(planId)
@@ -84,9 +84,9 @@ class MealStatService {
 
   static Future<void> bumpStat(String planId, String mealId,
       {bool? bumpCount, bool? bumpLastPlanned}) async {
-    log.finer('Call bumpStat for plan $planId');
+    _log.finer('Call bumpStat for plan $planId');
     if (planId.startsWith(kPlaceholderSymbol)) {
-      log.finer(
+      _log.finer(
           'bumpStat for plan $planId tried with placeholder: $mealId. Abort bump.');
       return;
     }
@@ -123,13 +123,13 @@ class MealStatService {
             .update(stat.toMap());
       }
     } catch (e) {
-      log.severe('ERR: updateStat for plan $planId with $mealId', e);
+      _log.severe('ERR: updateStat for plan $planId with $mealId', e);
       return;
     }
   }
 
   static Future<void> deleteStatByMealId(String? planId, String? mealId) async {
-    log.finer('Call deleteStatByMealId for plan $planId with meal $mealId');
+    _log.finer('Call deleteStatByMealId for plan $planId with meal $mealId');
     try {
       final querySnapshot = await _firestore
           .collection('plans')
@@ -141,17 +141,17 @@ class MealStatService {
       if (querySnapshot.docs.isNotEmpty) {
         await deleteStat(planId, querySnapshot.docs.first.id);
       } else {
-        log.finer(
+        _log.finer(
             'ERR: deleteStatByMealId for plan $planId with meal $mealId. Could not find stat.');
       }
     } catch (e) {
-      log.severe('ERR: deleteStatByMealId for plan $planId with $mealId', e);
+      _log.severe('ERR: deleteStatByMealId for plan $planId with $mealId', e);
       return;
     }
   }
 
   static Future<void> deleteStat(String? planId, String statId) async {
-    log.finer('Call deleteStat for plan $planId with stat $statId');
+    _log.finer('Call deleteStat for plan $planId with stat $statId');
     try {
       await _firestore
           .collection('plans')
@@ -160,7 +160,7 @@ class MealStatService {
           .doc(statId)
           .delete();
     } catch (e) {
-      log.severe('ERR: deleteStat for plan $planId with $statId', e);
+      _log.severe('ERR: deleteStat for plan $planId with $statId', e);
       return;
     }
   }

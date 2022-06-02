@@ -8,7 +8,7 @@ import '../utils/secrets.dart';
 import 'meal_stat_service.dart';
 
 class MealService {
-  static final log = Logger('MealService');
+  static final _log = Logger('MealService');
 
   static final CollectionReference<Meal> _firestore =
       FirebaseFirestore.instance.collection('meals').withConverter<Meal>(
@@ -20,7 +20,7 @@ class MealService {
   MealService._();
 
   static Future<List<Meal>> getMealsByIds(List<String>? ids) async {
-    log.finer('Call getMealsByIds with $ids');
+    _log.finer('Call getMealsByIds with $ids');
     if (ids == null || ids.isEmpty) {
       return [];
     }
@@ -41,19 +41,19 @@ class MealService {
   }
 
   static Future<Meal?> getMealById(String mealId) async {
-    log.finer('Call getMeals with $mealId');
+    _log.finer('Call getMeals with $mealId');
     try {
       final doc = await _firestore.doc(mealId).get();
 
       return doc.exists ? doc.data() : null;
     } catch (e) {
-      log.severe('ERR: getMeals with $mealId', e);
+      _log.severe('ERR: getMeals with $mealId', e);
       return null;
     }
   }
 
   static Future<List<Meal>> getAllMeals(String planId) async {
-    log.finer('Call getAllMeals with $planId');
+    _log.finer('Call getAllMeals with $planId');
     final List<Meal> meals = [];
     try {
       final snapsInPlan =
@@ -71,20 +71,20 @@ class MealService {
         meals.add(snap.data());
       }
     } catch (e) {
-      log.severe('ERR: getAllMeals with $planId', e);
+      _log.severe('ERR: getAllMeals with $planId', e);
     }
 
     return meals;
   }
 
   static Future<Meal?> createMeal(Meal meal) async {
-    log.finer('Call createMeal with ${meal.toMap()}');
+    _log.finer('Call createMeal with ${meal.toMap()}');
     if (meal.imageUrl == null || meal.imageUrl!.isEmpty) {
       try {
         meal.imageUrl = (await _getMealPhotos(meal.name))[0] ?? '';
-        log.finest('createMeal: Generated image: ${meal.imageUrl}');
+        _log.finest('createMeal: Generated image: ${meal.imageUrl}');
       } catch (e) {
-        log.severe('ERR: _getMealPhotos in createMeal with ${meal.name}', e);
+        _log.severe('ERR: _getMealPhotos in createMeal with ${meal.name}', e);
       }
     }
 
@@ -96,33 +96,33 @@ class MealService {
 
       return meal;
     } catch (e) {
-      log.severe('ERR: createMeal with ${meal.toMap()}', e);
+      _log.severe('ERR: createMeal with ${meal.toMap()}', e);
       return null;
     }
   }
 
   static Future<Meal?> updateMeal(Meal meal) async {
-    log.finer('Call updateMeal with ${meal.toMap()}');
+    _log.finer('Call updateMeal with ${meal.toMap()}');
     try {
       await _firestore.doc(meal.id).update(meal.toMap());
       return meal;
     } catch (e) {
-      log.severe('ERR: updateMeal with ${meal.toMap()}', e);
+      _log.severe('ERR: updateMeal with ${meal.toMap()}', e);
       return null;
     }
   }
 
   static Future<void> deleteMeal(String mealId) async {
-    log.finer('Call deleteMeal with $mealId');
+    _log.finer('Call deleteMeal with $mealId');
     try {
       await _firestore.doc(mealId).delete();
     } catch (e) {
-      log.severe('ERR: deleteMeal with $mealId', e);
+      _log.severe('ERR: deleteMeal with $mealId', e);
     }
   }
 
   static Future<void> addMeals(String planId, List<Meal> meals) async {
-    log.finer(
+    _log.finer(
         'Call addMeals with PlanId: $planId | Meals: ${meals.toString()}');
     try {
       for (final meal in meals) {
@@ -135,12 +135,13 @@ class MealService {
         }),
       );
     } catch (e) {
-      log.severe(
+      _log.severe(
           'ERR: addMeals with PlanId: $planId | Meals: ${meals.toString()}', e);
     }
   }
 
   static Future<List<String?>> _getMealPhotos(String mealName) async {
+    _log.finer('Call _getMealPhotos with $mealName');
     final List<String?> urls = [];
     final Response<dynamic> response = await Dio().get<dynamic>(
       'https://pixabay.com/api/',
@@ -164,6 +165,7 @@ class MealService {
   }
 
   static Future<List<String>> getAllTags(String planId) async {
+    _log.finer('Call getAllTags with $planId');
     final meals = await MealService.getAllMeals(planId);
     final tagsSeparated = meals.map((e) => e.tags);
     var tags = tagsSeparated.expand<String>((i) => i!).toList();
@@ -174,6 +176,7 @@ class MealService {
 
   static Future<List<Meal>> getMealsPaginated(String planId,
       {String? lastMealId, int amount = 30}) async {
+    _log.finer('Call getMealsPaginated with $planId, $lastMealId, $amount');
     Query<Meal> query;
     if (lastMealId != null) {
       final startAfter = await _firestore.doc(lastMealId).get();

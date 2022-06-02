@@ -2,13 +2,17 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:logging/logging.dart';
 
 class StorageService {
+  static final _log = Logger('StorageService');
+
   StorageService._();
 
   static const String _storageMealImageFolder = 'meal-images/';
 
   static Future<UploadTask?> uploadFile(PickedFile? file) async {
+    _log.finer('Call uploadFile');
     if (file == null) {
       return null;
     }
@@ -35,6 +39,7 @@ class StorageService {
   }
 
   static Future<String> getMealImageUrl(String? fileName) async {
+    _log.finer('Call getMealImageUrl with $fileName');
     if (fileName == null || fileName.isEmpty) {
       return '';
     }
@@ -49,6 +54,7 @@ class StorageService {
   }
 
   static Future<void> removeFile(String? fileName) async {
+    _log.finer('Call removeFile with $fileName');
     if (fileName == null || fileName.isEmpty) {
       return;
     }
