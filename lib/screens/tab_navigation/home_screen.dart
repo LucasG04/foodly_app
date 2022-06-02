@@ -133,12 +133,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _checkForUpdateAndroid() async {
-    final updateInfo =
-        await InAppUpdate.checkForUpdate().catchError((dynamic err) {
-      _log.severe('ERR in InAppUpdate.checkForUpdate()', err);
-    });
+    AppUpdateInfo? updateInfo;
 
-    if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
+    try {
+      updateInfo = await InAppUpdate.checkForUpdate();
+    } catch (e) {
+      _log.severe('ERR in InAppUpdate.checkForUpdate()', e);
+    }
+
+    if (updateInfo != null &&
+        updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
       InAppUpdate.startFlexibleUpdate().then((_) {
         InAppUpdate.completeFlexibleUpdate().catchError((dynamic err) {
           _log.severe('ERR in InAppUpdate.completeFlexibleUpdate()', err);
