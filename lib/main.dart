@@ -22,10 +22,10 @@ import 'providers/state_providers.dart';
 import 'services/authentication_service.dart';
 import 'services/foodly_user_service.dart';
 import 'services/link_metadata_service.dart';
-import 'services/log_record_service.dart';
 import 'services/plan_service.dart';
 import 'services/settings_service.dart';
 import 'services/version_service.dart';
+import 'utils/basic_utils.dart';
 
 Future<void> main() async {
   runZonedGuarded<Future<void>>(
@@ -74,24 +74,21 @@ class FoodlyApp extends StatefulWidget {
 
 class _FoodlyAppState extends State<FoodlyApp> {
   final Logger _log = Logger('FoodlyApp');
-  late StreamSubscription<String> _intentDataStreamSubscription;
-  late StreamSubscription<LogRecord> _logStream;
+  late StreamSubscription<String>? _intentDataStreamSubscription;
 
   final _appRouter = AppRouter();
 
   @override
-  void dispose() {
-    _logStream.cancel();
-    _intentDataStreamSubscription.cancel();
-    super.dispose();
+  void initState() {
+    _initializeLogger();
+    _listenForShareIntent();
+    super.initState();
   }
 
   @override
-  void initState() {
-    _initializeLogger();
-    LogRecordService.startPeriodicLogging();
-    _listenForShareIntent();
-    super.initState();
+  void dispose() {
+    _intentDataStreamSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -159,40 +156,34 @@ class _FoodlyAppState extends State<FoodlyApp> {
       context.read(userProvider).state = user;
     } else {
       FirebaseCrashlytics.instance.setUserIdentifier('');
+      BasicUtils.afterBuild(() => context.read(userProvider).state = null);
     }
+
+    BasicUtils.afterBuild(
+      () => context.read(initialUserLoadingProvider).state = false,
+    );
   }
 
   void _initializeLogger() {
     if (foundation.kDebugMode) {
       Logger.root.level = Level.ALL;
       Logger.root.onRecord.listen((record) {
-        _addLogToProvider(record);
         // ignore: avoid_print
         print('${record.level.name}: ${record.loggerName}: ${record.message}');
       });
     } else {
       Logger.root.level = Level.ALL;
       Logger.root.onRecord.listen((record) {
-        _addLogToProvider(record);
         if (record.level >= Level.SEVERE) {
-          final userId = context.read(userProvider).state?.id;
-          final planId = context.read(planProvider).state?.id;
-          LogRecordService.saveLog(
-            userId: userId,
-            planId: planId,
-            logRecord: record,
+          final message =
+              '${record.loggerName} (${record.level.name}): ${record.message}';
+          FirebaseCrashlytics.instance.recordError(
+            message,
+            record.stackTrace,
+            reason: record.error,
           );
         }
       });
-    }
-  }
-
-  void _addLogToProvider(LogRecord record) {
-    if (kLogViewEnabled) {
-      context.read(logsProvider).state = [
-        ...context.read(logsProvider).state,
-        record
-      ];
     }
   }
 

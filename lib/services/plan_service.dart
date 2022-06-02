@@ -12,7 +12,7 @@ import 'meal_stat_service.dart';
 import 'shopping_list_service.dart';
 
 class PlanService {
-  static final log = Logger('PlanService');
+  static final _log = Logger('PlanService');
 
   static final CollectionReference<Plan> _firestore =
       FirebaseFirestore.instance.collection('plans').withConverter<Plan>(
@@ -24,10 +24,11 @@ class PlanService {
   PlanService._();
 
   static Future<String?> getCurrentPlanId() async {
-    log.finer(
+    _log.finer(
         'Call getCurrentPlanId for User: ${AuthenticationService.currentUser}');
     if (AuthenticationService.currentUser == null) {
-      return '';
+      _log.finer('getCurrentPlanId: currentUser is null');
+      return null;
     }
 
     final currentUserId = AuthenticationService.currentUser!.uid;
@@ -40,14 +41,14 @@ class PlanService {
   }
 
   static Future<Plan?> getPlanById(String? id) async {
-    log.finer('Call getPlanById with $id');
+    _log.finer('Call getPlanById with $id');
     final doc = await _firestore.doc(id).get();
 
     return doc.exists ? doc.data() : null;
   }
 
   static Future<List<Plan>> getPlansByIds(List<String?> ids) async {
-    log.finer('Call getPlansByIds with ${ids.toString()}');
+    _log.finer('Call getPlansByIds with ${ids.toString()}');
     final List<DocumentSnapshot<Plan>> documents = [];
 
     for (final idList in ConvertUtil.splitArray(ids)) {
@@ -61,7 +62,7 @@ class PlanService {
   }
 
   static Stream<Plan> streamPlanById(String id) {
-    log.finer('Call streamPlanById with $id');
+    _log.finer('Call streamPlanById with $id');
     return _firestore
         .doc(id)
         .snapshots()
@@ -70,12 +71,12 @@ class PlanService {
   }
 
   static Future<Plan> createPlan(String? name) async {
-    log.finer('Call createPlan');
+    _log.finer('Call createPlan');
     String code = _generateCode().toString();
     while ((await getPlanById(code)) != null) {
       code = _generateCode().toString();
     }
-    log.finest('createPlan: Generated code: $code');
+    _log.finest('createPlan: Generated code: $code');
 
     final now = DateTime.now();
     final plan = Plan(
@@ -84,7 +85,7 @@ class PlanService {
       name: name,
       users: [],
     );
-    log.finest('createPlan: Plan is: ${plan.toMap()}');
+    _log.finest('createPlan: Plan is: ${plan.toMap()}');
 
     final id = DateTime.now().microsecondsSinceEpoch.toString();
     await _firestore.doc(id).set(plan);
@@ -104,21 +105,21 @@ class PlanService {
 
   static Future<Plan?> getPlanByCode(String code,
       {bool withMeals = true}) async {
-    log.finer('Call getPlanByCode with $code');
+    _log.finer('Call getPlanByCode with $code');
     final snaps =
         await _firestore.where('code', isEqualTo: code).limit(1).get();
 
     if (snaps.docs.isEmpty) {
       return null;
     }
-    log.finest('getPlanByCode: Query result: ${snaps.docs.toString()}');
+    _log.finest('getPlanByCode: Query result: ${snaps.docs.toString()}');
 
     final plan = snaps.docs.first.data();
 
     if (!withMeals) {
       final snapMeals = await _firestore.doc(plan.id).collection('meals').get();
 
-      log.finest(
+      _log.finest(
           'getPlanByCode: Query meals result: ${snapMeals.docs.toString()}');
 
       plan.meals = snapMeals.docs
@@ -130,19 +131,19 @@ class PlanService {
   }
 
   static Future<void> updatePlan(Plan plan) {
-    log.finer('Call updatePlan with ${plan.toMap()}');
+    _log.finer('Call updatePlan with ${plan.toMap()}');
     return _firestore.doc(plan.id).update(plan.toMap());
   }
 
   static Stream<List<PlanMeal>> streamPlanMealsByPlanId(String? id) {
-    log.finer('Call streamPlanMealsByPlanId with $id');
+    _log.finer('Call streamPlanMealsByPlanId with $id');
     return _firestore.doc(id).collection('meals').snapshots().map((snap) =>
         snap.docs.map((e) => PlanMeal.fromMap(e.id, e.data())).toList());
   }
 
   static Future<void> addPlanMealToPlan(
       String planId, PlanMeal planMeal) async {
-    log.finer(
+    _log.finer(
         'Call addPlanMealToPlan with planId: $planId | planMeal: ${planMeal.toMap()}');
     if (!planMeal.meal.startsWith(kPlaceholderSymbol)) {
       await MealStatService.bumpStat(planId, planMeal.meal,
@@ -152,7 +153,7 @@ class PlanService {
   }
 
   static Future<void> updatePlanMealFromPlan(String? planId, PlanMeal meal) {
-    log.finer(
+    _log.finer(
         'Call updatePlanMealFromPlan with planId: $planId | planMeal: ${meal.toMap()}');
     return _firestore
         .doc(planId)
@@ -162,20 +163,20 @@ class PlanService {
   }
 
   static Future<void> deletePlanMealFromPlan(String? planId, String? mealId) {
-    log.finer(
+    _log.finer(
         'Call deletePlanMealFromPlan with planId: $planId | mealId: $mealId');
     return _firestore.doc(planId).collection('meals').doc(mealId).delete();
   }
 
   static Future<void> voteForPlanMeal(
       String? planId, PlanMeal planMeal, String userId) {
-    log.finer(
+    _log.finer(
         'Call voteForPlanMeal with planId: $planId | planMeal: ${planMeal.toMap()} | userId: $userId');
     if (planMeal.upvotes!.contains(userId)) {
-      log.finest('voteForPlanMeal: upvotes contain userId.');
+      _log.finest('voteForPlanMeal: upvotes contain userId.');
       planMeal.upvotes!.remove(userId);
     } else {
-      log.finest('voteForPlanMeal: upvotes dont contain userId.');
+      _log.finest('voteForPlanMeal: upvotes dont contain userId.');
       planMeal.upvotes!.add(userId);
     }
 
@@ -187,7 +188,7 @@ class PlanService {
   }
 
   static Future<void> leavePlan(String? planId, String userId) async {
-    log.finer('Call leavePlan with planId: $planId | userId: $userId');
+    _log.finer('Call leavePlan with planId: $planId | userId: $userId');
     final plan = await getPlanById(planId);
 
     if (plan != null && plan.users != null && plan.users!.contains(userId)) {

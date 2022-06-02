@@ -10,6 +10,7 @@ import '../../../models/meal.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/lunix_api_service.dart';
 import '../../../services/meal_service.dart';
+import '../../../utils/basic_utils.dart';
 import '../../../utils/debouncer.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import '../../../widgets/user_information.dart';
@@ -336,8 +337,8 @@ class _MealListViewState extends State<MealListView>
   }
 
   void _listenForMealsChange() {
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => context.read(mealsChangedProvider).addListener((state) {
+    BasicUtils.afterBuild(
+      () => context.read(mealsChangedProvider).addListener((state) {
         if (state != 0) {
           _refreshMeals();
         }

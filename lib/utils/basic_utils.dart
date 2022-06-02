@@ -54,4 +54,8 @@ class BasicUtils {
     context.read(mealsChangedProvider).state =
         DateTime.now().millisecondsSinceEpoch;
   }
+
+  static void afterBuild(void Function() callback) {
+    return WidgetsBinding.instance.addPostFrameCallback((_) => callback());
+  }
 }
