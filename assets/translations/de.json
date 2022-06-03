@@ -61,6 +61,8 @@
     "meal_list_empty_subtitle": "In deinem Plan sind noch keine Gerichte angelegt. Klick auf den \"Plus\"-Button und leg los.",
     "meal_list_help_import": "Rezepte importieren",
     "meal_list_search": "Suchen",
+    "meal_list_empty_search_title": "Keine Gerichte gefunden",
+    "meal_list_empty_search_subtitle": "Für deine Suche konten keine Gerichte gefunden werden.\nVersuche etwas anderes oder erstelle ein neues Gericht.",
     "onboarding_one_title": "Danke, dass du {} verwendest.",
     "onboarding_one_subtitle": "{} verbindet für dich deinen Essensplan, Einkaufsliste und Kochbuch.",
     "onboarding_two_title": "Essensplan",
