@@ -214,7 +214,7 @@ class _MealListViewState extends State<MealListView>
     return Column(
       children: [
         UserInformation(
-          'assets/images/undraw_empty.png',
+          'assets/images/undraw_void.png',
           'meal_list_empty_search_title'.tr(),
           'meal_list_empty_search_subtitle'.tr(),
         ),
