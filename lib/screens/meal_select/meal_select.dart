@@ -124,9 +124,9 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
               )
             : context.read(_$isSearching).state
                 ? UserInformation(
-                    'assets/images/undraw_empty.png',
-                    'meal_select_no_results'.tr(),
-                    'meal_select_no_results_msg'.tr(),
+                    assetPath: 'assets/images/undraw_empty.png',
+                    title: 'meal_select_no_results'.tr(),
+                    message: 'meal_select_no_results_msg'.tr(),
                   )
                 : SettingsService.showSuggestions
                     ? _buildPreviewMeals(planId)
