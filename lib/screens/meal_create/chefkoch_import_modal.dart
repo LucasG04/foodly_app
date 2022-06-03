@@ -109,10 +109,10 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
   }
 
   void _importMeal() async {
-    final String link =
+    final String? link =
         BasicUtils.getUrlFromString(_linkController.text.trim());
 
-    if (link.isEmpty) {
+    if (link == null || link.isEmpty) {
       setState(() {
         _buttonState = ButtonState.error;
         _linkErrorText = 'import_modal_error_no_link'.tr();

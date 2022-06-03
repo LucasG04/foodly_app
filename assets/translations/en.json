@@ -105,7 +105,7 @@
     "ingredient_modal_error_name": "Please enter a name.",
     "ingredient_modal_error_amount": "Enter unit of measure.",
     "import_modal_title": "CHEFKOCH-IMPORT",
-    "import_modal_link_title": "link from chef",
+    "import_modal_link_title": "link from chefkoch.de",
     "import_modal_error_not_found": "Unfortunately, no dish could be found for this link on Chefkoch.",
     "import_modal_import": "import",
     "import_modal_error_no_link": "Please insert a link.",

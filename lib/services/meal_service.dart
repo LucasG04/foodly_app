@@ -81,7 +81,9 @@ class MealService {
     _log.finer('Call createMeal with ${meal.toMap()}');
     if (meal.imageUrl == null || meal.imageUrl!.isEmpty) {
       try {
-        meal.imageUrl = (await _getMealPhotos(meal.name))[0] ?? '';
+        final images = await _getMealPhotos(meal.name);
+        meal.imageUrl =
+            images.isNotEmpty && images.first != null ? images.first : '';
         _log.finest('createMeal: Generated image: ${meal.imageUrl}');
       } catch (e) {
         _log.severe('ERR: _getMealPhotos in createMeal with ${meal.name}', e);
