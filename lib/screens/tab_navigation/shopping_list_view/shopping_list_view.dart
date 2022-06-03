@@ -161,9 +161,8 @@ class _ShoppingListViewState extends State<ShoppingListView>
 
   Widget _buildEmptyShoppingList() {
     return UserInformation(
-      'assets/images/undraw_empty_cart.png',
-      'shopping_list_empty_title'.tr(),
-      'shopping_list_empty_subtitle'.tr(),
+      assetPath: 'assets/images/undraw_empty_cart.png',
+      message: 'shopping_list_empty_subtitle'.tr(),
     );
   }
 

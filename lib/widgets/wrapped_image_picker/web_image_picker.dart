@@ -161,17 +161,17 @@ class _WebImagePickerState extends State<WebImagePicker> {
 
   Widget _buildEmptyContent() {
     return UserInformation(
-      'assets/images/undraw_empty.png',
-      'image_link_picker_empty_title'.tr(),
-      'image_link_picker_empty_message'.tr(),
+      assetPath: 'assets/images/undraw_empty.png',
+      title: 'image_link_picker_empty_title'.tr(),
+      message: 'image_link_picker_empty_message'.tr(),
     );
   }
 
   Widget _buildPlaceholderContent() {
     return UserInformation(
-      'assets/images/undraw_searching.png',
-      'image_link_picker_placeholder_title'.tr(),
-      'image_link_picker_placeholder_message'.tr(),
+      assetPath: 'assets/images/undraw_searching.png',
+      title: 'image_link_picker_placeholder_title'.tr(),
+      message: 'image_link_picker_placeholder_message'.tr(),
     );
   }
 

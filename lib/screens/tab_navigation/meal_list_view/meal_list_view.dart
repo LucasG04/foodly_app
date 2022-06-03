@@ -191,9 +191,9 @@ class _MealListViewState extends State<MealListView>
     return Column(
       children: [
         UserInformation(
-          'assets/images/undraw_empty.png',
-          'meal_list_empty_title'.tr(),
-          'meal_list_empty_subtitle'.tr(),
+          assetPath: 'assets/images/undraw_empty.png',
+          title: 'meal_list_empty_title'.tr(),
+          message: 'meal_list_empty_subtitle'.tr(),
         ),
         const SizedBox(height: kPadding),
         TextButton.icon(
@@ -214,9 +214,9 @@ class _MealListViewState extends State<MealListView>
     return Column(
       children: [
         UserInformation(
-          'assets/images/undraw_void.png',
-          'meal_list_empty_search_title'.tr(),
-          'meal_list_empty_search_subtitle'.tr(),
+          assetPath: 'assets/images/undraw_void.png',
+          title: 'meal_list_empty_search_title'.tr(),
+          message: 'meal_list_empty_search_subtitle'.tr(),
         ),
       ],
     );

@@ -124,9 +124,9 @@ class _EditListContentModalState extends State<EditListContentModal> {
               final list = ref(_$filteredList).state;
               return _allContent.isEmpty && _textEditingController.text.isEmpty
                   ? UserInformation(
-                      'assets/images/undraw_empty.png',
-                      'meal_create_edit_tags_no_results'.tr(),
-                      'meal_create_edit_tags_no_results_msg'.tr(),
+                      assetPath: 'assets/images/undraw_empty.png',
+                      title: 'meal_create_edit_tags_no_results'.tr(),
+                      message: 'meal_create_edit_tags_no_results_msg'.tr(),
                     )
                   : AnimationLimiter(
                       key: _animationLimiterKey,
