@@ -18,6 +18,7 @@ import '../../../utils/main_snackbar.dart';
 import '../../../utils/widget_utils.dart';
 import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
+import '../../../widgets/user_information.dart';
 import 'animated_shopping_list.dart';
 import 'edit_grocery_modal.dart';
 
@@ -74,6 +75,8 @@ class _ShoppingListViewState extends State<ShoppingListView>
                                 ],
                               ),
                             ),
+                            if (todoItems.isEmpty && boughtItems.isEmpty)
+                              _buildEmptyShoppingList(),
                             SizedBox(
                               width: BasicUtils.contentWidth(
                                 context,
@@ -156,6 +159,14 @@ class _ShoppingListViewState extends State<ShoppingListView>
     );
   }
 
+  Widget _buildEmptyShoppingList() {
+    return UserInformation(
+      'assets/images/undraw_empty_cart.png',
+      'shopping_list_empty_title'.tr(),
+      'shopping_list_empty_subtitle'.tr(),
+    );
+  }
+
   void _editGrocery(String listId, [Grocery? grocery]) {
     WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
@@ -205,7 +216,6 @@ class _ShoppingListViewState extends State<ShoppingListView>
   }
 
   void _checkBoughtItems(String listId, List<Grocery> boughtGroceries) {
-    print(boughtGroceries.length);
     if (_shouldAskForRemovingOfBought(boughtGroceries.length)) {
       showDialog<void>(
         context: context,
