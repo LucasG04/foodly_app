@@ -32,11 +32,11 @@ class BasicUtils {
         : MediaQuery.of(context).size.width * smallMultiplier;
   }
 
-  static String getUrlFromString(String input) {
+  static String? getUrlFromString(String input) {
     final RegExp exp =
         RegExp(r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+');
-    final match = exp.firstMatch(input)!;
-    return input.substring(match.start, match.end);
+    final match = exp.firstMatch(input);
+    return match != null ? input.substring(match.start, match.end) : null;
   }
 
   static bool isValidUri(String uri) {
