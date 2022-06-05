@@ -57,6 +57,9 @@ class LinkMetadataService {
 
   static Future<void> _cacheData(LinkMetadata data) async {
     log.finer('Call _cacheData with key ${data.url}');
+    if (data.url == null) {
+      return;
+    }
     await _dataBox.put(data.url, data).catchError((dynamic err) {
       log.severe('ERR _cacheData with key ${data.url}');
       log.severe(err);
