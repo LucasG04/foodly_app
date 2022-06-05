@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/cupertino.dart';
@@ -27,16 +28,23 @@ import 'services/settings_service.dart';
 import 'services/version_service.dart';
 import 'utils/basic_utils.dart';
 
+Future<void> _configureFirebase() async {
+  await Firebase.initializeApp();
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  if (foundation.kDebugMode) {
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
+  } else {
+    await FirebaseAppCheck.instance.activate();
+  }
+}
+
 Future<void> main() async {
   runZonedGuarded<Future<void>>(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
       await EasyLocalization.ensureInitialized();
-      await Firebase.initializeApp();
+      await _configureFirebase();
       await initializeHive();
-
-      FlutterError.onError =
-          FirebaseCrashlytics.instance.recordFlutterFatalError;
 
       runApp(
         ProviderScope(
@@ -82,7 +90,6 @@ class _FoodlyAppState extends State<FoodlyApp> {
   void initState() {
     _initializeLogger();
     _listenForShareIntent();
-    _configureCrashlytics();
     super.initState();
   }
 
@@ -185,12 +192,6 @@ class _FoodlyAppState extends State<FoodlyApp> {
           );
         }
       });
-    }
-  }
-
-  void _configureCrashlytics() async {
-    if (foundation.kDebugMode) {
-      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
     }
   }
 
