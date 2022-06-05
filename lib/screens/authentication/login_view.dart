@@ -43,10 +43,10 @@ class _LoginViewState extends State<LoginView> {
   ButtonState? _buttonState;
   late bool _isRegistering;
   late bool _forgotPlan;
+  late TextEditingController _emailController;
+  late TextEditingController _passwordController;
+  late FocusNode _passwordFocusNode;
 
-  TextEditingController? _emailController;
-  TextEditingController? _passwordController;
-  FocusNode? _passwordFocusNode;
   String? _emailErrorText;
   String? _passwordErrorText;
   String? _unknownErrorText;
@@ -136,7 +136,7 @@ class _LoginViewState extends State<LoginView> {
             errorText: _emailErrorText,
             autofocus: true,
             keyboardType: TextInputType.emailAddress,
-            onSubmit: () => _passwordFocusNode!.requestFocus(),
+            onSubmit: () => _passwordFocusNode.requestFocus(),
           ),
           MainTextField(
             controller: _passwordController,
@@ -218,7 +218,7 @@ class _LoginViewState extends State<LoginView> {
       );
 
   bool _validateEmail() {
-    if (!EmailValidator.validate(_emailController!.text)) {
+    if (!EmailValidator.validate(_emailController.text)) {
       setState(() {
         _emailErrorText = 'login_error_wrong_mail'.tr();
       });
@@ -228,8 +228,8 @@ class _LoginViewState extends State<LoginView> {
   }
 
   bool _validatePassword() {
-    if (_passwordController!.text.isEmpty ||
-        _passwordController!.text.length < 6) {
+    if (_passwordController.text.isEmpty ||
+        _passwordController.text.length < 6) {
       setState(() {
         _passwordErrorText = 'login_error_password'.tr();
       });
@@ -250,9 +250,9 @@ class _LoginViewState extends State<LoginView> {
     try {
       final userId = await (_isRegistering && !_forgotPlan
           ? AuthenticationService.registerUser(
-              _emailController!.text, _passwordController!.text)
+              _emailController.text, _passwordController.text)
           : AuthenticationService.signInUser(
-              _emailController!.text, _passwordController!.text));
+              _emailController.text, _passwordController.text));
       await _processAuthentication(userId);
     } catch (e) {
       _handleAuthException(e);
@@ -278,8 +278,8 @@ class _LoginViewState extends State<LoginView> {
     BasicUtils.clearAllProvider(context);
   }
 
-  Future<void> _processAuthentication(String userId) async {
-    if (userId.isEmpty) {
+  Future<void> _processAuthentication(String? userId) async {
+    if (userId == null || userId.isEmpty) {
       throw Exception('No user id.');
     }
 
@@ -359,7 +359,7 @@ class _LoginViewState extends State<LoginView> {
       ),
       context: context,
       isScrollControlled: true,
-      builder: (context) => ResetPasswordModal(_emailController!.text),
+      builder: (context) => ResetPasswordModal(_emailController.text),
     );
   }
 
