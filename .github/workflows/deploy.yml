@@ -50,6 +50,16 @@ jobs:
           PROVISIONING_PROFILE_SPECIFIER: '${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}'
           FASTLANE_PASSWORD: '${{ secrets.TEMP_KEYCHAIN_PASSWORD }}'
           TEMP_KEYCHAIN_USER: '${{ secrets.TEMP_KEYCHAIN_USER }}'
+      - name: Notify on failure
+        if: ${{ failure() }}
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            FAILED iOS deployment!
+            Commit: ${{ github.event.commits[0].message }}
+            Action: https://github.com/LucasG04/foodly_app/actions/runs/${{ github.run_id }}
   deploy_android:
     name: Android deployment Internal
     runs-on: ubuntu-latest
@@ -83,3 +93,13 @@ jobs:
         with:
           lane: internal
           subdirectory: android
+      - name: Notify on failure
+        if: ${{ failure() }}
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            FAILED Android deployment!
+            Commit: ${{ github.event.commits[0].message }}
+            Action: https://github.com/LucasG04/foodly_app/actions/runs/${{ github.run_id }}
