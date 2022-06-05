@@ -86,8 +86,14 @@ class AuthenticationService {
 
     // Sign in the user with Firebase. If the nonce we generated earlier does
     // not match the nonce in `appleCredential.identityToken`, sign in will fail.
-    final user = await _auth.signInWithCredential(oauthCredential);
+    final credential = await _auth.signInWithCredential(oauthCredential);
 
-    return user.user!.uid;
+    if (credential.user == null) {
+      _log.severe(
+          'ERR! "signInWithApple" signInWithCredential() returned no user.');
+      throw Exception('signInWithCredential Failed');
+    }
+
+    return credential.user!.uid;
   }
 }
