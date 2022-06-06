@@ -22,7 +22,7 @@ class MealListView extends StatefulWidget {
   const MealListView({Key? key}) : super(key: key);
 
   @override
-  _MealListViewState createState() => _MealListViewState();
+  State<MealListView> createState() => _MealListViewState();
 }
 
 class _MealListViewState extends State<MealListView>

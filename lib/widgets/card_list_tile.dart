@@ -22,9 +22,9 @@ class CardListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double _width = MediaQuery.of(context).size.width * 0.9;
+    final double width = MediaQuery.of(context).size.width * 0.9;
     return Container(
-      width: _width > 599 ? 600 : _width,
+      width: width > 599 ? 600 : width,
       height: height,
       margin: const EdgeInsets.symmetric(vertical: kPadding / 2),
       decoration: BoxDecoration(

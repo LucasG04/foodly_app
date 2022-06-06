@@ -11,7 +11,7 @@ class LoadingLogut extends StatefulWidget {
   const LoadingLogut({Key? key}) : super(key: key);
 
   @override
-  _LoadingLogutState createState() => _LoadingLogutState();
+  State<LoadingLogut> createState() => _LoadingLogutState();
 }
 
 class _LoadingLogutState extends State<LoadingLogut> {

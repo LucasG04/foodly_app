@@ -8,6 +8,7 @@ import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
 import '../../widgets/toggle_tab/flutter_toggle_tab.dart';
+import 'authentication_keys.dart';
 
 class PlanSettingsView extends StatefulWidget {
   final Plan? plan;
@@ -22,7 +23,7 @@ class PlanSettingsView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _PlanSettingsViewState createState() => _PlanSettingsViewState();
+  State<PlanSettingsView> createState() => _PlanSettingsViewState();
 }
 
 class _PlanSettingsViewState extends State<PlanSettingsView> {
@@ -83,6 +84,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
           ),
           const SizedBox(height: kPadding),
           MainTextField(
+            key: AuthenticationKeys.buttonPlanNameNext,
             controller: _nameController,
             title: 'plan_settings_name_title'.tr(),
             textInputAction: TextInputAction.go,

@@ -16,7 +16,7 @@ class MarkdownEditor extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _MarkdownEditorState createState() => _MarkdownEditorState();
+  State<MarkdownEditor> createState() => _MarkdownEditorState();
 }
 
 class _MarkdownEditorState extends State<MarkdownEditor>

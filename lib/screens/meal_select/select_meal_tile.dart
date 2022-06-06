@@ -24,7 +24,7 @@ class SelectMealTile extends StatefulWidget {
         super(key: key);
 
   @override
-  _SelectMealTileState createState() => _SelectMealTileState();
+  State<SelectMealTile> createState() => _SelectMealTileState();
 }
 
 class _SelectMealTileState extends State<SelectMealTile> {
@@ -110,4 +110,5 @@ class _SelectMealTileState extends State<SelectMealTile> {
   }
 }
 
+// ignore: constant_identifier_names
 enum _ButtonState { DEFAULT, LOADING, DONE }

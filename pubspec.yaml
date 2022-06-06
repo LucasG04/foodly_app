@@ -56,7 +56,7 @@ dependencies:
   # Widgets
   flutter_snake_navigationbar: ^0.5.0
   eva_icons_flutter: ^3.0.2
-  cached_network_image: ^3.2.0
+  cached_network_image: ^3.2.1
   group_list_view: ^1.1.1
   adaptive_dialog: ^1.2.0
   flutter_markdown:
@@ -76,18 +76,19 @@ dependencies:
   font_awesome_flutter: ^9.2.0
 
 dev_dependencies:
+  integration_test:
+    sdk: flutter
   flutter_test:
     sdk: flutter
-  # integration_test:
-  #   sdk: flutter
+  lints: ^2.0.0
   # build runner via: `flutter packages pub run build_runner build`
   build_runner:
   auto_route_generator: ^4.0.0
   hive_generator: ^1.1.1
   flutter_launcher_icons: ^0.9.0
 
-dependency_overrides:
-  platform: ^3.1.0
+# dependency_overrides:
+#   platform: ^3.1.0
 
 flutter_icons:
   android: true

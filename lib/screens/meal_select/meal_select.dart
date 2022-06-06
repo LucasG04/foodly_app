@@ -29,7 +29,7 @@ class MealSelectScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  _MealSelectScreenState createState() => _MealSelectScreenState();
+  State<MealSelectScreen> createState() => _MealSelectScreenState();
 }
 
 class _MealSelectScreenState extends State<MealSelectScreen> {
@@ -185,14 +185,14 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
   }
 
   Widget _buildContainer(IconData iconData, String text, Function action) {
-    const double _height = 75.0;
-    final double _width = MediaQuery.of(context).size.width * 0.9;
+    const double height = 75.0;
+    final double width = MediaQuery.of(context).size.width * 0.9;
     return Align(
       // ignore: avoid_redundant_argument_values
       alignment: Alignment.center,
       child: Container(
-        width: _width > 599 ? 600 : _width,
-        height: _height,
+        width: width > 599 ? 600 : width,
+        height: height,
         margin: const EdgeInsets.symmetric(vertical: kPadding / 2),
         decoration: BoxDecoration(
           boxShadow: const [kSmallShadow],
@@ -202,8 +202,8 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
         child: Row(
           children: [
             SizedBox(
-              height: _height,
-              width: _height,
+              height: height,
+              width: height,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(kRadius),
                 child: Icon(iconData),
@@ -228,8 +228,8 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
               ),
             ),
             Container(
-              height: _height / 2,
-              width: _height / 2,
+              height: height / 2,
+              width: height / 2,
               margin: const EdgeInsets.only(right: 20.0),
               child: OutlinedButton(
                 onPressed: action as void Function()?,

@@ -22,7 +22,7 @@ import 'plan_download_modal.dart';
 class PlanTabView extends StatefulWidget {
   const PlanTabView({Key? key}) : super(key: key);
   @override
-  _PlanTabViewState createState() => _PlanTabViewState();
+  State<PlanTabView> createState() => _PlanTabViewState();
 }
 
 class _PlanTabViewState extends State<PlanTabView>

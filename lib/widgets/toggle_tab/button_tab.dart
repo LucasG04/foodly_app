@@ -6,22 +6,22 @@ import 'helper.dart';
 class ButtonsTab extends StatefulWidget {
   /// Define attribute Widget and State
   ///
-  const ButtonsTab(
-      {Key? key,
-      this.title,
-      this.onPressed,
-      required this.width,
-      this.height,
-      this.isSelected,
-      this.radius,
-      this.selectedTextStyle,
-      this.unSelectedTextStyle,
-      required this.selectedColors,
-      this.icons,
-      required this.unSelectedColors,
-      this.begin,
-      this.end})
-      : super(key: key);
+  const ButtonsTab({
+    Key? key,
+    this.title,
+    this.onPressed,
+    required this.width,
+    this.height,
+    this.isSelected,
+    this.radius,
+    this.selectedTextStyle,
+    this.unSelectedTextStyle,
+    required this.selectedColors,
+    this.icons,
+    required this.unSelectedColors,
+    this.begin,
+    this.end,
+  }) : super(key: key);
 
   final String? title;
   final Function? onPressed;
@@ -42,7 +42,7 @@ class ButtonsTab extends StatefulWidget {
   final Alignment? end;
 
   @override
-  _ButtonsTabState createState() => _ButtonsTabState();
+  State<ButtonsTab> createState() => _ButtonsTabState();
 }
 
 class _ButtonsTabState extends State<ButtonsTab> {
@@ -76,12 +76,15 @@ class _ButtonsTabState extends State<ButtonsTab> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (widget.icons != null) Icon(
-                    widget.icons,
-                    color: widget.isSelected!
-                        ? widget.selectedTextStyle!.color
-                        : widget.unSelectedTextStyle!.color,
-                  ) else Container(),
+            if (widget.icons != null)
+              Icon(
+                widget.icons,
+                color: widget.isSelected!
+                    ? widget.selectedTextStyle!.color
+                    : widget.unSelectedTextStyle!.color,
+              )
+            else
+              Container(),
             Visibility(
               visible: widget.icons != null,
               child: const SizedBox(

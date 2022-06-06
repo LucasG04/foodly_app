@@ -14,7 +14,7 @@ class SelectPickerDialog extends StatefulWidget {
   const SelectPickerDialog({Key? key}) : super(key: key);
 
   @override
-  _SelectPickerDialogState createState() => _SelectPickerDialogState();
+  State<SelectPickerDialog> createState() => _SelectPickerDialogState();
 }
 
 class _SelectPickerDialogState extends State<SelectPickerDialog> {

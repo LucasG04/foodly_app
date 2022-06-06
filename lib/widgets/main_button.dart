@@ -32,7 +32,7 @@ class MainButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _color = color ?? Theme.of(context).primaryColor;
+    final textColor = color ?? Theme.of(context).primaryColor;
     return !isProgress
         ? InkWell(
             onTap: onTap,
@@ -41,13 +41,13 @@ class MainButton extends StatelessWidget {
               height: height,
               decoration: !isSecondary
                   ? BoxDecoration(
-                      color: _color,
+                      color: textColor,
                       borderRadius: BorderRadius.circular(10),
                     )
                   : BoxDecoration(
                       color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: _color),
+                      border: Border.all(color: textColor),
                     ),
               child: Center(
                 child: text != null
@@ -78,13 +78,13 @@ class MainButton extends StatelessWidget {
               onPressed: onTap,
               decoration: !isSecondary
                   ? BoxDecoration(
-                      color: _color,
+                      color: textColor,
                       borderRadius: BorderRadius.circular(10),
                     )
                   : BoxDecoration(
                       color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: _color),
+                      border: Border.all(color: textColor),
                     ),
               progressColor: !isSecondary
                   ? Colors.white

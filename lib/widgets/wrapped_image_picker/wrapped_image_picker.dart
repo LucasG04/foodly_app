@@ -27,7 +27,7 @@ class WrappedImagePicker extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _WrappedImagePickerState createState() => _WrappedImagePickerState();
+  State<WrappedImagePicker> createState() => _WrappedImagePickerState();
 }
 
 class _WrappedImagePickerState extends State<WrappedImagePicker> {

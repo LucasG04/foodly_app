@@ -77,7 +77,7 @@ class FoodlyApp extends StatefulWidget {
   const FoodlyApp({foundation.Key? key}) : super(key: key);
 
   @override
-  _FoodlyAppState createState() => _FoodlyAppState();
+  State<FoodlyApp> createState() => _FoodlyAppState();
 }
 
 class _FoodlyAppState extends State<FoodlyApp> {

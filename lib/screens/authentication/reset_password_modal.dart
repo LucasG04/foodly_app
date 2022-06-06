@@ -18,7 +18,7 @@ class ResetPasswordModal extends StatefulWidget {
   const ResetPasswordModal([this.email]);
 
   @override
-  _ResetPasswordModalState createState() => _ResetPasswordModalState();
+  State<ResetPasswordModal> createState() => _ResetPasswordModalState();
 }
 
 class _ResetPasswordModalState extends State<ResetPasswordModal> {

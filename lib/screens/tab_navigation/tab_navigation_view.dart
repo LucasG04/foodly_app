@@ -19,7 +19,7 @@ class TabNavigationView extends StatefulWidget {
   const TabNavigationView({Key? key}) : super(key: key);
 
   @override
-  _TabNavigationViewState createState() => _TabNavigationViewState();
+  State<TabNavigationView> createState() => _TabNavigationViewState();
 }
 
 class _TabNavigationViewState extends State<TabNavigationView> {

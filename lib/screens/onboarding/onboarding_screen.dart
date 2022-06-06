@@ -10,6 +10,7 @@ import '../../services/authentication_service.dart';
 import '../../services/settings_service.dart';
 import '../../widgets/page_card.dart';
 import '../authentication/authentication_screen.dart';
+import 'onboarding_keys.dart';
 
 class OnboardingScreen extends StatelessWidget {
   final List<PageData> pages = [
@@ -61,8 +62,9 @@ class OnboardingScreen extends StatelessWidget {
         // ignore: avoid_redundant_argument_values
         verticalPosition: heightMultiplier,
         onFinish: () => _finishOnboarding(context),
-        buttonChild: const Center(
-          child: Icon(
+        buttonChild: Center(
+          key: OnboardingKeys.buttonNext,
+          child: const Icon(
             EvaIcons.arrowForwardOutline,
             color: Colors.white,
           ),

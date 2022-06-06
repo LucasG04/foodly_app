@@ -35,7 +35,7 @@ class MealCreateScreen extends StatefulWidget {
   const MealCreateScreen({required this.id, Key? key}) : super(key: key);
 
   @override
-  _MealCreateScreenState createState() => _MealCreateScreenState();
+  State<MealCreateScreen> createState() => _MealCreateScreenState();
 }
 
 class _MealCreateScreenState extends State<MealCreateScreen> {

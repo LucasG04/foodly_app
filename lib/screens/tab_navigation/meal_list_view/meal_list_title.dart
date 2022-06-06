@@ -22,7 +22,7 @@ class MealListTitle extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _MealListTitleState createState() => _MealListTitleState();
+  State<MealListTitle> createState() => _MealListTitleState();
 }
 
 class _MealListTitleState extends State<MealListTitle> {

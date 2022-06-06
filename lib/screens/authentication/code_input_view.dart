@@ -6,6 +6,7 @@ import '../../constants.dart';
 import '../../services/plan_service.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
+import 'authentication_keys.dart';
 import 'login_design_clipper.dart';
 
 class CodeInputView extends StatefulWidget {
@@ -17,7 +18,7 @@ class CodeInputView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CodeInputViewState createState() => _CodeInputViewState();
+  State<CodeInputView> createState() => _CodeInputViewState();
 }
 
 class _CodeInputViewState extends State<CodeInputView> {
@@ -60,6 +61,7 @@ class _CodeInputViewState extends State<CodeInputView> {
               child: Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
+                  key: AuthenticationKeys.buttonForgotCode,
                   child: const Text('login_code_forgot').tr(),
                   onPressed: () => widget.onPageChange(CodeInputResult.FORGOT),
                 ),
@@ -77,6 +79,7 @@ class _CodeInputViewState extends State<CodeInputView> {
             const SizedBox(height: kPadding * 2),
             Center(
               child: MainButton(
+                key: AuthenticationKeys.buttonCreatePlan,
                 text: 'login_code_create_plan'.tr(),
                 onTap: () => widget.onPageChange(CodeInputResult.NEW),
               ),
@@ -125,6 +128,7 @@ class _CodeInputViewState extends State<CodeInputView> {
 
   Widget _buildCodeInput() {
     return TextFormField(
+      key: AuthenticationKeys.inputCode,
       controller: _codeController,
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.go,
@@ -183,4 +187,5 @@ class _CodeInputViewState extends State<CodeInputView> {
   }
 }
 
+// ignore: constant_identifier_names
 enum CodeInputResult { JOIN, NEW, FORGOT }

@@ -21,7 +21,8 @@ class SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color? _color = color ?? Theme.of(context).textTheme.bodyText1!.color;
+    final Color? textColor =
+        color ?? Theme.of(context).textTheme.bodyText1!.color;
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -31,14 +32,14 @@ class SettingsTile extends StatelessWidget {
         child: Row(
           children: [
             if (leadingIcon != null)
-              Icon(leadingIcon, color: _color)
+              Icon(leadingIcon, color: textColor)
             else
               const SizedBox(),
             const SizedBox(width: kPadding),
             Expanded(
               child: AutoSizeText(
                 text,
-                style: TextStyle(color: _color),
+                style: TextStyle(color: textColor),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),

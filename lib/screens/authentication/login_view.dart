@@ -20,6 +20,7 @@ import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
 import '../../widgets/toggle_tab/flutter_toggle_tab.dart';
+import 'authentication_keys.dart';
 import 'reset_password_modal.dart';
 import 'select_plan_modal.dart';
 
@@ -28,15 +29,15 @@ class LoginView extends StatefulWidget {
   final Plan? plan;
   final void Function() navigateBack;
 
-  const LoginView(
-      {required this.isCreatingPlan,
-      required this.plan,
-      required this.navigateBack,
-      Key? key})
-      : super(key: key);
+  const LoginView({
+    required this.isCreatingPlan,
+    required this.plan,
+    required this.navigateBack,
+    Key? key,
+  }) : super(key: key);
 
   @override
-  _LoginViewState createState() => _LoginViewState();
+  State<LoginView> createState() => _LoginViewState();
 }
 
 class _LoginViewState extends State<LoginView> {
@@ -96,6 +97,12 @@ class _LoginViewState extends State<LoginView> {
                 _isRegistering = index == 0;
               });
             },
+            buttonKeys: _forgotPlan
+                ? [AuthenticationKeys.buttonGroupLogin]
+                : [
+                    AuthenticationKeys.buttonGroupRegister,
+                    AuthenticationKeys.buttonGroupLogin
+                  ],
           ),
           Expanded(
             child: Align(
@@ -130,6 +137,7 @@ class _LoginViewState extends State<LoginView> {
           ),
           const SizedBox(height: kPadding),
           MainTextField(
+            key: AuthenticationKeys.inputMail,
             controller: _emailController,
             title: 'login_mail_title'.tr(),
             textInputAction: TextInputAction.next,
@@ -139,6 +147,7 @@ class _LoginViewState extends State<LoginView> {
             onSubmit: () => _passwordFocusNode.requestFocus(),
           ),
           MainTextField(
+            key: AuthenticationKeys.inputPassword,
             controller: _passwordController,
             title: 'login_password_title'.tr(),
             textInputAction: TextInputAction.go,
@@ -191,12 +200,14 @@ class _LoginViewState extends State<LoginView> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 MainButton(
+                  key: AuthenticationKeys.buttonLoginBack,
                   iconData: Icons.arrow_back_ios_new_rounded,
                   width: constraints.maxWidth * 0.25,
                   onTap: widget.navigateBack,
                   isSecondary: true,
                 ),
                 MainButton(
+                  key: AuthenticationKeys.buttonJoin,
                   text: 'login_join'.tr(),
                   width: constraints.maxWidth * 0.65,
                   onTap: _authWithEmail,
