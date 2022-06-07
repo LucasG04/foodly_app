@@ -345,7 +345,7 @@ class _LoginViewState extends State<LoginView> {
   }
 
   void _handleAuthException(dynamic exception) {
-    if (exception is FirebaseAuthException) {
+    if (exception != null && exception is FirebaseAuthException) {
       if (exception.code == 'weak-password') {
         _passwordErrorText = 'login_error_password_weak'.tr();
       } else if (exception.code == 'email-already-in-use') {
