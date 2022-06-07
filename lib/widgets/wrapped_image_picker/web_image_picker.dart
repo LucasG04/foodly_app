@@ -298,12 +298,17 @@ class _WebImagePickerState extends State<WebImagePicker> {
         _getSearchLanguage(),
       );
 
+      if (response == null) {
+        throw Exception('API Response is null');
+      }
+
       setState(() {
         _images = response.images.map((e) => e.url).toList();
         _noResults = _images.isEmpty;
       });
     } catch (e) {
       _log.severe('ERR: searchImages with $search');
+      _noResults = true;
     }
     setState(() {
       _isLoading = false;
@@ -339,6 +344,13 @@ class _WebImagePickerState extends State<WebImagePicker> {
       _imagePage,
       _getSearchLanguage(),
     );
+
+    if (response == null) {
+      setState(() {
+        _isLoadingMore = false;
+      });
+      return;
+    }
 
     setState(() {
       _images.addAll(response.images.map((e) => e.url));
