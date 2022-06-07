@@ -87,8 +87,11 @@ class MealListTile extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     return Align(
       child: GestureDetector(
-        onTap: () =>
-            AutoRouter.of(context).push(MealScreenRoute(id: meal!.id!)),
+        onTap: () {
+          if (meal != null && meal!.id != null) {
+            AutoRouter.of(context).push(MealScreenRoute(id: meal!.id!));
+          }
+        },
         child: Container(
           width: width > 599 ? 600 : width * 0.9,
           height: height,
