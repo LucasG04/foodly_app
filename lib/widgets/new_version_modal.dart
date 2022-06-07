@@ -38,10 +38,17 @@ class NewVersionModal extends StatefulWidget {
 
     final newVersions = publishedVersions.where((v) => v > lastCheckedVersion);
 
+    String deviceLanguageCode;
+    try {
+      deviceLanguageCode = context.locale.languageCode;
+    } catch (e) {
+      deviceLanguageCode = 'en';
+    }
+
     final List<FoodlyVersion>? versions =
         await VersionService.getNotesForVersionsAndLanguage(
       newVersions.map((e) => e.toString()).toList(),
-      context.locale.languageCode,
+      deviceLanguageCode,
     );
 
     if (versions == null || versions.isEmpty) {

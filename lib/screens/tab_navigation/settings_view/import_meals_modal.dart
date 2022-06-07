@@ -91,11 +91,11 @@ class CopyPlanMealsTile extends StatefulWidget {
   const CopyPlanMealsTile(this.plan, {Key? key}) : super(key: key);
 
   @override
-  _CopyPlanMealsTileState createState() => _CopyPlanMealsTileState();
+  State<CopyPlanMealsTile> createState() => _CopyPlanMealsTileState();
 }
 
 class _CopyPlanMealsTileState extends State<CopyPlanMealsTile> {
-  CopyButtonState _buttonState = CopyButtonState.NORMAL;
+  CopyButtonState _buttonState = CopyButtonState.normal;
 
   @override
   Widget build(BuildContext context) {
@@ -105,9 +105,9 @@ class _CopyPlanMealsTileState extends State<CopyPlanMealsTile> {
       trailing: IconButton(
         icon: AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
-          child: _buttonState == CopyButtonState.NORMAL
+          child: _buttonState == CopyButtonState.normal
               ? Icon(EvaIcons.copyOutline, key: UniqueKey())
-              : _buttonState == CopyButtonState.LOADING
+              : _buttonState == CopyButtonState.loading
                   ? SmallCircularProgressIndicator(key: UniqueKey())
                   : Icon(
                       EvaIcons.checkmark,
@@ -124,7 +124,7 @@ class _CopyPlanMealsTileState extends State<CopyPlanMealsTile> {
 
   void _copyMeals(String currentPlanId) async {
     setState(() {
-      _buttonState = CopyButtonState.LOADING;
+      _buttonState = CopyButtonState.loading;
     });
 
     final copiedMeals = await MealService.getAllMeals(widget.plan.id!);
@@ -135,13 +135,13 @@ class _CopyPlanMealsTileState extends State<CopyPlanMealsTile> {
     }
     BasicUtils.emitMealsChanged(context);
     setState(() {
-      _buttonState = CopyButtonState.DONE;
+      _buttonState = CopyButtonState.done;
     });
     await Future<void>.delayed(const Duration(seconds: 1));
     setState(() {
-      _buttonState = CopyButtonState.NORMAL;
+      _buttonState = CopyButtonState.normal;
     });
   }
 }
 
-enum CopyButtonState { NORMAL, LOADING, DONE }
+enum CopyButtonState { normal, loading, done }

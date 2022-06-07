@@ -12,7 +12,7 @@ class EditIngredientModal extends StatefulWidget {
   const EditIngredientModal({this.ingredient, Key? key}) : super(key: key);
 
   @override
-  _EditIngredientModalState createState() => _EditIngredientModalState();
+  State<EditIngredientModal> createState() => _EditIngredientModalState();
 }
 
 class _EditIngredientModalState extends State<EditIngredientModal> {

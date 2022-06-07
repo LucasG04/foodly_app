@@ -45,4 +45,5 @@ class PlanMeal {
   String toString() => 'PlanMeal(date: $date, meal: $meal, type: $type)';
 }
 
+// ignore: constant_identifier_names
 enum MealType { LUNCH, DINNER }

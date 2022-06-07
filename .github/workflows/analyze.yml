@@ -21,5 +21,9 @@ jobs:
         channel: 'stable' # or: 'dev' or 'beta'
     - name: Get Dependencies
       run: flutter pub get
+    - name: Create dummy secrets
+      run: sh ./.github/scripts/create_dummy_secrets.sh
+      env:
+        DUMMY_SECRETS: ${{ secrets.DUMMY_SECRETS }}
     - name: Code analyze
       run: flutter analyze --no-fatal-infos --no-fatal-warnings

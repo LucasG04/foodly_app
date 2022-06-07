@@ -16,7 +16,7 @@ class MainAppBar extends StatefulWidget implements PreferredSizeWidget {
       : super(key: key);
 
   @override
-  _MainAppBarState createState() => _MainAppBarState();
+  State<MainAppBar> createState() => _MainAppBarState();
 
   @override
   Size get preferredSize => Size.fromHeight(AppBar().preferredSize.height);
@@ -25,7 +25,7 @@ class MainAppBar extends StatefulWidget implements PreferredSizeWidget {
 class _MainAppBarState extends State<MainAppBar> {
   bool _isScrollToTop = true;
   // empty_space is a distance of empty padding, only after scrolling through it the content starts getting under the app bar.
-  static const double EMPTY_SPACE = 10.0;
+  static const double kEmptySpace = 10.0;
 
   @override
   void initState() {
@@ -45,7 +45,7 @@ class _MainAppBarState extends State<MainAppBar> {
         });
       }
     } else {
-      if (widget.scrollController!.offset > EMPTY_SPACE && _isScrollToTop) {
+      if (widget.scrollController!.offset > kEmptySpace && _isScrollToTop) {
         setState(() {
           _isScrollToTop = false;
         });

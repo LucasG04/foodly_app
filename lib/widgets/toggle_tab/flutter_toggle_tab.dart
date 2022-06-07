@@ -3,6 +3,8 @@
 // To add platforms, run `flutter create -t plugin --platforms <platforms> .` under the same
 // directory. You can also find a detailed instruction on how to add platforms in the `pubspec.yaml` at https://flutter.dev/docs/development/packages-and-plugins/developing-packages#plugin-platforms.
 
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 
 import 'button_tab.dart';
@@ -36,7 +38,9 @@ class FlutterToggleTab extends StatefulWidget {
     this.end,
     this.selectedIndex,
     this.isScroll = true,
-  }) : super(key: key);
+    this.buttonKeys,
+  })  : assert(buttonKeys == null || labels.length == buttonKeys.length),
+        super(key: key);
 
   final List<String> labels;
   final List<IconData>? icons;
@@ -56,6 +60,7 @@ class FlutterToggleTab extends StatefulWidget {
   final double? borderRadius;
   final Alignment? begin;
   final Alignment? end;
+  final List<Key>? buttonKeys;
 
   @override
   _FlutterToggleTabState createState() => _FlutterToggleTabState();
@@ -123,6 +128,9 @@ class _FlutterToggleTabState extends State<FlutterToggleTab> {
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
           return ButtonsTab(
+            key: widget.buttonKeys == null
+                ? UniqueKey()
+                : widget.buttonKeys![index],
             unSelectedColors: widget.unSelectedBackgroundColors != null
                 ? (widget.unSelectedBackgroundColors!.length == 1
                     ? [
@@ -130,7 +138,10 @@ class _FlutterToggleTabState extends State<FlutterToggleTab> {
                         widget.unSelectedBackgroundColors![0]
                       ]
                     : widget.unSelectedBackgroundColors)
-                : [const Color(0xffe0e0e0), const Color(0xffe0e0e0)],
+                : [
+                    const Color(0xffe0e0e0),
+                    const Color(0xffe0e0e0),
+                  ],
             width: width / widget.labels.length,
             title: _labels[index].title,
             icons: widget.icons != null ? widget.icons![index] : null,
@@ -156,8 +167,9 @@ class _FlutterToggleTabState extends State<FlutterToggleTab> {
                     if (_labels[index] == _labels[x]) {
                       _labels[x].isSelected = true;
                       widget.selectedLabelIndex!(index);
-                    } else
+                    } else {
                       _labels[x].isSelected = false;
+                    }
                   });
                 }
               } catch (e) {

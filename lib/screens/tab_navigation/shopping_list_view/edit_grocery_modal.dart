@@ -19,7 +19,7 @@ class EditGroceryModal extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _EditGroceryModalState createState() => _EditGroceryModalState();
+  State<EditGroceryModal> createState() => _EditGroceryModalState();
 }
 
 class _EditGroceryModalState extends State<EditGroceryModal> {

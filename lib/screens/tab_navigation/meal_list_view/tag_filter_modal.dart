@@ -11,12 +11,12 @@ class TagFilterModal extends StatefulWidget {
   const TagFilterModal({Key? key}) : super(key: key);
 
   @override
-  _TagFilterModalState createState() => _TagFilterModalState();
+  State<TagFilterModal> createState() => _TagFilterModalState();
 }
 
 class _TagFilterModalState extends State<TagFilterModal> {
   // empty_space is a distance of empty padding, only after scrolling through it the content starts getting under the app bar.
-  static const double EMPTY_SPACE = kPadding / 2;
+  static const double kEmptySpace = kPadding / 2;
 
   bool _isScrollToTop = true;
   ScrollController? _scrollController;
@@ -185,7 +185,7 @@ class _TagFilterModalState extends State<TagFilterModal> {
         });
       }
     } else {
-      if (_scrollController!.offset > EMPTY_SPACE && _isScrollToTop) {
+      if (_scrollController!.offset > kEmptySpace && _isScrollToTop) {
         setState(() {
           _isScrollToTop = false;
         });

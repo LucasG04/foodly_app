@@ -28,8 +28,13 @@ class LunixApiService {
   );
 
   static Future<bool> lunixApiAvailable() async {
-    final result = await _dio.get<Map>(_lunixApiEndpoint);
-    return result.statusCode == 200;
+    Response? response;
+    try {
+      response = await _dio.get<Map>(_lunixApiEndpoint);
+    } catch (e) {
+      _log.severe('ERR in lunixApiAvailable. Reponse is null', e);
+    }
+    return response != null && response.statusCode == 200;
   }
 
   static Future<String?> saveDocxForPlan({
@@ -56,7 +61,6 @@ class LunixApiService {
         '$_lunixApiEndpoint/generate-plan-pdf',
         data: docxData.toJson(),
         options: Options(
-          headers: <String, dynamic>{'x-api-key': secretLunixApi},
           responseType: ResponseType.bytes,
         ),
       );
@@ -119,35 +123,47 @@ class LunixApiService {
         .toList();
   }
 
-  static Future<LunixImageResponse> searchImages(
+  static Future<LunixImageResponse?> searchImages(
     String text,
     int page,
     String langCode,
   ) async {
     _log.finer('Call searchImages() with $text, $page, $langCode');
-    final Response response = await _dio.get<Map<String, dynamic>>(
-      '$_lunixApiEndpoint/search-image',
-      queryParameters: <String, dynamic>{
-        'q': text,
-        'page': page,
-        'hl': langCode,
-      },
-      options: Options(
-        headers: <String, dynamic>{'x-api-key': secretLunixApi},
-      ),
-    );
+    Response? response;
+    try {
+      response = await _dio.get<Map<String, dynamic>>(
+        '$_lunixApiEndpoint/search-image',
+        queryParameters: <String, dynamic>{
+          'q': text,
+          'page': page,
+          'hl': langCode,
+        },
+      );
+    } catch (e) {
+      _log.severe('ERR in getAllPublishedVersions. Reponse is null', e);
+    }
+
+    if (response == null || response.data == null) {
+      return null;
+    }
 
     return LunixImageResponse.fromMap(response.data as Map<String, dynamic>);
   }
 
   static Future<List<String>> getAllPublishedVersions() async {
     _log.finer('Call getAllPublishedVersions()');
-    final Response response = await _dio.get<List<dynamic>>(
-      '$_lunixApiEndpoint/published-versions',
-      options: Options(
-        headers: <String, dynamic>{'x-api-key': secretLunixApi},
-      ),
-    );
+    Response? response;
+    try {
+      response = await _dio.get<List<dynamic>>(
+        '$_lunixApiEndpoint/published-versions',
+      );
+    } catch (e) {
+      _log.severe('ERR in getAllPublishedVersions. Reponse is null', e);
+    }
+
+    if (response == null || response.data == null) {
+      return [];
+    }
 
     final List<String> data = (response.data as List<dynamic>)
         .map((dynamic e) => e.toString())
@@ -158,18 +174,21 @@ class LunixApiService {
 
   static Future<List<Meal>> searchMeals(String planId, String query) async {
     _log.finer('Call searchMeals() with $planId and "$query"');
-    final Response response = await _dio.get<List<dynamic>>(
-      '$_lunixApiEndpoint/search-meals',
-      queryParameters: <String, String>{
-        'planId': planId,
-        'query': query,
-      },
-      options: Options(
-        headers: <String, dynamic>{'x-api-key': secretLunixApi},
-      ),
-    );
+    Response? response;
 
-    if (response.data == null) {
+    try {
+      response = await _dio.get<List<dynamic>>(
+        '$_lunixApiEndpoint/search-meals',
+        queryParameters: <String, String>{
+          'planId': planId,
+          'query': query,
+        },
+      );
+    } catch (e) {
+      _log.severe('ERR in searchMeals. Reponse is null', e);
+    }
+
+    if (response == null || response.data == null) {
       return [];
     }
 
@@ -186,13 +205,19 @@ class LunixApiService {
 
   static Future<List<String>> getAllTagsInPlan(String planId) async {
     _log.finer('Call getAllTagsInPlan() for $planId');
-    final Response response = await _dio.get<List<dynamic>>(
-      '$_lunixApiEndpoint/tags-in-plan',
-      queryParameters: <String, String>{'planId': planId},
-      options: Options(
-        headers: <String, dynamic>{'x-api-key': secretLunixApi},
-      ),
-    );
+    Response? response;
+    try {
+      response = await _dio.get<List<dynamic>>(
+        '$_lunixApiEndpoint/tags-in-plan',
+        queryParameters: <String, String>{'planId': planId},
+      );
+    } catch (e) {
+      _log.severe('ERR in getAllTagsInPlan. Reponse is null', e);
+    }
+
+    if (response == null || response.data == null) {
+      return [];
+    }
 
     final List<String> data = (response.data as List<dynamic>)
         .map((dynamic e) => e.toString())
@@ -206,18 +231,20 @@ class LunixApiService {
     List<String> tags,
   ) async {
     _log.finer('Call searchMealByTags() with $planId and "$tags"');
-    final Response response = await _dio.post<List<dynamic>>(
-      '$_lunixApiEndpoint/search-meal-by-tags',
-      data: <String, dynamic>{
-        'planId': planId,
-        'tags': tags,
-      },
-      options: Options(
-        headers: <String, dynamic>{'x-api-key': secretLunixApi},
-      ),
-    );
+    Response? response;
+    try {
+      response = await _dio.post<List<dynamic>>(
+        '$_lunixApiEndpoint/search-meal-by-tags',
+        data: <String, dynamic>{
+          'planId': planId,
+          'tags': tags,
+        },
+      );
+    } catch (e) {
+      _log.severe('ERR in searchMealsByTags. Reponse is null', e);
+    }
 
-    if (response.data == null) {
+    if (response == null || response.data == null) {
       return [];
     }
 

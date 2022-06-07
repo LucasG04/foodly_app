@@ -49,7 +49,7 @@ class AnimateIcons extends StatefulWidget {
   final void Function()? onTap;
 
   @override
-  _AnimateIconsState createState() => _AnimateIconsState();
+  State<AnimateIcons> createState() => _AnimateIconsState();
 }
 
 class _AnimateIconsState extends State<AnimateIcons>

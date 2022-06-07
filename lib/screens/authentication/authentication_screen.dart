@@ -8,7 +8,7 @@ import 'plan_settings_view.dart';
 class AuthenticationScreen extends StatefulWidget {
   const AuthenticationScreen({Key? key}) : super(key: key);
   @override
-  _AuthenticationScreenState createState() => _AuthenticationScreenState();
+  State<AuthenticationScreen> createState() => _AuthenticationScreenState();
 }
 
 class _AuthenticationScreenState extends State<AuthenticationScreen> {
@@ -57,7 +57,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                 _buildPlanSettingsView()
               else
                 _buildLoginView(),
-              if (_isCreatingPlan!) _buildLoginView() else const SizedBox()
+              if (_isCreatingPlan!) _buildLoginView()
             ],
           ),
         ),

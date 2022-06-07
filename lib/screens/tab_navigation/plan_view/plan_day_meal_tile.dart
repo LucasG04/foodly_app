@@ -30,7 +30,7 @@ class PlanDayMealTile extends StatefulWidget {
       : super(key: key);
 
   @override
-  _PlanDayMealTileState createState() => _PlanDayMealTileState();
+  State<PlanDayMealTile> createState() => _PlanDayMealTileState();
 }
 
 class _PlanDayMealTileState extends State<PlanDayMealTile> {

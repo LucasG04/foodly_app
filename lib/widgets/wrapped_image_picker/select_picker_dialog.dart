@@ -14,7 +14,7 @@ class SelectPickerDialog extends StatefulWidget {
   const SelectPickerDialog({Key? key}) : super(key: key);
 
   @override
-  _SelectPickerDialogState createState() => _SelectPickerDialogState();
+  State<SelectPickerDialog> createState() => _SelectPickerDialogState();
 }
 
 class _SelectPickerDialogState extends State<SelectPickerDialog> {
@@ -102,7 +102,10 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
       setState(() {
         _isLoading = true;
       });
-      final result = await upload!;
+      if (upload == null) {
+        throw Exception('upload task is null');
+      }
+      final result = await upload;
       _isLoading = false;
 
       if (!mounted) {

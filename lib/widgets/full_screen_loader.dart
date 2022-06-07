@@ -16,7 +16,7 @@ class FullScreenLoader extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _FullScreenLoaderState createState() => _FullScreenLoaderState();
+  State<FullScreenLoader> createState() => _FullScreenLoaderState();
 }
 
 class _FullScreenLoaderState extends State<FullScreenLoader> {

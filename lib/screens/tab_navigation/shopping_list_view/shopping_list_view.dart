@@ -25,7 +25,7 @@ import 'edit_grocery_modal.dart';
 class ShoppingListView extends StatefulWidget {
   const ShoppingListView({Key? key}) : super(key: key);
   @override
-  _ShoppingListViewState createState() => _ShoppingListViewState();
+  State<ShoppingListView> createState() => _ShoppingListViewState();
 }
 
 class _ShoppingListViewState extends State<ShoppingListView>
