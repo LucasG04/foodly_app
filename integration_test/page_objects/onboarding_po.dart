@@ -15,7 +15,7 @@ class OnboardingPo {
     for (var i = 0; i < 5; i++) {
       await tester.tap(button);
       sleep(const Duration(seconds: 2));
-      print('tap and sleep');
+      // print('tap and sleep');
     }
   }
 }
