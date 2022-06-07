@@ -134,13 +134,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _checkForUpdateIOS() async {
-    final availability = await getUpdateAvailability();
-    final available =
-        availability.foldElse(available: () => true, orElse: () => false);
+    bool? available;
+
+    try {
+      final availability = await getUpdateAvailability();
+      available = availability.foldElse(
+        available: () => true,
+        orElse: () => false,
+      );
+    } catch (e) {
+      _log.severe(
+        'ERR in _checkForUpdateIOS() for getUpdateAvailability() or foldElse()',
+        e,
+      );
+    }
 
     _log.fine('_checkForUpdateIOS() resulted in "$available"');
 
-    if (!available) {
+    if (available == null || !available) {
       return;
     }
 
