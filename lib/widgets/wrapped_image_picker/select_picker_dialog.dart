@@ -102,7 +102,10 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
       setState(() {
         _isLoading = true;
       });
-      final result = await upload!;
+      if (upload == null) {
+        throw Exception('upload task is null');
+      }
+      final result = await upload;
       _isLoading = false;
 
       if (!mounted) {
