@@ -5,6 +5,7 @@ import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import '../../../constants.dart';
 import '../../../models/plan.dart';
 import '../../../services/lunix_api_service.dart';
+import '../../../utils/main_snackbar.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/progress_button.dart';
 import '../settings_view/settings_tile.dart';
@@ -12,7 +13,10 @@ import '../settings_view/settings_tile.dart';
 class PlanDownloadModal extends StatefulWidget {
   final Plan plan;
 
-  const PlanDownloadModal({Key? key, required this.plan}) : super(key: key);
+  const PlanDownloadModal({
+    Key? key,
+    required this.plan,
+  }) : super(key: key);
 
   @override
   State<PlanDownloadModal> createState() => _PlanDownloadModalState();
@@ -76,30 +80,32 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
               text: 'plan_download_modal_cta'.tr(),
               isProgress: true,
               buttonState: _buttonState,
-              onTap: () async {
-                setState(() {
-                  _buttonState = ButtonState.inProgress;
-                });
-                final path = await LunixApiService.saveDocxForPlan(
-                  plan: widget.plan,
-                  languageTag: context.locale.toLanguageTag(),
-                  excludeToday: _excludeToday,
-                  vertical: _portraitFormat,
-                );
-                setState(() {
-                  _buttonState = ButtonState.normal;
-                });
-                await _savePlanPdf(path);
-                if (!mounted) {
-                  return;
-                }
-                Navigator.pop(context);
-              },
+              onTap: _handleDownload,
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _handleDownload() async {
+    setState(() {
+      _buttonState = ButtonState.inProgress;
+    });
+    final path = await LunixApiService.saveDocxForPlan(
+      plan: widget.plan,
+      languageTag: context.locale.toLanguageTag(),
+      excludeToday: _excludeToday,
+      vertical: _portraitFormat,
+    );
+    setState(() {
+      _buttonState = ButtonState.normal;
+    });
+    await _savePlanPdf(path);
+    if (!mounted) {
+      return;
+    }
+    Navigator.pop(context);
   }
 
   void _excludeTodayChange(bool? value) {
@@ -116,10 +122,24 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
 
   Future<void> _savePlanPdf(String? path) async {
     if (path == null || path.isEmpty) {
+      _handleException();
       return;
     }
 
     final params = SaveFileDialogParams(sourceFilePath: path);
     await FlutterFileDialog.saveFile(params: params);
+  }
+
+  void _handleException() async {
+    setState(() {
+      _buttonState = ButtonState.error;
+    });
+    await MainSnackbar(
+      message: 'general_error_message'.tr(),
+      isError: true,
+    ).show(context);
+    setState(() {
+      _buttonState = ButtonState.normal;
+    });
   }
 }

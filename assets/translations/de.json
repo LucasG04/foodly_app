@@ -4,6 +4,7 @@
     "add": "Hinzufügen",
     "create": "Erstellen",
     "done": "Fertig",
+    "general_error_message": "Ein Fehler ist aufgetreten. Bitte versuche es später erneut.",
     "shopping_list_title": "Einkaufsliste",
     "shopping_list_already_bought":"BEREITS GEKAUFT",
     "shopping_list_remove_all": "Gekaufte entfernen",

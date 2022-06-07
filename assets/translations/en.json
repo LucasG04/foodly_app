@@ -4,6 +4,7 @@
     "add": "Add",
     "create": "Create",
     "done": "Done",
+    "general_error_message": "An error has occurred. Please try again later.",
     "shopping_list_title": "Shopping list",
     "shopping_list_already_bought": "ALREADY PURCHASED",
     "shopping_list_remove_all": "Remove bought",

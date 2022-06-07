@@ -26,8 +26,8 @@ class MainSnackbar {
   }) : assert(!isSuccess || !isError || !isCountdown);
 
   /// Show the snackbar.
-  void show(BuildContext context) {
-    Flushbar<dynamic>(
+  Future<dynamic> show(BuildContext context) {
+    return Flushbar<dynamic>(
       margin: const EdgeInsets.all(8),
       borderRadius: BorderRadius.circular(10.0),
       title: title,
