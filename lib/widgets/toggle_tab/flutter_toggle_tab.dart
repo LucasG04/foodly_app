@@ -129,7 +129,6 @@ class _FlutterToggleTabState extends State<FlutterToggleTab> {
             : const NeverScrollableScrollPhysics(),
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
-          print(_labels);
           return ButtonsTab(
             key: widget.buttonKeys == null
                 ? UniqueKey()
