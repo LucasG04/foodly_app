@@ -74,19 +74,21 @@ class _FlutterToggleTabState extends State<FlutterToggleTab> {
       if (widget.selectedIndex != null) {
         _labels.clear();
         for (int x = 0; x < widget.labels.length; x++) {
-          if (x == widget.selectedIndex) {
-            _labels.add(DataTab(title: widget.labels[x], isSelected: true));
-          } else {
-            _labels.add(DataTab(title: widget.labels[x], isSelected: false));
-          }
+          _labels.add(
+            DataTab(
+              title: widget.labels[x],
+              isSelected: x == widget.selectedIndex,
+            ),
+          );
         }
       } else {
         for (int x = 0; x < widget.labels.length; x++) {
-          if (x == widget.initialIndex) {
-            _labels.add(DataTab(title: widget.labels[x], isSelected: true));
-          } else {
-            _labels.add(DataTab(title: widget.labels[x], isSelected: false));
-          }
+          _labels.add(
+            DataTab(
+              title: widget.labels[x],
+              isSelected: x == widget.initialIndex,
+            ),
+          );
         }
       }
     });
@@ -121,7 +123,7 @@ class _FlutterToggleTabState extends State<FlutterToggleTab> {
         boxShadow: const [bsInner],
       ),
       child: ListView.builder(
-        itemCount: _labels.length,
+        itemCount: widget.labels.length,
         physics: widget.isScroll
             ? const BouncingScrollPhysics()
             : const NeverScrollableScrollPhysics(),
@@ -162,7 +164,7 @@ class _FlutterToggleTabState extends State<FlutterToggleTab> {
                   ],
             onPressed: () {
               try {
-                for (int x = 0; x < _labels.length; x++) {
+                for (int x = 0; x < widget.labels.length; x++) {
                   setState(() {
                     if (_labels[index] == _labels[x]) {
                       _labels[x].isSelected = true;
