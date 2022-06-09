@@ -21,7 +21,7 @@ class SettingsService {
   }
 
   static bool get multipleMealsPerTime =>
-      _settingsBox.get('multipleMealsPerTime', defaultValue: true) as bool;
+      _settingsBox.get('multipleMealsPerTime', defaultValue: false) as bool;
 
   static bool get showSuggestions =>
       _settingsBox.get('showSuggestions', defaultValue: true) as bool;
