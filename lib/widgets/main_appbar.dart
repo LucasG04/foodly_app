@@ -7,13 +7,13 @@ class MainAppBar extends StatefulWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final ScrollController? scrollController;
 
-  const MainAppBar(
-      {required this.text,
-      this.showBack = true,
-      this.actions,
-      this.scrollController,
-      Key? key})
-      : super(key: key);
+  const MainAppBar({
+    required this.text,
+    this.showBack = true,
+    this.actions,
+    this.scrollController,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<MainAppBar> createState() => _MainAppBarState();
@@ -75,7 +75,7 @@ class _MainAppBarState extends State<MainAppBar> {
         overflow: TextOverflow.fade,
       ),
       centerTitle: true,
-      elevation: _isScrollToTop ? 0 : 4,
+      elevation: _isScrollToTop ? 0 : 2,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       leading: widget.showBack
           ? IconButton(
