@@ -4,6 +4,7 @@
 // directory. You can also find a detailed instruction on how to add platforms in the `pubspec.yaml` at https://flutter.dev/docs/development/packages-and-plugins/developing-packages#plugin-platforms.
 
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import 'button_tab.dart';
 import 'data_tab.dart';
@@ -68,6 +69,7 @@ class FlutterToggleTab extends StatefulWidget {
 }
 
 class _FlutterToggleTabState extends State<FlutterToggleTab> {
+  final Logger _log = Logger('FlutterToggleTab');
   final List<DataTab> _labels = [];
 
   /// Set default selected for first build
@@ -94,7 +96,6 @@ class _FlutterToggleTabState extends State<FlutterToggleTab> {
         ? widthInPercent(widget.width!, context)
         : widthInPercent(100, context);
 
-    /// Show text error if length less 1
     return Container(
       width: width,
       height: widget.height ?? 45,
@@ -204,7 +205,12 @@ class _FlutterToggleTabState extends State<FlutterToggleTab> {
                     }
                   });
                 }
-              } catch (e) {}
+              } catch (e) {
+                _log.severe(
+                  'ERR: onPressed at $index and length ${_labels.length}',
+                  e,
+                );
+              }
             },
           );
         },
