@@ -3,9 +3,8 @@
 // To add platforms, run `flutter create -t plugin --platforms <platforms> .` under the same
 // directory. You can also find a detailed instruction on how to add platforms in the `pubspec.yaml` at https://flutter.dev/docs/development/packages-and-plugins/developing-packages#plugin-platforms.
 
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import 'button_tab.dart';
 import 'data_tab.dart';
@@ -24,10 +23,9 @@ class FlutterToggleTab extends StatefulWidget {
   const FlutterToggleTab({
     Key? key,
     required this.labels,
-    required this.initialIndex,
-    required this.selectedLabelIndex,
     required this.selectedTextStyle,
     required this.unSelectedTextStyle,
+    this.selectedLabelIndex,
     this.height,
     this.icons,
     this.selectedBackgroundColors,
@@ -36,16 +34,17 @@ class FlutterToggleTab extends StatefulWidget {
     this.borderRadius,
     this.begin,
     this.end,
-    this.selectedIndex,
+    this.initialIndex = 0,
     this.isScroll = true,
+    this.marginSelected,
+    this.isShadowEnable = true,
     this.buttonKeys,
   })  : assert(buttonKeys == null || labels.length == buttonKeys.length),
         super(key: key);
 
   final List<String> labels;
-  final List<IconData>? icons;
+  final List<IconData?>? icons;
   final int initialIndex;
-  final int? selectedIndex;
   final double? width;
   final double? height;
   final bool isScroll;
@@ -62,77 +61,99 @@ class FlutterToggleTab extends StatefulWidget {
   final Alignment? end;
   final List<Key>? buttonKeys;
 
+  final EdgeInsets? marginSelected;
+  final bool isShadowEnable;
+
   @override
-  _FlutterToggleTabState createState() => _FlutterToggleTabState();
+  State<FlutterToggleTab> createState() => _FlutterToggleTabState();
 }
 
 class _FlutterToggleTabState extends State<FlutterToggleTab> {
+  final Logger _log = Logger('FlutterToggleTab');
   final List<DataTab> _labels = [];
 
-  void _setDefaultSelected() {
+  /// Set default selected for first build
+  void _setInitialSelected() {
+    final int initialIndex =
+        widget.initialIndex >= widget.labels.length ? 0 : widget.initialIndex;
     setState(() {
-      if (widget.selectedIndex != null) {
-        _labels.clear();
-        for (int x = 0; x < widget.labels.length; x++) {
-          _labels.add(
-            DataTab(
-              title: widget.labels[x],
-              isSelected: x == widget.selectedIndex,
-            ),
-          );
-        }
-      } else {
-        for (int x = 0; x < widget.labels.length; x++) {
-          _labels.add(
-            DataTab(
-              title: widget.labels[x],
-              isSelected: x == widget.initialIndex,
-            ),
-          );
-        }
-      }
+      _labels.addAll(
+        widget.labels.map((e) => DataTab(title: e, isSelected: false)),
+      );
+      _labels[initialIndex].isSelected = true;
     });
   }
 
   @override
+  void initState() {
+    super.initState();
+    _setInitialSelected();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    _setDefaultSelected();
     final width = widget.width != null
         ? widthInPercent(widget.width!, context)
         : widthInPercent(100, context);
 
-    // filter label size
     return Container(
       width: width,
       height: widget.height ?? 45,
+
+      /// Default height is 45
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          // Where the linear gradient begins and ends
-          begin: widget.begin ?? Alignment.topCenter,
-          end: widget.end ?? Alignment.bottomCenter,
-          colors: widget.unSelectedBackgroundColors != null
-              ? (widget.unSelectedBackgroundColors!.length == 1
-                  ? [
-                      widget.unSelectedBackgroundColors![0],
-                      widget.unSelectedBackgroundColors![0]
-                    ]
-                  : widget.unSelectedBackgroundColors!)
-              : [const Color(0xffe0e0e0), const Color(0xffe0e0e0)],
-        ),
-        borderRadius: BorderRadius.circular(widget.borderRadius ?? 30),
-        boxShadow: const [bsInner],
-      ),
+          gradient: LinearGradient(
+            // Where the linear gradient begins and ends
+            begin: widget.begin ?? Alignment.topCenter,
+            end: widget.end ?? Alignment.bottomCenter,
+
+            /// If unSelectedBackground is not null
+            /// We check again if it's length only 1
+            /// Using same color for gradients
+            colors: widget.unSelectedBackgroundColors != null
+                ? (widget.unSelectedBackgroundColors!.length == 1
+                    ? [
+                        widget.unSelectedBackgroundColors![0],
+                        widget.unSelectedBackgroundColors![0]
+                      ]
+                    : widget.unSelectedBackgroundColors!)
+                : [
+                    const Color(0xffe0e0e0),
+                    const Color(0xffe0e0e0),
+                  ],
+          ),
+          borderRadius: BorderRadius.circular(widget.borderRadius ?? 30),
+
+          /// Handle if shadow is Enable or not
+          boxShadow: [if (widget.isShadowEnable) bsInner]),
       child: ListView.builder(
-        itemCount: widget.labels.length,
+        itemCount: _labels.length,
+
+        /// Handle if isScroll or not
         physics: widget.isScroll
             ? const BouncingScrollPhysics()
             : const NeverScrollableScrollPhysics(),
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
+          IconData? icon;
+          Key buttonKey;
+
+          // Using try catch to fix error Range array
+          try {
+            icon = widget.icons?[index];
+            buttonKey = widget.buttonKeys?[index] ?? UniqueKey();
+          } catch (e) {
+            icon = null;
+            buttonKey = UniqueKey();
+          }
+
           return ButtonsTab(
-            key: widget.buttonKeys == null
-                ? UniqueKey()
-                : widget.buttonKeys![index],
+            key: buttonKey,
+            marginSelected: widget.marginSelected,
+
+            /// If unSelectedBackground is not null
+            /// We check again if it's length only 1
+            /// Using same color for gradients
             unSelectedColors: widget.unSelectedBackgroundColors != null
                 ? (widget.unSelectedBackgroundColors!.length == 1
                     ? [
@@ -146,11 +167,15 @@ class _FlutterToggleTabState extends State<FlutterToggleTab> {
                   ],
             width: width / widget.labels.length,
             title: _labels[index].title,
-            icons: widget.icons != null ? widget.icons![index] : null,
+            icons: icon,
             selectedTextStyle: widget.selectedTextStyle,
             unSelectedTextStyle: widget.unSelectedTextStyle,
             isSelected: _labels[index].isSelected,
             radius: widget.borderRadius ?? 30,
+
+            /// If selectedBackgroundColors is not null
+            /// We check again if it's length only 1
+            /// Using same color for gradients
             selectedColors: widget.selectedBackgroundColors != null
                 ? (widget.selectedBackgroundColors!.length == 1
                     ? [
@@ -163,24 +188,37 @@ class _FlutterToggleTabState extends State<FlutterToggleTab> {
                     Theme.of(context).primaryColor
                   ],
             onPressed: () {
+              if (_isIndexSelected(index)) {
+                return;
+              }
               try {
-                for (int x = 0; x < widget.labels.length; x++) {
+                for (int x = 0; x < _labels.length; x++) {
                   setState(() {
                     if (_labels[index] == _labels[x]) {
                       _labels[x].isSelected = true;
-                      widget.selectedLabelIndex!(index);
+
+                      if (widget.selectedLabelIndex != null) {
+                        widget.selectedLabelIndex!(index);
+                      }
                     } else {
                       _labels[x].isSelected = false;
                     }
                   });
                 }
               } catch (e) {
-                return;
+                _log.severe(
+                  'ERR: onPressed at $index and length ${_labels.length}',
+                  e,
+                );
               }
             },
           );
         },
       ),
     );
+  }
+
+  bool _isIndexSelected(int index) {
+    return _labels[index].isSelected ?? false;
   }
 }

@@ -55,7 +55,6 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
           FlutterToggleTab(
             width: 80,
             borderRadius: 15,
-            initialIndex: 0,
             selectedTextStyle: const TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -67,7 +66,6 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
               fontWeight: FontWeight.w400,
             ),
             labels: ['plan_settings_create_plan'.tr()],
-            selectedLabelIndex: null,
           ),
           Expanded(
             child: Align(

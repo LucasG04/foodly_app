@@ -11,11 +11,13 @@ import '../../models/meal.dart';
 import '../../models/plan_meal.dart';
 import '../../providers/state_providers.dart';
 import '../../services/lunix_api_service.dart';
+import '../../services/meal_service.dart';
 import '../../services/meal_stat_service.dart';
 import '../../services/plan_service.dart';
 import '../../services/settings_service.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/main_appbar.dart';
+import '../../widgets/meal_pagination.dart';
 import '../../widgets/user_information.dart';
 import '../tab_navigation/meal_list_view/meal_list_tile.dart';
 import 'search_bar.dart';
@@ -50,7 +52,10 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     final activePlan = context.read(planProvider).state!;
 
     return Scaffold(
-      appBar: MainAppBar(text: 'meal_select_title'.tr()),
+      appBar: MainAppBar(
+        text: 'meal_select_title'.tr(),
+        scrollController: _scrollController,
+      ),
       body: SingleChildScrollView(
         controller: _scrollController,
         child: Column(
@@ -129,11 +134,12 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                     message: 'meal_select_no_results_msg'.tr(),
                   )
                 : SettingsService.showSuggestions
-                    ? _buildPreviewMeals(planId)
-                    : const SizedBox();
+                    ? _buildPreviewMeals()
+                    : _buildPaginatedMealList();
   }
 
-  Widget _buildPreviewMeals(String planId) {
+  Widget _buildPreviewMeals() {
+    final planId = context.read(planProvider).state!.id!;
     return FutureBuilder<List<Meal>>(
       future: MealStatService.getMealRecommendations(planId),
       builder: (context, snapshot) {
@@ -181,6 +187,21 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
           },
         );
       },
+    );
+  }
+
+  Widget _buildPaginatedMealList() {
+    final planId = context.read(planProvider).state!.id!;
+    return MealPagination(
+      loadNextMeals: (lastMealId) => MealService.getMealsPaginated(
+        planId,
+        lastMealId: lastMealId,
+      ),
+      buildMeal: (meal) => SelectMealTile(
+        meal: meal,
+        onAddMeal: () => _addMealToPlan(meal.id!, planId),
+      ),
+      scrollController: _scrollController,
     );
   }
 

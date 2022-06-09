@@ -26,4 +26,4 @@ jobs:
       env:
         DUMMY_SECRETS: ${{ secrets.DUMMY_SECRETS }}
     - name: Code analyze
-      run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      run: flutter analyze --no-fatal-infos

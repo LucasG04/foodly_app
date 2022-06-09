@@ -21,6 +21,7 @@ class ButtonsTab extends StatefulWidget {
     required this.unSelectedColors,
     this.begin,
     this.end,
+    this.marginSelected = EdgeInsets.zero,
   }) : super(key: key);
 
   final String? title;
@@ -41,6 +42,8 @@ class ButtonsTab extends StatefulWidget {
   final Alignment? begin;
   final Alignment? end;
 
+  final EdgeInsets? marginSelected;
+
   @override
   State<ButtonsTab> createState() => _ButtonsTabState();
 }
@@ -48,58 +51,58 @@ class ButtonsTab extends StatefulWidget {
 class _ButtonsTabState extends State<ButtonsTab> {
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: widget.width ?? widthInPercent(100, context),
       height: widget.height ?? 50,
-      // enable decoration when item is selected
-      decoration: widget.isSelected!
-          ? bdHeader.copyWith(
-              borderRadius: BorderRadius.circular(widget.radius!),
-              gradient: LinearGradient(
-                // Where the linear gradient begins and ends
-                begin: widget.begin ?? Alignment.topCenter,
-                end: widget.end ?? Alignment.bottomCenter,
-                colors:
-                    widget.selectedColors ?? [Theme.of(context).primaryColor],
-              ),
-            )
-          : null,
-      child: TextButton(
-        onPressed: widget.onPressed as void Function()?,
-        style: ButtonStyle(
-          shape: MaterialStateProperty.all(
-            RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(widget.radius!)),
-          ),
-          padding: MaterialStateProperty.all(EdgeInsets.zero),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (widget.icons != null)
-              Icon(
-                widget.icons,
-                color: widget.isSelected!
-                    ? widget.selectedTextStyle!.color
-                    : widget.unSelectedTextStyle!.color,
+      //wrap with container to fix margin issue
+      child: Container(
+        margin: widget.isSelected! ? widget.marginSelected : EdgeInsets.zero,
+        decoration: widget.isSelected!
+            ? bdHeader.copyWith(
+                borderRadius: BorderRadius.circular(widget.radius!),
+                gradient: LinearGradient(
+                  // Where the linear gradient begins and ends
+                  begin: widget.begin ?? Alignment.topCenter,
+                  end: widget.end ?? Alignment.bottomCenter,
+                  colors:
+                      widget.selectedColors ?? [Theme.of(context).primaryColor],
+                ),
               )
-            else
-              Container(),
-            Visibility(
-              visible: widget.icons != null,
-              child: const SizedBox(
-                width: 4,
+            : null,
+        child: TextButton(
+          onPressed: widget.onPressed as void Function()?,
+          style: ButtonStyle(
+              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(widget.radius!))),
+              padding: MaterialStateProperty.all(EdgeInsets.zero)),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (widget.icons != null)
+                Icon(
+                  widget.icons,
+                  color: widget.isSelected!
+                      ? widget.selectedTextStyle!.color
+                      : widget.unSelectedTextStyle!.color,
+                )
+              else
+                Container(),
+              Visibility(
+                visible: widget.icons != null,
+                child: const SizedBox(
+                  width: 4,
+                ),
               ),
-            ),
-            AutoSizeText(
-              widget.title!,
-              maxLines: 1,
-              style: widget.isSelected!
-                  ? widget.selectedTextStyle
-                  : widget.unSelectedTextStyle,
-              textAlign: TextAlign.center,
-            )
-          ],
+              AutoSizeText(
+                widget.title!,
+                maxLines: 1,
+                style: widget.isSelected!
+                    ? widget.selectedTextStyle
+                    : widget.unSelectedTextStyle,
+                textAlign: TextAlign.center,
+              )
+            ],
+          ),
         ),
       ),
     );

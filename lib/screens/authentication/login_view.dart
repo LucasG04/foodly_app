@@ -80,7 +80,6 @@ class _LoginViewState extends State<LoginView> {
           FlutterToggleTab(
             width: 50,
             borderRadius: 15,
-            initialIndex: 0,
             selectedTextStyle: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w600,
