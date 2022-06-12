@@ -205,13 +205,18 @@ class _LoginViewState extends State<LoginView> {
                   onTap: widget.navigateBack,
                   isSecondary: true,
                 ),
-                MainButton(
-                  key: AuthenticationKeys.buttonJoin,
-                  text: 'login_join'.tr(),
+                SizedBox(
                   width: constraints.maxWidth * 0.65,
-                  onTap: _authWithEmail,
-                  isProgress: true,
-                  buttonState: _buttonState,
+                  child: Center(
+                    child: MainButton(
+                      key: AuthenticationKeys.buttonJoin,
+                      text: 'login_join'.tr(),
+                      width: constraints.maxWidth * 0.65,
+                      onTap: _authWithEmail,
+                      isProgress: true,
+                      buttonState: _buttonState,
+                    ),
+                  ),
                 ),
               ],
             );
@@ -265,7 +270,7 @@ class _LoginViewState extends State<LoginView> {
               _emailController.text, _passwordController.text));
       await _processAuthentication(userId);
     } catch (e) {
-      _handleAuthException(e);
+      _handleMailAuthException(e);
     }
   }
 
@@ -276,7 +281,10 @@ class _LoginViewState extends State<LoginView> {
       final userId = await AuthenticationService.signInWithApple();
       await _processAuthentication(userId);
     } catch (e) {
-      _handleAuthException(e);
+      _unknownErrorText = 'login_error_unknown'.tr();
+      setState(() {
+        _buttonState = ButtonState.error;
+      });
     }
   }
 
@@ -343,7 +351,7 @@ class _LoginViewState extends State<LoginView> {
     });
   }
 
-  void _handleAuthException(dynamic exception) {
+  void _handleMailAuthException(dynamic exception) {
     if (exception != null && exception is FirebaseAuthException) {
       if (exception.code == 'weak-password') {
         _passwordErrorText = 'login_error_password_weak'.tr();
