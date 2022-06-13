@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
+import '../../../app_router.gr.dart';
 import '../../../constants.dart';
 import '../../../models/plan.dart';
 import '../../../models/plan_meal.dart';
@@ -51,6 +53,12 @@ class _PlanTabViewState extends State<PlanTabView>
                             IconButton(
                               onPressed: () => _openDownloadModal(activePlan),
                               icon: const Icon(EvaIcons.downloadOutline),
+                            ),
+                            IconButton(
+                              onPressed: () => AutoRouter.of(context).push(
+                                const SettingsScreenRoute(),
+                              ),
+                              icon: const Icon(EvaIcons.settings2Outline),
                             )
                           ],
                         ),

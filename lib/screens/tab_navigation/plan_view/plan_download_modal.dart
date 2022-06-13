@@ -8,7 +8,7 @@ import '../../../services/lunix_api_service.dart';
 import '../../../utils/main_snackbar.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/progress_button.dart';
-import '../settings_view/settings_tile.dart';
+import '../../settings/settings_tile.dart';
 
 class PlanDownloadModal extends StatefulWidget {
   final Plan plan;

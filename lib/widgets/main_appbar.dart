@@ -5,13 +5,13 @@ class MainAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String text;
   final bool showBack;
   final List<Widget>? actions;
-  final ScrollController? scrollController;
+  final ScrollController scrollController;
 
   const MainAppBar({
     required this.text,
     this.showBack = true,
     this.actions,
-    this.scrollController,
+    required this.scrollController,
     Key? key,
   }) : super(key: key);
 
@@ -29,23 +29,20 @@ class _MainAppBarState extends State<MainAppBar> {
 
   @override
   void initState() {
-    if (widget.scrollController != null) {
-      widget.scrollController!.addListener(_scrollListener);
-    }
-
+    widget.scrollController.addListener(_scrollListener);
     super.initState();
   }
 
   void _scrollListener() {
-    if (widget.scrollController!.offset <=
-        widget.scrollController!.position.minScrollExtent) {
+    if (widget.scrollController.offset <=
+        widget.scrollController.position.minScrollExtent) {
       if (!_isScrollToTop) {
         setState(() {
           _isScrollToTop = true;
         });
       }
     } else {
-      if (widget.scrollController!.offset > kEmptySpace && _isScrollToTop) {
+      if (widget.scrollController.offset > kEmptySpace && _isScrollToTop) {
         setState(() {
           _isScrollToTop = false;
         });
@@ -55,10 +52,7 @@ class _MainAppBarState extends State<MainAppBar> {
 
   @override
   void dispose() {
-    if (widget.scrollController != null) {
-      widget.scrollController!.dispose();
-    }
-
+    widget.scrollController.dispose();
     super.dispose();
   }
 

@@ -11,7 +11,6 @@ import '../../services/shopping_list_service.dart';
 import '../../utils/widget_utils.dart';
 import 'meal_list_view/meal_list_view.dart';
 import 'plan_view/plan_tab_view.dart';
-import 'settings_view/settings_view.dart';
 import 'shopping_list_view/edit_grocery_modal.dart';
 import 'shopping_list_view/shopping_list_view.dart';
 
@@ -43,12 +42,7 @@ class _TabNavigationViewState extends State<TabNavigationView> {
               });
             }
           },
-          children: const [
-            ShoppingListView(),
-            PlanTabView(),
-            MealListView(),
-            SettingsView(),
-          ],
+          children: const [ShoppingListView(), PlanTabView(), MealListView()],
         ),
       ),
       floatingActionButton: _showActionButton()
@@ -95,10 +89,6 @@ class _TabNavigationViewState extends State<TabNavigationView> {
           BottomNavigationBarItem(
             icon: Icon(EvaIcons.bookOutline),
             label: 'meals',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(EvaIcons.settings2Outline),
-            label: 'settings',
           ),
         ],
       ),
