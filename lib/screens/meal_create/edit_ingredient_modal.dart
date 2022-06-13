@@ -17,11 +17,11 @@ class EditIngredientModal extends StatefulWidget {
 
 class _EditIngredientModalState extends State<EditIngredientModal> {
   late bool _isCreating;
-  TextEditingController? _nameController;
-  TextEditingController? _amountController;
-  TextEditingController? _unitController;
-  FocusNode? _amountFocusNode;
-  FocusNode? _unitFocusNode;
+  late TextEditingController _nameController;
+  late TextEditingController _amountController;
+  late TextEditingController _unitController;
+  late FocusNode _amountFocusNode;
+  late FocusNode _unitFocusNode;
 
   String? _nameErrorText;
 
@@ -29,10 +29,13 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
   void initState() {
     _isCreating = widget.ingredient == null;
     _nameController = TextEditingController(text: widget.ingredient?.name);
-    _amountController = TextEditingController(
-        text: widget.ingredient?.amount == null
-            ? ''
-            : widget.ingredient?.amount.toString());
+    String amountString = widget.ingredient?.amount?.toString() ?? '';
+    amountString = amountString == '0.0'
+        ? ''
+        : amountString.endsWith('.0')
+            ? amountString.substring(0, amountString.length - 2)
+            : amountString.trim();
+    _amountController = TextEditingController(text: amountString);
     _unitController = TextEditingController(text: widget.ingredient?.unit);
 
     _amountFocusNode = FocusNode();
@@ -74,7 +77,7 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
             placeholder: 'ingredient_modal_name_placeholder'.tr(),
             errorText: _nameErrorText,
             textInputAction: TextInputAction.next,
-            onSubmit: () => _amountFocusNode!.requestFocus(),
+            onSubmit: () => _amountFocusNode.requestFocus(),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -88,7 +91,7 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
                   placeholder: '1',
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
-                  onSubmit: () => _unitFocusNode!.requestFocus(),
+                  onSubmit: () => _unitFocusNode.requestFocus(),
                 ),
               ),
               SizedBox(
@@ -122,10 +125,10 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
 
   void _saveIngredient() async {
     final ingredient = _isCreating ? Ingredient() : widget.ingredient!;
-    ingredient.name = _nameController!.text.trim();
+    ingredient.name = _nameController.text.trim();
     ingredient.amount =
-        double.tryParse(_amountController!.text.trim().replaceAll(',', '.'));
-    ingredient.unit = _unitController!.text.trim();
+        double.tryParse(_amountController.text.trim().replaceAll(',', '.'));
+    ingredient.unit = _unitController.text.trim();
 
     if (ingredient.name!.isEmpty) {
       setState(() {

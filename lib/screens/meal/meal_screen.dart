@@ -121,7 +121,7 @@ class _MealScreenState extends State<MealScreen> {
                                           ),
                                           itemBuilder: (context) => [
                                             PopupMenuItem(
-                                              value: _PopupMenuValue.addToPlan,
+                                              value: _PopupMenuValue.edit,
                                               child: ListTile(
                                                 title: const Text(
                                                   'meal_details_edit',
@@ -132,7 +132,7 @@ class _MealScreenState extends State<MealScreen> {
                                               ),
                                             ),
                                             PopupMenuItem(
-                                              value: _PopupMenuValue.addToPlan,
+                                              value: _PopupMenuValue.delete,
                                               child: ListTile(
                                                 title: const Text(
                                                   'meal_details_delete',

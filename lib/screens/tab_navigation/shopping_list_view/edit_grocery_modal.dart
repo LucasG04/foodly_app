@@ -136,7 +136,8 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
     final grocery = _isCreating ? Grocery() : widget.grocery!;
     grocery.name = _nameController.text.trim();
     grocery.amount =
-        double.tryParse(_amountController.text.trim().replaceAll(',', '.'));
+        double.tryParse(_amountController.text.trim().replaceAll(',', '.')) ??
+            0;
     grocery.unit = _unitController.text.trim();
     grocery.bought = _isCreating ? false : grocery.bought;
 
