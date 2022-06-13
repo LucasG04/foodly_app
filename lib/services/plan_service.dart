@@ -78,9 +78,9 @@ class PlanService {
 
   static Future<Plan> createPlan(String? name) async {
     _log.finer('Call createPlan');
-    String code = generateCode().toString();
+    String code = generateCode();
     while ((await getPlanById(code)) != null) {
-      code = generateCode().toString();
+      code = generateCode();
     }
     _log.finest('createPlan: Generated code: $code');
 
@@ -102,11 +102,14 @@ class PlanService {
     return plan;
   }
 
-  static int generateCode() {
-    const int min = 10000000;
-    const int max = 99999999;
-    final randomizer = Random();
-    return min + randomizer.nextInt(max - min);
+  static String generateCode() {
+    const chars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    final Random rnd = Random();
+
+    return String.fromCharCodes(
+      Iterable.generate(8, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))),
+    );
   }
 
   static Future<Plan?> getPlanByCode(String code,

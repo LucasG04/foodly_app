@@ -326,9 +326,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       isLoading = true;
     });
-    String code = PlanService.generateCode().toString();
+    String code = PlanService.generateCode();
     while ((await PlanService.getPlanById(code)) != null) {
-      code = PlanService.generateCode().toString();
+      code = PlanService.generateCode();
     }
     plan.code = code;
     await PlanService.updatePlan(plan);
