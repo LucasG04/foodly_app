@@ -193,7 +193,10 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                                       title: 'meal_create_duration_title'.tr(),
                                       placeholder: '10',
                                       textAlign: TextAlign.end,
-                                      keyboardType: TextInputType.number,
+                                      keyboardType:
+                                          const TextInputType.numberWithOptions(
+                                        decimal: true,
+                                      ),
                                     ),
                                   ),
                                 ],

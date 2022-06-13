@@ -89,7 +89,9 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
                   focusNode: _amountFocusNode,
                   title: 'ingredient_modal_amount_title'.tr(),
                   placeholder: '1',
-                  keyboardType: TextInputType.number,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   textInputAction: TextInputAction.next,
                   onSubmit: () => _unitFocusNode.requestFocus(),
                 ),

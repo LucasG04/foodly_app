@@ -130,7 +130,6 @@ class _CodeInputViewState extends State<CodeInputView> {
     return TextFormField(
       key: AuthenticationKeys.inputCode,
       controller: _codeController,
-      keyboardType: TextInputType.number,
       textInputAction: TextInputAction.go,
       onChanged: _validateCode,
       style: const TextStyle(
