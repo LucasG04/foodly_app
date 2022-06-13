@@ -22,6 +22,7 @@ import '../../../utils/widget_utils.dart';
 import '../../../widgets/loading_logout.dart';
 import '../../models/plan.dart';
 import '../../widgets/main_appbar.dart';
+import '../../widgets/small_circular_progress_indicator.dart';
 import '../onboarding/onboarding_screen.dart';
 import 'change_plan_name_modal.dart';
 import 'help_slides/help_slide_share_import.dart';
@@ -36,7 +37,9 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final ScrollController _scrollController = ScrollController();
+  final _$loadingChangePlanLockState = AutoDisposeStateProvider((_) => false);
   bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -162,11 +165,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           SettingsTile(
                             leadingIcon: EvaIcons.lockOutline,
                             text: 'settings_section_plan_change_locked'.tr(),
-                            trailing: Switch.adaptive(
-                              value: plan.locked ?? false,
-                              onChanged: (value) =>
-                                  _changePlanLockState(plan, value),
-                            ),
+                            trailing: Consumer(builder: (context, watch, _) {
+                              final isLoadingLockState =
+                                  watch(_$loadingChangePlanLockState).state;
+                              return isLoadingLockState
+                                  ? const SmallCircularProgressIndicator()
+                                  : Switch.adaptive(
+                                      value: plan.locked ?? false,
+                                      onChanged: (value) =>
+                                          _changePlanLockState(plan, value),
+                                    );
+                            }),
                           ),
                           SettingsTile(
                             onTap: () => _leavePlan(plan.id, context),
@@ -418,17 +427,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _changePlanLockState(Plan plan, bool locked) async {
-    setState(() {
-      isLoading = true;
-    });
+    context.read(_$loadingChangePlanLockState).state = true;
     plan.locked = locked;
     await PlanService.updatePlan(plan);
     if (!mounted) {
       return;
     }
-    setState(() {
-      isLoading = false;
-    });
+    context.read(_$loadingChangePlanLockState).state = false;
     context.read(planProvider).state = plan;
   }
 
