@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:concentric_transition/page_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -324,6 +327,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  CupertinoAlertDialog _buildIOSLeaveDialog() {
+    return CupertinoAlertDialog(
+      title: Text('settings_plan_leave_dialog_title'.tr()),
+      content: Column(
+        children: [
+          const SizedBox(height: kPadding / 2),
+          Text('settings_plan_leave_dialog_description'.tr()),
+        ],
+      ),
+      actions: <Widget>[
+        CupertinoDialogAction(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: Text(
+            'settings_plan_leave_dialog_action_leave'.tr().toUpperCase(),
+          ),
+        ),
+        CupertinoDialogAction(
+          onPressed: () {
+            Navigator.of(context).pop(false);
+          },
+          isDefaultAction: true,
+          child: Text(
+            'settings_plan_leave_dialog_action_cancel'.tr().toUpperCase(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  AlertDialog _buildLeaveDialog() {
+    return AlertDialog(
+      title: Text('settings_plan_leave_dialog_title'.tr()),
+      content: Column(
+        children: [
+          const SizedBox(height: kPadding / 2),
+          Text('settings_plan_leave_dialog_description'.tr()),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: Text('settings_plan_leave_dialog_action_leave'.tr()),
+          onPressed: () {
+            Navigator.of(context).pop(true);
+          },
+        ),
+        TextButton(
+          child: Text(
+            'settings_plan_leave_dialog_action_cancel'.tr(),
+            style: TextStyle(color: Theme.of(context).primaryColor),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop(false);
+          },
+        ),
+      ],
+    );
+  }
+
   void _shareCode(String code, bool? isPlanLocked) async {
     await Share.share(
       'settings_share_msg'.tr(args: [kAppName, code]),
@@ -371,7 +432,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     context.read(planProvider).state = plan;
   }
 
-  void _leavePlan(String? planId, BuildContext context) {
+  void _leavePlan(String? planId, BuildContext context) async {
+    final leavePlan = await showDialog<bool?>(
+      context: context,
+      builder: (_) =>
+          Platform.isIOS ? _buildIOSLeaveDialog() : _buildLeaveDialog(),
+    );
+
+    if (leavePlan == null || !leavePlan) {
+      return;
+    }
+
     final String userId = AuthenticationService.currentUser!.uid;
     PlanService.leavePlan(planId, userId).then((_) {
       AuthenticationService.signOut();

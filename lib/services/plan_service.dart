@@ -203,11 +203,20 @@ class PlanService {
     }
     final plan = await getPlanById(planId);
 
-    if (plan != null && plan.users != null && plan.users!.contains(userId)) {
+    if (plan == null || plan.users == null) {
+      return;
+    }
+
+    if (plan.users!.length == 1 && plan.locked != null && plan.locked!) {
+      plan.locked = false;
+    }
+
+    if (plan.users!.contains(userId)) {
       plan.users!.remove(userId);
-      _firestore
-          .doc(planId)
-          .update(<String, List<String>>{'users': plan.users ?? []});
+      _firestore.doc(planId).update(<String, Object>{
+        'users': plan.users ?? <dynamic>[],
+        'locked': plan.locked ?? false
+      });
     }
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:email_validator/email_validator.dart';
@@ -174,7 +176,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
           ),
           const SizedBox(height: kPadding / 2),
-          SignInWithAppleButton(onPressed: _authWithApple),
+          if (Platform.isIOS) SignInWithAppleButton(onPressed: _authWithApple),
           SizedBox(
             height: size.height * 0.1 +
                 MediaQuery.of(context).viewInsets.bottom / 6,
