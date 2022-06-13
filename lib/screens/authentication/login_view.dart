@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:email_validator/email_validator.dart';
@@ -174,7 +176,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
           ),
           const SizedBox(height: kPadding / 2),
-          SignInWithAppleButton(onPressed: _authWithApple),
+          if (Platform.isIOS) SignInWithAppleButton(onPressed: _authWithApple),
           SizedBox(
             height: size.height * 0.1 +
                 MediaQuery.of(context).viewInsets.bottom / 6,
@@ -205,13 +207,18 @@ class _LoginViewState extends State<LoginView> {
                   onTap: widget.navigateBack,
                   isSecondary: true,
                 ),
-                MainButton(
-                  key: AuthenticationKeys.buttonJoin,
-                  text: 'login_join'.tr(),
+                SizedBox(
                   width: constraints.maxWidth * 0.65,
-                  onTap: _authWithEmail,
-                  isProgress: true,
-                  buttonState: _buttonState,
+                  child: Center(
+                    child: MainButton(
+                      key: AuthenticationKeys.buttonJoin,
+                      text: 'login_join'.tr(),
+                      width: constraints.maxWidth * 0.65,
+                      onTap: _authWithEmail,
+                      isProgress: true,
+                      buttonState: _buttonState,
+                    ),
+                  ),
                 ),
               ],
             );
@@ -265,7 +272,7 @@ class _LoginViewState extends State<LoginView> {
               _emailController.text, _passwordController.text));
       await _processAuthentication(userId);
     } catch (e) {
-      _handleAuthException(e);
+      _handleMailAuthException(e);
     }
   }
 
@@ -276,7 +283,10 @@ class _LoginViewState extends State<LoginView> {
       final userId = await AuthenticationService.signInWithApple();
       await _processAuthentication(userId);
     } catch (e) {
-      _handleAuthException(e);
+      setState(() {
+        _unknownErrorText = 'login_error_unknown'.tr();
+        _buttonState = ButtonState.error;
+      });
     }
   }
 
@@ -307,6 +317,13 @@ class _LoginViewState extends State<LoginView> {
     }
 
     if (plan != null && !plan.users!.contains(userId)) {
+      if (plan.locked != null && plan.locked!) {
+        setState(() {
+          _unknownErrorText = 'login_error_plan_locked'.tr();
+          _buttonState = ButtonState.error;
+        });
+        return;
+      }
       plan.users!.add(userId);
       await PlanService.updatePlan(plan);
     }
@@ -343,7 +360,7 @@ class _LoginViewState extends State<LoginView> {
     });
   }
 
-  void _handleAuthException(dynamic exception) {
+  void _handleMailAuthException(dynamic exception) {
     if (exception != null && exception is FirebaseAuthException) {
       if (exception.code == 'weak-password') {
         _passwordErrorText = 'login_error_password_weak'.tr();

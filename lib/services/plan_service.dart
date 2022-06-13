@@ -78,9 +78,9 @@ class PlanService {
 
   static Future<Plan> createPlan(String? name) async {
     _log.finer('Call createPlan');
-    String code = _generateCode().toString();
+    String code = generateCode();
     while ((await getPlanById(code)) != null) {
-      code = _generateCode().toString();
+      code = generateCode();
     }
     _log.finest('createPlan: Generated code: $code');
 
@@ -102,11 +102,14 @@ class PlanService {
     return plan;
   }
 
-  static int _generateCode() {
-    const int min = 10000000;
-    const int max = 99999999;
-    final randomizer = Random();
-    return min + randomizer.nextInt(max - min);
+  static String generateCode() {
+    const chars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    final Random rnd = Random();
+
+    return String.fromCharCodes(
+      Iterable.generate(8, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))),
+    );
   }
 
   static Future<Plan?> getPlanByCode(String code,
@@ -200,11 +203,20 @@ class PlanService {
     }
     final plan = await getPlanById(planId);
 
-    if (plan != null && plan.users != null && plan.users!.contains(userId)) {
+    if (plan == null || plan.users == null) {
+      return;
+    }
+
+    if (plan.users!.length == 1 && plan.locked != null && plan.locked!) {
+      plan.locked = false;
+    }
+
+    if (plan.users!.contains(userId)) {
       plan.users!.remove(userId);
-      _firestore
-          .doc(planId)
-          .update(<String, List<String>>{'users': plan.users ?? []});
+      _firestore.doc(planId).update(<String, Object>{
+        'users': plan.users ?? <dynamic>[],
+        'locked': plan.locked ?? false
+      });
     }
   }
 }

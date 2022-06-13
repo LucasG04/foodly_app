@@ -14,7 +14,7 @@ import '../../../utils/basic_utils.dart';
 import '../../../utils/debouncer.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import '../../../widgets/user_information.dart';
-import '../settings_view/help_slides/help_slide_share_import.dart';
+import '../../settings/help_slides/help_slide_share_import.dart';
 import 'meal_list_tile.dart';
 import 'meal_list_title.dart';
 

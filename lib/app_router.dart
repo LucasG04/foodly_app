@@ -6,6 +6,7 @@ import 'screens/meal/meal_screen.dart';
 import 'screens/meal_create/meal_create_screen.dart';
 import 'screens/meal_select/meal_select.dart';
 import 'screens/onboarding/onboarding_screen.dart';
+import 'screens/settings/settings_screen.dart';
 import 'screens/tab_navigation/home_screen.dart';
 import 'screens/unknown_route/unknown_route_screen.dart';
 
@@ -16,6 +17,7 @@ import 'screens/unknown_route/unknown_route_screen.dart';
   routes: <AutoRoute>[
     CupertinoRoute<dynamic>(page: HomeScreen, initial: true),
     CupertinoRoute<dynamic>(page: AuthenticationScreen),
+    CupertinoRoute<dynamic>(page: SettingsScreen),
     CupertinoRoute<dynamic>(page: MealSelectScreen),
     CupertinoRoute<dynamic>(page: OnboardingScreen),
     CupertinoRoute<dynamic>(page: FeedbackScreen),

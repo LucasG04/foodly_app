@@ -45,8 +45,8 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   late bool _isCreatingMeal;
   late bool _isLoadingMeal;
   late bool _mealSaved;
+  late ScrollController _scrollController;
   Meal _meal = Meal(name: '');
-  ScrollController? _scrollController;
   TextEditingController? _sourceController;
   TextEditingController? _titleController;
   String? _updatedImage;

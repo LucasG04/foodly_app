@@ -22,6 +22,7 @@ import '../../widgets/link_preview.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import 'border_icon.dart';
 import 'confirm_delete_modal.dart';
+import 'tag_tile.dart';
 
 class MealScreen extends StatefulWidget {
   final String id;
@@ -112,7 +113,7 @@ class _MealScreenState extends State<MealScreen> {
                                         width: 50,
                                         child: PopupMenuButton(
                                           padding: EdgeInsets.zero,
-                                          onSelected: (String value) =>
+                                          onSelected: (_PopupMenuValue value) =>
                                               _onMenuSelected(
                                             value,
                                             meal,
@@ -120,7 +121,7 @@ class _MealScreenState extends State<MealScreen> {
                                           ),
                                           itemBuilder: (context) => [
                                             PopupMenuItem(
-                                              value: 'edit',
+                                              value: _PopupMenuValue.addToPlan,
                                               child: ListTile(
                                                 title: const Text(
                                                   'meal_details_edit',
@@ -131,7 +132,7 @@ class _MealScreenState extends State<MealScreen> {
                                               ),
                                             ),
                                             PopupMenuItem(
-                                              value: 'delete',
+                                              value: _PopupMenuValue.addToPlan,
                                               child: ListTile(
                                                 title: const Text(
                                                   'meal_details_delete',
@@ -371,12 +372,12 @@ class _MealScreenState extends State<MealScreen> {
         : source;
   }
 
-  void _onMenuSelected(String value, Meal meal, String? planId) async {
+  void _onMenuSelected(_PopupMenuValue value, Meal meal, String? planId) async {
     if (meal.planId != planId) {
       return;
     }
     switch (value) {
-      case 'edit':
+      case _PopupMenuValue.edit:
         final result = await AutoRouter.of(context).push(
           MealCreateScreenRoute(id: meal.id!),
         );
@@ -385,10 +386,11 @@ class _MealScreenState extends State<MealScreen> {
           setState(() {});
         }
         break;
-      case 'delete':
+      case _PopupMenuValue.delete:
         _openConfirmDelete(meal);
         break;
-      default:
+      case _PopupMenuValue.addToPlan:
+        break;
     }
   }
 
@@ -432,29 +434,8 @@ class _MealScreenState extends State<MealScreen> {
   }
 }
 
-class TagTile extends StatelessWidget {
-  final String text;
-
-  const TagTile(
-    this.text, {
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(left: 25),
-      child: Column(
-        // ignore: avoid_redundant_argument_values
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          BorderIcon(
-            height: 50.0,
-            withBorder: true,
-            child: Text(text, style: const TextStyle(fontSize: 16.0)),
-          ),
-        ],
-      ),
-    );
-  }
+enum _PopupMenuValue {
+  edit,
+  delete,
+  addToPlan,
 }
