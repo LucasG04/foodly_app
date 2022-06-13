@@ -17,6 +17,7 @@ import '../../../utils/basic_utils.dart';
 import '../../../utils/main_snackbar.dart';
 import '../../../utils/widget_utils.dart';
 import '../../../widgets/loading_logout.dart';
+import '../../models/plan.dart';
 import '../../widgets/main_appbar.dart';
 import '../onboarding/onboarding_screen.dart';
 import 'change_plan_name_modal.dart';
@@ -32,6 +33,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final ScrollController _scrollController = ScrollController();
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           final plan = watch(planProvider).state;
           final foodlyUser = watch(userProvider).state;
           final firebaseUser = AuthenticationService.currentUser;
-          return plan != null && foodlyUser != null
+          return plan != null && foodlyUser != null && !isLoading
               ? SingleChildScrollView(
                   controller: _scrollController,
                   child: Padding(
@@ -57,36 +59,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       children: [
                         _buildSectionTitle('settings_section_general'.tr()),
                         _buildSection([
-                          SettingsTile(
-                            leadingIcon: EvaIcons.listOutline,
-                            text:
-                                'settings_section_general_multiple_meals'.tr(),
-                            trailing: Consumer(builder: (context, watch, _) {
-                              return Switch.adaptive(
-                                value: SettingsService.multipleMealsPerTime,
-                                onChanged: (value) {
-                                  setState(() {
-                                    SettingsService.setMultipleMealsPerTime(
-                                        value);
-                                  });
-                                },
-                              );
-                            }),
-                          ),
-                          SettingsTile(
-                            leadingIcon: EvaIcons.trendingUpOutline,
-                            text: 'settings_section_general_suggestions'.tr(),
-                            trailing: Consumer(builder: (context, watch, _) {
-                              return Switch.adaptive(
-                                value: SettingsService.showSuggestions,
-                                onChanged: (value) {
-                                  setState(() {
-                                    SettingsService.setShowSuggestions(value);
-                                  });
-                                },
-                              );
-                            }),
-                          ),
                           SettingsTile(
                             leadingIcon: EvaIcons.globe2Outline,
                             text: 'settings_section_general_language'.tr(),
@@ -106,9 +78,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               },
                             ),
                           ),
+                        ], context),
+                        _buildSectionTitle(
+                          'settings_section_customization'.tr(),
+                        ),
+                        _buildSection([
+                          SettingsTile(
+                            leadingIcon: EvaIcons.listOutline,
+                            text:
+                                'settings_section_customization_multiple_meals'
+                                    .tr(),
+                            trailing: Consumer(builder: (context, watch, _) {
+                              return Switch.adaptive(
+                                value: SettingsService.multipleMealsPerTime,
+                                onChanged: (value) {
+                                  setState(() {
+                                    SettingsService.setMultipleMealsPerTime(
+                                        value);
+                                  });
+                                },
+                              );
+                            }),
+                          ),
+                          SettingsTile(
+                            leadingIcon: EvaIcons.trendingUpOutline,
+                            text: 'settings_section_customization_suggestions'
+                                .tr(),
+                            trailing: Consumer(builder: (context, watch, _) {
+                              return Switch.adaptive(
+                                value: SettingsService.showSuggestions,
+                                onChanged: (value) {
+                                  setState(() {
+                                    SettingsService.setShowSuggestions(value);
+                                  });
+                                },
+                              );
+                            }),
+                          ),
                           SettingsTile(
                             leadingIcon: EvaIcons.trash2Outline,
-                            text: 'settings_section_general_remove_bought'.tr(),
+                            text: 'settings_section_customization_remove_bought'
+                                .tr(),
                             trailing: Consumer(builder: (context, watch, _) {
                               return Switch.adaptive(
                                 value: SettingsService.removeBoughtImmediately,
@@ -136,6 +146,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             leadingIcon: EvaIcons.shareOutline,
                             text: 'settings_section_plan_share'
                                 .tr(args: [plan.code!]),
+                            trailing:
+                                const Icon(EvaIcons.arrowIosForwardOutline),
+                          ),
+                          SettingsTile(
+                            onTap: () => _changePlanCode(plan),
+                            leadingIcon: EvaIcons.hashOutline,
+                            text: 'settings_section_plan_change_code'.tr(),
                             trailing:
                                 const Icon(EvaIcons.arrowIosForwardOutline),
                           ),
@@ -299,7 +316,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _shareCode(String code) {
-    Share.share('settings_share_msg'.tr(args: [kAppName, code]));
+    Share.share(
+      'settings_share_msg'.tr(args: [kAppName, code]),
+      subject: 'settings_section_plan_share'.tr(),
+    );
+  }
+
+  Future<void> _changePlanCode(Plan plan) async {
+    setState(() {
+      isLoading = true;
+    });
+    String code = PlanService.generateCode().toString();
+    while ((await PlanService.getPlanById(code)) != null) {
+      code = PlanService.generateCode().toString();
+    }
+    plan.code = code;
+    await PlanService.updatePlan(plan);
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      isLoading = false;
+    });
+    context.read(planProvider).state = plan;
   }
 
   void _leavePlan(String? planId, BuildContext context) {
