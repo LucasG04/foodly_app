@@ -5,7 +5,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../constants.dart';
 import '../../../models/grocery.dart';
@@ -178,16 +178,21 @@ class _ShoppingListViewState extends State<ShoppingListView>
 
   void _shareList(List<Grocery> groceries) {
     if (groceries.isEmpty) {
+      MainSnackbar(
+        message: 'shopping_list_share_error'.tr(),
+        isError: true,
+      ).show(context);
       return;
     }
     final list = groceries
         .map((e) => e.amount == null
-            ? '\n- ${e.name}'
+            ? '- ${e.name}'
             : e.unit == null
-                ? '\n- ${e.amount} ${e.name}'
-                : '\n- ${e.amount} ${e.unit} ${e.name}')
+                ? '- ${e.amount} ${e.name}'
+                : '- ${e.amount} ${e.unit} ${e.name}')
         .toList();
-    Share.share(list.join());
+    final listAsString = list.join('\n');
+    Share.share(listAsString, subject: listAsString);
   }
 
   void _removeBoughtGrocery(

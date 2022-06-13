@@ -5,7 +5,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
@@ -318,7 +318,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _shareCode(String code) {
     Share.share(
       'settings_share_msg'.tr(args: [kAppName, code]),
-      subject: 'settings_section_plan_share'.tr(),
+      subject: 'settings_share_msg'.tr(args: [kAppName, code]),
     );
   }
 
