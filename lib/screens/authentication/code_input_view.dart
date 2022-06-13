@@ -139,7 +139,7 @@ class _CodeInputViewState extends State<CodeInputView> {
         fontFamily: 'Poppins',
       ),
       decoration: InputDecoration(
-        hintText: '81726354',
+        hintText: '8Lu261gO',
         suffix: _loadingCode
             ? const Padding(
                 padding: EdgeInsets.only(right: 10.0),

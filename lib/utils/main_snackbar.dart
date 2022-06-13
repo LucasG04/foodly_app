@@ -7,10 +7,11 @@ class MainSnackbar {
   final String? title;
   final String message;
   final Widget? action;
-  final int seconds;
+  final int duration;
   final bool isSuccess;
   final bool isError;
   final bool isCountdown;
+  final bool infinite;
 
   /// Example Usage: `MainSnackbar(message: 'Hello there!').show(context);`
   ///
@@ -19,10 +20,11 @@ class MainSnackbar {
     required this.message,
     this.title,
     this.action,
-    this.seconds = 5,
+    this.duration = 5,
     this.isSuccess = false,
     this.isError = false,
     this.isCountdown = false,
+    this.infinite = false,
   }) : assert(!isSuccess || !isError || !isCountdown);
 
   /// Show the snackbar.
@@ -32,7 +34,9 @@ class MainSnackbar {
       borderRadius: BorderRadius.circular(10.0),
       title: title,
       message: message,
-      duration: Duration(seconds: seconds),
+      duration: infinite ? null : Duration(seconds: duration),
+      isDismissible: infinite,
+      onTap: infinite ? (_) => Navigator.maybePop(context) : null,
       icon: isCountdown
           ? _buildCountdown()
           : isSuccess
@@ -59,8 +63,8 @@ class MainSnackbar {
     return Container(
       constraints: const BoxConstraints(maxHeight: 22.0),
       child: TweenAnimationBuilder(
-        tween: Tween<double>(begin: 0, end: seconds * 1000.toDouble()),
-        duration: Duration(seconds: seconds),
+        tween: Tween<double>(begin: 0, end: duration * 1000.toDouble()),
+        duration: Duration(seconds: duration),
         builder: (context, double value, child) {
           return Stack(
             alignment: Alignment.center,
@@ -92,7 +96,7 @@ class MainSnackbar {
   }
 
   double _getProgressValue(double value) {
-    return value / (seconds * 1000);
+    return value / (duration * 1000);
 
     // Progress with steps:
     // final step = 1 / seconds;
@@ -102,6 +106,6 @@ class MainSnackbar {
   }
 
   String _getCountdownText(double value) {
-    return ((seconds - (value / 1000)).toInt()).toString();
+    return ((duration - (value / 1000)).toInt()).toString();
   }
 }

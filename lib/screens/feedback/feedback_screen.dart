@@ -159,7 +159,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     if (!mounted) {
       return;
     }
-    MainSnackbar(message: 'feedback_thanks'.tr(), isSuccess: true, seconds: 1)
+    MainSnackbar(message: 'feedback_thanks'.tr(), isSuccess: true, duration: 1)
         .show(context);
     await Future<int?>.delayed(const Duration(seconds: 1));
 

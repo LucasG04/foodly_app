@@ -281,8 +281,8 @@ class _LoginViewState extends State<LoginView> {
       final userId = await AuthenticationService.signInWithApple();
       await _processAuthentication(userId);
     } catch (e) {
-      _unknownErrorText = 'login_error_unknown'.tr();
       setState(() {
+        _unknownErrorText = 'login_error_unknown'.tr();
         _buttonState = ButtonState.error;
       });
     }
@@ -315,6 +315,13 @@ class _LoginViewState extends State<LoginView> {
     }
 
     if (plan != null && !plan.users!.contains(userId)) {
+      if (plan.locked != null && plan.locked!) {
+        setState(() {
+          _unknownErrorText = 'login_error_plan_locked'.tr();
+          _buttonState = ButtonState.error;
+        });
+        return;
+      }
       plan.users!.add(userId);
       await PlanService.updatePlan(plan);
     }

@@ -142,7 +142,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 const Icon(EvaIcons.arrowIosForwardOutline),
                           ),
                           SettingsTile(
-                            onTap: () => _shareCode(plan.code!),
+                            onTap: () => _shareCode(plan.code!, plan.locked),
                             leadingIcon: EvaIcons.shareOutline,
                             text: 'settings_section_plan_share'
                                 .tr(args: [plan.code!]),
@@ -155,6 +155,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             text: 'settings_section_plan_change_code'.tr(),
                             trailing:
                                 const Icon(EvaIcons.arrowIosForwardOutline),
+                          ),
+                          SettingsTile(
+                            leadingIcon: EvaIcons.lockOutline,
+                            text: 'settings_section_plan_change_locked'.tr(),
+                            trailing: Switch.adaptive(
+                              value: plan.locked ?? false,
+                              onChanged: (value) =>
+                                  _changePlanLockState(plan, value),
+                            ),
                           ),
                           SettingsTile(
                             onTap: () => _leavePlan(plan.id, context),
@@ -315,11 +324,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _shareCode(String code) {
-    Share.share(
+  void _shareCode(String code, bool? isPlanLocked) async {
+    await Share.share(
       'settings_share_msg'.tr(args: [kAppName, code]),
       subject: 'settings_share_msg'.tr(args: [kAppName, code]),
     );
+    if (isPlanLocked != null && isPlanLocked && mounted) {
+      MainSnackbar(
+        message: 'settings_share_plan_locked'.tr(),
+        infinite: true,
+      ).show(context);
+    }
   }
 
   Future<void> _changePlanCode(Plan plan) async {
@@ -331,6 +346,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
       code = PlanService.generateCode();
     }
     plan.code = code;
+    await PlanService.updatePlan(plan);
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      isLoading = false;
+    });
+    context.read(planProvider).state = plan;
+  }
+
+  Future<void> _changePlanLockState(Plan plan, bool locked) async {
+    setState(() {
+      isLoading = true;
+    });
+    plan.locked = locked;
     await PlanService.updatePlan(plan);
     if (!mounted) {
       return;
