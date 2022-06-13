@@ -96,7 +96,9 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
                   focusNode: _amountFocusNode,
                   title: 'edit_grocery_modal_ctrl_amount_title'.tr(),
                   placeholder: '1',
-                  keyboardType: TextInputType.number,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   textInputAction: TextInputAction.next,
                   onSubmit: () => _unitFocusNode.requestFocus(),
                 ),
