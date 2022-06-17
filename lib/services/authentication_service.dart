@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logging/logging.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
+import '../utils/firebase_auth_providers.dart';
+
 class AuthenticationService {
   AuthenticationService._();
 
@@ -52,15 +54,35 @@ class AuthenticationService {
     return _auth.currentUser!.delete();
   }
 
-  static Future<UserCredential?> reauthenticate(String password) async {
-    if (_auth.currentUser == null) {
+  static Future<UserCredential?> reauthenticateApple() async {
+    if (_auth.currentUser == null ||
+        !userHasAuthProvider(FirebaseAuthProvider.apple)) {
       return null;
     }
+
+    final credential = await _getAppleOAuthCredential();
+    return _auth.currentUser!.reauthenticateWithCredential(credential);
+  }
+
+  static Future<UserCredential?> reauthenticatePassword(String password) async {
+    if (_auth.currentUser == null ||
+        !userHasAuthProvider(FirebaseAuthProvider.password)) {
+      return null;
+    }
+
     final credential = EmailAuthProvider.credential(
       email: _auth.currentUser!.email ?? '',
       password: password,
     );
     return _auth.currentUser!.reauthenticateWithCredential(credential);
+  }
+
+  static bool userHasAuthProvider(String providerId) {
+    if (_auth.currentUser == null) {
+      return false;
+    }
+    return _auth.currentUser!.providerData
+        .any((e) => e.providerId == providerId);
   }
 
   /// Generates a cryptographically secure random nonce, to be included in a
@@ -80,8 +102,7 @@ class AuthenticationService {
     return digest.toString();
   }
 
-  static Future<String> signInWithApple() async {
-    _log.finer('Call signInWithApple');
+  static Future<OAuthCredential> _getAppleOAuthCredential() async {
     // To prevent replay attacks with the credential returned from Apple, we
     // include a nonce in the credential request. When signing in with
     // Firebase, the nonce in the id token returned by Apple, is expected to
@@ -98,10 +119,15 @@ class AuthenticationService {
     );
 
     // Create an `OAuthCredential` from the credential returned by Apple.
-    final oauthCredential = OAuthProvider('apple.com').credential(
+    return OAuthProvider('apple.com').credential(
       idToken: appleCredential.identityToken,
       rawNonce: rawNonce,
     );
+  }
+
+  static Future<String> signInWithApple() async {
+    _log.finer('Call signInWithApple');
+    final oauthCredential = await _getAppleOAuthCredential();
 
     // Sign in the user with Firebase. If the nonce we generated earlier does
     // not match the nonce in `appleCredential.identityToken`, sign in will fail.
