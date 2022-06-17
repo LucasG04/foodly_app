@@ -7,6 +7,7 @@ import 'package:logging/logging.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../utils/firebase_auth_providers.dart';
+import 'foodly_user_service.dart';
 
 class AuthenticationService {
   AuthenticationService._();
@@ -50,6 +51,13 @@ class AuthenticationService {
     _log.finer('Call deleteAccount');
     if (_auth.currentUser == null) {
       return;
+    }
+    try {
+      FoodlyUserService.deleteUserById(_auth.currentUser!.uid);
+    } catch (e) {
+      _log.severe(
+          'ERR! deleteAccount at deleteUserById with ${_auth.currentUser!.uid}',
+          e);
     }
     return _auth.currentUser!.delete();
   }
