@@ -51,7 +51,12 @@ class _SettingsReauthenticateModalState
               ).tr(),
             ),
           ),
-          const SizedBox(height: kPadding * 2),
+          Text(
+            'settings_reauthenticate_description'.tr(
+              args: [AuthenticationService.currentUser?.email ?? ''],
+            ),
+          ),
+          const SizedBox(height: kPadding),
           Consumer(builder: (context, watch, _) {
             final errorText = watch(_$errorText).state;
             return MainTextField(
@@ -61,6 +66,7 @@ class _SettingsReauthenticateModalState
               textInputAction: TextInputAction.go,
               obscureText: true,
               errorText: errorText?.tr(),
+              errorMaxLines: 2,
               onSubmit: _reauthenticate,
             );
           }),
@@ -96,6 +102,7 @@ class _SettingsReauthenticateModalState
       context.read(_$buttonState).state = ButtonState.error;
       context.read(_$errorText).state =
           'settings_reauthenticate_input_error_empty';
+      return;
     }
 
     try {
@@ -105,6 +112,7 @@ class _SettingsReauthenticateModalState
         context.read(_$buttonState).state = ButtonState.error;
         context.read(_$errorText).state =
             'settings_reauthenticate_input_error_wrong';
+        return;
       }
     }
 

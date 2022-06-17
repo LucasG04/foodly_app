@@ -268,10 +268,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           SettingsTile(
                             onTap: _deleteAccount,
-                            leadingIcon: EvaIcons.logOutOutline,
+                            leadingIcon: EvaIcons.trash2Outline,
                             text: 'settings_section_account_delete'.tr(),
                             trailing: const Icon(
-                              EvaIcons.trash2Outline,
+                              EvaIcons.arrowIosForwardOutline,
                               color: Colors.red,
                             ),
                             color: Colors.red,
