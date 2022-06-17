@@ -19,6 +19,7 @@ class MainTextField extends StatefulWidget {
   final TextAlign textAlign;
   final Widget? suffix;
   final String? errorText;
+  final int? errorMaxLines;
   final String Function(String?)? validator;
   final bool required;
 
@@ -38,6 +39,7 @@ class MainTextField extends StatefulWidget {
     this.textAlign = TextAlign.start,
     this.suffix,
     this.errorText,
+    this.errorMaxLines,
     this.validator,
     this.required = false,
     Key? key,
@@ -125,6 +127,7 @@ class _MainTextFieldState extends State<MainTextField> {
                 )
               : null,
           errorText: widget.errorText,
+          errorMaxLines: widget.errorMaxLines,
         ),
         obscureText: _obscureText,
         textAlign: widget.textAlign,

@@ -23,7 +23,7 @@ class WidgetUtils {
   }
 
   /// Shows a edit dialog for a placeholder plan meal.
-  static Future<String?> showPlacholderEditDialog(
+  static Future<String?> showPlaceholderEditDialog(
     BuildContext context, {
     String initialText = '',
     bool required = true,

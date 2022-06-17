@@ -275,7 +275,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
 
   Future<void> _editPlaceholder() async {
     final planId = context.read(planProvider).state!.id!;
-    final text = await WidgetUtils.showPlacholderEditDialog(
+    final text = await WidgetUtils.showPlaceholderEditDialog(
       context,
       initialText: widget.planMeal.meal.split(kPlaceholderSymbol)[1],
       required: false,
