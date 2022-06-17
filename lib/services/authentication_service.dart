@@ -44,6 +44,25 @@ class AuthenticationService {
     return _auth.sendPasswordResetEmail(email: email);
   }
 
+  static Future<void> deleteAccount() async {
+    _log.finer('Call deleteAccount');
+    if (_auth.currentUser == null) {
+      return;
+    }
+    return _auth.currentUser!.delete();
+  }
+
+  static Future<UserCredential?> reauthenticate(String password) async {
+    if (_auth.currentUser == null) {
+      return null;
+    }
+    final credential = EmailAuthProvider.credential(
+      email: _auth.currentUser!.email ?? '',
+      password: password,
+    );
+    return _auth.currentUser!.reauthenticateWithCredential(credential);
+  }
+
   /// Generates a cryptographically secure random nonce, to be included in a
   /// credential request.
   static String _generateNonce([int length = 32]) {
