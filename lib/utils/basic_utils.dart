@@ -43,11 +43,11 @@ class BasicUtils {
     return Uri.tryParse(uri)?.isAbsolute ?? false;
   }
 
-  static List<DateTime> getPlanDateTimes(int hourDiffToUtc) {
+  static List<DateTime> getPlanDateTimes(int hourDiffToUtc, {int amount = 8}) {
     final now = DateTime.now().toUtc().add(Duration(hours: hourDiffToUtc));
     final today = DateTime(now.year, now.month, now.day);
 
-    return List.generate(8, (i) => today.add(Duration(days: i)));
+    return List.generate(amount, (i) => today.add(Duration(days: i)));
   }
 
   static void emitMealsChanged(BuildContext context) {

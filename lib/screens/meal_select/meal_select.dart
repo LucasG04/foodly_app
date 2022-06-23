@@ -286,7 +286,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
 
   Future<void> _showPlaceholderDialog() async {
     final planId = context.read(planProvider).state!.id!;
-    final text = await WidgetUtils.showPlacholderEditDialog(context);
+    final text = await WidgetUtils.showPlaceholderEditDialog(context);
 
     if (text == null || text.isEmpty) {
       return;

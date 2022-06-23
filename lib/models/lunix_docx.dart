@@ -1,16 +1,26 @@
 import 'dart:convert';
 
 class LunixDocx {
-  bool? vertical;
-  bool? colorful;
+  bool vertical;
+  String type;
+  String? lunchTranslation;
+  String? dinnerTranslation;
   LunixDocxPlan? plan;
 
-  LunixDocx({this.vertical, this.colorful, this.plan});
+  LunixDocx({
+    this.plan,
+    this.vertical = false,
+    this.type = 'color',
+    this.lunchTranslation,
+    this.dinnerTranslation,
+  });
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'vertical': vertical,
-      'colorful': colorful,
+      'type': type,
+      'lunchTranslation': lunchTranslation,
+      'dinnerTranslation': dinnerTranslation,
       'plan': plan?.toMap(),
     };
   }

@@ -1,13 +1,13 @@
-import 'dart:io';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:concentric_transition/page_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../app_router.gr.dart';
@@ -27,6 +27,8 @@ import '../onboarding/onboarding_screen.dart';
 import 'change_plan_name_modal.dart';
 import 'help_slides/help_slide_share_import.dart';
 import 'import_meals_modal.dart';
+import 'settings_alerts.dart';
+import 'settings_reauthenticate_modal.dart';
 import 'settings_tile.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -36,6 +38,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  final Logger _log = Logger('SettingsScreen');
   final ScrollController _scrollController = ScrollController();
   final _$loadingChangePlanLockState = AutoDisposeStateProvider((_) => false);
   bool isLoading = false;
@@ -264,6 +267,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 const Icon(EvaIcons.arrowIosForwardOutline),
                           ),
                           SettingsTile(
+                            onTap: _deleteAccount,
+                            leadingIcon: EvaIcons.trash2Outline,
+                            text: 'settings_section_account_delete'.tr(),
+                            trailing: const Icon(
+                              EvaIcons.arrowIosForwardOutline,
+                              color: Colors.red,
+                            ),
+                            color: Colors.red,
+                          ),
+                          SettingsTile(
                             onTap: () => AuthenticationService.signOut(),
                             leadingIcon: EvaIcons.logOutOutline,
                             text: 'settings_section_account_logout'.tr(),
@@ -283,7 +296,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               TextSpan(
                                 text: '\n${firebaseUser!.email!}',
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ],
                           ),
@@ -336,64 +350,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  CupertinoAlertDialog _buildIOSLeaveDialog() {
-    return CupertinoAlertDialog(
-      title: Text('settings_plan_leave_dialog_title'.tr()),
-      content: Column(
-        children: [
-          const SizedBox(height: kPadding / 2),
-          Text('settings_plan_leave_dialog_description'.tr()),
-        ],
-      ),
-      actions: <Widget>[
-        CupertinoDialogAction(
-          onPressed: () => Navigator.of(context).pop(true),
-          child: Text(
-            'settings_plan_leave_dialog_action_leave'.tr().toUpperCase(),
-          ),
-        ),
-        CupertinoDialogAction(
-          onPressed: () {
-            Navigator.of(context).pop(false);
-          },
-          isDefaultAction: true,
-          child: Text(
-            'settings_plan_leave_dialog_action_cancel'.tr().toUpperCase(),
-          ),
-        ),
-      ],
-    );
-  }
-
-  AlertDialog _buildLeaveDialog() {
-    return AlertDialog(
-      title: Text('settings_plan_leave_dialog_title'.tr()),
-      content: Column(
-        children: [
-          const SizedBox(height: kPadding / 2),
-          Text('settings_plan_leave_dialog_description'.tr()),
-        ],
-      ),
-      actions: <Widget>[
-        TextButton(
-          child: Text('settings_plan_leave_dialog_action_leave'.tr()),
-          onPressed: () {
-            Navigator.of(context).pop(true);
-          },
-        ),
-        TextButton(
-          child: Text(
-            'settings_plan_leave_dialog_action_cancel'.tr(),
-            style: TextStyle(color: Theme.of(context).primaryColor),
-          ),
-          onPressed: () {
-            Navigator.of(context).pop(false);
-          },
-        ),
-      ],
-    );
-  }
-
   void _shareCode(String code, bool? isPlanLocked) async {
     await Share.share(
       'settings_share_msg'.tr(args: [kAppName, code]),
@@ -438,13 +394,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _leavePlan(String? planId, BuildContext context) async {
-    final leavePlan = await showDialog<bool?>(
-      context: context,
-      builder: (_) =>
-          Platform.isIOS ? _buildIOSLeaveDialog() : _buildLeaveDialog(),
-    );
+    final leavePlan = await showLeaveConfirmDialog(context);
 
-    if (leavePlan == null || !leavePlan) {
+    if (!leavePlan) {
       return;
     }
 
@@ -467,5 +419,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (_) => const ChangePlanNameModal(),
     );
+  }
+
+  Future<void> _deleteAccount() async {
+    final delete = await showDeleteConfirmDialog(context);
+    if (!delete) {
+      return;
+    }
+    try {
+      await AuthenticationService.deleteAccount();
+    } catch (e) {
+      if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
+        await _reauthenticateUserAndDelete();
+      }
+    }
+  }
+
+  Future<void> _reauthenticateUserAndDelete() async {
+    final reauthenticated = await WidgetUtils.showFoodlyBottomSheet<bool?>(
+      context: context,
+      builder: (_) => const SettingsReauthenticateModal(),
+    );
+
+    if (reauthenticated == null || !reauthenticated) {
+      return;
+    }
+
+    try {
+      await AuthenticationService.deleteAccount();
+    } catch (e) {
+      _log.severe('ERR! Account deletion failed after reauthentication!', e);
+    }
   }
 }

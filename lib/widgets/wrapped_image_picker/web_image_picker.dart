@@ -345,6 +345,10 @@ class _WebImagePickerState extends State<WebImagePicker> {
       _getSearchLanguage(),
     );
 
+    if (!mounted) {
+      return;
+    }
+
     if (response == null) {
       setState(() {
         _isLoadingMore = false;

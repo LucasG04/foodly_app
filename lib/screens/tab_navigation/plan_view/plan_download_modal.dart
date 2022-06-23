@@ -23,9 +23,10 @@ class PlanDownloadModal extends StatefulWidget {
 }
 
 class _PlanDownloadModalState extends State<PlanDownloadModal> {
+  ButtonState _buttonState = ButtonState.normal;
   bool _excludeToday = false;
   bool _portraitFormat = false;
-  ButtonState _buttonState = ButtonState.normal;
+  _PlanDocType _docType = _PlanDocType.color;
 
   @override
   Widget build(BuildContext context) {
@@ -53,11 +54,11 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
               ),
             ),
           ),
-          Flexible(
-            child: Image.asset(
-              'assets/images/template-plan-${_portraitFormat ? 'vertical' : 'horizontal'}-color.png',
-            ),
-          ),
+          // Flexible(
+          //   child: Image.asset(
+          //     'assets/images/template-plan-${_portraitFormat ? 'vertical' : 'horizontal'}-color.png',
+          //   ),
+          // ),
           SettingsTile(
             text: 'plan_download_modal_exclude_today'.tr(),
             trailing: Checkbox(
@@ -73,6 +74,19 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
               onChanged: _portraitFormatChange,
             ),
             onTap: () => _portraitFormatChange(!_portraitFormat),
+          ),
+          SettingsTile(
+            text: 'plan_download_modal_type'.tr(),
+            trailing: DropdownButton<_PlanDocType>(
+              value: _docType,
+              items: _PlanDocType.values
+                  .map((type) => DropdownMenuItem<_PlanDocType>(
+                        value: type,
+                        child: Text(_getTextForDocType(type)).tr(),
+                      ))
+                  .toList(),
+              onChanged: _docTypeChange,
+            ),
           ),
           Padding(
             padding: const EdgeInsets.only(top: kPadding, bottom: kPadding * 2),
@@ -97,7 +111,12 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
       languageTag: context.locale.toLanguageTag(),
       excludeToday: _excludeToday,
       vertical: _portraitFormat,
+      type: _getValueForDocType(_docType),
     );
+
+    if (!mounted) {
+      return;
+    }
     setState(() {
       _buttonState = ButtonState.normal;
     });
@@ -118,6 +137,30 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
     setState(() {
       _portraitFormat = value ?? false;
     });
+  }
+
+  void _docTypeChange(_PlanDocType? value) {
+    setState(() {
+      _docType = value ?? _PlanDocType.color;
+    });
+  }
+
+  String _getTextForDocType(_PlanDocType type) {
+    switch (type) {
+      case _PlanDocType.color:
+        return 'plan_download_modal_type_color';
+      case _PlanDocType.simple:
+        return 'plan_download_modal_type_simple';
+    }
+  }
+
+  String _getValueForDocType(_PlanDocType type) {
+    switch (type) {
+      case _PlanDocType.color:
+        return 'color';
+      case _PlanDocType.simple:
+        return 'simple';
+    }
   }
 
   Future<void> _savePlanPdf(String? path) async {
@@ -143,3 +186,5 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
     });
   }
 }
+
+enum _PlanDocType { color, simple }

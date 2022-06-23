@@ -42,4 +42,9 @@ class FoodlyUserService {
     log.finest(
         'Call addOldPlanIdToUser with UserId: $userId | PlanId: $planId | ${user.toString()} | oldPlans dont contain planId');
   }
+
+  static Future<void> deleteUserById(String userId) {
+    log.finer('Call deleteUserById with $userId');
+    return _firestore.doc(userId).delete();
+  }
 }

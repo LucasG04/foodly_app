@@ -98,13 +98,12 @@ class _SelectMealTileState extends State<SelectMealTile> {
 
       await widget.onAddMeal!();
 
-      setState(() {
-        _buttonState = _ButtonState.DONE;
-      });
-
       if (!mounted) {
         return;
       }
+      setState(() {
+        _buttonState = _ButtonState.DONE;
+      });
       AutoRouter.of(context).pop();
     }
   }
