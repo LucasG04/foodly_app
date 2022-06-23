@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
@@ -41,15 +42,17 @@ class LunixApiService {
     required Plan plan,
     required String languageTag,
     bool vertical = true,
-    bool colorful = true,
+    String type = 'color',
     bool excludeToday = false,
   }) async {
     _log.finer(
-      'Call saveDocxForPlan with plan: ${plan.id}, langTag: $languageTag, vertical: $vertical, colorful: $colorful, excludeToday: $excludeToday',
+      'Call saveDocxForPlan with plan: ${plan.id}, langTag: $languageTag, vertical: $vertical, type: $type, excludeToday: $excludeToday',
     );
     final docxData = LunixDocx(
       vertical: vertical,
-      colorful: colorful,
+      type: type,
+      lunchTranslation: 'lunch'.tr(),
+      dinnerTranslation: 'dinner'.tr(),
       plan: await _getLunixDocxPlan(plan, languageTag, excludeToday),
     );
 
@@ -60,9 +63,7 @@ class LunixApiService {
       final Response response = await _dio.post<List<int>>(
         '$_lunixApiEndpoint/generate-plan-pdf',
         data: docxData.toJson(),
-        options: Options(
-          responseType: ResponseType.bytes,
-        ),
+        options: Options(responseType: ResponseType.bytes),
       );
 
       final File file = File(planSavePath);
@@ -86,31 +87,38 @@ class LunixApiService {
       return LunixDocxPlan(name: plan.name, meals: []);
     }
 
-    List<DateTime> dates = BasicUtils.getPlanDateTimes(plan.hourDiffToUtc ?? 0);
+    List<DateTime> dates = BasicUtils.getPlanDateTimes(
+      plan.hourDiffToUtc ?? 0,
+      amount: excludeToday ? 9 : 8,
+    );
     if (excludeToday) {
       dates = dates.sublist(1, dates.length);
     }
 
     final List<LunixDocxPlanDay> templateDays = [];
-    final mealIds = plan.meals!.map((e) => e.meal).toList();
+    List<String> mealIds = plan.meals!.map((e) => e.meal).toList();
+    mealIds = mealIds.toSet().toList();
     final meals = await MealService.getMealsByIds(mealIds);
     meals.addAll(_getPlaceholderMeals(mealIds));
 
     for (var i = 0; i < dates.length; i++) {
       final date = dates[i];
-      final dateMeals =
-          plan.meals!.where((m) => m.date.difference(date).inDays == 0);
+      final dateMeals = plan.meals!
+          .where((m) => m.date.difference(date).inDays == 0)
+          .toList();
       final dayName = DateFormat('EEEE', languageTag).format(date);
       templateDays.add(LunixDocxPlanDay(dayName: dayName));
+      final lunchNames = <String>[];
+      final dinnerNames = <String>[];
       for (final meal in dateMeals) {
         if (meal.type == MealType.LUNCH) {
-          templateDays[i].lunch =
-              meals.firstWhere((m) => m.id == meal.meal).name;
+          lunchNames.add(meals.firstWhere((m) => m.id == meal.meal).name);
         } else {
-          templateDays[i].dinner =
-              meals.firstWhere((m) => m.id == meal.meal).name;
+          dinnerNames.add(meals.firstWhere((m) => m.id == meal.meal).name);
         }
       }
+      templateDays[i].lunch = lunchNames.join(', ');
+      templateDays[i].dinner = dinnerNames.join(', ');
     }
 
     return LunixDocxPlan(name: plan.name, meals: templateDays);
