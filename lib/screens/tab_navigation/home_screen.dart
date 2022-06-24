@@ -155,7 +155,11 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    showDialog<void>(
+    _showIOSUpdateDialog();
+  }
+
+  Future<void> _showIOSUpdateDialog() {
+    return showDialog<void>(
       context: context,
       builder: (_) => CupertinoAlertDialog(
         title: Column(
@@ -178,8 +182,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           CupertinoDialogAction(
             onPressed: () {
-              _openAppStore();
               Navigator.of(context).pop();
+              _openAppStore();
             },
             isDefaultAction: true,
             child: Text('update_dialog_action_update'.tr().toUpperCase()),
@@ -192,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _openAppStore() async {
     final url = Uri.parse('https://apps.apple.com/app/id$kAppBundleId');
     if (await canLaunchUrl(url)) {
-      launchUrl(url);
+      await launchUrl(url);
     }
   }
 }
