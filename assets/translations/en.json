@@ -201,6 +201,7 @@
   "plan_download_modal_type_color": "Color",
   "plan_download_modal_type_simple": "Plain",
   "plan_download_modal_cta": "Download",
+  "plan_download_modal_docx_info": "Download the \"Microsoft Word\" app for the best results when printing. Using it will improve the layout and style of your printed meal plan.",
   "meal_create_edit_tags_info": "Search for tags or create a new one by searching.",
   "meal_create_edit_tags_create_tile": "Tap to create",
   "meal_create_edit_tags_no_results": "No Tags",

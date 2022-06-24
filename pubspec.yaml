@@ -24,7 +24,7 @@ dependencies:
   #     url: https://github.com/X-Wei/flutter_cache_manager_hive.git
   #     ref: master
   dio: ^4.0.0-beta5
-  url_launcher: ^6.0.17
+  url_launcher: ^6.1.4
   another_flushbar: ^1.10.28
   share_plus: ^4.0.8
   email_validator: ^2.0.1

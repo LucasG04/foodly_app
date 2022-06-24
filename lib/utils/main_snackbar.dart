@@ -48,12 +48,12 @@ class MainSnackbar {
                   ? Icon(
                       EvaIcons.alertCircleOutline,
                       size: 28.0,
-                      color: Colors.red[300],
+                      color: Theme.of(context).errorColor,
                     )
-                  : const Icon(
+                  : Icon(
                       EvaIcons.infoOutline,
                       size: 28.0,
-                      color: Colors.grey,
+                      color: Theme.of(context).primaryColor,
                     ),
       mainButton: action,
     ).show(context);

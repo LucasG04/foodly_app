@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 
@@ -41,24 +42,29 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: kPadding),
-              child: Text(
-                'plan_download_modal_title'.tr().toUpperCase(),
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+          Padding(
+            padding: const EdgeInsets.only(top: kPadding / 2),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'plan_download_modal_title'.tr().toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                textAlign: TextAlign.center,
-              ),
+                IconButton(
+                  onPressed: _openDocxInfo,
+                  icon: Icon(
+                    EvaIcons.infoOutline,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  splashRadius: 25.0,
+                ),
+              ],
             ),
           ),
-          // Flexible(
-          //   child: Image.asset(
-          //     'assets/images/template-plan-${_portraitFormat ? 'vertical' : 'horizontal'}-color.png',
-          //   ),
-          // ),
           SettingsTile(
             text: 'plan_download_modal_exclude_today'.tr(),
             trailing: Checkbox(
@@ -184,6 +190,13 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
     setState(() {
       _buttonState = ButtonState.normal;
     });
+  }
+
+  Future<dynamic> _openDocxInfo() {
+    return MainSnackbar(
+      message: 'plan_download_modal_docx_info'.tr(),
+      infinite: true,
+    ).show(context);
   }
 }
 
