@@ -12,6 +12,7 @@ class MainSnackbar {
   final bool isError;
   final bool isCountdown;
   final bool infinite;
+  final bool isDismissible;
 
   /// Example Usage: `MainSnackbar(message: 'Hello there!').show(context);`
   ///
@@ -25,6 +26,7 @@ class MainSnackbar {
     this.isError = false,
     this.isCountdown = false,
     this.infinite = false,
+    this.isDismissible = false,
   }) : assert(!isSuccess || !isError || !isCountdown);
 
   /// Show the snackbar.
@@ -35,7 +37,7 @@ class MainSnackbar {
       title: title,
       message: message,
       duration: infinite ? null : Duration(seconds: duration),
-      isDismissible: infinite,
+      isDismissible: isDismissible || infinite,
       onTap: infinite ? (_) => Navigator.maybePop(context) : null,
       icon: isCountdown
           ? _buildCountdown()

@@ -226,6 +226,7 @@ class _ShoppingListViewState extends State<ShoppingListView>
       message: 'shopping_list_grocery_removed'.tr(args: [grocery.name!]),
       duration: 3,
       isCountdown: true,
+      isDismissible: true,
       action: IconButton(
         icon: Icon(EvaIcons.undoOutline, color: Theme.of(context).primaryColor),
         onPressed: () {
