@@ -135,13 +135,15 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
   }
 
   void _saveGrocery() async {
-    final grocery = _isCreating ? Grocery() : widget.grocery!;
+    final grocery = _isCreating
+        ? Grocery(lastBoughtEdited: DateTime.now())
+        : widget.grocery!;
     grocery.name = _nameController.text.trim();
     grocery.amount =
         double.tryParse(_amountController.text.trim().replaceAll(',', '.')) ??
             0;
     grocery.unit = _unitController.text.trim();
-    grocery.bought = _isCreating ? false : grocery.bought;
+    grocery.bought = !_isCreating && grocery.bought;
 
     if (grocery.name != null && grocery.name!.isNotEmpty) {
       setState(() {
