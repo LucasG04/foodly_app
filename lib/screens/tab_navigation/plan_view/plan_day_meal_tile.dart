@@ -258,6 +258,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
             amount: ingredient.amount,
             unit: ingredient.unit,
             productGroup: ingredient.productGroup,
+            lastBoughtEdited: DateTime.now(),
           ),
         );
       }

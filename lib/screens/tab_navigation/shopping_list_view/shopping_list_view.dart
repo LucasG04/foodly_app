@@ -55,94 +55,19 @@ class _ShoppingListViewState extends State<ShoppingListView>
                         return _buildLoader();
                       }
                       final List<Grocery> todoItems =
-                          snapshot.data!.where((e) => !e.bought!).toList();
+                          snapshot.data!.where((e) => !e.bought).toList();
                       final List<Grocery> boughtItems =
-                          snapshot.data!.where((e) => e.bought!).toList();
+                          snapshot.data!.where((e) => e.bought).toList();
+                      boughtItems.sort(
+                        (a, b) =>
+                            b.lastBoughtEdited.compareTo(a.lastBoughtEdited),
+                      );
 
-                      return SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            const SizedBox(height: kPadding),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 5.0),
-                              child: PageTitle(
-                                text: 'shopping_list_title'.tr(),
-                                actions: [
-                                  IconButton(
-                                    onPressed: () => _shareList(todoItems),
-                                    icon: const Icon(EvaIcons.shareOutline),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            if (todoItems.isEmpty && boughtItems.isEmpty)
-                              _buildEmptyShoppingList(),
-                            SizedBox(
-                              width: BasicUtils.contentWidth(
-                                context,
-                                smallMultiplier: 1,
-                              ),
-                              child: AnimatedShoppingList(
-                                groceries: todoItems,
-                                onEdit: (e) => _editGrocery(listId, e),
-                                onTap: (item) => _removeBoughtGrocery(
-                                    listId, item, boughtItems),
-                              ),
-                            ),
-                            const SizedBox(height: kPadding),
-                            if (boughtItems.isNotEmpty)
-                              SizedBox(
-                                width: BasicUtils.contentWidth(
-                                  context,
-                                  smallMultiplier: 1,
-                                ),
-                                child: ExpansionTile(
-                                  title: Text(
-                                    'shopping_list_already_bought',
-                                    style: TextStyle(
-                                      color: Theme.of(context).primaryColor,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ).tr(),
-                                  children: [
-                                    AnimatedShoppingList(
-                                      groceries: boughtItems,
-                                      onEdit: (e) => _editGrocery(listId, e),
-                                      onTap: (item) {
-                                        item.bought = false;
-                                        ShoppingListService.updateGrocery(
-                                            listId, item);
-                                      },
-                                    ),
-                                    Center(
-                                      child: TextButton(
-                                        onPressed: () => ShoppingListService
-                                            .deleteAllBoughtGrocery(listId),
-                                        style: ButtonStyle(
-                                          shadowColor:
-                                              MaterialStateProperty.all<Color>(
-                                            Theme.of(context).errorColor,
-                                          ),
-                                          overlayColor:
-                                              MaterialStateProperty.all<Color>(
-                                            Theme.of(context)
-                                                .errorColor
-                                                .withOpacity(0.1),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          'shopping_list_remove_all',
-                                          style: TextStyle(
-                                            color: Theme.of(context).errorColor,
-                                          ),
-                                        ).tr(),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ),
+                      return _buildShoppingList(
+                        todoItems,
+                        boughtItems,
+                        context,
+                        listId,
                       );
                     },
                   );
@@ -150,6 +75,97 @@ class _ShoppingListViewState extends State<ShoppingListView>
               )
             : _buildLoader();
       },
+    );
+  }
+
+  SingleChildScrollView _buildShoppingList(List<Grocery> todoItems,
+      List<Grocery> boughtItems, BuildContext context, String listId) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const SizedBox(height: kPadding),
+          _buildPageTitle(todoItems),
+          if (todoItems.isEmpty && boughtItems.isEmpty)
+            _buildEmptyShoppingList(),
+          SizedBox(
+            width: BasicUtils.contentWidth(
+              context,
+              smallMultiplier: 1,
+            ),
+            child: AnimatedShoppingList(
+              groceries: todoItems,
+              onEdit: (e) => _editGrocery(listId, e),
+              onTap: (item) => _removeBoughtGrocery(listId, item, boughtItems),
+            ),
+          ),
+          const SizedBox(height: kPadding),
+          if (boughtItems.isNotEmpty)
+            SizedBox(
+              width: BasicUtils.contentWidth(
+                context,
+                smallMultiplier: 1,
+              ),
+              child: ExpansionTile(
+                title: Text(
+                  'shopping_list_already_bought',
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ).tr(),
+                children: [
+                  AnimatedShoppingList(
+                    groceries: boughtItems,
+                    onEdit: (e) => _editGrocery(listId, e),
+                    onTap: (item) {
+                      item.bought = false;
+                      item.lastBoughtEdited = DateTime.now();
+                      ShoppingListService.updateGrocery(
+                        listId,
+                        item,
+                      );
+                    },
+                  ),
+                  Center(
+                    child: TextButton(
+                      onPressed: () =>
+                          ShoppingListService.deleteAllBoughtGrocery(listId),
+                      style: ButtonStyle(
+                        shadowColor: MaterialStateProperty.all<Color>(
+                          Theme.of(context).errorColor,
+                        ),
+                        overlayColor: MaterialStateProperty.all<Color>(
+                          Theme.of(context).errorColor.withOpacity(0.1),
+                        ),
+                      ),
+                      child: Text(
+                        'shopping_list_remove_all',
+                        style: TextStyle(
+                          color: Theme.of(context).errorColor,
+                        ),
+                      ).tr(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Padding _buildPageTitle(List<Grocery> todoItems) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 5.0),
+      child: PageTitle(
+        text: 'shopping_list_title'.tr(),
+        actions: [
+          IconButton(
+            onPressed: () => _shareList(todoItems),
+            icon: const Icon(EvaIcons.shareOutline),
+          ),
+        ],
+      ),
     );
   }
 
@@ -199,6 +215,7 @@ class _ShoppingListViewState extends State<ShoppingListView>
       String listId, Grocery grocery, List<Grocery> boughtItems) {
     if (!SettingsService.removeBoughtImmediately) {
       grocery.bought = true;
+      grocery.lastBoughtEdited = DateTime.now();
       ShoppingListService.updateGrocery(listId, grocery);
       _checkBoughtItems(listId, boughtItems);
       return;
