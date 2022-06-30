@@ -165,14 +165,14 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'meal_select_recommondations',
+                      'meal_select_recommendations',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ).tr(),
                     IconButton(
-                      onPressed: _showRecommondationsInfo,
+                      onPressed: _showRecommendationsInfo,
                       icon: Icon(
                         EvaIcons.infoOutline,
                         color: Theme.of(context).textTheme.bodyText1?.color ??
@@ -350,9 +350,9 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     );
   }
 
-  Future<dynamic> _showRecommondationsInfo() {
+  Future<dynamic> _showRecommendationsInfo() {
     return MainSnackbar(
-      message: 'meal_select_recommondations_info'.tr(),
+      message: 'meal_select_recommendations_info'.tr(),
       infinite: true,
     ).show(context);
   }
