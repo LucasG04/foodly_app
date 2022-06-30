@@ -105,6 +105,7 @@
   "meal_select_no_results": "No results",
   "meal_select_no_results_msg": "We could not find any dishes for your search.",
   "meal_select_recommondations": "Suggestions",
+  "meal_select_recommondations_info": "Up to 10 selected dishes are listed here. Use the search to browse all your dishes or disable the suggestions in the settings.",
   "meal_select_placeholder_dialog_placeholder": "Please enter a placeholder.",
   "meal_select_placeholder_dialog_title": "Placeholder",
   "meal_select_placeholder_dialog_cancel": "CANCEL",

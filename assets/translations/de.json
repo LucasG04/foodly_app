@@ -105,6 +105,7 @@
     "meal_select_no_results": "Keine Ergebnisse",
     "meal_select_no_results_msg": "Wir konnten keine Gerichte für deine Suche finden.",
     "meal_select_recommondations": "Vorschläge",
+    "meal_select_recommondations_info": "Hier werden dir bis zu 10 ausgewählte Gerichte angezeigt. Verwende die Suche, um all deine Gerichte zu durchsuchen oder deaktiviere die Vorschläge in den Einstellungen.",
     "meal_select_placeholder_dialog_placeholder": "Bitte trag einen Platzhalter ein.",
     "meal_select_placeholder_dialog_title": "Platzhalter",
     "meal_select_placeholder_dialog_cancel": "ABBRECHEN",

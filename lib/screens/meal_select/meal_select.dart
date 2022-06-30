@@ -15,6 +15,7 @@ import '../../services/meal_service.dart';
 import '../../services/meal_stat_service.dart';
 import '../../services/plan_service.dart';
 import '../../services/settings_service.dart';
+import '../../utils/main_snackbar.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/meal_pagination.dart';
@@ -160,14 +161,27 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
                   horizontal: kPadding,
                   vertical: kPadding / 4,
                 ),
-                child: const Text(
-                  'meal_select_recommondations',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.start,
-                ).tr(),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'meal_select_recommondations',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ).tr(),
+                    IconButton(
+                      onPressed: _showRecommondationsInfo,
+                      icon: Icon(
+                        EvaIcons.infoOutline,
+                        color: Theme.of(context).textTheme.bodyText1?.color ??
+                            Theme.of(context).primaryColor,
+                      ),
+                      splashRadius: 25.0,
+                    ),
+                  ],
+                ),
               );
             }
             index--;
@@ -334,5 +348,12 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
       context.read(planProvider).state!.id!,
       query,
     );
+  }
+
+  Future<dynamic> _showRecommondationsInfo() {
+    return MainSnackbar(
+      message: 'meal_select_recommondations_info'.tr(),
+      infinite: true,
+    ).show(context);
   }
 }
