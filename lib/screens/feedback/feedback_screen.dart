@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -150,7 +152,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       title: _titleController.text.trim(),
       email: _emailController.text.trim(),
       description: _textController.text.trim(),
-      version: appInfo.version,
+      version: '${appInfo.version} (${Platform.operatingSystem})',
     );
 
     await FeedbackService.create(feedback);
