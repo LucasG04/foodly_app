@@ -29,6 +29,9 @@ class SettingsService {
   static bool get removeBoughtImmediately =>
       _settingsBox.get('removeBoughtImmediately', defaultValue: false) as bool;
 
+  static bool get planWithBreakfast =>
+      _settingsBox.get('planWithBreakfast', defaultValue: false) as bool;
+
   static Future<void> setMultipleMealsPerTime(bool value) async {
     await _settingsBox.put('multipleMealsPerTime', value);
   }
@@ -41,7 +44,17 @@ class SettingsService {
     await _settingsBox.put('removeBoughtImmediately', value);
   }
 
+  static Future<void> setPlanWithBreakfast(bool value) async {
+    await _settingsBox.put('planWithBreakfast', value);
+  }
+
   static Stream<BoxEvent> streamMultipleMealsPerTime() {
     return _settingsBox.watch(key: 'multipleMealsPerTime');
+  }
+
+  static Stream<bool> streamPlanWithBreakfast() {
+    return _settingsBox
+        .watch(key: 'planWithBreakfast')
+        .map((event) => event.value == true);
   }
 }

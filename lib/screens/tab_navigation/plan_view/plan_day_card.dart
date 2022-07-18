@@ -21,6 +21,7 @@ class PlanDayCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final breakfastList = meals.where((e) => e.type == MealType.BREAKFAST);
     final lunchList = meals.where((e) => e.type == MealType.LUNCH);
     final dinnerList = meals.where((e) => e.type == MealType.DINNER);
 
@@ -53,6 +54,37 @@ class PlanDayCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: kPadding),
+              StreamBuilder<bool>(
+                initialData: SettingsService.planWithBreakfast,
+                stream: SettingsService.streamPlanWithBreakfast(),
+                builder: (context, snapshot) {
+                  if (snapshot.data != null && snapshot.data!) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildSubtitle('plan_day_breakfast'.tr()),
+                        ...breakfastList
+                            .map((e) => PlanDayMealTile(
+                                  e,
+                                  enableVoting: breakfastList.length > 1,
+                                ))
+                            .toList(),
+                        _buildAddButton(
+                          context,
+                          mealType: MealType.BREAKFAST,
+                          mealsAtTime: breakfastList.length,
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Divider(),
+                        ),
+                      ],
+                    );
+                  }
+                  return const SizedBox();
+                },
+              ),
               _buildSubtitle('plan_day_lunch'.tr()),
               ...lunchList
                   .map((e) => PlanDayMealTile(
@@ -62,7 +94,7 @@ class PlanDayCard extends StatelessWidget {
                   .toList(),
               _buildAddButton(
                 context,
-                isLunch: true,
+                mealType: MealType.LUNCH,
                 mealsAtTime: lunchList.length,
               ),
               const Padding(
@@ -78,7 +110,7 @@ class PlanDayCard extends StatelessWidget {
                   .toList(),
               _buildAddButton(
                 context,
-                isLunch: false,
+                mealType: MealType.DINNER,
                 mealsAtTime: dinnerList.length,
               ),
             ],
@@ -90,7 +122,7 @@ class PlanDayCard extends StatelessWidget {
 
   Widget _buildAddButton(
     BuildContext context, {
-    required bool isLunch,
+    required MealType mealType,
     required int mealsAtTime,
   }) {
     return StreamBuilder<dynamic>(
@@ -102,7 +134,7 @@ class PlanDayCard extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: OutlinedButton(
                     onPressed: () => AutoRouter.of(context).push(
-                      MealSelectScreenRoute(date: date, isLunch: isLunch),
+                      MealSelectScreenRoute(date: date, mealType: mealType),
                     ),
                     style: ButtonStyle(
                       padding: MaterialStateProperty.resolveWith(

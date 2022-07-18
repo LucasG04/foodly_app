@@ -11,8 +11,10 @@
 // ignore_for_file: type=lint
 
 import 'package:auto_route/auto_route.dart' as _i10;
+import 'package:flutter/cupertino.dart' as _i13;
 import 'package:flutter/material.dart' as _i11;
 
+import 'models/plan_meal.dart' as _i12;
 import 'screens/authentication/authentication_screen.dart' as _i2;
 import 'screens/feedback/feedback_screen.dart' as _i6;
 import 'screens/meal/meal_screen.dart' as _i8;
@@ -46,7 +48,7 @@ class AppRouter extends _i10.RootStackRouter {
       return _i10.CupertinoPageX<dynamic>(
           routeData: routeData,
           child: _i4.MealSelectScreen(
-              date: args.date, isLunch: args.isLunch, key: args.key));
+              date: args.date, mealType: args.mealType, key: args.key));
     },
     OnboardingScreenRoute.name: (routeData) {
       final args = routeData.argsAs<OnboardingScreenRouteArgs>(
@@ -124,28 +126,28 @@ class SettingsScreenRoute extends _i10.PageRouteInfo<void> {
 class MealSelectScreenRoute
     extends _i10.PageRouteInfo<MealSelectScreenRouteArgs> {
   MealSelectScreenRoute(
-      {required DateTime date, required bool isLunch, _i11.Key? key})
+      {required DateTime date, required _i12.MealType mealType, _i13.Key? key})
       : super(MealSelectScreenRoute.name,
             path: '/meal-select-screen',
             args: MealSelectScreenRouteArgs(
-                date: date, isLunch: isLunch, key: key));
+                date: date, mealType: mealType, key: key));
 
   static const String name = 'MealSelectScreenRoute';
 }
 
 class MealSelectScreenRouteArgs {
   const MealSelectScreenRouteArgs(
-      {required this.date, required this.isLunch, this.key});
+      {required this.date, required this.mealType, this.key});
 
   final DateTime date;
 
-  final bool isLunch;
+  final _i12.MealType mealType;
 
-  final _i11.Key? key;
+  final _i13.Key? key;
 
   @override
   String toString() {
-    return 'MealSelectScreenRouteArgs{date: $date, isLunch: $isLunch, key: $key}';
+    return 'MealSelectScreenRouteArgs{date: $date, mealType: $mealType, key: $key}';
   }
 }
 
@@ -153,7 +155,7 @@ class MealSelectScreenRouteArgs {
 /// [_i5.OnboardingScreen]
 class OnboardingScreenRoute
     extends _i10.PageRouteInfo<OnboardingScreenRouteArgs> {
-  OnboardingScreenRoute({_i11.Key? key})
+  OnboardingScreenRoute({_i13.Key? key})
       : super(OnboardingScreenRoute.name,
             path: '/onboarding-screen',
             args: OnboardingScreenRouteArgs(key: key));
@@ -164,7 +166,7 @@ class OnboardingScreenRoute
 class OnboardingScreenRouteArgs {
   const OnboardingScreenRouteArgs({this.key});
 
-  final _i11.Key? key;
+  final _i13.Key? key;
 
   @override
   String toString() {
@@ -185,7 +187,7 @@ class FeedbackScreenRoute extends _i10.PageRouteInfo<void> {
 /// [_i7.MealCreateScreen]
 class MealCreateScreenRoute
     extends _i10.PageRouteInfo<MealCreateScreenRouteArgs> {
-  MealCreateScreenRoute({required String id, _i11.Key? key})
+  MealCreateScreenRoute({required String id, _i13.Key? key})
       : super(MealCreateScreenRoute.name,
             path: '/meal-create/:id',
             args: MealCreateScreenRouteArgs(id: id, key: key));
@@ -198,7 +200,7 @@ class MealCreateScreenRouteArgs {
 
   final String id;
 
-  final _i11.Key? key;
+  final _i13.Key? key;
 
   @override
   String toString() {
@@ -209,7 +211,7 @@ class MealCreateScreenRouteArgs {
 /// generated route for
 /// [_i8.MealScreen]
 class MealScreenRoute extends _i10.PageRouteInfo<MealScreenRouteArgs> {
-  MealScreenRoute({required String id, _i11.Key? key})
+  MealScreenRoute({required String id, _i13.Key? key})
       : super(MealScreenRoute.name,
             path: '/meal/:id', args: MealScreenRouteArgs(id: id, key: key));
 
@@ -221,7 +223,7 @@ class MealScreenRouteArgs {
 
   final String id;
 
-  final _i11.Key? key;
+  final _i13.Key? key;
 
   @override
   String toString() {
