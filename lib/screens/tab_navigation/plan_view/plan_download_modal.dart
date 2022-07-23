@@ -130,7 +130,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
     if (!mounted) {
       return;
     }
-    Navigator.pop(context);
+    Navigator.maybePop(context);
   }
 
   void _excludeTodayChange(bool? value) {

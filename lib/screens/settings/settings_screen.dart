@@ -140,6 +140,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               );
                             }),
                           ),
+                          SettingsTile(
+                            leadingIcon: Icons.emoji_food_beverage_rounded,
+                            text:
+                                'settings_section_customization_breakfast'.tr(),
+                            trailing: Consumer(builder: (context, watch, _) {
+                              return Switch.adaptive(
+                                value: SettingsService.planWithBreakfast,
+                                onChanged: (value) {
+                                  setState(() {
+                                    SettingsService.setPlanWithBreakfast(value);
+                                  });
+                                },
+                              );
+                            }),
+                          ),
                         ], context),
                         _buildSectionTitle('settings_section_plan'.tr()),
                         _buildSection([

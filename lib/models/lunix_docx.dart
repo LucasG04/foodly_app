@@ -3,6 +3,8 @@ import 'dart:convert';
 class LunixDocx {
   bool vertical;
   String type;
+  bool fillBreakfast;
+  String? breakfastTranslation;
   String? lunchTranslation;
   String? dinnerTranslation;
   LunixDocxPlan? plan;
@@ -11,6 +13,8 @@ class LunixDocx {
     this.plan,
     this.vertical = false,
     this.type = 'color',
+    this.fillBreakfast = false,
+    this.breakfastTranslation,
     this.lunchTranslation,
     this.dinnerTranslation,
   });
@@ -19,6 +23,8 @@ class LunixDocx {
     return <String, dynamic>{
       'vertical': vertical,
       'type': type,
+      'fillBreakfast': fillBreakfast,
+      'breakfastTranslation': breakfastTranslation,
       'lunchTranslation': lunchTranslation,
       'dinnerTranslation': dinnerTranslation,
       'plan': plan?.toMap(),
@@ -44,11 +50,13 @@ class LunixDocxPlan {
 
 class LunixDocxPlanDay {
   String? dayName;
+  String? breakfast;
   String? lunch;
   String? dinner;
 
   LunixDocxPlanDay({
     this.dayName,
+    this.breakfast,
     this.lunch,
     this.dinner,
   });
@@ -56,6 +64,7 @@ class LunixDocxPlanDay {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'dayName': dayName,
+      'breakfast': breakfast,
       'lunch': lunch,
       'dinner': dinner,
     };

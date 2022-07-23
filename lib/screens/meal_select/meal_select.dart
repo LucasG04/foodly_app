@@ -26,9 +26,9 @@ import 'select_meal_tile.dart';
 
 class MealSelectScreen extends StatefulWidget {
   final DateTime date;
-  final bool isLunch;
+  final MealType mealType;
 
-  const MealSelectScreen({required this.date, required this.isLunch, Key? key})
+  const MealSelectScreen({required this.date, required this.mealType, Key? key})
       : super(key: key);
 
   @override
@@ -336,7 +336,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
       PlanMeal(
         date: widget.date,
         meal: mealId,
-        type: widget.isLunch ? MealType.LUNCH : MealType.DINNER,
+        type: widget.mealType,
         upvotes: [],
         downvotes: [],
       ),

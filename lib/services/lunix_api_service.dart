@@ -48,12 +48,18 @@ class LunixApiService {
     _log.finer(
       'Call saveDocxForPlan with plan: ${plan.id}, langTag: $languageTag, vertical: $vertical, type: $type, excludeToday: $excludeToday',
     );
+    final docxPlan = await _getLunixDocxPlan(plan, languageTag, excludeToday);
+    final fillBreakfast = docxPlan.meals
+            ?.any((e) => e.breakfast != null && e.breakfast!.isNotEmpty) ??
+        false;
     final docxData = LunixDocx(
       vertical: vertical,
       type: type,
+      fillBreakfast: fillBreakfast,
+      breakfastTranslation: 'breakfast'.tr(),
       lunchTranslation: 'lunch'.tr(),
       dinnerTranslation: 'dinner'.tr(),
-      plan: await _getLunixDocxPlan(plan, languageTag, excludeToday),
+      plan: docxPlan,
     );
 
     try {
@@ -108,15 +114,19 @@ class LunixApiService {
           .toList();
       final dayName = DateFormat('EEEE', languageTag).format(date);
       templateDays.add(LunixDocxPlanDay(dayName: dayName));
+      final breakfastNames = <String>[];
       final lunchNames = <String>[];
       final dinnerNames = <String>[];
       for (final meal in dateMeals) {
         if (meal.type == MealType.LUNCH) {
           lunchNames.add(meals.firstWhere((m) => m.id == meal.meal).name);
-        } else {
+        } else if (meal.type == MealType.DINNER) {
           dinnerNames.add(meals.firstWhere((m) => m.id == meal.meal).name);
+        } else if (meal.type == MealType.BREAKFAST) {
+          breakfastNames.add(meals.firstWhere((m) => m.id == meal.meal).name);
         }
       }
+      templateDays[i].breakfast = breakfastNames.join(', ');
       templateDays[i].lunch = lunchNames.join(', ');
       templateDays[i].dinner = dinnerNames.join(', ');
     }

@@ -46,4 +46,4 @@ class PlanMeal {
 }
 
 // ignore: constant_identifier_names
-enum MealType { LUNCH, DINNER }
+enum MealType { BREAKFAST, LUNCH, DINNER }
