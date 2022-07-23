@@ -23,6 +23,7 @@ class LunixDocx {
     return <String, dynamic>{
       'vertical': vertical,
       'type': type,
+      'fillBreakfast': fillBreakfast,
       'breakfastTranslation': breakfastTranslation,
       'lunchTranslation': lunchTranslation,
       'dinnerTranslation': dinnerTranslation,
