@@ -42,6 +42,7 @@ const kCardTitle = TextStyle(
 const kCardSubtitle = TextStyle(
   fontSize: 16,
   fontWeight: FontWeight.w500,
+  color: kLightTextColor,
 );
 
 /// AppStore
