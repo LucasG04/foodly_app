@@ -33,7 +33,7 @@ class LunixApiService {
     try {
       response = await _dio.get<Map>(_lunixApiEndpoint);
     } catch (e) {
-      _log.severe('ERR in lunixApiAvailable. Reponse is null', e);
+      _log.severe('ERR in lunixApiAvailable. Response is null', e);
     }
     return response != null && response.statusCode == 200;
   }
@@ -158,7 +158,7 @@ class LunixApiService {
         },
       );
     } catch (e) {
-      _log.severe('ERR in getAllPublishedVersions. Reponse is null', e);
+      _log.severe('ERR in getAllPublishedVersions. Response is null', e);
     }
 
     if (response == null || response.data == null) {
@@ -176,7 +176,7 @@ class LunixApiService {
         '$_lunixApiEndpoint/published-versions',
       );
     } catch (e) {
-      _log.severe('ERR in getAllPublishedVersions. Reponse is null', e);
+      _log.severe('ERR in getAllPublishedVersions. Response is null', e);
     }
 
     if (response == null || response.data == null) {
@@ -203,7 +203,7 @@ class LunixApiService {
         },
       );
     } catch (e) {
-      _log.severe('ERR in searchMeals. Reponse is null', e);
+      _log.severe('ERR in searchMeals. Response is null', e);
     }
 
     if (response == null || response.data == null) {
@@ -230,7 +230,7 @@ class LunixApiService {
         queryParameters: <String, String>{'planId': planId},
       );
     } catch (e) {
-      _log.severe('ERR in getAllTagsInPlan. Reponse is null', e);
+      _log.severe('ERR in getAllTagsInPlan. Response is null', e);
     }
 
     if (response == null || response.data == null) {
@@ -259,7 +259,7 @@ class LunixApiService {
         },
       );
     } catch (e) {
-      _log.severe('ERR in searchMealsByTags. Reponse is null', e);
+      _log.severe('ERR in searchMealsByTags. Response is null', e);
     }
 
     if (response == null || response.data == null) {
