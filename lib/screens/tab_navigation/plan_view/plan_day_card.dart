@@ -38,19 +38,21 @@ class PlanDayCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Text(
-                  DateFormat('EEEE', context.locale.toLanguageTag())
-                      .format(date),
-                  style: kCardTitle,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Text(
-                  DateFormat('d. MMMM y', context.locale.toLanguageTag())
-                      .format(date),
-                  style: kCardSubtitle,
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      DateFormat('EEEE', context.locale.toLanguageTag())
+                          .format(date),
+                      style: kCardTitle,
+                    ),
+                    Text(
+                      DateFormat('d. MMMM y', context.locale.toLanguageTag())
+                          .format(date),
+                      style: kCardSubtitle,
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: kPadding),
