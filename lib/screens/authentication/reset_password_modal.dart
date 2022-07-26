@@ -77,6 +77,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
             placeholder: 'tony@gmail.com',
             errorText: _errorText,
             onSubmit: _resetPassword,
+            autofillHints: const [AutofillHints.email],
           ),
           const SizedBox(height: kPadding),
           if (_showSuccess)
