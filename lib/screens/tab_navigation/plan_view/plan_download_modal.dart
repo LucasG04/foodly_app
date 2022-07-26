@@ -5,7 +5,9 @@ import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 
 import '../../../constants.dart';
 import '../../../models/plan.dart';
+import '../../../models/plan_meal.dart';
 import '../../../services/lunix_api_service.dart';
+import '../../../services/settings_service.dart';
 import '../../../utils/main_snackbar.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/progress_button.dart';
@@ -27,7 +29,14 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
   ButtonState _buttonState = ButtonState.normal;
   bool _excludeToday = false;
   bool _portraitFormat = false;
+  late bool _includeBreakfast;
   _PlanDocType _docType = _PlanDocType.color;
+
+  @override
+  void initState() {
+    _includeBreakfast = _getIinitialIncludeBreakfast();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +91,14 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
             onTap: () => _portraitFormatChange(!_portraitFormat),
           ),
           SettingsTile(
+            text: 'plan_download_modal_breakfast'.tr(),
+            trailing: Checkbox(
+              value: _includeBreakfast,
+              onChanged: _includeBreakfastChange,
+            ),
+            onTap: () => _includeBreakfastChange(!_includeBreakfast),
+          ),
+          SettingsTile(
             text: 'plan_download_modal_type'.tr(),
             trailing: DropdownButton<_PlanDocType>(
               value: _docType,
@@ -117,6 +134,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
       languageTag: context.locale.toLanguageTag(),
       excludeToday: _excludeToday,
       vertical: _portraitFormat,
+      includeBreakfast: _includeBreakfast,
       type: _getValueForDocType(_docType),
     );
 
@@ -133,6 +151,14 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
     Navigator.maybePop(context);
   }
 
+  bool _getIinitialIncludeBreakfast() {
+    final settingActive = SettingsService.planWithBreakfast;
+    final breakfastInPlan =
+        widget.plan.meals?.any((e) => e.type == MealType.BREAKFAST) ?? false;
+
+    return settingActive || breakfastInPlan;
+  }
+
   void _excludeTodayChange(bool? value) {
     setState(() {
       _excludeToday = value ?? false;
@@ -142,6 +168,12 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
   void _portraitFormatChange(bool? value) {
     setState(() {
       _portraitFormat = value ?? false;
+    });
+  }
+
+  void _includeBreakfastChange(bool? value) {
+    setState(() {
+      _includeBreakfast = value ?? false;
     });
   }
 

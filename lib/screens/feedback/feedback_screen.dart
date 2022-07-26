@@ -82,6 +82,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           title: 'feedback_email_title'.tr(),
                           textInputAction: TextInputAction.next,
                           keyboardType: TextInputType.emailAddress,
+                          autofillHints: const [AutofillHints.email],
                         ),
                         const SizedBox(height: kPadding / 2),
                         MainTextField(

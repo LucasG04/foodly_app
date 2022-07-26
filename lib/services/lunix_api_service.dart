@@ -42,20 +42,19 @@ class LunixApiService {
     required Plan plan,
     required String languageTag,
     bool vertical = true,
+    bool includeBreakfast = false,
     String type = 'color',
     bool excludeToday = false,
   }) async {
     _log.finer(
-      'Call saveDocxForPlan with plan: ${plan.id}, langTag: $languageTag, vertical: $vertical, type: $type, excludeToday: $excludeToday',
+      'Call saveDocxForPlan with plan: ${plan.id}, langTag: $languageTag, vertical: $vertical, type: $type, includeBreakfast: $includeBreakfast, excludeToday: $excludeToday',
     );
     final docxPlan = await _getLunixDocxPlan(plan, languageTag, excludeToday);
-    final fillBreakfast = docxPlan.meals
-            ?.any((e) => e.breakfast != null && e.breakfast!.isNotEmpty) ??
-        false;
+
     final docxData = LunixDocx(
       vertical: vertical,
       type: type,
-      fillBreakfast: fillBreakfast,
+      fillBreakfast: includeBreakfast,
       breakfastTranslation: 'breakfast'.tr(),
       lunchTranslation: 'lunch'.tr(),
       dinnerTranslation: 'dinner'.tr(),

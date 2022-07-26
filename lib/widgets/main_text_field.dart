@@ -22,6 +22,7 @@ class MainTextField extends StatefulWidget {
   final int? errorMaxLines;
   final String Function(String?)? validator;
   final bool required;
+  final List<String>? autofillHints;
 
   const MainTextField({
     required this.controller,
@@ -42,6 +43,7 @@ class MainTextField extends StatefulWidget {
     this.errorMaxLines,
     this.validator,
     this.required = false,
+    this.autofillHints,
     Key? key,
   }) : super(key: key);
 
@@ -97,6 +99,7 @@ class _MainTextFieldState extends State<MainTextField> {
         controller: widget.controller,
         autofocus: widget.autofocus,
         focusNode: _focusNode,
+        autofillHints: widget.autofillHints,
         decoration: InputDecoration(
           hintText: widget.placeholder,
           border: OutlineInputBorder(

@@ -137,25 +137,36 @@ class _LoginViewState extends State<LoginView> {
             ),
           ),
           const SizedBox(height: kPadding),
-          MainTextField(
-            key: AuthenticationKeys.inputMail,
-            controller: _emailController,
-            title: 'login_mail_title'.tr(),
-            textInputAction: TextInputAction.next,
-            errorText: _emailErrorText,
-            autofocus: true,
-            keyboardType: TextInputType.emailAddress,
-            onSubmit: () => _passwordFocusNode.requestFocus(),
-          ),
-          MainTextField(
-            key: AuthenticationKeys.inputPassword,
-            controller: _passwordController,
-            title: 'login_password_title'.tr(),
-            textInputAction: TextInputAction.go,
-            obscureText: true,
-            errorText: _passwordErrorText,
-            focusNode: _passwordFocusNode,
-            onSubmit: _authWithEmail,
+          AutofillGroup(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                MainTextField(
+                  key: AuthenticationKeys.inputMail,
+                  controller: _emailController,
+                  title: 'login_mail_title'.tr(),
+                  textInputAction: TextInputAction.next,
+                  errorText: _emailErrorText,
+                  autofocus: true,
+                  keyboardType: TextInputType.emailAddress,
+                  onSubmit: () => _passwordFocusNode.requestFocus(),
+                  autofillHints: const [AutofillHints.email],
+                ),
+                MainTextField(
+                  key: AuthenticationKeys.inputPassword,
+                  controller: _passwordController,
+                  title: 'login_password_title'.tr(),
+                  textInputAction: TextInputAction.go,
+                  obscureText: true,
+                  errorText: _passwordErrorText,
+                  focusNode: _passwordFocusNode,
+                  onSubmit: _authWithEmail,
+                  autofillHints: _isRegistering
+                      ? [AutofillHints.newPassword]
+                      : [AutofillHints.password],
+                ),
+              ],
+            ),
           ),
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 250),

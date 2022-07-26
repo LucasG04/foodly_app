@@ -202,6 +202,7 @@
   "plan_download_modal_title": "Plan download",
   "plan_download_modal_exclude_today": "Exclude today",
   "plan_download_modal_portrait": "Portrait format",
+  "plan_download_modal_breakfast": "Include breakfast",
   "plan_download_modal_type": "Type",
   "plan_download_modal_type_color": "Color",
   "plan_download_modal_type_simple": "Plain",
