@@ -90,14 +90,15 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
             ),
             onTap: () => _portraitFormatChange(!_portraitFormat),
           ),
-          SettingsTile(
-            text: 'plan_download_modal_breakfast'.tr(),
-            trailing: Checkbox(
-              value: _includeBreakfast,
-              onChanged: _includeBreakfastChange,
+          if (_isBreakfastAvailableForSelectedType())
+            SettingsTile(
+              text: 'plan_download_modal_breakfast'.tr(),
+              trailing: Checkbox(
+                value: _includeBreakfast,
+                onChanged: _includeBreakfastChange,
+              ),
+              onTap: () => _includeBreakfastChange(!_includeBreakfast),
             ),
-            onTap: () => _includeBreakfastChange(!_includeBreakfast),
-          ),
           SettingsTile(
             text: 'plan_download_modal_type'.tr(),
             trailing: DropdownButton<_PlanDocType>(
@@ -199,6 +200,10 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
       case _PlanDocType.simple:
         return 'simple';
     }
+  }
+
+  bool _isBreakfastAvailableForSelectedType() {
+    return [_PlanDocType.simple].contains(_docType);
   }
 
   Future<void> _savePlanPdf(String? path) async {
