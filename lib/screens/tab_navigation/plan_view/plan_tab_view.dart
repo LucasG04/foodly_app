@@ -49,7 +49,14 @@ class _PlanTabViewState extends State<PlanTabView>
                         padding: const EdgeInsets.only(left: 5.0),
                         child: PageTitle(
                           text: 'plan_title'.tr(),
+                          autoSize: true,
                           actions: [
+                            IconButton(
+                              onPressed: () {
+                                context.read(planHistoryPageIndex).state = 0;
+                              },
+                              icon: const Icon(EvaIcons.clockOutline),
+                            ),
                             IconButton(
                               onPressed: () => _openDownloadModal(activePlan),
                               icon: const Icon(EvaIcons.downloadOutline),
