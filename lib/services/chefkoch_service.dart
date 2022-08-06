@@ -32,7 +32,7 @@ class ChefkochService {
           .where((tag) => tag.isNotEmpty)
           .toList();
       meal.tags = meal.tags!.toSet().toList(); // removes duplicates
-      meal.duration = (response.data as Map)['totalTime'] as int;
+      meal.duration = (response.data as Map)['totalTime'] as int?;
       meal.ingredients = _filterIngredientsFromChefkochIngredientGroups(
           List<Map<String, dynamic>>.from(
               (response.data as Map)['ingredientGroups'] as List));

@@ -39,16 +39,16 @@ class MealCreateScreen extends StatefulWidget {
 }
 
 class _MealCreateScreenState extends State<MealCreateScreen> {
-  ButtonState? _buttonState;
-  TextEditingController? _durationController;
+  late ButtonState _buttonState;
+  late TextEditingController _durationController;
   late TextEditingController _instructionsController;
   late bool _isCreatingMeal;
   late bool _isLoadingMeal;
   late bool _mealSaved;
   late ScrollController _scrollController;
+  late TextEditingController _sourceController;
+  late TextEditingController _titleController;
   Meal _meal = Meal(name: '');
-  TextEditingController? _sourceController;
-  TextEditingController? _titleController;
   String? _updatedImage;
 
   List<String>? _existingMealTags;
@@ -193,10 +193,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                                       title: 'meal_create_duration_title'.tr(),
                                       placeholder: '10',
                                       textAlign: TextAlign.end,
-                                      keyboardType:
-                                          const TextInputType.numberWithOptions(
-                                        decimal: true,
-                                      ),
+                                      keyboardType: TextInputType.number,
                                     ),
                                   ),
                                 ],
@@ -205,7 +202,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: kPadding / 2),
-                                  child: LinkPreview(_sourceController!.text),
+                                  child: LinkPreview(_sourceController.text),
                                 ),
                               const Divider(),
                               if (!_isLoadingMeal) ...[
@@ -280,7 +277,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
           _titleController = TextEditingController(text: meal.name);
           _sourceController = TextEditingController(text: meal.source);
           _durationController =
-              TextEditingController(text: meal.duration.toString());
+              TextEditingController(text: (meal.duration ?? '').toString());
           _instructionsController =
               TextEditingController(text: meal.instructions);
           _meal.ingredients = _meal.ingredients ?? [];
@@ -300,7 +297,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
           _titleController = TextEditingController(text: meal.name);
           _sourceController = TextEditingController(text: meal.source);
           _durationController =
-              TextEditingController(text: meal.duration.toString());
+              TextEditingController(text: (meal.duration ?? '').toString());
           _instructionsController =
               TextEditingController(text: meal.instructions);
           _meal.ingredients = _meal.ingredients ?? [];
@@ -319,9 +316,9 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
       _buttonState = ButtonState.inProgress;
     });
 
-    _meal.name = _titleController!.text;
-    _meal.source = _sourceController!.text;
-    _meal.duration = int.tryParse(_durationController!.text) ?? 0;
+    _meal.name = _titleController.text;
+    _meal.source = _sourceController.text;
+    _meal.duration = int.tryParse(_durationController.text.trim());
     _meal.instructions = _instructionsController.text;
     _meal.createdBy = _isCreatingMeal
         ? AuthenticationService.currentUser!.uid
@@ -369,7 +366,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   }
 
   bool _formIsValid() {
-    return _titleController!.text.isNotEmpty;
+    return _titleController.text.isNotEmpty;
   }
 
   void _openChefkochImport() async {
@@ -380,10 +377,10 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
 
     if (result != null) {
       setState(() {
-        _titleController!.text = result.name;
+        _titleController.text = result.name;
         _meal.imageUrl = result.imageUrl;
-        _sourceController!.text = result.source!;
-        _durationController!.text = result.duration.toString();
+        _sourceController.text = result.source!;
+        _durationController.text = (result.duration ?? '').toString();
         _instructionsController.text = result.instructions!;
         _meal.ingredients = result.ingredients ?? [];
 

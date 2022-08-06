@@ -22,21 +22,21 @@ class ConvertUtil {
     return result;
   }
 
-  /// Converts the amount and the unit (optional) to a good readable string
+  /// Converts the amount and the unit (optional) to a better readable string
   static String amountToString(double? amount, [String? unit = '']) {
+    amount ??= 0;
+    unit ??= '';
     String number = amount.toString();
-    if (number.endsWith('0')) {
+
+    if (number.endsWith('.0')) {
       number = number.substring(0, number.indexOf('.'));
     }
 
-    if (number == '0') {
-      number = '';
+    if (number == '0' && unit.isEmpty) {
+      return '';
     }
 
-    final String result = '$number $unit';
-    result.trim();
-
-    return result;
+    return '$number $unit'.trim();
   }
 
   /// Maps a LogRecord to a Map<String, dynamic>
