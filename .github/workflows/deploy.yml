@@ -29,6 +29,8 @@ jobs:
         run: sh ./.github/scripts/create_secret_files.sh
         env:
           GOOGLE_SERVICES_IOS: ${{ secrets.GOOGLE_SERVICES_IOS }}
+      - name: Test
+        run: flutter test
       - name: Set version to version in commit
         run: bash ./.github/scripts/update_version_ios.sh '${{ github.event.head_commit.message }}' '${{ github.run_number }}'
       - name: Build app
@@ -74,6 +76,8 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'beta'
+      - name: Install Flutter dependencies
+        run: flutter pub get
       - name: Create general secrets
         run: sh ./.github/scripts/create_general_secrets.sh
         env:
@@ -82,8 +86,8 @@ jobs:
         run: sh ./.github/scripts/decrypt_android_keys.sh
         env:
           ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.ANDROID_KEYS_SECRET_PASSPHRASE }}
-      - name: Install Flutter dependencies
-        run: flutter pub get
+      - name: Test
+        run: flutter test
       - name: Set version to version in commit
         run: bash ./.github/scripts/update_version.sh '${{ github.event.head_commit.message }}' '${{ github.run_number }}'
       - name: Build the AAB
