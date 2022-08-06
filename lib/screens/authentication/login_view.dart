@@ -294,6 +294,9 @@ class _LoginViewState extends State<LoginView> {
       final userId = await AuthenticationService.signInWithApple();
       await _processAuthentication(userId);
     } catch (e) {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         _unknownErrorText = 'login_error_unknown'.tr();
         _buttonState = ButtonState.error;

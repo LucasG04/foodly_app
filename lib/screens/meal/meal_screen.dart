@@ -216,8 +216,11 @@ class _MealScreenState extends State<MealScreen> {
                                     ),
                                     withBorder: true,
                                     child: Text(
-                                      'meal_details_duration_trailing'
-                                          .tr(args: [meal.duration.toString()]),
+                                      'meal_details_duration_trailing'.tr(
+                                        args: [
+                                          (meal.duration ?? '?').toString(),
+                                        ],
+                                      ),
                                       style: const TextStyle(
                                         fontSize: 20.0,
                                         fontWeight: FontWeight.bold,

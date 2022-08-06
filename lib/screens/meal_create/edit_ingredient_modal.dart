@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../constants.dart';
 import '../../models/ingredient.dart';
+import '../../utils/convert_util.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 
@@ -29,12 +30,7 @@ class _EditIngredientModalState extends State<EditIngredientModal> {
   void initState() {
     _isCreating = widget.ingredient == null;
     _nameController = TextEditingController(text: widget.ingredient?.name);
-    String amountString = widget.ingredient?.amount?.toString() ?? '';
-    amountString = amountString == '0.0'
-        ? ''
-        : amountString.endsWith('.0')
-            ? amountString.substring(0, amountString.length - 2)
-            : amountString.trim();
+    final amountString = ConvertUtil.amountToString(widget.ingredient?.amount);
     _amountController = TextEditingController(text: amountString);
     _unitController = TextEditingController(text: widget.ingredient?.unit);
 
