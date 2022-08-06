@@ -95,8 +95,8 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
 
   Row _buildDataRow(BuildContext context, {String? placeholder, Meal? meal}) {
     final bool isPlaceholder = placeholder != null && placeholder.isNotEmpty;
-    final voteColor = widget.planMeal.upvotes!
-            .contains(AuthenticationService.currentUser!.uid)
+    final voteColor = (widget.planMeal.upvotes ?? [])
+            .contains(AuthenticationService.currentUser?.uid)
         ? Theme.of(context).primaryColor
         : Theme.of(context).textTheme.bodyText1!.color;
 
