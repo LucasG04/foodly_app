@@ -6,11 +6,9 @@ on:
       - 'master'
 
 jobs:
-  
   build:
     name: Analyze flutter code
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v1
     - uses: actions/setup-java@v1
@@ -25,5 +23,7 @@ jobs:
       run: sh ./.github/scripts/create_dummy_secrets.sh
       env:
         DUMMY_SECRETS: ${{ secrets.DUMMY_SECRETS }}
-    - name: Code analyze
+    - name: Analyze
       run: flutter analyze --no-fatal-infos
+    - name: Test
+      run: flutter test

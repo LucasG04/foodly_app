@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../constants.dart';
 import '../../../models/grocery.dart';
 import '../../../services/shopping_list_service.dart';
+import '../../../utils/convert_util.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/main_text_field.dart';
 import '../../../widgets/progress_button.dart';
@@ -37,10 +38,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
   void initState() {
     _isCreating = widget.grocery == null;
     _nameController = TextEditingController(text: widget.grocery?.name);
-    String amountString = widget.grocery?.amount?.toString() ?? '';
-    amountString = amountString.endsWith('.0')
-        ? amountString.substring(0, amountString.length - 2)
-        : amountString;
+    final amountString = ConvertUtil.amountToString(widget.grocery?.amount);
     _amountController = TextEditingController(text: amountString);
     _unitController = TextEditingController(text: widget.grocery?.unit);
 
