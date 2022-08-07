@@ -194,6 +194,27 @@ class PlanService {
     return _firestore.doc(planId).collection('meals').doc(mealId).delete();
   }
 
+  static Future<void> addPlanMealToPlanHistory(
+      String planId, PlanMeal planMeal) async {
+    _log.finer(
+        'Call addPlanMealToPlanHistory with planId: $planId | planMeal: ${planMeal.toMap()}');
+    await _firestore
+        .doc(planId)
+        .collection('mealHistory')
+        .add(planMeal.toMap());
+  }
+
+  static Future<void> updateHistoryPlanMealFromPlan(
+      String? planId, PlanMeal meal) {
+    _log.finer(
+        'Call updateHistoryPlanMealFromPlan with planId: $planId | planMeal: ${meal.toMap()}');
+    return _firestore
+        .doc(planId)
+        .collection('mealHistory')
+        .doc(meal.id)
+        .set(meal.toMap(), SetOptions(merge: true));
+  }
+
   static Future<void> voteForPlanMeal(
       String? planId, PlanMeal planMeal, String userId) {
     _log.finer(

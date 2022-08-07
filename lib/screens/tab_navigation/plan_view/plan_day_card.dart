@@ -11,11 +11,13 @@ import 'plan_day_meal_tile.dart';
 class PlanDayCard extends StatelessWidget {
   final DateTime date;
   final List<PlanMeal> meals;
+  final bool readonly;
 
   const PlanDayCard({
     Key? key,
     required this.date,
     required this.meals,
+    this.readonly = false,
   }) : super(key: key);
 
   @override
@@ -69,7 +71,8 @@ class PlanDayCard extends StatelessWidget {
                         ...breakfastList
                             .map((e) => PlanDayMealTile(
                                   e,
-                                  enableVoting: breakfastList.length > 1,
+                                  enableVoting:
+                                      breakfastList.length > 1 && !readonly,
                                 ))
                             .toList(),
                         _buildAddButton(
@@ -91,7 +94,7 @@ class PlanDayCard extends StatelessWidget {
               ...lunchList
                   .map((e) => PlanDayMealTile(
                         e,
-                        enableVoting: lunchList.length > 1,
+                        enableVoting: lunchList.length > 1 && !readonly,
                       ))
                   .toList(),
               _buildAddButton(
@@ -107,7 +110,7 @@ class PlanDayCard extends StatelessWidget {
               ...dinnerList
                   .map((e) => PlanDayMealTile(
                         e,
-                        enableVoting: dinnerList.length > 1,
+                        enableVoting: dinnerList.length > 1 && !readonly,
                       ))
                   .toList(),
               _buildAddButton(
@@ -127,6 +130,13 @@ class PlanDayCard extends StatelessWidget {
     required MealType mealType,
     required int mealsAtTime,
   }) {
+    if (readonly) {
+      return mealsAtTime > 0
+          ? const SizedBox()
+          : const Center(
+              child: Text('-', style: TextStyle(fontWeight: FontWeight.bold)),
+            );
+    }
     return StreamBuilder<dynamic>(
       stream: SettingsService.streamMultipleMealsPerTime(),
       builder: (context, _) {

@@ -122,13 +122,12 @@ class _PlanTabViewState extends State<PlanTabView>
         DateTime.now().toUtc().add(Duration(hours: plan.hourDiffToUtc!));
     final today = DateTime(now.year, now.month, now.day);
 
-    // remove old plan days
+    // remove old plan days and add to history
     final oldMeals = planMeals.where((meal) => meal.date.isBefore(today));
-    Future.wait(
-      oldMeals.map(
-        (meal) => PlanService.deletePlanMealFromPlan(plan.id, meal.id),
-      ),
-    );
+    for (final meal in oldMeals) {
+      PlanService.addPlanMealToPlanHistory(plan.id!, meal);
+      PlanService.deletePlanMealFromPlan(plan.id, meal.id);
+    }
     oldMeals.forEach(updatedMeals.remove);
 
     // update plan days
