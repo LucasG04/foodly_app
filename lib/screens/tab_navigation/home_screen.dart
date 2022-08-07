@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _checkForNewFeaturesNotification();
     _checkForUpdate();
     super.initState();
-    context.read(planHistoryPageIndex).addListener(
+    context.read(planHistoryPageChanged).addListener(
           (_) => _changePage(),
           fireImmediately: false,
         );
@@ -70,6 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return PageView(
       controller: _pageController,
       physics: const NeverScrollableScrollPhysics(),
+      scrollDirection: Axis.vertical,
       children: [PlanHistoryView(), const TabNavigationView()],
     );
   }

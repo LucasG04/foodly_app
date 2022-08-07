@@ -53,7 +53,8 @@ class _PlanTabViewState extends State<PlanTabView>
                           actions: [
                             IconButton(
                               onPressed: () {
-                                context.read(planHistoryPageIndex).state = 0;
+                                context.read(planHistoryPageChanged).state =
+                                    DateTime.now().millisecondsSinceEpoch;
                               },
                               icon: const Icon(EvaIcons.clockOutline),
                             ),
