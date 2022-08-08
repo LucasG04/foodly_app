@@ -20,6 +20,7 @@ import '../../services/settings_service.dart';
 import '../../services/version_service.dart';
 import '../../widgets/new_version_modal.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
+import 'plan_history_view.dart';
 import 'tab_navigation_view.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -31,12 +32,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final Logger _log = Logger('HomeScreen');
+  final PageController _pageController = PageController(initialPage: 1);
 
   @override
   void initState() {
     _checkForNewFeaturesNotification();
     _checkForUpdate();
     super.initState();
+    context.read(planHistoryPageChanged).addListener(
+          (_) => _changePage(),
+          fireImmediately: false,
+        );
   }
 
   @override
@@ -49,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
           body: Center(child: SmallCircularProgressIndicator()),
         );
       } else if (user != null) {
-        return const TabNavigationView();
+        return _buildNavigationView();
       } else if (SettingsService.isFirstUsage) {
         AutoRouter.of(context).replace(OnboardingScreenRoute());
         return const Scaffold();
@@ -58,6 +64,26 @@ class _HomeScreenState extends State<HomeScreen> {
         return const Scaffold();
       }
     });
+  }
+
+  Widget _buildNavigationView() {
+    return PageView(
+      controller: _pageController,
+      physics: const NeverScrollableScrollPhysics(),
+      scrollDirection: Axis.vertical,
+      children: const [PlanHistoryView(), TabNavigationView()],
+    );
+  }
+
+  void _changePage() {
+    if (!_pageController.hasClients) {
+      return;
+    }
+    _pageController.animateToPage(
+      _pageController.page == 0 ? 1 : 0,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.ease,
+    );
   }
 
   void _checkForNewFeaturesNotification() async {

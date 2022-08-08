@@ -20,3 +20,7 @@ final mealsChangedProvider = StateProvider<int>((_) => 0);
 
 /// Provides the current initial search for the WebImagePicker
 final initSearchWebImagePickerProvider = StateProvider<String>((_) => '');
+
+/// Provides the last time the page index of the pagehistory/home page
+/// controller has been changed
+final planHistoryPageChanged = StateProvider<int>((_) => 0);

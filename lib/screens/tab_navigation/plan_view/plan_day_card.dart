@@ -11,11 +11,13 @@ import 'plan_day_meal_tile.dart';
 class PlanDayCard extends StatelessWidget {
   final DateTime date;
   final List<PlanMeal> meals;
+  final bool readonly;
 
   const PlanDayCard({
     Key? key,
     required this.date,
     required this.meals,
+    this.readonly = false,
   }) : super(key: key);
 
   @override
@@ -67,10 +69,14 @@ class PlanDayCard extends StatelessWidget {
                       children: [
                         _buildSubtitle('plan_day_breakfast'.tr()),
                         ...breakfastList
-                            .map((e) => PlanDayMealTile(
-                                  e,
-                                  enableVoting: breakfastList.length > 1,
-                                ))
+                            .map(
+                              (e) => PlanDayMealTile(
+                                e,
+                                readonly: readonly,
+                                enableVoting:
+                                    breakfastList.length > 1 && !readonly,
+                              ),
+                            )
                             .toList(),
                         _buildAddButton(
                           context,
@@ -89,10 +95,13 @@ class PlanDayCard extends StatelessWidget {
               ),
               _buildSubtitle('plan_day_lunch'.tr()),
               ...lunchList
-                  .map((e) => PlanDayMealTile(
-                        e,
-                        enableVoting: lunchList.length > 1,
-                      ))
+                  .map(
+                    (e) => PlanDayMealTile(
+                      e,
+                      readonly: readonly,
+                      enableVoting: lunchList.length > 1 && !readonly,
+                    ),
+                  )
                   .toList(),
               _buildAddButton(
                 context,
@@ -105,10 +114,13 @@ class PlanDayCard extends StatelessWidget {
               ),
               _buildSubtitle('plan_day_dinner'.tr()),
               ...dinnerList
-                  .map((e) => PlanDayMealTile(
-                        e,
-                        enableVoting: dinnerList.length > 1,
-                      ))
+                  .map(
+                    (e) => PlanDayMealTile(
+                      e,
+                      readonly: readonly,
+                      enableVoting: dinnerList.length > 1 && !readonly,
+                    ),
+                  )
                   .toList(),
               _buildAddButton(
                 context,
@@ -127,6 +139,13 @@ class PlanDayCard extends StatelessWidget {
     required MealType mealType,
     required int mealsAtTime,
   }) {
+    if (readonly) {
+      return mealsAtTime > 0
+          ? const SizedBox()
+          : const Center(
+              child: Text('-', style: TextStyle(fontWeight: FontWeight.bold)),
+            );
+    }
     return StreamBuilder<dynamic>(
       stream: SettingsService.streamMultipleMealsPerTime(),
       builder: (context, _) {

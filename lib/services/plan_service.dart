@@ -146,8 +146,25 @@ class PlanService {
 
   static Stream<List<PlanMeal>> streamPlanMealsByPlanId(String? id) {
     _log.finer('Call streamPlanMealsByPlanId with $id');
-    return _firestore.doc(id).collection('meals').snapshots().map((snap) =>
-        snap.docs.map((e) => PlanMeal.fromMap(e.id, e.data())).toList());
+    return _firestore
+        .doc(id)
+        .collection('meals')
+        .snapshots()
+        .map((snap) => snap.docs
+            .map(
+              (e) => PlanMeal.fromMap(e.id, e.data()),
+            )
+            .toList());
+  }
+
+  static Future<List<PlanMeal>> getPlanMealHistoryByPlanId(String id) async {
+    _log.finer('Call getPlanMealHistoryByPlanId with $id');
+    final snaps = await _firestore.doc(id).collection('mealHistory').get();
+    return snaps.docs
+        .map(
+          (snap) => PlanMeal.fromMap(snap.id, snap.data()),
+        )
+        .toList();
   }
 
   static Future<void> addPlanMealToPlan(
@@ -175,6 +192,27 @@ class PlanService {
     _log.finer(
         'Call deletePlanMealFromPlan with planId: $planId | mealId: $mealId');
     return _firestore.doc(planId).collection('meals').doc(mealId).delete();
+  }
+
+  static Future<void> addPlanMealToPlanHistory(
+      String planId, PlanMeal planMeal) async {
+    _log.finer(
+        'Call addPlanMealToPlanHistory with planId: $planId | planMeal: ${planMeal.toMap()}');
+    await _firestore
+        .doc(planId)
+        .collection('mealHistory')
+        .add(planMeal.toMap());
+  }
+
+  static Future<void> updateHistoryPlanMealFromPlan(
+      String? planId, PlanMeal meal) {
+    _log.finer(
+        'Call updateHistoryPlanMealFromPlan with planId: $planId | planMeal: ${meal.toMap()}');
+    return _firestore
+        .doc(planId)
+        .collection('mealHistory')
+        .doc(meal.id)
+        .set(meal.toMap(), SetOptions(merge: true));
   }
 
   static Future<void> voteForPlanMeal(
