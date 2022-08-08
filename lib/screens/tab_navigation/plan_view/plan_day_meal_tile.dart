@@ -25,9 +25,14 @@ import 'plan_move_meal_modal.dart';
 class PlanDayMealTile extends StatefulWidget {
   final bool enableVoting;
   final PlanMeal planMeal;
+  final bool readonly;
 
-  const PlanDayMealTile(this.planMeal, {Key? key, this.enableVoting = false})
-      : super(key: key);
+  const PlanDayMealTile(
+    this.planMeal, {
+    Key? key,
+    this.enableVoting = false,
+    this.readonly = false,
+  }) : super(key: key);
 
   @override
   State<PlanDayMealTile> createState() => _PlanDayMealTileState();
@@ -42,8 +47,8 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
       margin: const EdgeInsets.symmetric(vertical: kPadding / 2),
       child: widget.planMeal.meal.startsWith(kPlaceholderSymbol)
           ? GestureDetector(
-              onTap: _editPlaceholder,
-              onLongPress: _openMoveModal,
+              onTap: widget.readonly ? null : _editPlaceholder,
+              onLongPress: widget.readonly ? null : _openMoveModal,
               child: _buildDataRow(
                 context,
                 placeholder: widget.planMeal.meal.split(kPlaceholderSymbol)[1],
@@ -58,7 +63,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                     return GestureDetector(
                       onTap: () => AutoRouter.of(context)
                           .push(MealScreenRoute(id: meal.id!)),
-                      onLongPress: _openMoveModal,
+                      onLongPress: widget.readonly ? null : _openMoveModal,
                       child: _buildDataRow(context, meal: meal),
                     );
                   } else {
@@ -163,7 +168,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                   ),
           ),
         ),
-        if (widget.enableVoting) ...[
+        if (widget.enableVoting && !widget.readonly) ...[
           const SizedBox(width: kPadding / 2),
           Row(
             children: [
@@ -195,37 +200,38 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
           ),
           const SizedBox(width: kPadding / 2),
         ],
-        PopupMenuButton(
-          onSelected: (String val) =>
-              _onMenuSelected(val, context.read(planProvider).state!.id!),
-          icon: const Icon(EvaIcons.moreVerticalOutline),
-          itemBuilder: (BuildContext context) {
-            return [
-              if (!widget.planMeal.meal.startsWith(kPlaceholderSymbol))
+        if (!widget.readonly)
+          PopupMenuButton(
+            onSelected: (String val) =>
+                _onMenuSelected(val, context.read(planProvider).state!.id!),
+            icon: const Icon(EvaIcons.moreVerticalOutline),
+            itemBuilder: (BuildContext context) {
+              return [
+                if (!widget.planMeal.meal.startsWith(kPlaceholderSymbol))
+                  PopupMenuItem(
+                    value: 'tolist',
+                    child: ListTile(
+                      title: const Text('plan_ingredients_to_list').tr(),
+                      leading: const Icon(EvaIcons.fileAddOutline),
+                    ),
+                  ),
                 PopupMenuItem(
-                  value: 'tolist',
+                  value: 'move',
                   child: ListTile(
-                    title: const Text('plan_ingredients_to_list').tr(),
-                    leading: const Icon(EvaIcons.fileAddOutline),
+                    title: const Text('plan_move').tr(),
+                    leading: const Icon(EvaIcons.cornerLeftUpOutline),
                   ),
                 ),
-              PopupMenuItem(
-                value: 'move',
-                child: ListTile(
-                  title: const Text('plan_move').tr(),
-                  leading: const Icon(EvaIcons.cornerLeftUpOutline),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: ListTile(
+                    title: const Text('plan_day_tile_remove').tr(),
+                    leading: const Icon(EvaIcons.minusCircleOutline),
+                  ),
                 ),
-              ),
-              PopupMenuItem(
-                value: 'delete',
-                child: ListTile(
-                  title: const Text('plan_day_tile_remove').tr(),
-                  leading: const Icon(EvaIcons.minusCircleOutline),
-                ),
-              ),
-            ];
-          },
-        ),
+              ];
+            },
+          ),
       ],
     );
   }

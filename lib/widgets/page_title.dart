@@ -5,11 +5,13 @@ import '../constants.dart';
 
 class PageTitle extends StatelessWidget {
   final String text;
+  final bool autoSize;
   final List<Widget>? actions;
 
   const PageTitle({
     Key? key,
     required this.text,
+    this.autoSize = false,
     this.actions,
   }) : super(key: key);
 
@@ -41,8 +43,10 @@ class PageTitle extends StatelessWidget {
   AutoSizeText _buildTitle() {
     return AutoSizeText(
       text,
-      style: const TextStyle(
-        fontSize: 30.0,
+      maxFontSize: 30.0,
+      minFontSize: 26.0,
+      style: TextStyle(
+        fontSize: autoSize ? null : 30.0,
         fontWeight: FontWeight.w700,
         fontFamily: 'Poppins',
       ),
