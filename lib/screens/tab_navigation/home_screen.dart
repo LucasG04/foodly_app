@@ -71,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
       controller: _pageController,
       physics: const NeverScrollableScrollPhysics(),
       scrollDirection: Axis.vertical,
-      children: [PlanHistoryView(), const TabNavigationView()],
+      children: const [PlanHistoryView(), TabNavigationView()],
     );
   }
 

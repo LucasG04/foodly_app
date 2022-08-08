@@ -69,11 +69,14 @@ class PlanDayCard extends StatelessWidget {
                       children: [
                         _buildSubtitle('plan_day_breakfast'.tr()),
                         ...breakfastList
-                            .map((e) => PlanDayMealTile(
-                                  e,
-                                  enableVoting:
-                                      breakfastList.length > 1 && !readonly,
-                                ))
+                            .map(
+                              (e) => PlanDayMealTile(
+                                e,
+                                readonly: readonly,
+                                enableVoting:
+                                    breakfastList.length > 1 && !readonly,
+                              ),
+                            )
                             .toList(),
                         _buildAddButton(
                           context,
@@ -92,10 +95,13 @@ class PlanDayCard extends StatelessWidget {
               ),
               _buildSubtitle('plan_day_lunch'.tr()),
               ...lunchList
-                  .map((e) => PlanDayMealTile(
-                        e,
-                        enableVoting: lunchList.length > 1 && !readonly,
-                      ))
+                  .map(
+                    (e) => PlanDayMealTile(
+                      e,
+                      readonly: readonly,
+                      enableVoting: lunchList.length > 1 && !readonly,
+                    ),
+                  )
                   .toList(),
               _buildAddButton(
                 context,
@@ -108,10 +114,13 @@ class PlanDayCard extends StatelessWidget {
               ),
               _buildSubtitle('plan_day_dinner'.tr()),
               ...dinnerList
-                  .map((e) => PlanDayMealTile(
-                        e,
-                        enableVoting: dinnerList.length > 1 && !readonly,
-                      ))
+                  .map(
+                    (e) => PlanDayMealTile(
+                      e,
+                      readonly: readonly,
+                      enableVoting: dinnerList.length > 1 && !readonly,
+                    ),
+                  )
                   .toList(),
               _buildAddButton(
                 context,

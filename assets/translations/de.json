@@ -208,6 +208,8 @@
     "plan_download_modal_type_simple": "Einfach",
     "plan_download_modal_cta": "Herunterladen",
     "plan_download_modal_docx_info": "Lade dir die \"Microsoft Word\" App für das beste Ergebnis beim Ausdrucken herunter. Verwendest du sie, verbessert sich das Layout und der Stil deines ausgedruckten Essensplans.",
+    "plan_history_title": "Historie",
+    "plan_history_back_tooltip": "Zurück zum Plan",
     "meal_create_edit_tags_info": "Suche nach Kategorien oder erstelle eine Neue durch Eingabe.",
     "meal_create_edit_tags_create_tile": "Tippe um zu erstellen",
     "meal_create_edit_tags_no_results": "Keine Kategorien",

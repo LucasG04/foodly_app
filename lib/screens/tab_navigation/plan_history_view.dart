@@ -3,6 +3,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../constants.dart';
 import '../../models/plan.dart';
 import '../../models/plan_meal.dart';
 import '../../providers/state_providers.dart';
@@ -32,61 +33,75 @@ class _PlanHistoryViewState extends State<PlanHistoryView> {
         scrollController: _scrollController,
         showBack: false,
         actions: [
-          IconButton(
-            onPressed: navigateBack,
-            icon: const Icon(EvaIcons.close),
+          Padding(
+            padding: const EdgeInsets.only(right: kPadding / 2),
+            child: IconButton(
+              onPressed: navigateBack,
+              icon: Icon(
+                EvaIcons.close,
+                color: Theme.of(context).textTheme.bodyText1!.color,
+              ),
+            ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        child: Column(
-          children: [
-            Center(
-              child: SizedBox(
-                width: BasicUtils.contentWidth(context),
-                child: FutureBuilder<List<PlanMeal>>(
-                  future: PlanService.getPlanMealHistoryByPlanId(
-                    context.read(planProvider).state!.id!,
-                  ),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      if (!initialScrolledDown) {
-                        BasicUtils.afterBuild(
-                          () => _scrollController.jumpTo(
-                              _scrollController.position.maxScrollExtent),
-                        );
-                        initialScrolledDown = true;
-                      }
-                      return ListView(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        children: _getPlanDays(snapshot.data!)
-                            .map(
-                              (e) => PlanDayCard(
-                                date: e.date,
-                                meals: e.meals,
-                                readonly: true,
+      body: context.read(planProvider).state != null
+          ? SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                children: [
+                  Center(
+                    child: SizedBox(
+                      width: BasicUtils.contentWidth(context),
+                      child: FutureBuilder<List<PlanMeal>>(
+                        future: PlanService.getPlanMealHistoryByPlanId(
+                          context.read(planProvider).state!.id!,
+                        ),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            if (!initialScrolledDown) {
+                              BasicUtils.afterBuild(
+                                () => _scrollController.jumpTo(
+                                    _scrollController.position.maxScrollExtent),
+                              );
+                              initialScrolledDown = true;
+                            }
+                            return ListView(
+                              shrinkWrap: true,
+                              padding: EdgeInsets.zero,
+                              physics: const NeverScrollableScrollPhysics(),
+                              children: _getPlanDays(snapshot.data!)
+                                  .map(
+                                    (e) => PlanDayCard(
+                                      date: e.date,
+                                      meals: e.meals,
+                                      readonly: true,
+                                    ),
+                                  )
+                                  .toList(),
+                            );
+                          } else {
+                            return SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.75,
+                              child: const Center(
+                                child: SmallCircularProgressIndicator(),
                               ),
-                            )
-                            .toList(),
-                      );
-                    } else {
-                      return const Center(
-                        child: SmallCircularProgressIndicator(),
-                      );
-                    }
-                  },
-                ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: navigateBack,
+                    tooltip: 'plan_history_back_tooltip'.tr(),
+                    icon: const Icon(EvaIcons.arrowDownwardOutline),
+                  ),
+                  const SizedBox(height: kPadding),
+                ],
               ),
-            ),
-            TextButton(
-              onPressed: navigateBack,
-              child: Text('plan_history_back'.tr()),
-            ),
-          ],
-        ),
-      ),
+            )
+          : const SizedBox(),
     );
   }
 
