@@ -38,10 +38,12 @@ class OptionsSheetOptions extends StatelessWidget {
               color: textColor ?? Theme.of(context).textTheme.bodyText1?.color,
             ),
             const SizedBox(width: kPadding),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: textColor),
+            Flexible(
+              child: Text(
+                title,
+                textAlign: TextAlign.start,
+                style: TextStyle(color: textColor),
+              ),
             ),
           ],
         ),
