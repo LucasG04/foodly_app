@@ -14,6 +14,7 @@ import '../../../providers/state_providers.dart';
 import '../../../services/settings_service.dart';
 import '../../../services/shopping_list_service.dart';
 import '../../../utils/basic_utils.dart';
+import '../../../utils/convert_util.dart';
 import '../../../utils/main_snackbar.dart';
 import '../../../utils/widget_utils.dart';
 import '../../../widgets/page_title.dart';
@@ -200,13 +201,10 @@ class _ShoppingListViewState extends State<ShoppingListView>
       ).show(context);
       return;
     }
-    final list = groceries
-        .map((e) => e.amount == null
-            ? '- ${e.name}'
-            : e.unit == null
-                ? '- ${e.amount} ${e.name}'
-                : '- ${e.amount} ${e.unit} ${e.name}')
-        .toList();
+    final list = groceries.map((e) {
+      final amount = ConvertUtil.amountToString(e.amount, e.unit);
+      return amount.isEmpty ? '- ${e.name}' : '- $amount ${e.name}';
+    }).toList();
     final listAsString = list.join('\n');
     Share.share(listAsString, subject: listAsString);
   }
