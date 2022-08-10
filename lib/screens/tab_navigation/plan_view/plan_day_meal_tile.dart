@@ -254,13 +254,12 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
           ),
         OptionsSheetOptions(
           title: 'plan_move'.tr(),
-          icon: EvaIcons.cornerLeftUpOutline,
+          icon: EvaIcons.moveOutline,
           onTap: () => _openMoveModal(),
         ),
         OptionsSheetOptions(
           title: 'plan_day_tile_remove'.tr(),
           icon: EvaIcons.minusCircleOutline,
-          textColor: Theme.of(context).errorColor,
           onTap: () => PlanService.deletePlanMealFromPlan(
             planId,
             widget.planMeal.id,

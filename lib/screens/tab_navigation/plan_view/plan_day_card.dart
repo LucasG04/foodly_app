@@ -62,7 +62,7 @@ class PlanDayCard extends StatelessWidget {
                 initialData: SettingsService.planWithBreakfast,
                 stream: SettingsService.streamPlanWithBreakfast(),
                 builder: (context, snapshot) {
-                  if (snapshot.data != null && snapshot.data!) {
+                  if (_showBreakfast(snapshot.data, breakfastList.isEmpty)) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
@@ -202,5 +202,10 @@ class PlanDayCard extends StatelessWidget {
 
   bool _showAddButton(BuildContext context, int mealsAtTime) {
     return mealsAtTime < 1 || SettingsService.multipleMealsPerTime;
+  }
+
+  bool _showBreakfast(bool? settingEnabled, bool breakfastListEmpty) {
+    return (readonly && !breakfastListEmpty) ||
+        (!readonly && settingEnabled != null && settingEnabled);
   }
 }
