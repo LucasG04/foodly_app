@@ -16,9 +16,12 @@ import '../../services/meal_stat_service.dart';
 import '../../services/plan_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/convert_util.dart';
+import '../../utils/widget_utils.dart';
 import '../../widgets/foodly_network_image.dart';
 import '../../widgets/full_screen_loader.dart';
 import '../../widgets/link_preview.dart';
+import '../../widgets/options_modal/options_modal.dart';
+import '../../widgets/options_modal/options_modal_option.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import 'border_icon.dart';
 import 'confirm_delete_modal.dart';
@@ -111,38 +114,15 @@ class _MealScreenState extends State<MealScreen> {
                                       BorderIcon(
                                         height: 50,
                                         width: 50,
-                                        child: PopupMenuButton(
+                                        child: IconButton(
+                                          icon: const Icon(
+                                            EvaIcons.moreHorizontalOutline,
+                                          ),
                                           padding: EdgeInsets.zero,
-                                          onSelected: (_PopupMenuValue value) =>
-                                              _onMenuSelected(
-                                            value,
+                                          onPressed: () => _showOptionsSheet(
                                             meal,
                                             currentPlanId,
                                           ),
-                                          itemBuilder: (context) => [
-                                            PopupMenuItem(
-                                              value: _PopupMenuValue.edit,
-                                              child: ListTile(
-                                                title: const Text(
-                                                  'meal_details_edit',
-                                                ).tr(),
-                                                leading: const Icon(
-                                                  EvaIcons.edit2Outline,
-                                                ),
-                                              ),
-                                            ),
-                                            PopupMenuItem(
-                                              value: _PopupMenuValue.delete,
-                                              child: ListTile(
-                                                title: const Text(
-                                                  'meal_details_delete',
-                                                ).tr(),
-                                                leading: const Icon(
-                                                  EvaIcons.minusCircleOutline,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
                                         ),
                                       )
                                     else
@@ -375,26 +355,34 @@ class _MealScreenState extends State<MealScreen> {
         : source;
   }
 
-  void _onMenuSelected(_PopupMenuValue value, Meal meal, String? planId) async {
+  void _showOptionsSheet(Meal meal, String? planId) {
     if (meal.planId != planId) {
       return;
     }
-    switch (value) {
-      case _PopupMenuValue.edit:
-        final result = await AutoRouter.of(context).push(
-          MealCreateScreenRoute(id: meal.id!),
-        );
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => OptionsSheet(options: [
+        OptionsSheetOptions(
+          title: 'meal_details_edit'.tr(),
+          icon: EvaIcons.edit2Outline,
+          onTap: () async {
+            final result = await AutoRouter.of(context).push(
+              MealCreateScreenRoute(id: meal.id!),
+            );
 
-        if (result != null && result is Meal) {
-          setState(() {});
-        }
-        break;
-      case _PopupMenuValue.delete:
-        _openConfirmDelete(meal);
-        break;
-      case _PopupMenuValue.addToPlan:
-        break;
-    }
+            if (result != null && result is Meal) {
+              setState(() {});
+            }
+          },
+        ),
+        OptionsSheetOptions(
+          title: 'meal_details_delete'.tr(),
+          icon: EvaIcons.minusCircleOutline,
+          textColor: Theme.of(context).errorColor,
+          onTap: () => _openConfirmDelete(meal),
+        ),
+      ]),
+    );
   }
 
   void _openConfirmDelete(Meal meal) async {
