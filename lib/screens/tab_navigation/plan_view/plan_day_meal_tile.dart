@@ -18,6 +18,8 @@ import '../../../services/shopping_list_service.dart';
 import '../../../utils/widget_utils.dart';
 import '../../../widgets/foodly_network_image.dart';
 import '../../../widgets/meal_tag.dart';
+import '../../../widgets/options_modal/options_modal.dart';
+import '../../../widgets/options_modal/options_modal_option.dart';
 import '../../../widgets/skeleton_container.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import 'plan_move_meal_modal.dart';
@@ -201,36 +203,10 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
           const SizedBox(width: kPadding / 2),
         ],
         if (!widget.readonly)
-          PopupMenuButton(
-            onSelected: (String val) =>
-                _onMenuSelected(val, context.read(planProvider).state!.id!),
-            icon: const Icon(EvaIcons.moreVerticalOutline),
-            itemBuilder: (BuildContext context) {
-              return [
-                if (!widget.planMeal.meal.startsWith(kPlaceholderSymbol))
-                  PopupMenuItem(
-                    value: 'tolist',
-                    child: ListTile(
-                      title: const Text('plan_ingredients_to_list').tr(),
-                      leading: const Icon(EvaIcons.fileAddOutline),
-                    ),
-                  ),
-                PopupMenuItem(
-                  value: 'move',
-                  child: ListTile(
-                    title: const Text('plan_move').tr(),
-                    leading: const Icon(EvaIcons.cornerLeftUpOutline),
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'delete',
-                  child: ListTile(
-                    title: const Text('plan_day_tile_remove').tr(),
-                    leading: const Icon(EvaIcons.minusCircleOutline),
-                  ),
-                ),
-              ];
-            },
+          IconButton(
+            icon: const Icon(EvaIcons.moreHorizontalOutline),
+            onPressed: () =>
+                _showOptionsModal(context.read(planProvider).state!.id!),
           ),
       ],
     );
@@ -246,31 +222,52 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
     });
   }
 
-  void _onMenuSelected(String value, String planId) async {
-    if (value == 'delete') {
-      PlanService.deletePlanMealFromPlan(planId, widget.planMeal.id);
-    } else if (value == 'tolist') {
-      final meal = await MealService.getMealById(widget.planMeal.meal);
-      if (meal == null || meal.ingredients == null) {
-        return;
-      }
-      final listId =
-          (await ShoppingListService.getShoppingListByPlanId(planId)).id;
-      for (final ingredient in meal.ingredients!) {
-        ShoppingListService.addGrocery(
-          listId!,
-          Grocery(
-            name: ingredient.name,
-            amount: ingredient.amount,
-            unit: ingredient.unit,
-            productGroup: ingredient.productGroup,
-            lastBoughtEdited: DateTime.now(),
+  void _showOptionsModal(String planId) {
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => OptionsSheet(options: [
+        if (!widget.planMeal.meal.startsWith(kPlaceholderSymbol))
+          OptionsSheetOptions(
+            title: 'plan_ingredients_to_list'.tr(),
+            icon: EvaIcons.fileAddOutline,
+            onTap: () async {
+              final meal = await MealService.getMealById(widget.planMeal.meal);
+              if (meal == null || meal.ingredients == null) {
+                return;
+              }
+              final listId =
+                  (await ShoppingListService.getShoppingListByPlanId(planId))
+                      .id;
+              for (final ingredient in meal.ingredients!) {
+                ShoppingListService.addGrocery(
+                  listId!,
+                  Grocery(
+                    name: ingredient.name,
+                    amount: ingredient.amount,
+                    unit: ingredient.unit,
+                    productGroup: ingredient.productGroup,
+                    lastBoughtEdited: DateTime.now(),
+                  ),
+                );
+              }
+            },
           ),
-        );
-      }
-    } else if (value == 'move') {
-      _openMoveModal();
-    }
+        OptionsSheetOptions(
+          title: 'plan_move'.tr(),
+          icon: EvaIcons.cornerLeftUpOutline,
+          onTap: () => _openMoveModal(),
+        ),
+        OptionsSheetOptions(
+          title: 'plan_day_tile_remove'.tr(),
+          icon: EvaIcons.minusCircleOutline,
+          textColor: Theme.of(context).errorColor,
+          onTap: () => PlanService.deletePlanMealFromPlan(
+            planId,
+            widget.planMeal.id,
+          ),
+        ),
+      ]),
+    );
   }
 
   Future<void> _openMoveModal() async {

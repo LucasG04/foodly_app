@@ -291,6 +291,10 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     } else {
       _isLoadingMeal = true;
       _isCreatingMeal = false;
+      _titleController = TextEditingController();
+      _sourceController = TextEditingController();
+      _durationController = TextEditingController();
+      _instructionsController = TextEditingController();
       MealService.getMealById(widget.id).then((meal) {
         if (meal != null) {
           _meal = meal;

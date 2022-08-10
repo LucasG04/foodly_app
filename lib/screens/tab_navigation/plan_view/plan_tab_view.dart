@@ -16,6 +16,8 @@ import '../../../services/plan_service.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/widget_utils.dart';
 import '../../../widgets/loading_logout.dart';
+import '../../../widgets/options_modal/options_modal.dart';
+import '../../../widgets/options_modal/options_modal_option.dart';
 import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import 'plan_day_card.dart';
@@ -49,24 +51,16 @@ class _PlanTabViewState extends State<PlanTabView>
                         padding: const EdgeInsets.only(left: 5.0),
                         child: PageTitle(
                           text: 'plan_title'.tr(),
-                          autoSize: true,
                           actions: [
-                            IconButton(
-                              onPressed: () {
-                                context.read(planHistoryPageChanged).state =
-                                    DateTime.now().millisecondsSinceEpoch;
-                              },
-                              icon: const Icon(EvaIcons.clockOutline),
-                            ),
-                            IconButton(
-                              onPressed: () => _openDownloadModal(activePlan),
-                              icon: const Icon(EvaIcons.downloadOutline),
-                            ),
                             IconButton(
                               onPressed: () => AutoRouter.of(context).push(
                                 const SettingsScreenRoute(),
                               ),
                               icon: const Icon(EvaIcons.settings2Outline),
+                            ),
+                            IconButton(
+                              onPressed: () => _showOptionsSheet(activePlan),
+                              icon: const Icon(EvaIcons.moreHorizontalOutline),
                             )
                           ],
                         ),
@@ -105,6 +99,27 @@ class _PlanTabViewState extends State<PlanTabView>
               )
             : const LoadingLogut();
       },
+    );
+  }
+
+  void _showOptionsSheet(Plan plan) {
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => OptionsSheet(options: [
+        OptionsSheetOptions(
+          title: 'plan_history_title'.tr(),
+          icon: EvaIcons.clockOutline,
+          onTap: () {
+            context.read(planHistoryPageChanged).state =
+                DateTime.now().millisecondsSinceEpoch;
+          },
+        ),
+        OptionsSheetOptions(
+          title: 'plan_download_modal_title'.tr(),
+          icon: EvaIcons.downloadOutline,
+          onTap: () => _openDownloadModal(plan),
+        ),
+      ]),
     );
   }
 
