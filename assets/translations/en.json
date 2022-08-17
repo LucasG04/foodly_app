@@ -237,5 +237,10 @@
   "shopping_dialog_description": "You already bought more than 50 groceries. Do you want to remove them?",
   "shopping_dialog_settings_info": "If you want to remove bought groceries immediately, enable the option in the settings.",
   "shopping_dialog_action_cancel": "Keep",
-  "update_dialog_action_delete": "Remove"
+  "update_dialog_action_delete": "Remove",
+  "save_changes_title": "Save changes?",
+  "save_changes_text": "You have made changes to this dish. Do you want to save them?",
+  "save_changes_confirm": "Save",
+  "save_changes_discard": "Discard",
+  "save_changes_cancel": "Back"
 }

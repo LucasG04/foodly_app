@@ -205,8 +205,11 @@ class _ShoppingListViewState extends State<ShoppingListView>
       final amount = ConvertUtil.amountToString(e.amount, e.unit);
       return amount.isEmpty ? '- ${e.name}' : '- $amount ${e.name}';
     }).toList();
-    final listAsString = list.join('\n');
-    Share.share(listAsString, subject: listAsString);
+    final shareText = list.join('\n');
+    final subject = shareText
+        .substring(0, shareText.length > 50 ? 50 : shareText.length)
+        .trim();
+    Share.share(shareText, subject: '$subject...');
   }
 
   void _removeBoughtGrocery(

@@ -237,5 +237,10 @@
     "shopping_dialog_description": "Du hast schon über 50 Lebensmittel gekauft. Möchtest du diese entfernen?",
     "shopping_dialog_settings_info": "Falls du gekaufte Lebensmittel direkt entfernen möchtest, aktiviere die Funktion in den Einstellungen.",
     "shopping_dialog_action_cancel": "Behalten",
-    "update_dialog_action_delete": "Entfernen"
+    "update_dialog_action_delete": "Entfernen",
+    "save_changes_title": "Änderungen speichern?",
+    "save_changes_text": "Du hast Änderungen an diesem Gericht vorgenommen. Willst du sie speichern?",
+    "save_changes_confirm": "Speichern",
+    "save_changes_discard": "Verwerfen",
+    "save_changes_cancel": "Zurück"
 }
