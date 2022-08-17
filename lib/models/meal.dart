@@ -42,7 +42,7 @@ class Meal {
     };
   }
 
-  factory Meal.fromMap(String id, Map<String, dynamic> map) {
+  factory Meal.fromMap(String? id, Map<String, dynamic> map) {
     return Meal(
       id: id,
       name: map['name'] as String,
