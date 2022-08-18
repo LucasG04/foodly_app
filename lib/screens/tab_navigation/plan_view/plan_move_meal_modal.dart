@@ -3,28 +3,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../constants.dart';
+import '../../../models/meal.dart';
 import '../../../models/plan_meal.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/plan_service.dart';
+import '../../../services/settings_service.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/progress_button.dart';
 
 class PlanMoveMealModal extends StatefulWidget {
-  final PlanMeal planMeal;
+  final bool isMoving;
+  final PlanMeal? planMeal;
+  final Meal? meal;
 
   const PlanMoveMealModal({
-    required this.planMeal,
+    required this.isMoving,
+    this.planMeal,
+    this.meal,
     Key? key,
-  }) : super(key: key);
+  })  : assert((isMoving && planMeal != null) || (!isMoving && meal != null)),
+        super(key: key);
 
   @override
   State<PlanMoveMealModal> createState() => _PlanMoveMealModalState();
 }
 
 class _PlanMoveMealModalState extends State<PlanMoveMealModal> {
-  late DateTime? _selectedDate;
-  late MealType? _selectedMealType;
+  late DateTime _selectedDate;
+  late MealType _selectedMealType;
   late final List<DateTime> _dropdownValues;
 
   ButtonState _buttonState = ButtonState.normal;
@@ -32,12 +39,10 @@ class _PlanMoveMealModalState extends State<PlanMoveMealModal> {
   @override
   void initState() {
     _dropdownValues = getDropdownValues();
-    _selectedDate = DateTime(
-      widget.planMeal.date.year,
-      widget.planMeal.date.month,
-      widget.planMeal.date.day,
-    );
-    _selectedMealType = widget.planMeal.type;
+    _selectedDate =
+        widget.isMoving ? widget.planMeal!.date : _dropdownValues.first;
+    _selectedMealType =
+        widget.isMoving ? widget.planMeal!.type : MealType.LUNCH;
     super.initState();
   }
 
@@ -62,7 +67,9 @@ class _PlanMoveMealModalState extends State<PlanMoveMealModal> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'plan_move'.tr().toUpperCase(),
+                    'plan_move_${widget.isMoving ? 'move' : 'add'}'
+                        .tr()
+                        .toUpperCase(),
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -88,6 +95,13 @@ class _PlanMoveMealModalState extends State<PlanMoveMealModal> {
             isExpanded: true,
           ),
           const SizedBox(height: kPadding / 2),
+          if (SettingsService.planWithBreakfast)
+            RadioListTile(
+              title: const Text('plan_move_breakfast').tr(),
+              value: MealType.BREAKFAST,
+              groupValue: _selectedMealType,
+              onChanged: _changeMealType,
+            ),
           RadioListTile(
             title: const Text('plan_move_lunch').tr(),
             value: MealType.LUNCH,
@@ -101,11 +115,13 @@ class _PlanMoveMealModalState extends State<PlanMoveMealModal> {
             onChanged: _changeMealType,
           ),
           const SizedBox(height: kPadding),
-          MainButton(
-            text: 'save'.tr(),
-            onTap: _save,
-            isProgress: true,
-            buttonState: _buttonState,
+          Center(
+            child: MainButton(
+              text: 'save'.tr(),
+              onTap: _save,
+              isProgress: true,
+              buttonState: _buttonState,
+            ),
           ),
           const SizedBox(height: kPadding * 2),
         ],
@@ -114,12 +130,18 @@ class _PlanMoveMealModalState extends State<PlanMoveMealModal> {
   }
 
   void _changeDate(DateTime? value) {
+    if (value == null) {
+      return;
+    }
     setState(() {
       _selectedDate = value;
     });
   }
 
   void _changeMealType(MealType? type) {
+    if (type == null) {
+      return;
+    }
     setState(() {
       _selectedMealType = type;
     });
@@ -139,15 +161,31 @@ class _PlanMoveMealModalState extends State<PlanMoveMealModal> {
   }
 
   Future<void> _save() async {
-    widget.planMeal.date = _selectedDate!;
-    widget.planMeal.type = _selectedMealType!;
+    PlanMeal? newPlanMeal = null; // ignore: avoid_init_to_null
+    if (widget.isMoving) {
+      widget.planMeal!.date = _selectedDate;
+      widget.planMeal!.type = _selectedMealType;
+    } else {
+      newPlanMeal = PlanMeal(
+        date: _selectedDate,
+        type: _selectedMealType,
+        meal: widget.meal!.id!,
+      );
+    }
     setState(() {
       _buttonState = ButtonState.inProgress;
     });
-    await PlanService.updatePlanMealFromPlan(
-      context.read(planProvider).state!.id,
-      widget.planMeal,
-    );
+    if (widget.isMoving) {
+      await PlanService.updatePlanMealFromPlan(
+        context.read(planProvider).state!.id,
+        widget.planMeal!,
+      );
+    } else {
+      await PlanService.addPlanMealToPlan(
+        context.read(planProvider).state!.id!,
+        newPlanMeal!,
+      );
+    }
     setState(() {
       _buttonState = ButtonState.normal;
     });

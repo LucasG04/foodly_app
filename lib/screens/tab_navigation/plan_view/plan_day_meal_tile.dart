@@ -253,7 +253,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
             },
           ),
         OptionsSheetOptions(
-          title: 'plan_move'.tr(),
+          title: 'plan_move_move'.tr(),
           icon: EvaIcons.moveOutline,
           onTap: () => _openMoveModal(),
         ),
@@ -272,7 +272,10 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
   Future<void> _openMoveModal() async {
     WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
-      builder: (_) => PlanMoveMealModal(planMeal: widget.planMeal),
+      builder: (_) => PlanMoveMealModal(
+        isMoving: true,
+        planMeal: widget.planMeal,
+      ),
     );
   }
 
