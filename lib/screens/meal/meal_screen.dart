@@ -24,6 +24,7 @@ import '../../widgets/link_preview.dart';
 import '../../widgets/options_modal/options_modal.dart';
 import '../../widgets/options_modal/options_modal_option.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
+import '../tab_navigation/plan_view/plan_move_meal_modal.dart';
 import 'border_icon.dart';
 import 'confirm_delete_modal.dart';
 import 'tag_tile.dart';
@@ -375,6 +376,11 @@ class _MealScreenState extends State<MealScreen> with DisposableWidget {
       context: context,
       builder: (_) => OptionsSheet(options: [
         OptionsSheetOptions(
+          title: 'meal_details_add_to_plan'.tr(),
+          icon: EvaIcons.fileAddOutline,
+          onTap: () => _openAddToPlan(meal),
+        ),
+        OptionsSheetOptions(
           title: 'meal_details_edit'.tr(),
           icon: EvaIcons.edit2Outline,
           onTap: () => AutoRouter.of(context).push(
@@ -388,6 +394,13 @@ class _MealScreenState extends State<MealScreen> with DisposableWidget {
           onTap: () => _openConfirmDelete(meal),
         ),
       ]),
+    );
+  }
+
+  void _openAddToPlan(Meal meal) async {
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => PlanMoveMealModal(isMoving: false, meal: meal),
     );
   }
 
