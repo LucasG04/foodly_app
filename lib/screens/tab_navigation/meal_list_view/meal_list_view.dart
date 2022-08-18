@@ -12,6 +12,7 @@ import '../../../services/lunix_api_service.dart';
 import '../../../services/meal_service.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/debouncer.dart';
+import '../../../widgets/disposable_widget.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import '../../../widgets/user_information.dart';
 import '../../settings/help_slides/help_slide_share_import.dart';
@@ -26,7 +27,7 @@ class MealListView extends StatefulWidget {
 }
 
 class _MealListViewState extends State<MealListView>
-    with AutomaticKeepAliveClientMixin {
+    with AutomaticKeepAliveClientMixin, DisposableWidget {
   late AutoDisposeStateProvider<bool> _$isLoading;
   late StateProvider<bool> _$isLoadingPagination;
   late StateProvider<bool> _$isSearching;
@@ -57,6 +58,7 @@ class _MealListViewState extends State<MealListView>
   @override
   void dispose() {
     _scrollController.dispose();
+    cancelSubscriptions();
     super.dispose();
   }
 
@@ -338,12 +340,12 @@ class _MealListViewState extends State<MealListView>
 
   void _listenForMealsChange() {
     BasicUtils.afterBuild(
-      () => context.read(lastChangedMealProvider).addListener((state) {
-        // TODO: better stream management
-        if (state != null) {
-          _refreshMeals();
-        }
-      }),
+      () => context
+          .read(lastChangedMealProvider)
+          .stream
+          .where((mealId) => mealId != null)
+          .listen((_) => _refreshMeals())
+          .canceledBy(this),
     );
   }
 }
