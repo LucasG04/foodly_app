@@ -338,8 +338,9 @@ class _MealListViewState extends State<MealListView>
 
   void _listenForMealsChange() {
     BasicUtils.afterBuild(
-      () => context.read(mealsChangedProvider).addListener((state) {
-        if (state != 0) {
+      () => context.read(lastChangedMealProvider).addListener((state) {
+        // TODO: better stream management
+        if (state != null) {
           _refreshMeals();
         }
       }),

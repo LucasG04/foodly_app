@@ -17,6 +17,7 @@ import '../../services/plan_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/convert_util.dart';
 import '../../utils/widget_utils.dart';
+import '../../widgets/disposable_widget.dart';
 import '../../widgets/foodly_network_image.dart';
 import '../../widgets/full_screen_loader.dart';
 import '../../widgets/link_preview.dart';
@@ -36,13 +37,24 @@ class MealScreen extends StatefulWidget {
   State<MealScreen> createState() => _MealScreenState();
 }
 
-class _MealScreenState extends State<MealScreen> {
-  late bool _isDeleting;
+class _MealScreenState extends State<MealScreen> with DisposableWidget {
+  bool _isDeleting = false;
 
   @override
   void initState() {
-    _isDeleting = false;
     super.initState();
+    context
+        .read(lastChangedMealProvider)
+        .stream
+        .where((mealId) => mealId != null && widget.id == mealId)
+        .listen((_) => setState(() {}))
+        .canceledBy(this);
+  }
+
+  @override
+  void dispose() {
+    cancelSubscriptions();
+    super.dispose();
   }
 
   @override
@@ -365,15 +377,9 @@ class _MealScreenState extends State<MealScreen> {
         OptionsSheetOptions(
           title: 'meal_details_edit'.tr(),
           icon: EvaIcons.edit2Outline,
-          onTap: () async {
-            final result = await AutoRouter.of(context).push(
-              MealCreateScreenRoute(id: meal.id!),
-            );
-
-            if (result != null && result is Meal) {
-              setState(() {});
-            }
-          },
+          onTap: () => AutoRouter.of(context).push(
+            MealCreateScreenRoute(id: meal.id!),
+          ),
         ),
         OptionsSheetOptions(
           title: 'meal_details_delete'.tr(),
@@ -403,7 +409,7 @@ class _MealScreenState extends State<MealScreen> {
       if (!mounted) {
         return;
       }
-      BasicUtils.emitMealsChanged(context);
+      BasicUtils.emitMealsChanged(context, meal.id ?? '');
       AutoRouter.of(context).pop();
     }
   }
@@ -423,10 +429,4 @@ class _MealScreenState extends State<MealScreen> {
     }
     _isDeleting = false;
   }
-}
-
-enum _PopupMenuValue {
-  edit,
-  delete,
-  addToPlan,
 }

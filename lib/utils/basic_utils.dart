@@ -50,9 +50,8 @@ class BasicUtils {
     return List.generate(amount, (i) => today.add(Duration(days: i)));
   }
 
-  static void emitMealsChanged(BuildContext context) {
-    context.read(mealsChangedProvider).state =
-        DateTime.now().millisecondsSinceEpoch;
+  static void emitMealsChanged(BuildContext context, [String id = '']) {
+    context.read(lastChangedMealProvider).state = id;
   }
 
   static void afterBuild(void Function() callback) {

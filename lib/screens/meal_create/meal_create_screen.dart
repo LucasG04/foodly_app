@@ -42,11 +42,12 @@ class MealCreateScreen extends StatefulWidget {
 }
 
 class _MealCreateScreenState extends State<MealCreateScreen> {
-  late ButtonState _buttonState;
+  bool _mealSaved = false;
+  ButtonState _buttonState = ButtonState.normal;
+  final ScrollController _scrollController = ScrollController();
+
   late bool _isCreatingMeal;
   late bool _isLoadingMeal;
-  late bool _mealSaved;
-  late ScrollController _scrollController;
 
   late TextEditingController _durationController;
   late TextEditingController _instructionsController;
@@ -62,11 +63,6 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   @override
   void initState() {
     _initialParseId();
-
-    _buttonState = ButtonState.normal;
-    _scrollController = ScrollController();
-    _mealSaved = false;
-
     super.initState();
   }
 
@@ -381,8 +377,8 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         if (!mounted) {
           return false;
         }
-        BasicUtils.emitMealsChanged(context);
-        AutoRouter.of(context).pop(newMeal);
+        BasicUtils.emitMealsChanged(context, newMeal?.id ?? '');
+        AutoRouter.of(context).pop();
         return true;
       } catch (e) {
         if (!mounted) {
