@@ -50,6 +50,12 @@ class _MealPaginationState extends State<MealPagination> {
   }
 
   @override
+  void dispose() {
+    widget.scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, watch, _) {
       final loadedMeals = watch(_$loadedMeals).state;

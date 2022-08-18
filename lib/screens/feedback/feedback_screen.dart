@@ -42,7 +42,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
   @override
   void dispose() {
-    _textFocusNode.removeListener(_scrollToBottomIfFocused);
+    _textFocusNode.dispose();
     super.dispose();
   }
 

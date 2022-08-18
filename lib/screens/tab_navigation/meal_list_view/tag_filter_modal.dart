@@ -18,24 +18,20 @@ class _TagFilterModalState extends State<TagFilterModal> {
   // empty_space is a distance of empty padding, only after scrolling through it the content starts getting under the app bar.
   static const double kEmptySpace = kPadding / 2;
 
+  final ScrollController _scrollController = ScrollController();
   bool _isScrollToTop = true;
-  ScrollController? _scrollController;
-
-  @override
-  void dispose() {
-    if (_scrollController != null) {
-      _scrollController!.dispose();
-    }
-
-    super.dispose();
-  }
 
   @override
   void initState() {
-    _scrollController = ScrollController();
-    _scrollController!.addListener(_scrollListener);
+    _scrollController.addListener(_scrollListener);
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -177,15 +173,15 @@ class _TagFilterModalState extends State<TagFilterModal> {
   }
 
   void _scrollListener() {
-    if (_scrollController!.offset <=
-        _scrollController!.position.minScrollExtent) {
+    if (_scrollController.offset <=
+        _scrollController.position.minScrollExtent) {
       if (!_isScrollToTop) {
         setState(() {
           _isScrollToTop = true;
         });
       }
     } else {
-      if (_scrollController!.offset > kEmptySpace && _isScrollToTop) {
+      if (_scrollController.offset > kEmptySpace && _isScrollToTop) {
         setState(() {
           _isScrollToTop = false;
         });

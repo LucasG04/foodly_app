@@ -39,6 +39,7 @@ class _SearchBarState extends State<SearchBar> {
 
   @override
   void dispose() {
+    _focusNode.dispose();
     _debounce?.cancel();
     super.dispose();
   }

@@ -33,23 +33,6 @@ class _MainAppBarState extends State<MainAppBar> {
     super.initState();
   }
 
-  void _scrollListener() {
-    if (widget.scrollController.offset <=
-        widget.scrollController.position.minScrollExtent) {
-      if (!_isScrollToTop) {
-        setState(() {
-          _isScrollToTop = true;
-        });
-      }
-    } else {
-      if (widget.scrollController.offset > kEmptySpace && _isScrollToTop) {
-        setState(() {
-          _isScrollToTop = false;
-        });
-      }
-    }
-  }
-
   @override
   void dispose() {
     widget.scrollController.dispose();
@@ -85,6 +68,23 @@ class _MainAppBarState extends State<MainAppBar> {
           : null,
       actions: widget.actions,
     );
+  }
+
+  void _scrollListener() {
+    if (widget.scrollController.offset <=
+        widget.scrollController.position.minScrollExtent) {
+      if (!_isScrollToTop) {
+        setState(() {
+          _isScrollToTop = true;
+        });
+      }
+    } else {
+      if (widget.scrollController.offset > kEmptySpace && _isScrollToTop) {
+        setState(() {
+          _isScrollToTop = false;
+        });
+      }
+    }
   }
 
   /// Returns the appropriate "back" icon for the given `platform`.

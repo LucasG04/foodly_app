@@ -27,6 +27,7 @@ import 'services/plan_service.dart';
 import 'services/settings_service.dart';
 import 'services/version_service.dart';
 import 'utils/basic_utils.dart';
+import 'widgets/disposable_widget.dart';
 
 Future<void> _configureFirebase() async {
   await Firebase.initializeApp();
@@ -80,9 +81,8 @@ class FoodlyApp extends StatefulWidget {
   State<FoodlyApp> createState() => _FoodlyAppState();
 }
 
-class _FoodlyAppState extends State<FoodlyApp> {
+class _FoodlyAppState extends State<FoodlyApp> with DisposableWidget {
   final Logger _log = Logger('FoodlyApp');
-  late StreamSubscription<String>? _intentDataStreamSubscription;
 
   final _appRouter = AppRouter();
 
@@ -95,7 +95,7 @@ class _FoodlyAppState extends State<FoodlyApp> {
 
   @override
   void dispose() {
-    _intentDataStreamSubscription?.cancel();
+    cancelSubscriptions();
     super.dispose();
   }
 
@@ -178,29 +178,30 @@ class _FoodlyAppState extends State<FoodlyApp> {
       Logger.root.onRecord.listen((record) {
         // ignore: avoid_print
         print('${record.level.name}: ${record.loggerName}: ${record.message}');
-      });
+      }).canceledBy(this);
     } else {
       Logger.root.level = Level.ALL;
-      Logger.root.onRecord.listen((record) {
-        if (record.level >= Level.SEVERE) {
-          final message =
-              '${record.loggerName} (${record.level.name}): ${record.message}';
-          FirebaseCrashlytics.instance.recordError(
-            message,
-            record.stackTrace,
-            reason: record.error,
-          );
-        }
-      });
+      Logger.root.onRecord
+          .where((record) => record.level >= Level.SEVERE)
+          .listen((record) {
+        final message =
+            '${record.loggerName} (${record.level.name}): ${record.message}';
+        FirebaseCrashlytics.instance.recordError(
+          message,
+          record.stackTrace,
+          reason: record.error,
+        );
+      }).canceledBy(this);
     }
   }
 
   void _listenForShareIntent() {
     // For sharing or opening urls/text coming from outside the app while the app is in the memory
-    _intentDataStreamSubscription = ReceiveSharingIntent.getTextStream()
-        .listen(_handleReceivedMealShare, onError: (dynamic err) {
-      _log.severe('ERR in ReceiveSharingIntent.getTextStream()', err);
-    });
+    ReceiveSharingIntent.getTextStream()
+        .listen(_handleReceivedMealShare,
+            onError: (dynamic err) =>
+                _log.severe('ERR in ReceiveSharingIntent.getTextStream()', err))
+        .canceledBy(this);
 
     // For sharing or opening urls/text coming from outside the app while the app is closed
     ReceiveSharingIntent.getInitialText().then(_handleReceivedMealShare);

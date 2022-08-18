@@ -18,6 +18,7 @@ import '../../constants.dart';
 import '../../providers/state_providers.dart';
 import '../../services/settings_service.dart';
 import '../../services/version_service.dart';
+import '../../widgets/disposable_widget.dart';
 import '../../widgets/new_version_modal.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import 'plan_history_view.dart';
@@ -30,7 +31,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with DisposableWidget {
   final Logger _log = Logger('HomeScreen');
   final PageController _pageController = PageController(initialPage: 1);
 
@@ -39,10 +40,17 @@ class _HomeScreenState extends State<HomeScreen> {
     _checkForNewFeaturesNotification();
     _checkForUpdate();
     super.initState();
-    context.read(planHistoryPageChanged).addListener(
-          (_) => _changePage(),
-          fireImmediately: false,
-        );
+    context
+        .read(planHistoryPageChanged)
+        .stream
+        .listen((_) => _changePage())
+        .canceledBy(this);
+  }
+
+  @override
+  void dispose() {
+    cancelSubscriptions();
+    super.dispose();
   }
 
   @override
