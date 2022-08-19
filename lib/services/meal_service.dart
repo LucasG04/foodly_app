@@ -91,9 +91,8 @@ class MealService {
     }
 
     try {
-      final id = DateTime.now().microsecondsSinceEpoch.toString();
-      await _firestore.doc(id).set(meal);
-      meal.id = id;
+      final created = await _firestore.add(meal);
+      meal.id = created.id;
       await MealStatService.bumpStat(meal.planId!, meal.id!);
 
       return meal;
@@ -132,8 +131,7 @@ class MealService {
       }
       await Future.wait(
         meals.map((meal) {
-          final id = DateTime.now().microsecondsSinceEpoch.toString();
-          return _firestore.doc(id).set(meal);
+          return _firestore.add(meal);
         }),
       );
     } catch (e) {
