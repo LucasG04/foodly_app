@@ -45,8 +45,10 @@ class Grocery {
   factory Grocery.fromApiSuggestion(Map<String, dynamic> map) {
     return Grocery(
       name: map['name'] as String?,
-      group: map['group'] as int?,
-      amount: map['amount'] as double?,
+      group: map['group'] is String ? null : map['group'] as int?,
+      amount: map['amount'] is int
+          ? (map['amount'] as int).toDouble()
+          : map['amount'] as double?,
       unit: map['unit'] as String?,
       lastBoughtEdited: DateTime.now(),
     );

@@ -314,8 +314,9 @@ class LunixApiService {
     if (response == null || response.data == null) {
       return [];
     }
-    final data = (response.data as List<Map<String, dynamic>>)
-        .map((Map<String, dynamic> e) => Grocery.fromApiSuggestion(e))
+    final data = (response.data as List<dynamic>)
+        .map(
+            (dynamic e) => Grocery.fromApiSuggestion(e as Map<String, dynamic>))
         .toList();
     return data;
   }

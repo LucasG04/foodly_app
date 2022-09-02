@@ -13,6 +13,7 @@ import '../../../utils/debouncer.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/main_text_field.dart';
 import '../../../widgets/progress_button.dart';
+import 'grocery_suggestion_tile.dart';
 
 class EditGroceryModal extends StatefulWidget {
   final String shoppingListId;
@@ -63,7 +64,7 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width > 599
         ? 580.0
-        : MediaQuery.of(context).size.width * 0.8;
+        : MediaQuery.of(context).size.width * 0.9;
 
     return Container(
       padding: EdgeInsets.symmetric(
@@ -73,7 +74,23 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          const SizedBox(height: kPadding),
+          Consumer(builder: (_, ref, __) {
+            return SizedBox(
+                height: ref(_$suggestions).state.isNotEmpty ? kPadding : 0);
+          }),
+          Consumer(builder: (_, ref, __) {
+            return Wrap(
+              spacing: kPadding / 2,
+              runSpacing: kPadding / 2,
+              children: ref(_$suggestions).state.take(6).map((grocery) {
+                return GrocerySuggestionTile(
+                  grocery: grocery,
+                  onTap: () => _applyGroceryFromSuggestion(grocery),
+                );
+              }).toList(),
+            );
+          }),
+          const SizedBox(height: kPadding / 2),
           Consumer(builder: (_, ref, __) {
             ref(_$buttonState);
             return MainTextField(
@@ -185,5 +202,20 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
     if (mounted) {
       context.read(_$suggestions).state = suggestions;
     }
+  }
+
+  void _applyGroceryFromSuggestion(Grocery grocery) {
+    _nameController.text = grocery.name.toString();
+
+    if (grocery.amount != null) {
+      _amountController.text = ConvertUtil.amountToString(grocery.amount);
+    }
+
+    if (grocery.unit != null) {
+      _unitController.text = grocery.unit.toString();
+    }
+
+    context.read(_$suggestions).state = [];
+    _amountFocusNode.requestFocus();
   }
 }
