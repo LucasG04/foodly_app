@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -56,5 +59,16 @@ class BasicUtils {
 
   static void afterBuild(void Function() callback) {
     return WidgetsBinding.instance.addPostFrameCallback((_) => callback());
+  }
+
+  /// Retuns the current language (e.g., "en").
+  /// If the in-app language is not "en" it will be returned.
+  /// If the in-app language is "en" the platform language will be retuned.
+  ///
+  /// Helps to improve the results of the image search.
+  static String getActiveLanguage(BuildContext context) {
+    return context.locale.languageCode == 'en'
+        ? Platform.localeName.split('_')[0]
+        : context.locale.languageCode;
   }
 }

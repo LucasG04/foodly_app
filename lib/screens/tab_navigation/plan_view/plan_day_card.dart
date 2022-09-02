@@ -49,10 +49,15 @@ class PlanDayCard extends StatelessWidget {
                           .format(date),
                       style: kCardTitle,
                     ),
-                    Text(
-                      DateFormat('d. MMMM y', context.locale.toLanguageTag())
-                          .format(date),
-                      style: kCardSubtitle,
+                    Flexible(
+                      child: Text(
+                        DateFormat(
+                          'd. MMMM y',
+                          context.locale.toLanguageTag(),
+                        ).format(date),
+                        style: kCardSubtitle,
+                        textAlign: TextAlign.right,
+                      ),
                     ),
                   ],
                 ),

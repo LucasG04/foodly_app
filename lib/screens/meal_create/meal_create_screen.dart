@@ -49,15 +49,14 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   late bool _isCreatingMeal;
   late bool _isLoadingMeal;
 
-  late TextEditingController _durationController;
-  late TextEditingController _instructionsController;
-  late TextEditingController _sourceController;
-  late TextEditingController _titleController;
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _durationController = TextEditingController();
+  final TextEditingController _instructionsController = TextEditingController();
+  final TextEditingController _sourceController = TextEditingController();
 
   Meal _meal = Meal(name: '');
   Meal _originalMeal = Meal(name: '');
   String? _updatedImage;
-
   List<String>? _existingMealTags;
 
   @override
@@ -266,10 +265,6 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     if (widget.id == 'create') {
       _isLoadingMeal = false;
       _isCreatingMeal = true;
-      _titleController = TextEditingController();
-      _sourceController = TextEditingController();
-      _durationController = TextEditingController();
-      _instructionsController = TextEditingController();
       _meal.ingredients = [];
       _meal.tags = [];
     } else if (widget.id.startsWith('https') &&
@@ -281,12 +276,10 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         if (meal != null) {
           _meal = meal;
           meal.imageUrl = meal.imageUrl!.replaceFirst('http:', 'https:');
-          _titleController = TextEditingController(text: meal.name);
-          _sourceController = TextEditingController(text: meal.source);
-          _durationController =
-              TextEditingController(text: (meal.duration ?? '').toString());
-          _instructionsController =
-              TextEditingController(text: meal.instructions);
+          _titleController.text = meal.name;
+          _sourceController.text = meal.source ?? '';
+          _durationController.text = (meal.duration ?? '').toString();
+          _instructionsController.text = meal.instructions ?? '';
           _meal.ingredients = _meal.ingredients ?? [];
           _meal.tags = _meal.tags ?? [];
           _originalMeal = Meal.fromMap(_meal.id, _meal.toMap());
@@ -299,19 +292,13 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
     } else {
       _isLoadingMeal = true;
       _isCreatingMeal = false;
-      _titleController = TextEditingController();
-      _sourceController = TextEditingController();
-      _durationController = TextEditingController();
-      _instructionsController = TextEditingController();
       MealService.getMealById(widget.id).then((meal) {
         if (meal != null) {
           _meal = meal;
-          _titleController = TextEditingController(text: meal.name);
-          _sourceController = TextEditingController(text: meal.source);
-          _durationController =
-              TextEditingController(text: (meal.duration ?? '').toString());
-          _instructionsController =
-              TextEditingController(text: meal.instructions);
+          _titleController.text = meal.name;
+          _sourceController.text = meal.source ?? '';
+          _durationController.text = (meal.duration ?? '').toString();
+          _instructionsController.text = meal.instructions ?? '';
           _meal.ingredients = _meal.ingredients ?? [];
           _meal.tags = _meal.tags ?? [];
           _originalMeal = Meal.fromMap(_meal.id, _meal.toMap());

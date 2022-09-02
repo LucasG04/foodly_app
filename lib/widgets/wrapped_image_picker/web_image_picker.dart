@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -13,6 +11,7 @@ import '../../constants.dart';
 import '../../providers/state_providers.dart';
 import '../../services/link_metadata_service.dart';
 import '../../services/lunix_api_service.dart';
+import '../../utils/basic_utils.dart';
 import '../main_text_field.dart';
 import '../skeleton_container.dart';
 import '../small_circular_progress_indicator.dart';
@@ -279,6 +278,7 @@ class _WebImagePickerState extends State<WebImagePicker> {
     });
     final String search = _inputController.text.trim();
     String? imageFromUrl;
+    final language = BasicUtils.getActiveLanguage(context);
 
     try {
       imageFromUrl = await _getImageFromUrl(search);
@@ -295,7 +295,7 @@ class _WebImagePickerState extends State<WebImagePicker> {
       final response = await LunixApiService.searchImages(
         search,
         _imagePage,
-        _getSearchLanguage(),
+        language,
       );
 
       if (response == null) {
@@ -342,7 +342,7 @@ class _WebImagePickerState extends State<WebImagePicker> {
     final response = await LunixApiService.searchImages(
       search,
       _imagePage,
-      _getSearchLanguage(),
+      BasicUtils.getActiveLanguage(context),
     );
 
     if (!mounted) {
@@ -360,17 +360,6 @@ class _WebImagePickerState extends State<WebImagePicker> {
       _images.addAll(response.images.map((e) => e.url));
       _isLoadingMore = false;
     });
-  }
-
-  /// Retuns the current language (e.g., "en").
-  /// If the in-app language is not "en" it will be returned.
-  /// If the in-app language is "en" the platform language will be retuned.
-  ///
-  /// Helps to improve the results of the image search.
-  String _getSearchLanguage() {
-    return context.locale.languageCode == 'en'
-        ? Platform.localeName.split('_')[0]
-        : context.locale.languageCode;
   }
 
   void _selectImage(String url) {

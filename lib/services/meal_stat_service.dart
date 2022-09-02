@@ -100,7 +100,10 @@ class MealStatService {
 
       if (querySnapshot.docs.isEmpty) {
         final stat = MealStat(
-            mealId: mealId, lastTimePlanned: DateTime.now(), plannedCount: 1);
+          mealId: mealId,
+          lastTimePlanned: DateTime.now(),
+          plannedCount: 1,
+        );
         await _firestore
             .collection('plans')
             .doc(planId)

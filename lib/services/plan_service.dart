@@ -93,11 +93,10 @@ class PlanService {
     );
     _log.finest('createPlan: Plan is: ${plan.toMap()}');
 
-    final id = DateTime.now().microsecondsSinceEpoch.toString();
-    await _firestore.doc(id).set(plan);
-    plan.id = id;
+    final created = await _firestore.add(plan);
+    plan.id = created.id;
 
-    await ShoppingListService.createShoppingListWithPlanId(id);
+    await ShoppingListService.createShoppingListWithPlanId(created.id);
 
     return plan;
   }

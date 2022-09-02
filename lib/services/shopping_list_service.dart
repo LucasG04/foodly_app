@@ -23,9 +23,8 @@ class ShoppingListService {
     _log.finer('Call createShoppingListWithPlanId with $planId');
     final list = ShoppingList(meals: [], planId: planId);
 
-    final id = DateTime.now().microsecondsSinceEpoch.toString();
-    await _firestore.doc(id).set(list);
-    list.id = id;
+    final created = await _firestore.add(list);
+    list.id = created.id;
 
     return list;
   }
@@ -107,7 +106,7 @@ class ShoppingListService {
         .collection('groceries')
         .where('name', isEqualTo: grocery.name)
         .where('unit', isEqualTo: grocery.unit)
-        .where('productGroup', isEqualTo: grocery.productGroup)
+        .where('group', isEqualTo: grocery.group)
         .where('bought', isEqualTo: false)
         .get();
 
