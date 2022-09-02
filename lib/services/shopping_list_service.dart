@@ -106,7 +106,7 @@ class ShoppingListService {
         .collection('groceries')
         .where('name', isEqualTo: grocery.name)
         .where('unit', isEqualTo: grocery.unit)
-        .where('productGroup', isEqualTo: grocery.productGroup)
+        .where('group', isEqualTo: grocery.group)
         .where('bought', isEqualTo: false)
         .get();
 

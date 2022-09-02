@@ -3,7 +3,7 @@ class Grocery {
   String? name;
   double? amount;
   String? unit;
-  String? productGroup;
+  int? group;
   bool bought;
   DateTime lastBoughtEdited;
 
@@ -12,7 +12,7 @@ class Grocery {
     this.name,
     this.amount = 0.0,
     this.unit = '',
-    this.productGroup = '',
+    this.group,
     this.bought = false,
     required this.lastBoughtEdited,
   });
@@ -22,7 +22,7 @@ class Grocery {
       'name': name,
       'amount': amount,
       'unit': unit,
-      'productGroup': productGroup,
+      'group': group,
       'bought': bought,
       'lastBoughtEdited': lastBoughtEdited.millisecondsSinceEpoch,
     };
@@ -34,7 +34,7 @@ class Grocery {
       name: map['name'] as String?,
       amount: map['amount'] as double?,
       unit: map['unit'] as String?,
-      productGroup: map['productGroup'] as String?,
+      group: map['group'] as int?,
       bought: map['bought'] as bool? ?? false,
       lastBoughtEdited: map['lastBoughtEdited'] == null
           ? DateTime.now()
@@ -42,7 +42,17 @@ class Grocery {
     );
   }
 
+  factory Grocery.fromApiSuggestion(Map<String, dynamic> map) {
+    return Grocery(
+      name: map['name'] as String?,
+      group: map['group'] as int?,
+      amount: map['amount'] as double?,
+      unit: map['unit'] as String?,
+      lastBoughtEdited: DateTime.now(),
+    );
+  }
+
   @override
   String toString() =>
-      'Grocery(id: $id, name: $name, amount: $amount, unit: $unit, bought: $bought, lastEdited: ${lastBoughtEdited.toIso8601String()})';
+      'Grocery(id: $id, name: $name, amount: $amount, unit: $unit, bought: $bought, group: $group, lastEdited: ${lastBoughtEdited.toIso8601String()})';
 }

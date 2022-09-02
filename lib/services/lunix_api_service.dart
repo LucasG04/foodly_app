@@ -7,6 +7,8 @@ import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../constants.dart';
+import '../models/grocery.dart';
+import '../models/grocery_group.dart';
 import '../models/lunix_docx.dart';
 import '../models/lunix_image.dart';
 import '../models/meal.dart';
@@ -270,6 +272,51 @@ class LunixApiService {
             Meal.fromMap((e as Map<String, dynamic>)['id'] as String, e))
         .toList();
 
+    return data;
+  }
+
+  static Future<List<GroceryGroup>> getGroceryGroups(String langCode) async {
+    _log.finer('Call getGroceryGroups()');
+    Response? response;
+    try {
+      response = await _dio.get<List<dynamic>>(
+        '$_lunixApiEndpoint/grocery-groups',
+        queryParameters: <String, dynamic>{'language': langCode},
+      );
+    } catch (e) {
+      _log.severe('ERR in getGroceryGroups. Response is null', e);
+    }
+    if (response == null || response.data == null) {
+      return [];
+    }
+    final data = (response.data as List<Map<String, dynamic>>)
+        .map((Map<String, dynamic> e) => GroceryGroup.fromMap(e))
+        .toList();
+    return data;
+  }
+
+  static Future<List<Grocery>> getGrocerySuggestions(
+      String query, String langCode, String planId) async {
+    _log.finer('Call getGrocerySuggestions()');
+    Response? response;
+    try {
+      response = await _dio.get<List<dynamic>>(
+        '$_lunixApiEndpoint/get-grocery-suggestion',
+        queryParameters: <String, dynamic>{
+          'language': langCode,
+          'query': query,
+          'planId': planId,
+        },
+      );
+    } catch (e) {
+      _log.severe('ERR in getGrocerySuggestions. Response is null', e);
+    }
+    if (response == null || response.data == null) {
+      return [];
+    }
+    final data = (response.data as List<Map<String, dynamic>>)
+        .map((Map<String, dynamic> e) => Grocery.fromApiSuggestion(e))
+        .toList();
     return data;
   }
 }
