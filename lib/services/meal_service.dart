@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dio/dio.dart';
 import 'package:logging/logging.dart';
 
 import '../models/meal.dart';
 import '../utils/convert_util.dart';
-import '../utils/secrets.dart';
 import 'meal_stat_service.dart';
 
 class MealService {
@@ -79,16 +77,6 @@ class MealService {
 
   static Future<Meal?> createMeal(Meal meal) async {
     _log.finer('Call createMeal with ${meal.toMap()}');
-    if (meal.imageUrl == null || meal.imageUrl!.isEmpty) {
-      try {
-        final images = await _getMealPhotos(meal.name);
-        meal.imageUrl =
-            images.isNotEmpty && images.first != null ? images.first : '';
-        _log.finest('createMeal: Generated image: ${meal.imageUrl}');
-      } catch (e) {
-        _log.severe('ERR: _getMealPhotos in createMeal with ${meal.name}', e);
-      }
-    }
 
     try {
       final created = await _firestore.add(meal);
@@ -138,30 +126,6 @@ class MealService {
       _log.severe(
           'ERR: addMeals with PlanId: $planId | Meals: ${meals.toString()}', e);
     }
-  }
-
-  static Future<List<String?>> _getMealPhotos(String mealName) async {
-    _log.finer('Call _getMealPhotos with $mealName');
-    final List<String?> urls = [];
-    final Response<dynamic> response = await Dio().get<dynamic>(
-      'https://pixabay.com/api/',
-      queryParameters: <String, dynamic>{
-        'key': secretPixabay,
-        'q': '$mealName food',
-        'per_page': '3',
-        'safesearch': 'true',
-        'lang': 'de',
-      },
-    );
-
-    final Map<String, dynamic> data = response.data as Map<String, dynamic>;
-    if (response.data != null && data['totalHits'] != 0) {
-      for (final item in data['hits']) {
-        urls.add((item as Map<String, dynamic>)['webformatURL'] as String);
-      }
-    }
-
-    return urls;
   }
 
   static Future<List<String>> getAllTags(String planId) async {
