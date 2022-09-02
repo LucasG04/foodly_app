@@ -43,19 +43,24 @@ class _WebImagePickerState extends State<WebImagePicker> {
   bool _isLoading = false;
   bool _isLoadingMore = false;
   bool _noResults = false;
+  bool _firstBuild = true;
 
   @override
   void initState() {
-    final initialSearch = context.read(initSearchWebImagePickerProvider).state;
-    if (initialSearch.isNotEmpty) {
-      _inputController.text = initialSearch;
-      _search();
-    }
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_firstBuild) {
+      final initialSearch =
+          context.read(initSearchWebImagePickerProvider).state;
+      if (initialSearch.isNotEmpty) {
+        _inputController.text = initialSearch;
+        _search();
+      }
+      _firstBuild = false;
+    }
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
