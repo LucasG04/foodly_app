@@ -10,7 +10,6 @@ import '../../../services/shopping_list_service.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/convert_util.dart';
 import '../../../utils/debouncer.dart';
-import '../../../widgets/disposable_widget.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/main_text_field.dart';
 import '../../../widgets/progress_button.dart';
@@ -30,8 +29,7 @@ class EditGroceryModal extends StatefulWidget {
   State<EditGroceryModal> createState() => _EditGroceryModalState();
 }
 
-class _EditGroceryModalState extends State<EditGroceryModal>
-    with DisposableWidget {
+class _EditGroceryModalState extends State<EditGroceryModal> {
   late Debouncer _nameDebouncer;
   late bool _isCreating;
   late TextEditingController _nameController;
