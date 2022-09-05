@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 
@@ -127,6 +128,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
   }
 
   Future<void> _handleDownload() async {
+    _logAnalyticsEvent();
     setState(() {
       _buttonState = ButtonState.inProgress;
     });
@@ -234,6 +236,18 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
       message: 'plan_download_modal_docx_info'.tr(),
       infinite: true,
     ).show(context);
+  }
+
+  void _logAnalyticsEvent() {
+    FirebaseAnalytics.instance.logEvent(
+      name: 'plan_download',
+      parameters: {
+        'excludeToday': _excludeToday,
+        'vertical': _portraitFormat,
+        'includeBreakfast': _includeBreakfast,
+        'type': _getValueForDocType(_docType),
+      },
+    );
   }
 }
 

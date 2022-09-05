@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:logging/logging.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
@@ -31,22 +33,29 @@ import 'widgets/disposable_widget.dart';
 
 Future<void> _configureFirebase() async {
   await Firebase.initializeApp();
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   if (foundation.kDebugMode) {
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
   } else {
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     await FirebaseAppCheck.instance.activate();
+    final packageInfo = await PackageInfo.fromPlatform();
+    await Future.wait([
+      FirebaseAnalytics.instance
+          .setDefaultEventParameters({'version': packageInfo.version}),
+      FirebaseCrashlytics.instance.setCustomKey('version', packageInfo.version),
+      FirebaseCrashlytics.instance
+          .setCustomKey('buildNumber', packageInfo.buildNumber),
+    ]);
   }
 }
 
 Future<void> main() async {
-  runZonedGuarded<Future<void>>(
-    () async {
-      WidgetsFlutterBinding.ensureInitialized();
-      await EasyLocalization.ensureInitialized();
-      await _configureFirebase();
-      await initializeHive();
-
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+  await _configureFirebase();
+  await initializeHive();
+  runZonedGuarded<void>(
+    () {
       runApp(
         ProviderScope(
           child: EasyLocalization(
@@ -58,8 +67,11 @@ Future<void> main() async {
         ),
       );
     },
-    (error, stack) =>
-        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true),
+    (error, stack) => FirebaseCrashlytics.instance.recordError(
+      error,
+      stack,
+      fatal: true,
+    ),
   );
 }
 
