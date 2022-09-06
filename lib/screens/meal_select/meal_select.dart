@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -290,6 +291,10 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
         return;
       }
       context.read(_$isSearching).state = false;
+      FirebaseAnalytics.instance.logEvent(
+        name: 'search_meal_select',
+        parameters: {'query': query},
+      );
     } else {
       if (context.read(_$isSearching).state) {}
       searchedMeals = [];
@@ -330,16 +335,24 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     }
   }
 
-  Future<void> _addMealToPlan(String mealId, String planId) {
-    return PlanService.addPlanMealToPlan(
+  Future<void> _addMealToPlan(String mealId, String planId) async {
+    await PlanService.addPlanMealToPlan(
       planId,
       PlanMeal(
         date: widget.date,
         meal: mealId,
         type: widget.mealType,
-        upvotes: [],
-        downvotes: [],
       ),
+    );
+    _logAnalyticsEvent(mealId.startsWith(kPlaceholderSymbol));
+  }
+
+  void _logAnalyticsEvent(bool isPlaceholder) {
+    FirebaseAnalytics.instance.logEvent(
+      name: 'add_meal_to_plan',
+      parameters: {
+        'isPlaceholder': isPlaceholder,
+      },
     );
   }
 

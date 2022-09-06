@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:concentric_transition/page_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -367,8 +368,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _shareCode(String code, bool? isPlanLocked) async {
     await Share.share(
-      'settings_share_msg'.tr(args: [kAppName, code]),
-      subject: 'settings_share_msg'.tr(args: [kAppName, code]),
+      'settings_share_msg'.tr(args: [kAppName, code, kAppDownloadUrl]),
+      subject: 'settings_share_msg_short'.tr(args: [kAppName, code]),
     );
     if (isPlanLocked != null && isPlanLocked && mounted) {
       MainSnackbar(
@@ -376,6 +377,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         infinite: true,
       ).show(context);
     }
+    FirebaseAnalytics.instance.logEvent(name: 'share_code');
   }
 
   Future<void> _changePlanCode(Plan plan) async {
@@ -448,6 +450,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await _reauthenticateUserAndDelete();
       }
     }
+    FirebaseAnalytics.instance.logEvent(name: 'delete_account');
   }
 
   Future<void> _reauthenticateUserAndDelete() async {

@@ -1,4 +1,5 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -24,13 +25,19 @@ class _TagFilterModalState extends State<TagFilterModal> {
   @override
   void initState() {
     _scrollController.addListener(_scrollListener);
-
     super.initState();
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    final selectedTags = context.read(mealTagFilterProvider).state;
+    if (selectedTags.isNotEmpty) {
+      FirebaseAnalytics.instance.logEvent(
+        name: 'meal_tag_filter',
+        parameters: {'tags': selectedTags.join(', ')},
+      );
+    }
     super.dispose();
   }
 

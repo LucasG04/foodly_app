@@ -4,6 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +19,7 @@ import '../../services/authentication_service.dart';
 import '../../services/foodly_user_service.dart';
 import '../../services/plan_service.dart';
 import '../../utils/basic_utils.dart';
+import '../../utils/firebase_auth_providers.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
@@ -281,7 +283,7 @@ class _LoginViewState extends State<LoginView> {
               _emailController.text, _passwordController.text)
           : AuthenticationService.signInUser(
               _emailController.text, _passwordController.text));
-      await _processAuthentication(userId);
+      await _processAuthentication(userId, FirebaseAuthProvider.password);
     } catch (e) {
       _handleMailAuthException(e);
     }
@@ -292,7 +294,7 @@ class _LoginViewState extends State<LoginView> {
 
     try {
       final userId = await AuthenticationService.signInWithApple();
-      await _processAuthentication(userId);
+      await _processAuthentication(userId, FirebaseAuthProvider.apple);
     } catch (e) {
       if (!mounted) {
         return;
@@ -312,7 +314,7 @@ class _LoginViewState extends State<LoginView> {
     BasicUtils.clearAllProvider(context);
   }
 
-  Future<void> _processAuthentication(String? userId) async {
+  Future<void> _processAuthentication(String? userId, String platform) async {
     if (userId == null || userId.isEmpty) {
       throw Exception('No user id.');
     }
@@ -359,7 +361,11 @@ class _LoginViewState extends State<LoginView> {
     if (!mounted) {
       return;
     }
-
+    if (_isRegistering) {
+      FirebaseAnalytics.instance.logSignUp(signUpMethod: platform);
+    } else {
+      FirebaseAnalytics.instance.logLogin(loginMethod: platform);
+    }
     context.read(planProvider).state = plan;
     context.read(userProvider).state = foodlyUser;
     AutoRouter.of(context).replace(const HomeScreenRoute());

@@ -1,6 +1,7 @@
 import 'package:concentric_transition/concentric_transition.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:group_list_view/group_list_view.dart';
@@ -281,6 +282,10 @@ class _MealListViewState extends State<MealListView>
     }
     context.read(_$isSearching).state = true;
     context.read(_$isLoading).state = false;
+    FirebaseAnalytics.instance.logEvent(
+      name: 'search_meal_list',
+      parameters: {'query': query},
+    );
   }
 
   void _scrollListener() {

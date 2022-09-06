@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 final kAppName = Platform.isIOS ? 'Foodster' : 'Foodly';
 const kPlaceholderSymbol = 'p--';
 const kChefkochShareEndpoint = 'https://www.chefkoch.de/rezepte';
+const kAppDownloadUrl = 'https://golenia.dev';
 
 /// Styling
 const kPadding = 20.0;
