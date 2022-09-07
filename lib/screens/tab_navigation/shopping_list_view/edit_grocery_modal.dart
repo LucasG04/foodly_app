@@ -13,7 +13,7 @@ import '../../../utils/debouncer.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/main_text_field.dart';
 import '../../../widgets/progress_button.dart';
-import 'suggestion_tile.dart';
+import '../../../widgets/suggestion_tile.dart';
 
 class EditGroceryModal extends StatefulWidget {
   final String shoppingListId;
