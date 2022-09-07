@@ -13,7 +13,7 @@ import '../../../utils/debouncer.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/main_text_field.dart';
 import '../../../widgets/progress_button.dart';
-import 'grocery_suggestion_tile.dart';
+import 'suggestion_tile.dart';
 
 class EditGroceryModal extends StatefulWidget {
   final String shoppingListId;
@@ -101,8 +101,8 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
                 spacing: kPadding / 2,
                 runSpacing: kPadding / 2,
                 children: ref(_$suggestions).state.take(6).map((grocery) {
-                  return GrocerySuggestionTile(
-                    grocery: grocery,
+                  return SuggestionTile(
+                    text: grocery.name.toString(),
                     onTap: () => _applyGroceryFromSuggestion(grocery),
                   );
                 }).toList(),
