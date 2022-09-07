@@ -14,7 +14,7 @@ class BasicUtils {
     context.read(userProvider).state = null;
   }
 
-  /// Clears all state providers.
+  /// Returns if the given image url/string is a image from Firebase Storage
   static bool isStorageMealImage(String image) {
     try {
       final date = DateTime.fromMicrosecondsSinceEpoch(
