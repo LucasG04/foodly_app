@@ -8,21 +8,16 @@ import '../services/storage_service.dart';
 import '../utils/basic_utils.dart';
 import 'skeleton_container.dart';
 
-class FoodlyNetworkImage extends StatefulWidget {
+class FoodlyNetworkImage extends StatelessWidget {
   final String imageUrl;
   final BoxFit boxFit;
 
-  const FoodlyNetworkImage(
+  FoodlyNetworkImage(
     this.imageUrl, {
     this.boxFit = BoxFit.cover,
     Key? key,
   }) : super(key: key);
 
-  @override
-  State<FoodlyNetworkImage> createState() => _FoodlyNetworkImageState();
-}
-
-class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
   final _dio = Dio()
     ..interceptors.add(
       DioCacheInterceptor(
@@ -32,9 +27,9 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
 
   @override
   Widget build(BuildContext context) {
-    return BasicUtils.isStorageMealImage(widget.imageUrl)
+    return BasicUtils.isStorageMealImage(imageUrl)
         ? FutureBuilder<String>(
-            future: StorageService.getMealImageUrl(widget.imageUrl),
+            future: StorageService.getMealImageUrl(imageUrl),
             builder: (context, snapshot) {
               return snapshot.data != null && snapshot.data!.isNotEmpty
                   ? _buildImageChecker(
@@ -44,7 +39,7 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
             },
           )
         : _buildImageChecker(
-            child: _buildCachedNetworkImage(widget.imageUrl),
+            child: _buildCachedNetworkImage(imageUrl),
           );
   }
 
@@ -60,7 +55,7 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
 
   FutureBuilder _buildImageChecker({required OptimizedCacheImage child}) {
     return FutureBuilder<bool>(
-      future: _imageIsAvailable(widget.imageUrl),
+      future: _imageIsAvailable(imageUrl),
       builder: (context, snapshot) =>
           snapshot.connectionState == ConnectionState.waiting
               ? _buildLoader()
