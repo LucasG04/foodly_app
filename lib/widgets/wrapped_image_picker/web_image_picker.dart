@@ -1,11 +1,11 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:logging/logging.dart';
+import 'package:logging/logging.dart' as app_logger;
+import 'package:optimized_cached_image/optimized_cached_image.dart';
 
 import '../../constants.dart';
 import '../../providers/state_providers.dart';
@@ -32,7 +32,7 @@ class WebImagePicker extends StatefulWidget {
 }
 
 class _WebImagePickerState extends State<WebImagePicker> {
-  final _log = Logger('LogRecordService');
+  final _log = app_logger.Logger('LogRecordService');
 
   final TextEditingController _inputController = TextEditingController();
   final bool _showLinkError = false;
@@ -225,7 +225,7 @@ class _WebImagePickerState extends State<WebImagePicker> {
   Widget _buildImage(String url) {
     url = url.replaceFirst('http://', 'https://');
     return _buildImageContainer(
-      child: CachedNetworkImage(
+      child: OptimizedCacheImage(
         imageUrl: url,
         imageBuilder: (context, image) => InkWell(
           onTap: () => _selectImage(url),

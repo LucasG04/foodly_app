@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/material.dart';
+import 'package:optimized_cached_image/optimized_cached_image.dart';
 
 import '../services/image_cache_service.dart';
 import '../services/storage_service.dart';
@@ -48,9 +48,9 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
           );
   }
 
-  CachedNetworkImage _buildCachedNetworkImage(String url) {
+  OptimizedCacheImage _buildCachedNetworkImage(String url) {
     url = url.replaceFirst('http://', 'https://');
-    return CachedNetworkImage(
+    return OptimizedCacheImage(
       imageUrl: url,
       fit: BoxFit.cover,
       placeholder: (_, __) => _buildLoader(),
@@ -58,7 +58,7 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
     );
   }
 
-  FutureBuilder _buildImageChecker({required CachedNetworkImage child}) {
+  FutureBuilder _buildImageChecker({required OptimizedCacheImage child}) {
     return FutureBuilder<bool>(
       future: _imageIsAvailable(widget.imageUrl),
       builder: (context, snapshot) =>
