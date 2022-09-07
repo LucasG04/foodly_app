@@ -24,6 +24,7 @@ import 'models/plan.dart';
 import 'providers/state_providers.dart';
 import 'services/authentication_service.dart';
 import 'services/foodly_user_service.dart';
+import 'services/image_cache_service.dart';
 import 'services/link_metadata_service.dart';
 import 'services/plan_service.dart';
 import 'services/settings_service.dart';
@@ -83,6 +84,7 @@ Future<void> initializeHive() async {
     SettingsService.initialize(),
     LinkMetadataService.initialize(),
     VersionService.initialize(),
+    ImageCacheService.initialize(),
   ]);
 }
 
