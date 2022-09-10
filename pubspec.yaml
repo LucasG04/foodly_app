@@ -59,7 +59,7 @@ dependencies:
   # Widgets
   flutter_snake_navigationbar: ^0.5.0
   eva_icons_flutter: ^3.0.2
-  optimized_cached_image: ^3.0.1
+  cached_network_image: ^3.2.2
   group_list_view: ^1.1.1
   adaptive_dialog: ^1.2.0
   flutter_markdown:
