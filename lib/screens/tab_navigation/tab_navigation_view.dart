@@ -6,12 +6,14 @@ import 'package:flutter_riverpod/src/provider.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
 
 import '../../app_router.gr.dart';
+import '../../models/grocery.dart';
+import '../../models/ingredient.dart';
 import '../../providers/state_providers.dart';
 import '../../services/shopping_list_service.dart';
 import '../../utils/widget_utils.dart';
+import '../../widgets/ingredient_edit_modal.dart';
 import 'meal_list_view/meal_list_view.dart';
 import 'plan_view/plan_tab_view.dart';
-import 'shopping_list_view/edit_grocery_modal.dart';
 import 'shopping_list_view/shopping_list_view.dart';
 
 class TabNavigationView extends StatefulWidget {
@@ -110,11 +112,20 @@ class _TabNavigationViewState extends State<TabNavigationView> {
       _activeListId = list.id;
     }
 
-    WidgetUtils.showFoodlyBottomSheet<void>(
+    final result = await WidgetUtils.showFoodlyBottomSheet<Ingredient?>(
       context: context,
-      builder: (_) => EditGroceryModal(
-        shoppingListId: _activeListId!,
+      builder: (_) => IngredientEditModal(
+        ingredient: Ingredient(),
       ),
+    );
+
+    if (result == null) {
+      return;
+    }
+
+    await ShoppingListService.addGrocery(
+      _activeListId!,
+      Grocery.fromIngredient(result),
     );
   }
 
