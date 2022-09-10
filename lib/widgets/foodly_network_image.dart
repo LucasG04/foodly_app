@@ -32,9 +32,7 @@ class FoodlyNetworkImage extends StatelessWidget {
             future: StorageService.getMealImageUrl(imageUrl),
             builder: (context, snapshot) {
               return snapshot.data != null && snapshot.data!.isNotEmpty
-                  ? _buildImageChecker(
-                      child: _buildCachedNetworkImage(snapshot.data!),
-                    )
+                  ? _buildCachedNetworkImage(snapshot.data!)
                   : _buildLoader();
             },
           )
