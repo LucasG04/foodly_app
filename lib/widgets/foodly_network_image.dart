@@ -8,16 +8,21 @@ import '../services/storage_service.dart';
 import '../utils/basic_utils.dart';
 import 'skeleton_container.dart';
 
-class FoodlyNetworkImage extends StatelessWidget {
+class FoodlyNetworkImage extends StatefulWidget {
   final String imageUrl;
   final BoxFit boxFit;
 
-  FoodlyNetworkImage(
+  const FoodlyNetworkImage(
     this.imageUrl, {
     this.boxFit = BoxFit.cover,
     Key? key,
   }) : super(key: key);
 
+  @override
+  State<FoodlyNetworkImage> createState() => _FoodlyNetworkImageState();
+}
+
+class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
   final _dio = Dio()
     ..interceptors.add(
       DioCacheInterceptor(
@@ -27,9 +32,9 @@ class FoodlyNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BasicUtils.isStorageMealImage(imageUrl)
+    return BasicUtils.isStorageMealImage(widget.imageUrl)
         ? FutureBuilder<String>(
-            future: StorageService.getMealImageUrl(imageUrl),
+            future: StorageService.getMealImageUrl(widget.imageUrl),
             builder: (context, snapshot) {
               return snapshot.data != null && snapshot.data!.isNotEmpty
                   ? _buildCachedNetworkImage(snapshot.data!)
@@ -37,7 +42,7 @@ class FoodlyNetworkImage extends StatelessWidget {
             },
           )
         : _buildImageChecker(
-            child: _buildCachedNetworkImage(imageUrl),
+            child: _buildCachedNetworkImage(widget.imageUrl),
           );
   }
 
@@ -53,7 +58,7 @@ class FoodlyNetworkImage extends StatelessWidget {
 
   FutureBuilder _buildImageChecker({required CachedNetworkImage child}) {
     return FutureBuilder<bool>(
-      future: _imageIsAvailable(imageUrl),
+      future: _imageIsAvailable(widget.imageUrl),
       builder: (context, snapshot) =>
           snapshot.connectionState == ConnectionState.waiting
               ? _buildLoader()
@@ -80,7 +85,7 @@ class FoodlyNetworkImage extends StatelessWidget {
     try {
       final response = await _dio.head<dynamic>(url);
       return response.statusCode == 200;
-    } catch (_) {
+    } catch (error) {
       return false;
     }
   }
