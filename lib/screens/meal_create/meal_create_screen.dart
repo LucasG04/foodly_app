@@ -212,7 +212,11 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                                     padding: const EdgeInsets.symmetric(
                                       vertical: kPadding / 2,
                                     ),
-                                    child: LinkPreview(_sourceController.text),
+                                    child: Consumer(
+                                      builder: (_, ref, __) => LinkPreview(
+                                        ref(_$sourceLinkMetadata).state ?? '',
+                                      ),
+                                    ),
                                   ),
                                 const Divider(),
                                 if (!_isLoadingMeal) ...[

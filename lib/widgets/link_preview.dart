@@ -12,6 +12,7 @@ import 'skeleton_container.dart';
 class LinkPreview extends StatefulWidget {
   final String link;
   final bool isSmall;
+
   const LinkPreview(
     this.link, {
     this.isSmall = true,
