@@ -54,22 +54,24 @@ class _HomeScreenState extends State<HomeScreen> with DisposableWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext _) {
     return Consumer(builder: (context, watch, _) {
       final initialUserLoading = watch(initialUserLoadingProvider).state;
+      final initialPlanLoading = watch(initialPlanLoadingProvider).state;
       final user = watch(userProvider).state;
-      if (initialUserLoading) {
+
+      if (SettingsService.isFirstUsage) {
+        AutoRouter.of(context).replace(OnboardingScreenRoute());
+        return const Scaffold();
+      } else if (!initialUserLoading && user == null) {
+        AutoRouter.of(context).replace(const AuthenticationScreenRoute());
+        return const Scaffold();
+      } else if (!initialUserLoading && !initialPlanLoading && user != null) {
+        return _buildNavigationView();
+      } else {
         return const Scaffold(
           body: Center(child: SmallCircularProgressIndicator()),
         );
-      } else if (user != null) {
-        return _buildNavigationView();
-      } else if (SettingsService.isFirstUsage) {
-        AutoRouter.of(context).replace(OnboardingScreenRoute());
-        return const Scaffold();
-      } else {
-        AutoRouter.of(context).replace(const AuthenticationScreenRoute());
-        return const Scaffold();
       }
     });
   }

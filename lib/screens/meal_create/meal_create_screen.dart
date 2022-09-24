@@ -54,6 +54,8 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   final TextEditingController _instructionsController = TextEditingController();
   final TextEditingController _sourceController = TextEditingController();
 
+  final _$sourceLinkMetadata = AutoDisposeStateProvider<String?>((_) => null);
+
   Meal _meal = Meal(name: '');
   Meal _originalMeal = Meal(name: '');
   String? _updatedImage;
@@ -188,6 +190,8 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                                         placeholder:
                                             'meal_create_source_placeholder'
                                                 .tr(),
+                                        onChange: (newText) =>
+                                            _onSourceTextChange(newText.trim()),
                                       ),
                                     ),
                                     const SizedBox(width: kPadding / 2),
@@ -206,8 +210,13 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                                 if (!_isLoadingMeal)
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        vertical: kPadding / 2),
-                                    child: LinkPreview(_sourceController.text),
+                                      vertical: kPadding / 2,
+                                    ),
+                                    child: Consumer(
+                                      builder: (_, ref, __) => LinkPreview(
+                                        ref(_$sourceLinkMetadata).state ?? '',
+                                      ),
+                                    ),
                                   ),
                                 const Divider(),
                                 if (!_isLoadingMeal) ...[
@@ -485,5 +494,16 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
       }
     }
     return true;
+  }
+
+  void _onSourceTextChange(String newText) {
+    if (newText.isEmpty) {
+      context.read(_$sourceLinkMetadata).state = null;
+      return;
+    }
+    final textIsUri = BasicUtils.isValidUri(newText);
+    if (textIsUri) {
+      context.read(_$sourceLinkMetadata).state = newText;
+    }
   }
 }
