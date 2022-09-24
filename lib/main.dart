@@ -164,6 +164,10 @@ class _FoodlyAppState extends State<FoodlyApp> with DisposableWidget {
         context.read(planProvider).state = newPlan;
       }
     }
+
+    BasicUtils.afterBuild(
+      () => context.read(initialPlanLoadingProvider).state = false,
+    );
   }
 
   Future<void> _loadActiveUser(BuildContext context) async {
