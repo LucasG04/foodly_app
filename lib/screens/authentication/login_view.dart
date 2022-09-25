@@ -7,6 +7,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
@@ -152,7 +153,13 @@ class _LoginViewState extends State<LoginView> {
                   autofocus: true,
                   keyboardType: TextInputType.emailAddress,
                   onSubmit: () => _passwordFocusNode.requestFocus(),
-                  autofillHints: const [AutofillHints.email],
+                  autofillHints: [
+                    AutofillHints.email,
+                    // ignore: prefer_if_elements_to_conditional_expressions
+                    _isRegistering
+                        ? AutofillHints.newUsername
+                        : AutofillHints.username,
+                  ],
                 ),
                 MainTextField(
                   key: AuthenticationKeys.inputPassword,
@@ -277,6 +284,7 @@ class _LoginViewState extends State<LoginView> {
       return;
     }
 
+    TextInput.finishAutofillContext();
     try {
       final userId = await (_isRegistering && !_forgotPlan
           ? AuthenticationService.registerUser(
