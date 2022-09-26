@@ -1,3 +1,3 @@
 #!/bin/sh
 
-printf "%s" "$DUMMY_SECRETS" > "./lib/utils/secrets.dart"
+printf "%s" "$SECRETS_ENV_DUMMY" > ".env"

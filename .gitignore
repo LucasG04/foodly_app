@@ -8,6 +8,8 @@ google-services.json
 key.jks
 service_account_key.json
 android_keys.zip
+*.env
+env.g.dart
 
 # Builds
 android/fastlane/report.xml

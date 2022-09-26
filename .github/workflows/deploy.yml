@@ -24,11 +24,13 @@ jobs:
       - name: Create general secrets
         run: sh ./.github/scripts/create_general_secrets.sh
         env:
-          GENERAL_SECRETS_DART: ${{ secrets.GENERAL_SECRETS_DART }}
+          SECRETS_ENV: ${{ secrets.SECRETS_ENV }}
       - name: Create ios secrets
         run: sh ./.github/scripts/create_secret_files.sh
         env:
           GOOGLE_SERVICES_IOS: ${{ secrets.GOOGLE_SERVICES_IOS }}
+      - name: Run Flutter build runner
+        run: flutter pub run build_runner build --delete-conflicting-outputs
       - name: Test
         run: flutter test
       - name: Set version to version in commit
@@ -81,11 +83,13 @@ jobs:
       - name: Create general secrets
         run: sh ./.github/scripts/create_general_secrets.sh
         env:
-          GENERAL_SECRETS_DART: ${{ secrets.GENERAL_SECRETS_DART }}
+          SECRETS_ENV: ${{ secrets.SECRETS_ENV }}
       - name: Decrypt Android keys
         run: sh ./.github/scripts/decrypt_android_keys.sh
         env:
           ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.ANDROID_KEYS_SECRET_PASSPHRASE }}
+      - name: Run Flutter build runner
+        run: flutter pub run build_runner build --delete-conflicting-outputs
       - name: Test
         run: flutter test
       - name: Set version to version in commit
