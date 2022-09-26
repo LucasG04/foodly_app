@@ -7,7 +7,7 @@ packages:
       name: _fe_analyzer_shared
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "38.0.0"
+    version: "43.0.0"
   adaptive_dialog:
     dependency: "direct main"
     description:
@@ -21,7 +21,7 @@ packages:
       name: analyzer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.4.1"
+    version: "4.3.1"
   animations:
     dependency: transitive
     description:
@@ -63,14 +63,14 @@ packages:
       name: auto_route
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.1"
+    version: "4.2.1"
   auto_route_generator:
     dependency: "direct dev"
     description:
       name: auto_route_generator
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.0"
+    version: "4.2.1"
   auto_size_text:
     dependency: "direct main"
     description:
@@ -304,6 +304,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.2.0"
+  dotenv:
+    dependency: transitive
+    description:
+      name: dotenv
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.1"
   dotted_border:
     dependency: "direct main"
     description:
@@ -332,6 +339,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
+  envied:
+    dependency: "direct main"
+    description:
+      name: envied
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.3"
+  envied_generator:
+    dependency: "direct dev"
+    description:
+      name: envied_generator
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.3"
   eva_icons_flutter:
     dependency: "direct main"
     description:

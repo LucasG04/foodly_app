@@ -19,6 +19,9 @@ analyzer:
     unnecessary_import: ignore
   exclude:
     - "bin/cache/**"
+    - "**.g.dart"
+    - "**.gr.dart"
+    - "**.freezed.dart"
 
 linter:
   rules:
