@@ -177,6 +177,9 @@ class _LoginViewState extends State<LoginView> {
               ],
             ),
           ),
+          SizedBox(
+            height: MediaQuery.of(context).viewInsets.bottom / 6,
+          ),
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 250),
             child: !_isRegistering
@@ -198,8 +201,7 @@ class _LoginViewState extends State<LoginView> {
           const SizedBox(height: kPadding / 2),
           if (Platform.isIOS) SignInWithAppleButton(onPressed: _authWithApple),
           SizedBox(
-            height: size.height * 0.1 +
-                MediaQuery.of(context).viewInsets.bottom / 6,
+            height: size.height * 0.1,
             child: _unknownErrorText != null
                 ? Row(
                     children: [
