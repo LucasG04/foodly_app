@@ -9,7 +9,7 @@ import '../../constants.dart';
 Future<bool> showLeaveConfirmDialog(BuildContext context) async {
   final leavePlan = await showDialog<bool?>(
     context: context,
-    builder: (_) => Platform.isIOS
+    builder: (_) => Platform.isIOS || Platform.isMacOS
         ? _buildIOSLeaveDialog(context)
         : _buildLeaveDialog(context),
   );
@@ -81,7 +81,7 @@ AlertDialog _buildLeaveDialog(BuildContext context) {
 Future<bool> showDeleteConfirmDialog(BuildContext context) async {
   final delete = await showDialog<bool?>(
     context: context,
-    builder: (_) => Platform.isIOS
+    builder: (_) => Platform.isIOS || Platform.isMacOS
         ? _buildIOSDeleteConfirmDialog(context)
         : _buildDeleteConfirmDialog(context),
   );

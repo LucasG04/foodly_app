@@ -249,7 +249,7 @@ class _ShoppingListViewState extends State<ShoppingListView>
     if (_shouldAskForRemovingOfBought(boughtGroceries.length)) {
       showDialog<void>(
         context: context,
-        builder: (_) => Platform.isIOS
+        builder: (_) => Platform.isIOS || Platform.isMacOS
             ? _buildIOSAlertDialog(listId)
             : _buildAlertDialog(listId),
       );

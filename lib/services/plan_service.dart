@@ -91,6 +91,7 @@ class PlanService {
       hourDiffToUtc: now.differenceTimeZoneOffset(now.toUtc()).inHours,
       name: name,
       users: [],
+      lastUserJoined: DateTime.now(),
     );
     _log.finest('createPlan: Plan is: ${plan.toMap()}');
 
@@ -257,6 +258,16 @@ class PlanService {
         'locked': plan.locked ?? false
       });
     }
+  }
+
+  static Future<void> lockPlan(String planId) async {
+    _log.finer('Call lockPlan');
+    final plan = await getPlanById(planId);
+    if (plan == null) {
+      return;
+    }
+    plan.locked = true;
+    await updatePlan(plan);
   }
 }
 

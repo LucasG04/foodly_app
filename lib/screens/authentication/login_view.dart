@@ -199,7 +199,8 @@ class _LoginViewState extends State<LoginView> {
                   ),
           ),
           const SizedBox(height: kPadding / 2),
-          if (Platform.isIOS) SignInWithAppleButton(onPressed: _authWithApple),
+          if (Platform.isIOS || Platform.isMacOS)
+            SignInWithAppleButton(onPressed: _authWithApple),
           SizedBox(
             height: size.height * 0.1,
             child: _unknownErrorText != null
@@ -351,6 +352,7 @@ class _LoginViewState extends State<LoginView> {
         return;
       }
       plan.users!.add(userId);
+      plan.lastUserJoined = DateTime.now();
       await PlanService.updatePlan(plan);
     }
 
