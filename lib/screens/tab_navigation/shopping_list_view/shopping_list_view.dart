@@ -11,6 +11,7 @@ import '../../../constants.dart';
 import '../../../models/grocery.dart';
 import '../../../models/shopping_list.dart';
 import '../../../providers/state_providers.dart';
+import '../../../services/app_review_service.dart';
 import '../../../services/settings_service.dart';
 import '../../../services/shopping_list_service.dart';
 import '../../../utils/basic_utils.dart';
@@ -96,7 +97,12 @@ class _ShoppingListViewState extends State<ShoppingListView>
             child: AnimatedShoppingList(
               groceries: todoItems,
               onEdit: (e) => _editGrocery(listId, e),
-              onTap: (item) => _removeBoughtGrocery(listId, item, boughtItems),
+              onTap: (item) => _removeBoughtGrocery(
+                listId,
+                item,
+                todoItems,
+                boughtItems,
+              ),
             ),
           ),
           const SizedBox(height: kPadding),
@@ -212,8 +218,9 @@ class _ShoppingListViewState extends State<ShoppingListView>
     Share.share(shareText, subject: '$subject...');
   }
 
-  void _removeBoughtGrocery(
-      String listId, Grocery grocery, List<Grocery> boughtItems) {
+  void _removeBoughtGrocery(String listId, Grocery grocery, List<Grocery> items,
+      List<Grocery> boughtItems) {
+    AppReviewService.logGroceryBought(items.isEmpty);
     if (!SettingsService.removeBoughtImmediately) {
       grocery.bought = true;
       grocery.lastBoughtEdited = DateTime.now();

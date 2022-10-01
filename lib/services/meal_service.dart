@@ -3,6 +3,7 @@ import 'package:logging/logging.dart';
 
 import '../models/meal.dart';
 import '../utils/convert_util.dart';
+import 'app_review_service.dart';
 import 'meal_stat_service.dart';
 
 class MealService {
@@ -82,6 +83,7 @@ class MealService {
       final created = await _firestore.add(meal);
       meal.id = created.id;
       await MealStatService.bumpStat(meal.planId!, meal.id!);
+      AppReviewService.logMealCreated();
 
       return meal;
     } catch (e) {

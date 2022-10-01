@@ -7,6 +7,7 @@ import '../constants.dart';
 import '../models/plan.dart';
 import '../models/plan_meal.dart';
 import '../utils/convert_util.dart';
+import 'app_review_service.dart';
 import 'authentication_service.dart';
 import 'meal_stat_service.dart';
 import 'shopping_list_service.dart';
@@ -175,6 +176,7 @@ class PlanService {
           bumpCount: true, bumpLastPlanned: true);
     }
     await _firestore.doc(planId).collection('meals').add(planMeal.toMap());
+    AppReviewService.logPlanMeal();
   }
 
   static Future<void> updatePlanMealFromPlan(String? planId, PlanMeal meal) {
