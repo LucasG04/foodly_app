@@ -223,10 +223,13 @@ class _HomeScreenState extends State<HomeScreen> with DisposableWidget {
     final planIsLocked = plan.locked != null && plan.locked!;
     final lastUserJoinedIsFiveDaysAgo = plan.lastUserJoined != null &&
         plan.lastUserJoined!.difference(DateTime.now()).inDays.abs() > 5;
+    final lastLockedChecked = PlanService.lastLockedChecked();
+    final lastLockCheck2WeeksAgo = lastLockedChecked != null &&
+        lastLockedChecked.difference(DateTime.now()).inDays.abs() > 14;
 
-    // TODO: check when last time checked, to avoid spamming (consider saving the plan id with the date)
-
-    if (planIsLocked && !lastUserJoinedIsFiveDaysAgo) {
+    if (planIsLocked &&
+        !lastUserJoinedIsFiveDaysAgo &&
+        !lastLockCheck2WeeksAgo) {
       return false;
     }
 

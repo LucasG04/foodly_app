@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hive/hive.dart';
 import 'package:logging/logging.dart';
 
 import '../constants.dart';
@@ -22,7 +23,13 @@ class PlanService {
             toFirestore: (model, _) => model.toMap(),
           );
 
+  static late Box _planBox;
+
   PlanService._();
+
+  static Future initialize() async {
+    _planBox = await Hive.openBox<dynamic>('plan');
+  }
 
   static Future<String?> getCurrentPlanId() async {
     _log.finer(
@@ -268,6 +275,20 @@ class PlanService {
     }
     plan.locked = true;
     await updatePlan(plan);
+  }
+
+  static DateTime? lastLockedChecked() {
+    _log.finer('Call lastLockedChecked');
+    final milliseconds = _planBox.get('lastLockedCheck') as int?;
+    return milliseconds != null
+        ? DateTime.fromMillisecondsSinceEpoch(milliseconds)
+        : null;
+  }
+
+  static Future<void> setLastLockedCheck() async {
+    _log.finer('Call setLastLockedCheck');
+    await _planBox.put(
+        'lastLockedCheck', DateTime.now().millisecondsSinceEpoch);
   }
 }
 
