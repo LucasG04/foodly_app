@@ -87,6 +87,7 @@ Future<void> initializeHive() async {
     VersionService.initialize(),
     ImageCacheService.initialize(),
     AppReviewService.initialize(),
+    PlanService.initialize(),
   ]);
 }
 

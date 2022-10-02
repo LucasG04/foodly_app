@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
@@ -16,11 +15,13 @@ import 'package:version/version.dart';
 import '../../app_router.gr.dart';
 import '../../constants.dart';
 import '../../providers/state_providers.dart';
+import '../../services/plan_service.dart';
 import '../../services/settings_service.dart';
 import '../../services/version_service.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/new_version_modal.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
+import 'home_screen_dialogs.dart';
 import 'plan_history_view.dart';
 import 'tab_navigation_view.dart';
 
@@ -37,8 +38,7 @@ class _HomeScreenState extends State<HomeScreen> with DisposableWidget {
 
   @override
   void initState() {
-    _checkForNewFeaturesNotification();
-    _checkForUpdate();
+    _showAlerts();
     super.initState();
     context
         .read(planHistoryPageChanged)
@@ -96,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> with DisposableWidget {
     );
   }
 
-  void _checkForNewFeaturesNotification() async {
+  Future<bool> _checkForNewFeaturesNotification() async {
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
     final String? lastCheckedVersionString = VersionService.lastCheckedVersion;
 
@@ -106,22 +106,23 @@ class _HomeScreenState extends State<HomeScreen> with DisposableWidget {
 
     if (lastCheckedVersionString == null) {
       VersionService.lastCheckedVersion = packageInfo.version;
-      return;
+      return false;
     }
 
     final Version currentVersion = Version.parse(packageInfo.version);
     final Version lastCheckedVersion = Version.parse(lastCheckedVersionString);
 
     if (lastCheckedVersion >= currentVersion) {
-      return;
+      return false;
     }
 
     if (!mounted) {
-      return;
+      return false;
     }
     NewVersionModal.open(context).then((_) {
       VersionService.lastCheckedVersion = packageInfo.version;
     });
+    return true;
   }
 
   void _checkForUpdate() async {
@@ -132,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> with DisposableWidget {
 
     if (Platform.isAndroid) {
       _checkForUpdateAndroid();
-    } else if (Platform.isIOS) {
+    } else if (Platform.isIOS || Platform.isMacOS) {
       _checkForUpdateIOS();
     }
   }
@@ -197,34 +198,12 @@ class _HomeScreenState extends State<HomeScreen> with DisposableWidget {
   Future<void> _showIOSUpdateDialog() {
     return showDialog<void>(
       context: context,
-      builder: (_) => CupertinoAlertDialog(
-        title: Column(
-          children: <Widget>[
-            Text('update_dialog_title'.tr(args: [kAppName])),
-          ],
-        ),
-        content: Column(
-          children: [
-            const SizedBox(height: kPadding / 2),
-            Text('update_dialog_description'.tr()),
-            Text('update_dialog_question'.tr()),
-          ],
-        ),
-        actions: <Widget>[
-          CupertinoDialogAction(
-            onPressed: () => Navigator.of(context).pop(),
-            isDestructiveAction: true,
-            child: Text('update_dialog_action_later'.tr().toUpperCase()),
-          ),
-          CupertinoDialogAction(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _openAppStore();
-            },
-            isDefaultAction: true,
-            child: Text('update_dialog_action_update'.tr().toUpperCase()),
-          ),
-        ],
+      builder: (context) => HomeScreenDialogs.updateDialogCupertino(
+        onUpdate: () {
+          Navigator.of(context).pop();
+          _openAppStore();
+        },
+        onDismiss: () => Navigator.of(context).pop(),
       ),
     );
   }
@@ -234,5 +213,68 @@ class _HomeScreenState extends State<HomeScreen> with DisposableWidget {
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     }
+  }
+
+  bool _checkLockPlan() {
+    final plan = context.read(planProvider).state;
+    if (plan == null) {
+      return false;
+    }
+    final planIsLocked = plan.locked != null && plan.locked!;
+    final lastUserJoinedIsFiveDaysAgo = plan.lastUserJoined != null &&
+        plan.lastUserJoined!.difference(DateTime.now()).inDays.abs() > 5;
+    final lastLockedChecked = PlanService.lastLockedChecked();
+    final lastLockCheck2WeeksAgo = lastLockedChecked != null &&
+        lastLockedChecked.difference(DateTime.now()).inDays.abs() > 14;
+
+    if (planIsLocked ||
+        !lastUserJoinedIsFiveDaysAgo ||
+        !lastLockCheck2WeeksAgo) {
+      return false;
+    }
+    PlanService.setLastLockedCheck();
+
+    if (!mounted) {
+      return false;
+    }
+    _showLockPlanAlert();
+    return true;
+  }
+
+  void _showLockPlanAlert() {
+    void onLock() {
+      Navigator.of(context).pop();
+      PlanService.lockPlan(context.read(planProvider).state!.id!);
+    }
+
+    void onDismiss() => Navigator.of(context).pop();
+
+    showDialog<void>(
+      context: context,
+      builder: (context) => Platform.isIOS || Platform.isMacOS
+          ? HomeScreenDialogs.lockPlanCupertino(
+              onLock: onLock,
+              onDismiss: onDismiss,
+            )
+          : HomeScreenDialogs.lockPlanMaterial(
+              onLock: onLock,
+              onDismiss: onDismiss,
+              context: context,
+            ),
+    );
+  }
+
+  void _showAlerts() async {
+    final newFeaturesShown = await _checkForNewFeaturesNotification();
+    if (newFeaturesShown) {
+      return;
+    }
+
+    if (_shouldCheckForUpdate()) {
+      _checkForUpdate();
+      return;
+    }
+
+    _checkLockPlan();
   }
 }

@@ -9,6 +9,7 @@ class Plan {
   int? hourDiffToUtc;
   bool? adFree;
   bool? locked;
+  DateTime? lastUserJoined;
 
   Plan({
     this.id,
@@ -19,6 +20,7 @@ class Plan {
     this.hourDiffToUtc,
     this.adFree,
     this.locked,
+    this.lastUserJoined,
   });
 
   Map<String, dynamic> toMap() {
@@ -29,6 +31,7 @@ class Plan {
       'hourDiffToUtc': hourDiffToUtc,
       'adFree': adFree ?? false,
       'locked': locked ?? false,
+      'lastUserJoined': lastUserJoined?.millisecondsSinceEpoch ?? 0,
     };
   }
 
@@ -41,6 +44,8 @@ class Plan {
       hourDiffToUtc: map['hourDiffToUtc'] as int? ?? 0,
       adFree: (map['adFree'] as bool?) ?? false,
       locked: (map['locked'] as bool?) ?? false,
+      lastUserJoined: DateTime.fromMillisecondsSinceEpoch(
+          map['lastUserJoined'] as int? ?? 0),
     );
   }
 
