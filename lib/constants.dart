@@ -3,7 +3,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 
 /// General constants
-final kAppName = Platform.isIOS ? 'Foodster' : 'Foodly';
+final kAppName = Platform.isIOS || Platform.isMacOS ? 'Foodster' : 'Foodly';
 const kPlaceholderSymbol = 'p--';
 const kChefkochShareEndpoint = 'https://www.chefkoch.de/rezepte';
 const kAppDownloadUrl = 'https://golenia.dev';
