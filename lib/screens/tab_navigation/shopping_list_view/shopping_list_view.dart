@@ -53,13 +53,15 @@ class _ShoppingListViewState extends State<ShoppingListView>
                   return StreamBuilder<List<Grocery>>(
                     stream: ShoppingListService.streamShoppingList(listId),
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
+                      if (snapshot.connectionState == ConnectionState.waiting ||
+                          snapshot.connectionState == ConnectionState.none) {
                         return _buildLoader();
                       }
+                      final data = snapshot.data ?? [];
                       final List<Grocery> todoItems =
-                          snapshot.data!.where((e) => !e.bought).toList();
+                          data.where((e) => !e.bought).toList();
                       final List<Grocery> boughtItems =
-                          snapshot.data!.where((e) => e.bought).toList();
+                          data.where((e) => e.bought).toList();
                       boughtItems.sort(
                         (a, b) =>
                             b.lastBoughtEdited.compareTo(a.lastBoughtEdited),
