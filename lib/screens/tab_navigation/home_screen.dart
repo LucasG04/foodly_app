@@ -227,11 +227,12 @@ class _HomeScreenState extends State<HomeScreen> with DisposableWidget {
     final lastLockCheck2WeeksAgo = lastLockedChecked != null &&
         lastLockedChecked.difference(DateTime.now()).inDays.abs() > 14;
 
-    if (planIsLocked &&
-        !lastUserJoinedIsFiveDaysAgo &&
+    if (planIsLocked ||
+        !lastUserJoinedIsFiveDaysAgo ||
         !lastLockCheck2WeeksAgo) {
       return false;
     }
+    PlanService.setLastLockedCheck();
 
     if (!mounted) {
       return false;
