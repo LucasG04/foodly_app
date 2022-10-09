@@ -46,6 +46,7 @@ dependencies:
   version: ^2.0.0
   package_info_plus: ^1.4.2
   update_available: ^2.1.0
+  envied: ^0.2.3
 
   # Firebase
   firebase_core: ^1.21.1
@@ -59,7 +60,7 @@ dependencies:
   # Widgets
   flutter_snake_navigationbar: ^0.5.0
   eva_icons_flutter: ^3.0.2
-  optimized_cached_image: ^3.0.1
+  cached_network_image: ^3.2.2
   group_list_view: ^1.1.1
   adaptive_dialog: ^1.2.0
   flutter_markdown:
@@ -72,6 +73,7 @@ dependencies:
     git:
       url: https://github.com/LucasG04/flutter-concentric-transition.git
   dotted_border: ^2.0.0+2
+  in_app_review: ^2.0.4
 
   # Icons/Styles/Animations
   cupertino_icons: ^1.0.4
@@ -89,6 +91,7 @@ dev_dependencies:
   auto_route_generator: ^4.0.0
   hive_generator: ^1.1.1
   flutter_launcher_icons: ^0.9.0
+  envied_generator: ^0.2.3
 
 # dependency_overrides:
 #   platform: ^3.1.0

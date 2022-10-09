@@ -1,12 +1,14 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hive/hive.dart';
 import 'package:logging/logging.dart';
 
 import '../constants.dart';
 import '../models/plan.dart';
 import '../models/plan_meal.dart';
 import '../utils/convert_util.dart';
+import 'app_review_service.dart';
 import 'authentication_service.dart';
 import 'meal_stat_service.dart';
 import 'shopping_list_service.dart';
@@ -21,7 +23,13 @@ class PlanService {
             toFirestore: (model, _) => model.toMap(),
           );
 
+  static late Box _planBox;
+
   PlanService._();
+
+  static Future initialize() async {
+    _planBox = await Hive.openBox<dynamic>('plan');
+  }
 
   static Future<String?> getCurrentPlanId() async {
     _log.finer(
@@ -90,6 +98,7 @@ class PlanService {
       hourDiffToUtc: now.differenceTimeZoneOffset(now.toUtc()).inHours,
       name: name,
       users: [],
+      lastUserJoined: DateTime.now(),
     );
     _log.finest('createPlan: Plan is: ${plan.toMap()}');
 
@@ -175,6 +184,7 @@ class PlanService {
           bumpCount: true, bumpLastPlanned: true);
     }
     await _firestore.doc(planId).collection('meals').add(planMeal.toMap());
+    AppReviewService.logPlanMeal();
   }
 
   static Future<void> updatePlanMealFromPlan(String? planId, PlanMeal meal) {
@@ -255,6 +265,30 @@ class PlanService {
         'locked': plan.locked ?? false
       });
     }
+  }
+
+  static Future<void> lockPlan(String planId) async {
+    _log.finer('Call lockPlan');
+    final plan = await getPlanById(planId);
+    if (plan == null) {
+      return;
+    }
+    plan.locked = true;
+    await updatePlan(plan);
+  }
+
+  static DateTime? lastLockedChecked() {
+    _log.finer('Call lastLockedChecked');
+    final milliseconds = _planBox.get('lastLockedCheck') as int?;
+    return milliseconds != null
+        ? DateTime.fromMillisecondsSinceEpoch(milliseconds)
+        : null;
+  }
+
+  static Future<void> setLastLockedCheck() async {
+    _log.finer('Call setLastLockedCheck');
+    await _planBox.put(
+        'lastLockedCheck', DateTime.now().millisecondsSinceEpoch);
   }
 }
 

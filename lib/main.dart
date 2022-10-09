@@ -22,6 +22,7 @@ import 'models/foodly_user.dart';
 import 'models/link_metadata.dart';
 import 'models/plan.dart';
 import 'providers/state_providers.dart';
+import 'services/app_review_service.dart';
 import 'services/authentication_service.dart';
 import 'services/foodly_user_service.dart';
 import 'services/image_cache_service.dart';
@@ -85,6 +86,8 @@ Future<void> initializeHive() async {
     LinkMetadataService.initialize(),
     VersionService.initialize(),
     ImageCacheService.initialize(),
+    AppReviewService.initialize(),
+    PlanService.initialize(),
   ]);
 }
 
@@ -164,6 +167,10 @@ class _FoodlyAppState extends State<FoodlyApp> with DisposableWidget {
         context.read(planProvider).state = newPlan;
       }
     }
+
+    BasicUtils.afterBuild(
+      () => context.read(initialPlanLoadingProvider).state = false,
+    );
   }
 
   Future<void> _loadActiveUser(BuildContext context) async {

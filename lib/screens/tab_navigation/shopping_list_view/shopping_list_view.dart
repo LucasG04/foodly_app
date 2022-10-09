@@ -12,6 +12,7 @@ import '../../../models/grocery.dart';
 import '../../../models/ingredient.dart';
 import '../../../models/shopping_list.dart';
 import '../../../providers/state_providers.dart';
+import '../../../services/app_review_service.dart';
 import '../../../services/settings_service.dart';
 import '../../../services/shopping_list_service.dart';
 import '../../../utils/basic_utils.dart';
@@ -53,13 +54,15 @@ class _ShoppingListViewState extends State<ShoppingListView>
                   return StreamBuilder<List<Grocery>>(
                     stream: ShoppingListService.streamShoppingList(listId),
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
+                      if (snapshot.connectionState == ConnectionState.waiting ||
+                          snapshot.connectionState == ConnectionState.none) {
                         return _buildLoader();
                       }
+                      final data = snapshot.data ?? [];
                       final List<Grocery> todoItems =
-                          snapshot.data!.where((e) => !e.bought).toList();
+                          data.where((e) => !e.bought).toList();
                       final List<Grocery> boughtItems =
-                          snapshot.data!.where((e) => e.bought).toList();
+                          data.where((e) => e.bought).toList();
                       boughtItems.sort(
                         (a, b) =>
                             b.lastBoughtEdited.compareTo(a.lastBoughtEdited),
@@ -97,7 +100,12 @@ class _ShoppingListViewState extends State<ShoppingListView>
             child: AnimatedShoppingList(
               groceries: todoItems,
               onEdit: (e) => _editGrocery(listId, e),
-              onTap: (item) => _removeBoughtGrocery(listId, item, boughtItems),
+              onTap: (item) => _removeBoughtGrocery(
+                listId,
+                item,
+                todoItems,
+                boughtItems,
+              ),
             ),
           ),
           const SizedBox(height: kPadding),
@@ -224,8 +232,9 @@ class _ShoppingListViewState extends State<ShoppingListView>
     Share.share(shareText, subject: '$subject...');
   }
 
-  void _removeBoughtGrocery(
-      String listId, Grocery grocery, List<Grocery> boughtItems) {
+  void _removeBoughtGrocery(String listId, Grocery grocery, List<Grocery> items,
+      List<Grocery> boughtItems) {
+    AppReviewService.logGroceryBought(items.isEmpty);
     if (!SettingsService.removeBoughtImmediately) {
       grocery.bought = true;
       grocery.lastBoughtEdited = DateTime.now();
@@ -254,7 +263,7 @@ class _ShoppingListViewState extends State<ShoppingListView>
     if (_shouldAskForRemovingOfBought(boughtGroceries.length)) {
       showDialog<void>(
         context: context,
-        builder: (_) => Platform.isIOS
+        builder: (_) => Platform.isIOS || Platform.isMacOS
             ? _buildIOSAlertDialog(listId)
             : _buildAlertDialog(listId),
       );

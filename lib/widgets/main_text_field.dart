@@ -23,6 +23,7 @@ class MainTextField extends StatefulWidget {
   final String Function(String?)? validator;
   final bool required;
   final List<String>? autofillHints;
+  final TextCapitalization? textCapitalization;
 
   const MainTextField({
     required this.controller,
@@ -44,6 +45,7 @@ class MainTextField extends StatefulWidget {
     this.validator,
     this.required = false,
     this.autofillHints,
+    this.textCapitalization,
     Key? key,
   }) : super(key: key);
 
@@ -100,6 +102,8 @@ class _MainTextFieldState extends State<MainTextField> {
         autofocus: widget.autofocus,
         focusNode: _focusNode,
         autofillHints: widget.autofillHints,
+        textCapitalization:
+            widget.textCapitalization ?? TextCapitalization.none,
         decoration: InputDecoration(
           hintText: widget.placeholder,
           border: OutlineInputBorder(
