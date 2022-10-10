@@ -112,20 +112,17 @@ class _TabNavigationViewState extends State<TabNavigationView> {
       _activeListId = list.id;
     }
 
-    final result = await WidgetUtils.showFoodlyBottomSheet<Ingredient?>(
+    await WidgetUtils.showFoodlyBottomSheet<Ingredient?>(
       context: context,
       builder: (_) => IngredientEditModal(
         ingredient: Ingredient(),
+        onSaved: (result) async {
+          await ShoppingListService.addGrocery(
+            _activeListId!,
+            Grocery.fromIngredient(result),
+          );
+        },
       ),
-    );
-
-    if (result == null) {
-      return;
-    }
-
-    await ShoppingListService.addGrocery(
-      _activeListId!,
-      Grocery.fromIngredient(result),
     );
   }
 

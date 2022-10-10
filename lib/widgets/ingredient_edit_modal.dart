@@ -17,9 +17,11 @@ import '../models/ingredient.dart';
 
 class IngredientEditModal extends StatefulWidget {
   final Ingredient ingredient;
+  final Future<void> Function(Ingredient)? onSaved;
 
   const IngredientEditModal({
     required this.ingredient,
+    this.onSaved,
     Key? key,
   }) : super(key: key);
 
@@ -171,8 +173,7 @@ class _IngredientEditModalState extends State<IngredientEditModal> {
     );
   }
 
-  void _saveGrocery() {
-    // TODO: should handle loading state
+  Future<void> _saveGrocery() async {
     if (_formIsValid()) {
       context.read(_$buttonState).state = ButtonState.inProgress;
       widget.ingredient.name = _nameController.text.trim();
@@ -180,12 +181,21 @@ class _IngredientEditModalState extends State<IngredientEditModal> {
           double.tryParse(_amountController.text.trim().replaceAll(',', '.'));
       widget.ingredient.unit = _unitController.text.trim();
 
-      Navigator.of(context).pop(widget.ingredient);
+      if (widget.onSaved != null) {
+        try {
+          await widget.onSaved!(widget.ingredient);
+        } catch (e) {
+          // TODO: sometime doc not found
+          print(e);
+        }
+      }
+
       if (!mounted) {
         return;
       }
+
       context.read(_$buttonState).state = ButtonState.normal;
-      Navigator.pop(context);
+      Navigator.pop(context, widget.onSaved != null ? widget.ingredient : null);
     } else {
       _errorText = 'edit_grocery_modal_error'.tr();
       context.read(_$buttonState).state = ButtonState.error;

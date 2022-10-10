@@ -194,23 +194,20 @@ class _ShoppingListViewState extends State<ShoppingListView>
 
   void _editGrocery(String listId, [Grocery? grocery]) async {
     final isCreating = grocery == null;
-    final result = await WidgetUtils.showFoodlyBottomSheet<Ingredient?>(
+    await WidgetUtils.showFoodlyBottomSheet<Ingredient?>(
       context: context,
       builder: (_) => IngredientEditModal(
         ingredient: isCreating ? Ingredient() : grocery!.toIngredient(),
+        onSaved: (result) async {
+          final updatedGrocery = Grocery.fromIngredient(result);
+          if (isCreating) {
+            await ShoppingListService.addGrocery(listId, updatedGrocery);
+          } else {
+            await ShoppingListService.updateGrocery(listId, updatedGrocery);
+          }
+        },
       ),
     );
-
-    if (result == null) {
-      return;
-    }
-
-    final updatedGrocery = Grocery.fromIngredient(result);
-    if (isCreating) {
-      await ShoppingListService.addGrocery(listId, updatedGrocery);
-    } else {
-      await ShoppingListService.updateGrocery(listId, updatedGrocery);
-    }
   }
 
   void _shareList(List<Grocery> groceries) {
