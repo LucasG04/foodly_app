@@ -1,9 +1,11 @@
+import 'ingredient.dart';
+
 class Grocery {
   String? id;
   String? name;
   double? amount;
   String? unit;
-  int? group;
+  String? group;
   bool bought;
   DateTime lastBoughtEdited;
 
@@ -28,13 +30,22 @@ class Grocery {
     };
   }
 
+  Ingredient toIngredient() {
+    return Ingredient(
+      name: name,
+      amount: amount,
+      unit: unit,
+      productGroup: group,
+    );
+  }
+
   factory Grocery.fromMap(String id, Map<String, dynamic> map) {
     return Grocery(
       id: id,
       name: map['name'] as String?,
       amount: map['amount'] as double?,
       unit: map['unit'] as String?,
-      group: map['group'] as int?,
+      group: map['group'] as String?,
       bought: map['bought'] as bool? ?? false,
       lastBoughtEdited: map['lastBoughtEdited'] == null
           ? DateTime.now()
@@ -45,11 +56,21 @@ class Grocery {
   factory Grocery.fromApiSuggestion(Map<String, dynamic> map) {
     return Grocery(
       name: map['name'] as String?,
-      group: map['group'] is String ? null : map['group'] as int?,
+      group: map['group']?.toString(),
       amount: map['amount'] is int
           ? (map['amount'] as int).toDouble()
           : map['amount'] as double?,
       unit: map['unit'] as String?,
+      lastBoughtEdited: DateTime.now(),
+    );
+  }
+
+  factory Grocery.fromIngredient(Ingredient ingredient) {
+    return Grocery(
+      name: ingredient.name,
+      group: ingredient.productGroup,
+      amount: ingredient.amount,
+      unit: ingredient.unit,
       lastBoughtEdited: DateTime.now(),
     );
   }

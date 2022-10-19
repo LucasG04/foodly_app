@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../constants.dart';
 import '../../../models/grocery.dart';
+import '../../../models/ingredient.dart';
 import '../../../models/shopping_list.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/app_review_service.dart';
@@ -18,11 +19,11 @@ import '../../../utils/basic_utils.dart';
 import '../../../utils/convert_util.dart';
 import '../../../utils/main_snackbar.dart';
 import '../../../utils/widget_utils.dart';
+import '../../../widgets/ingredient_edit_modal.dart';
 import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import '../../../widgets/user_information.dart';
 import 'animated_shopping_list.dart';
-import 'edit_grocery_modal.dart';
 
 class ShoppingListView extends StatefulWidget {
   const ShoppingListView({Key? key}) : super(key: key);
@@ -191,12 +192,21 @@ class _ShoppingListViewState extends State<ShoppingListView>
     );
   }
 
-  void _editGrocery(String listId, [Grocery? grocery]) {
-    WidgetUtils.showFoodlyBottomSheet<void>(
+  void _editGrocery(String listId, [Grocery? grocery]) async {
+    final isCreating = grocery == null;
+    await WidgetUtils.showFoodlyBottomSheet<Ingredient?>(
       context: context,
-      builder: (_) => EditGroceryModal(
-        shoppingListId: listId,
-        grocery: grocery,
+      builder: (_) => IngredientEditModal(
+        ingredient: isCreating ? Ingredient() : grocery!.toIngredient(),
+        onSaved: (result) async {
+          final updatedGrocery = Grocery.fromIngredient(result);
+          if (isCreating) {
+            await ShoppingListService.addGrocery(listId, updatedGrocery);
+          } else {
+            updatedGrocery.id = grocery!.id;
+            await ShoppingListService.updateGrocery(listId, updatedGrocery);
+          }
+        },
       ),
     );
   }

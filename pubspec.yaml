@@ -60,7 +60,12 @@ dependencies:
   # Widgets
   flutter_snake_navigationbar: ^0.5.0
   eva_icons_flutter: ^3.0.2
-  cached_network_image: ^3.2.2
+  # cached_network_image: ^3.2.2
+  cached_network_image:
+    git:
+      url: https://github.com/SuaMusica/flutter_cached_network_image.git
+      ref: feature/errorListener
+      path: cached_network_image
   group_list_view: ^1.1.1
   adaptive_dialog: ^1.2.0
   flutter_markdown:

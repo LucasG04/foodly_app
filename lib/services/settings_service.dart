@@ -1,3 +1,4 @@
+import 'package:flutter/painting.dart';
 import 'package:hive/hive.dart';
 
 class SettingsService {
@@ -32,6 +33,8 @@ class SettingsService {
   static bool get planWithBreakfast =>
       _settingsBox.get('planWithBreakfast', defaultValue: false) as bool;
 
+  static Color? get primaryColor => _settingsBox.get('primaryColor') as Color?;
+
   static Future<void> setMultipleMealsPerTime(bool value) async {
     await _settingsBox.put('multipleMealsPerTime', value);
   }
@@ -56,5 +59,9 @@ class SettingsService {
     return _settingsBox
         .watch(key: 'planWithBreakfast')
         .map((event) => event.value == true);
+  }
+
+  static Future<void> setPrimaryColor(Color value) async {
+    await _settingsBox.put('primaryColor', value);
   }
 }
