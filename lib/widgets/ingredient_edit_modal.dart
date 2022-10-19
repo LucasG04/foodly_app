@@ -230,14 +230,6 @@ class _IngredientEditModalState extends State<IngredientEditModal> {
   void _applyGroceryFromSuggestion(Grocery grocery) {
     _nameController.text = grocery.name.toString();
 
-    if (grocery.amount != null) {
-      _amountController.text = ConvertUtil.amountToString(grocery.amount);
-    }
-
-    if (grocery.unit != null) {
-      _unitController.text = grocery.unit.toString();
-    }
-
     if (grocery.group != null) {
       widget.ingredient.productGroup = grocery.group.toString();
     }
