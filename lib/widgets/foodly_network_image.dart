@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import '../services/image_cache_service.dart';
 import '../services/storage_service.dart';
@@ -23,6 +26,7 @@ class FoodlyNetworkImage extends StatefulWidget {
 }
 
 class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
+  static final _log = Logger('FoodlyNetworkImage');
   final _dio = Dio()
     ..interceptors.add(
       DioCacheInterceptor(
@@ -53,6 +57,17 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
       fit: BoxFit.cover,
       placeholder: (_, __) => _buildLoader(),
       errorWidget: (_, __, dynamic ___) => _buildFallbackImage(),
+      errorListener: (dynamic e) {
+        if (e is SocketException) {
+          _log.finer(
+            'Error with image "$url". Address: "${e.address}". Message: "${e.message}".',
+          );
+        } else {
+          _log.severe(
+            'Error with image "$url". Exception: "${e.runtimeType}".',
+          );
+        }
+      },
     );
   }
 

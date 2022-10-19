@@ -151,23 +151,29 @@ packages:
   cached_network_image:
     dependency: "direct main"
     description:
-      name: cached_network_image
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: cached_network_image
+      ref: "feature/errorListener"
+      resolved-ref: e812bb8debb506e8715a93c9d83fd565a1ea00c6
+      url: "https://github.com/SuaMusica/flutter_cached_network_image.git"
+    source: git
     version: "3.2.2"
   cached_network_image_platform_interface:
     dependency: transitive
     description:
-      name: cached_network_image_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: cached_network_image_platform_interface
+      ref: "feature/errorListener"
+      resolved-ref: e812bb8debb506e8715a93c9d83fd565a1ea00c6
+      url: "https://github.com/SuaMusica/flutter_cached_network_image.git"
+    source: git
     version: "2.0.0"
   cached_network_image_web:
     dependency: transitive
     description:
-      name: cached_network_image_web
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: cached_network_image_web
+      ref: "feature/errorListener"
+      resolved-ref: e812bb8debb506e8715a93c9d83fd565a1ea00c6
+      url: "https://github.com/SuaMusica/flutter_cached_network_image.git"
+    source: git
     version: "1.0.2"
   characters:
     dependency: transitive
