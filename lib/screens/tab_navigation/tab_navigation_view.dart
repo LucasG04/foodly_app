@@ -117,10 +117,8 @@ class _TabNavigationViewState extends State<TabNavigationView> {
       builder: (_) => IngredientEditModal(
         ingredient: Ingredient(),
         onSaved: (result) async {
-          await ShoppingListService.addGrocery(
-            _activeListId!,
-            Grocery.fromIngredient(result),
-          );
+          final grocery = Grocery.fromIngredient(result);
+          await ShoppingListService.addGrocery(_activeListId!, grocery);
         },
       ),
     );

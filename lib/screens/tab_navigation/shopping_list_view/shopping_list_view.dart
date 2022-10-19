@@ -203,6 +203,7 @@ class _ShoppingListViewState extends State<ShoppingListView>
           if (isCreating) {
             await ShoppingListService.addGrocery(listId, updatedGrocery);
           } else {
+            updatedGrocery.id = grocery!.id;
             await ShoppingListService.updateGrocery(listId, updatedGrocery);
           }
         },
