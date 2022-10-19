@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
 
 import '../../../constants.dart';
 import '../../../providers/state_providers.dart';
@@ -30,6 +31,7 @@ class IngredientEditModal extends StatefulWidget {
 }
 
 class _IngredientEditModalState extends State<IngredientEditModal> {
+  static final _log = Logger('IngredientEditModal');
   late Debouncer _nameDebouncer;
   late TextEditingController _nameController;
   late TextEditingController _amountController;
@@ -185,8 +187,7 @@ class _IngredientEditModalState extends State<IngredientEditModal> {
         try {
           await widget.onSaved!(widget.ingredient);
         } catch (e) {
-          // TODO: sometime doc not found
-          print(e);
+          _log.severe('Error while saving ingredient. ${widget.ingredient}', e);
         }
       }
 
