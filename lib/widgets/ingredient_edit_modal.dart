@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../constants.dart';
-import '../../../models/grocery.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/lunix_api_service.dart';
-import '../../../services/shopping_list_service.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/convert_util.dart';
 import '../../../utils/debouncer.dart';
@@ -14,24 +12,25 @@ import '../../../widgets/main_button.dart';
 import '../../../widgets/main_text_field.dart';
 import '../../../widgets/progress_button.dart';
 import '../../../widgets/suggestion_tile.dart';
+import '../models/grocery.dart';
+import '../models/ingredient.dart';
 
-class EditGroceryModal extends StatefulWidget {
-  final String shoppingListId;
-  final Grocery? grocery;
+class IngredientEditModal extends StatefulWidget {
+  final Ingredient ingredient;
+  final Future<void> Function(Ingredient)? onSaved;
 
-  const EditGroceryModal({
-    required this.shoppingListId,
-    this.grocery,
+  const IngredientEditModal({
+    required this.ingredient,
+    this.onSaved,
     Key? key,
   }) : super(key: key);
 
   @override
-  State<EditGroceryModal> createState() => _EditGroceryModalState();
+  State<IngredientEditModal> createState() => _IngredientEditModalState();
 }
 
-class _EditGroceryModalState extends State<EditGroceryModal> {
+class _IngredientEditModalState extends State<IngredientEditModal> {
   late Debouncer _nameDebouncer;
-  late bool _isCreating;
   late TextEditingController _nameController;
   late TextEditingController _amountController;
   late TextEditingController _unitController;
@@ -46,11 +45,10 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
   @override
   void initState() {
     _nameDebouncer = Debouncer(milliseconds: 300);
-    _isCreating = widget.grocery == null;
-    _nameController = TextEditingController(text: widget.grocery?.name);
-    final amountString = ConvertUtil.amountToString(widget.grocery?.amount);
+    _nameController = TextEditingController(text: widget.ingredient.name);
+    final amountString = ConvertUtil.amountToString(widget.ingredient.amount);
     _amountController = TextEditingController(text: amountString);
-    _unitController = TextEditingController(text: widget.grocery?.unit);
+    _unitController = TextEditingController(text: widget.ingredient.unit);
 
     _$buttonState =
         StateProvider.autoDispose<ButtonState>((_) => ButtonState.normal);
@@ -175,34 +173,38 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
     );
   }
 
-  void _saveGrocery() async {
-    final grocery = _isCreating
-        ? Grocery(lastBoughtEdited: DateTime.now())
-        : widget.grocery!;
-    grocery.name = _nameController.text.trim();
-    grocery.amount =
-        double.tryParse(_amountController.text.trim().replaceAll(',', '.')) ??
-            0;
-    grocery.unit = _unitController.text.trim();
-    grocery.bought = !_isCreating && grocery.bought;
-
-    if (grocery.name != null && grocery.name!.isNotEmpty) {
+  Future<void> _saveGrocery() async {
+    if (_formIsValid()) {
       context.read(_$buttonState).state = ButtonState.inProgress;
+      widget.ingredient.name = _nameController.text.trim();
+      widget.ingredient.amount =
+          double.tryParse(_amountController.text.trim().replaceAll(',', '.'));
+      widget.ingredient.unit = _unitController.text.trim();
 
-      if (_isCreating) {
-        await ShoppingListService.addGrocery(widget.shoppingListId, grocery);
-      } else {
-        await ShoppingListService.updateGrocery(widget.shoppingListId, grocery);
+      if (widget.onSaved != null) {
+        try {
+          await widget.onSaved!(widget.ingredient);
+        } catch (e) {
+          // TODO: sometime doc not found
+          print(e);
+        }
       }
+
       if (!mounted) {
         return;
       }
+
       context.read(_$buttonState).state = ButtonState.normal;
-      Navigator.pop(context);
+      Navigator.pop(context, widget.onSaved != null ? widget.ingredient : null);
     } else {
       _errorText = 'edit_grocery_modal_error'.tr();
       context.read(_$buttonState).state = ButtonState.error;
     }
+  }
+
+  bool _formIsValid() {
+    final name = _nameController.text.trim();
+    return name.isNotEmpty;
   }
 
   Future<void> _loadSuggestions(String text) async {
@@ -228,12 +230,8 @@ class _EditGroceryModalState extends State<EditGroceryModal> {
   void _applyGroceryFromSuggestion(Grocery grocery) {
     _nameController.text = grocery.name.toString();
 
-    if (grocery.amount != null) {
-      _amountController.text = ConvertUtil.amountToString(grocery.amount);
-    }
-
-    if (grocery.unit != null) {
-      _unitController.text = grocery.unit.toString();
+    if (grocery.group != null) {
+      widget.ingredient.productGroup = grocery.group.toString();
     }
 
     context.read(_$suggestions).state = [];

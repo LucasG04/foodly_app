@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../models/ingredient.dart';
 import '../../utils/convert_util.dart';
 import '../../utils/widget_utils.dart';
-import 'edit_ingredient_modal.dart';
+import '../../widgets/ingredient_edit_modal.dart';
 
 class EditIngredients extends StatelessWidget {
   final String title;
@@ -62,21 +62,25 @@ class EditIngredients extends StatelessWidget {
     );
   }
 
-  void _editIngredient(BuildContext context,
+  Future<void> _editIngredient(BuildContext context,
       [Ingredient? ingredient, int? index]) async {
-    final result = await WidgetUtils.showFoodlyBottomSheet<Ingredient>(
+    final isCreating = ingredient == null || index == null;
+    final result = await WidgetUtils.showFoodlyBottomSheet<Ingredient?>(
       context: context,
-      builder: (_) => EditIngredientModal(ingredient: ingredient),
+      builder: (_) => IngredientEditModal(
+        ingredient: isCreating ? Ingredient() : ingredient!,
+      ),
     );
 
-    if (result != null) {
-      if (ingredient == null) {
-        content.add(result);
-        onChanged!(content);
-      } else {
-        content[index!] = result;
-        onChanged!(content);
-      }
+    if (result == null) {
+      return;
     }
+
+    if (isCreating) {
+      content.add(result);
+    } else {
+      content[index!] = result;
+    }
+    onChanged!(content);
   }
 }
