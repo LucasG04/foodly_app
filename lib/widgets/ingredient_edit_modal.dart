@@ -196,7 +196,7 @@ class _IngredientEditModalState extends State<IngredientEditModal> {
       }
 
       context.read(_$buttonState).state = ButtonState.normal;
-      Navigator.pop(context, widget.onSaved != null ? widget.ingredient : null);
+      Navigator.of(context).pop(widget.ingredient);
     } else {
       _errorText = 'edit_grocery_modal_error'.tr();
       context.read(_$buttonState).state = ButtonState.error;
