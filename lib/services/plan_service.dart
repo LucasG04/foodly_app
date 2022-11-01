@@ -210,6 +210,16 @@ class PlanService {
       String planId, PlanMeal planMeal) async {
     _log.finer(
         'Call addPlanMealToPlanHistory with planId: $planId | planMeal: ${planMeal.toMap()}');
+    final mealInHistory = await _firestore
+        .doc(planId)
+        .collection('mealHistory')
+        .doc(planMeal.id)
+        .get();
+
+    if (mealInHistory.exists) {
+      return;
+    }
+
     await _firestore
         .doc(planId)
         .collection('mealHistory')
