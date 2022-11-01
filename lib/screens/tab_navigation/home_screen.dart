@@ -86,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> with DisposableWidget {
   }
 
   void _changePage() {
-    if (!_pageController.hasClients) {
+    if (!_pageController.hasClients || _pageController.page == null) {
       return;
     }
     _pageController.animateToPage(
