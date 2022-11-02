@@ -198,6 +198,9 @@ class PlanService {
   }
 
   static Future<void> deletePlanMealFromPlan(String? planId, String? mealId) {
+    if (planId == null || mealId == null) {
+      return Future.value();
+    }
     _log.finer(
         'Call deletePlanMealFromPlan with planId: $planId | mealId: $mealId');
     return _firestore.doc(planId).collection('meals').doc(mealId).delete();
@@ -207,10 +210,21 @@ class PlanService {
       String planId, PlanMeal planMeal) async {
     _log.finer(
         'Call addPlanMealToPlanHistory with planId: $planId | planMeal: ${planMeal.toMap()}');
+    final mealInHistory = await _firestore
+        .doc(planId)
+        .collection('mealHistory')
+        .doc(planMeal.id)
+        .get();
+
+    if (mealInHistory.exists) {
+      return;
+    }
+
     await _firestore
         .doc(planId)
         .collection('mealHistory')
-        .add(planMeal.toMap());
+        .doc(planMeal.id)
+        .set(planMeal.toMap());
   }
 
   static Future<void> updateHistoryPlanMealFromPlan(
