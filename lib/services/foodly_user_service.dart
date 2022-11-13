@@ -47,4 +47,15 @@ class FoodlyUserService {
     log.finer('Call deleteUserById with $userId');
     return _firestore.doc(userId).delete();
   }
+
+  static Future<void> subscribeToPremium(String userId, DateTime expiresAt) {
+    log.finer('Call subscribeToPremium with $userId and $expiresAt');
+    return _firestore.doc(userId).set(
+          <String, dynamic>{
+            'isPremium': true,
+            'premiumExpiresAt': expiresAt,
+          } as FoodlyUser,
+          SetOptions(merge: true),
+        );
+  }
 }

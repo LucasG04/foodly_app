@@ -26,6 +26,7 @@
     "settings_title": "Einstellungen",
     "settings_section_general": "Allgemein",
     "settings_section_general_language": "Sprache",
+    "settings_section_general_premium": "Hol dir Premium",
     "settings_section_customization": "Anpassung",
     "settings_section_customization_multiple_meals": "Mehrere Gerichte pro Mahlzeit",
     "settings_section_customization_suggestions": "Vorschläge anzeigen",
@@ -249,5 +250,19 @@
     "save_changes_text": "Du hast Änderungen an diesem Gericht vorgenommen. Willst du sie speichern?",
     "save_changes_confirm": "Speichern",
     "save_changes_discard": "Verwerfen",
-    "save_changes_cancel": "Zurück"
+    "save_changes_cancel": "Zurück",
+    "get_premium_modal_title": "Hol dir Premium",
+    "get_premium_modal_cta": "Hol dir {} Premium",
+    "get_premium_modal_monthly": "Monatlich",
+    "get_premium_modal_yearly": "Jährlich",
+    "get_premium_modal_not_now": "Nicht jetzt",
+    "get_premium_modal_restore": "Wiederherstellen",
+    "get_premium_modal_1_title": "Autovervollständigung",
+    "get_premium_modal_1_description": "Beim Eintippen von Lebensmitteln werden passende Vorschläge angezeigt.",
+    "get_premium_modal_2_title": "Vorschläge von Gerichten",
+    "get_premium_modal_2_description": "Vorschläge von Gerichten für die nächsten Tage.",
+    "get_premium_modal_3_title": "{} unterstützen",
+    "get_premium_modal_3_description": "Mit deinem Beitrag förderst du die Weiterentwicklung der App, hältst die App werbefrei und unterstützt bei der Deckung von Serverkosten.",
+    "get_premium_modal_4_title": "",
+    "get_premium_modal_4_description": ""
 }

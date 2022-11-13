@@ -26,6 +26,7 @@
   "settings_title": "Settings",
   "settings_section_general": "General",
   "settings_section_general_language": "Language",
+  "settings_section_general_premium": "Get Premium",
   "settings_section_customization": "Customization",
   "settings_section_customization_multiple_meals": "Multiple dishes per meal",
   "settings_section_customization_suggestions": "Show suggestions",
@@ -249,5 +250,19 @@
   "save_changes_text": "You have made changes to this dish. Do you want to save them?",
   "save_changes_confirm": "Save",
   "save_changes_discard": "Discard",
-  "save_changes_cancel": "Back"
+  "save_changes_cancel": "Back",
+  "get_premium_modal_title": "Get Premium",
+  "get_premium_modal_cta": "Get {} Premium",
+  "get_premium_modal_monthly": "Monthly",
+  "get_premium_modal_yearly": "Yearly",
+  "get_premium_modal_not_now": "Not now",
+  "get_premium_modal_restore": "Restore",
+  "get_premium_modal_1_title": "Autocomplete",
+  "get_premium_modal_1_description": "As you type in groceries, matching suggestions are displayed.",
+  "get_premium_modal_2_title": "Suggestions from dishes",
+  "get_premium_modal_2_description": "Suggestions of dishes for the next few days.",
+  "get_premium_modal_3_title": "Support {}",
+  "get_premium_modal_3_description": "With your contribution you support the further development of the app, keep the app ad-free and help cover server costs.",
+  "get_premium_modal_4_title": "",
+  "get_premium_modal_4_description": ""
 }

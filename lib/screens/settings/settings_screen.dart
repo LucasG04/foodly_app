@@ -22,6 +22,7 @@ import '../../../utils/main_snackbar.dart';
 import '../../../utils/widget_utils.dart';
 import '../../../widgets/loading_logout.dart';
 import '../../models/plan.dart';
+import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import '../onboarding/onboarding_screen.dart';
@@ -86,6 +87,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               onChanged: (Locale? locale) async {
                                 await context.setLocale(locale!);
                               },
+                            ),
+                          ),
+                          SettingsTile(
+                            onTap: _openGetPremium,
+                            leadingIcon: EvaIcons.awardOutline,
+                            text: 'settings_section_general_premium'.tr(),
+                            trailing: const Icon(
+                              EvaIcons.arrowIosForwardOutline,
                             ),
                           ),
                         ], context),
@@ -468,5 +477,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       _log.severe('ERR! Account deletion failed after reauthentication!', e);
     }
+  }
+
+  void _openGetPremium() {
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => const GetPremiumModal(),
+    );
   }
 }
