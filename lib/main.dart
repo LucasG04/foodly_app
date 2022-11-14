@@ -26,6 +26,7 @@ import 'services/app_review_service.dart';
 import 'services/authentication_service.dart';
 import 'services/foodly_user_service.dart';
 import 'services/image_cache_service.dart';
+import 'services/in_app_purchase_service.dart';
 import 'services/link_metadata_service.dart';
 import 'services/plan_service.dart';
 import 'services/settings_service.dart';
@@ -88,6 +89,7 @@ Future<void> initializeHive() async {
     ImageCacheService.initialize(),
     AppReviewService.initialize(),
     PlanService.initialize(),
+    InAppPurchaseService.initialize(),
   ]);
 }
 

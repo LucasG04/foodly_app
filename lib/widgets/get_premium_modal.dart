@@ -4,8 +4,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
 
 import '../constants.dart';
+import '../services/in_app_purchase_service.dart';
 import 'list_tile_card.dart';
 import 'main_button.dart';
 
@@ -17,13 +19,14 @@ class GetPremiumModal extends StatefulWidget {
 }
 
 class _GetPremiumModalState extends State<GetPremiumModal> {
+  final _log = Logger('GetPremiumModal');
   late final ScrollController _scrollController;
   late final AutoDisposeStateProvider<bool> _$titleShowShadow;
   late final AutoDisposeStateProvider<int> _$selectedPremiumDuration;
 
   final premiumDurations = [
-    _PremiumDuration('get_premium_modal_monthly'.tr()),
-    _PremiumDuration('get_premium_modal_yearly'.tr()),
+    _PremiumDuration('get_premium_modal_monthly'),
+    _PremiumDuration('get_premium_modal_yearly'),
   ];
 
   @override
@@ -34,8 +37,8 @@ class _GetPremiumModalState extends State<GetPremiumModal> {
     _scrollController.addListener(_handleTitleShadowState);
     super.initState();
 
-    // TODO: get prices from service
-    // TODO: handle scrolling
+    _getPricesFromService();
+
     // TODO: add "Und viele weitere Vorteile in der Zukunft. Evtl. mit Link auf offene Issues?"
   }
 
@@ -48,7 +51,7 @@ class _GetPremiumModalState extends State<GetPremiumModal> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.min,
+      // mainAxisSize: MainAxisSize.min,
       children: [
         Consumer(
           builder: (context, ref, child) {
@@ -94,74 +97,74 @@ class _GetPremiumModalState extends State<GetPremiumModal> {
         Expanded(
           child: SingleChildScrollView(
             controller: _scrollController,
-            child: Container(
-              constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height * 0.8,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: kPadding),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ListTileCard(
-                          iconData: EvaIcons.loaderOutline,
-                          title: 'get_premium_modal_1_title'.tr(),
-                          description: 'get_premium_modal_1_description'.tr(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: kPadding),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ListTileCard(
+                        iconData: EvaIcons.loaderOutline,
+                        title: 'get_premium_modal_1_title'.tr(),
+                        description: 'get_premium_modal_1_description'.tr(),
+                      ),
+                      ListTileCard(
+                        iconData: EvaIcons.trendingUpOutline,
+                        title: 'get_premium_modal_2_title'.tr(),
+                        description: 'get_premium_modal_2_description'.tr(),
+                      ),
+                      ListTileCard(
+                        iconData: EvaIcons.messageCircleOutline,
+                        title: 'get_premium_modal_4_title'.tr(),
+                        description: 'get_premium_modal_4_description'.tr(),
+                      ),
+                      ListTileCard(
+                        iconData: _getSupportAppIcon(),
+                        iconColor: Colors.red,
+                        title: 'get_premium_modal_3_title'.tr(
+                          args: [kAppName],
                         ),
-                        ListTileCard(
-                          iconData: EvaIcons.trendingUpOutline,
-                          title: 'get_premium_modal_2_title'.tr(),
-                          description: 'get_premium_modal_2_description'.tr(),
-                        ),
-                        ListTileCard(
-                          iconData: _getSupportAppIcon(),
-                          iconColor: Colors.red,
-                          title: 'get_premium_modal_3_title'.tr(
-                            args: [kAppName],
-                          ),
-                          description: 'get_premium_modal_3_description'.tr(),
-                        ),
-                      ],
-                    ),
+                        description: 'get_premium_modal_3_description'.tr(),
+                      ),
+                    ],
                   ),
-                  Container(
-                    padding: const EdgeInsets.only(
-                      top: kPadding / 2,
-                      bottom: kPadding / 2,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildPremiumDurationSelector(context),
-                        const SizedBox(height: kPadding / 2),
-                        MainButton(
-                          onTap: () => print('get'),
-                          text: 'get_premium_modal_cta'.tr(args: [kAppName]),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            TextButton(
-                              onPressed: _close,
-                              child: Text('get_premium_modal_not_now'.tr()),
-                            ),
-                            TextButton(
-                              onPressed: () => print('restore'),
-                              child: Text('get_premium_modal_restore'.tr()),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.only(
+            top: kPadding / 2,
+            bottom: kPadding / 2,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildPremiumDurationSelector(context),
+              const SizedBox(height: kPadding / 2),
+              MainButton(
+                onTap: subscribeToPremium,
+                text: 'get_premium_modal_cta'.tr(args: [kAppName]),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: _close,
+                    child: Text('get_premium_modal_not_now'.tr()),
+                  ),
+                  TextButton(
+                    onPressed: () => InAppPurchaseService.restore(),
+                    child: Text('get_premium_modal_restore'.tr()),
                   ),
                 ],
               ),
-            ),
+            ],
           ),
         ),
       ],
@@ -184,30 +187,33 @@ class _GetPremiumModalState extends State<GetPremiumModal> {
             children: premiumDurations.map((e) {
               final index = premiumDurations.indexOf(e);
               final isSelected = selectedDuration == index;
-              return Container(
-                height: width * 0.2,
-                width: width * 0.3,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(kRadius),
-                  border: isSelected
-                      ? Border.all(
-                          color: Theme.of(context).primaryColor,
-                          width: 2.5,
-                        )
-                      : null,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      e.title.tr(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
+              return InkWell(
+                onTap: () => ref(_$selectedPremiumDuration).state = index,
+                child: Container(
+                  height: width * 0.2,
+                  width: width * 0.3,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(kRadius),
+                    border: isSelected
+                        ? Border.all(
+                            color: Theme.of(context).primaryColor,
+                            width: 2.5,
+                          )
+                        : null,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        e.title.tr(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Text(e.price ?? ''),
-                  ],
+                      Text(e.price ?? ''),
+                    ],
+                  ),
                 ),
               );
             }).toList(),
@@ -230,6 +236,15 @@ class _GetPremiumModalState extends State<GetPremiumModal> {
     }
   }
 
+  void _getPricesFromService() {
+    try {
+      premiumDurations[0].price = InAppPurchaseService.products[0].price;
+      premiumDurations[1].price = InAppPurchaseService.products[1].price;
+    } catch (e) {
+      _log.severe(e);
+    }
+  }
+
   IconData _getSupportAppIcon() {
     final icons = [
       EvaIcons.heartOutline,
@@ -241,6 +256,14 @@ class _GetPremiumModalState extends State<GetPremiumModal> {
 
     final index = Random().nextInt(icons.length);
     return icons[index];
+  }
+
+  void subscribeToPremium() {
+    final index = context.read(_$selectedPremiumDuration).state;
+    final products = InAppPurchaseService.products;
+    if (products.isNotEmpty) {
+      InAppPurchaseService.buy(products[index]);
+    }
   }
 }
 

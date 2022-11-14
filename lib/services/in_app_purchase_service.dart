@@ -12,20 +12,23 @@ class InAppPurchaseService {
   InAppPurchaseService._();
 
   static final _log = Logger('InAppPurchaseService');
-  static const _storeKeySubscriptionMonth = 'premium_month';
-  static const _storeKeySubscriptionYear = 'premium_year';
+  static const _storeKeySubscriptionMonth = 'premium_monthly';
+  static const _storeKeySubscriptionYear = 'premium_yearly';
 
-  static StoreState storeState = StoreState.loading;
+  static StoreState _storeState = StoreState.loading;
   static List<PurchasableProduct> _products = [];
   static late StreamSubscription<List<PurchaseDetails>> _$purchases;
 
-  static void initialize() {
+  static List<PurchasableProduct> get products => _products;
+  static StoreState get storeState => _storeState;
+
+  static Future<void> initialize() async {
     _$purchases = InAppPurchase.instance.purchaseStream.listen(
       _onPurchaseUpdate,
       onDone: _updateStreamOnDone,
       onError: _updateStreamOnError,
     );
-    _loadPurchases();
+    await _loadPurchases();
   }
 
   static Future<void> _loadPurchases() async {
@@ -34,7 +37,7 @@ class InAppPurchaseService {
     }
     final available = await InAppPurchase.instance.isAvailable();
     if (!available) {
-      storeState = StoreState.notAvailable;
+      _storeState = StoreState.notAvailable;
       return;
     }
     final ids = <String>{
@@ -47,7 +50,7 @@ class InAppPurchaseService {
     }
     _products =
         response.productDetails.map((e) => PurchasableProduct(e)).toList();
-    storeState = StoreState.available;
+    _storeState = StoreState.available;
   }
 
   static Future<void> buy(PurchasableProduct product) async {
@@ -93,6 +96,15 @@ class InAppPurchaseService {
 
     if (purchaseDetails.pendingCompletePurchase) {
       InAppPurchase.instance.completePurchase(purchaseDetails);
+    }
+  }
+
+  static Future<void> restore() async {
+    // TODO: handle validation: https://pub.dev/packages/in_app_purchase#restoring-previous-purchases
+    try {
+      await InAppPurchase.instance.restorePurchases();
+    } catch (e) {
+      _log.severe(e);
     }
   }
 
