@@ -1,130 +1,114 @@
 import 'dart:async';
+import 'dart:io';
 
-import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
-import '../models/purchasable_product.dart';
-import '../models/store_state.dart';
-import 'authentication_service.dart';
-import 'foodly_user_service.dart';
+import '../utils/env.dart';
 
 class InAppPurchaseService {
   InAppPurchaseService._();
 
   static final _log = Logger('InAppPurchaseService');
-  static const _storeKeySubscriptionMonth = 'premium_monthly';
-  static const _storeKeySubscriptionYear = 'premium_yearly';
+  static const _premiumEntitlementId = 'premium';
 
-  static StoreState _storeState = StoreState.loading;
-  static List<PurchasableProduct> _products = [];
-  static late StreamSubscription<List<PurchaseDetails>> _$purchases;
-  static late BehaviorSubject<PurchaseStatus> _$purchaseStatus;
+  static List<StoreProduct> _products = [];
+  static bool _userIsSubscribed = false;
 
-  static List<PurchasableProduct> get products => _products;
-  static StoreState get storeState => _storeState;
-  static Stream<PurchaseStatus> get $purchaseStatus =>
-      _$purchaseStatus.asBroadcastStream();
-  static PurchaseStatus? get currentPurchaseStatus =>
-      _$purchaseStatus.valueOrNull;
+  static List<StoreProduct> get products => _products;
+  static bool get userIsSubscribed => _userIsSubscribed;
 
   static Future<void> initialize() async {
-    _$purchases = InAppPurchase.instance.purchaseStream.listen(
-      _onPurchaseUpdate,
-      onDone: _updateStreamOnDone,
-      onError: _updateStreamOnError,
-    );
-    _$purchaseStatus = BehaviorSubject();
-    await _loadPurchases();
+    await Purchases.setDebugLogsEnabled(true);
+
+    PurchasesConfiguration? configuration;
+    if (Platform.isAndroid) {
+      configuration = PurchasesConfiguration(Env.revenuecatGoogleKey);
+    } else if (Platform.isIOS || Platform.isMacOS) {
+      configuration = PurchasesConfiguration(Env.revenuecatAppleKey);
+    }
+
+    if (configuration != null) {
+      await Purchases.configure(configuration);
+    }
+
+    await _loadOfferings();
+    fetchUserSubscription();
   }
 
-  static Future<void> _loadPurchases() async {
-    if (_products.isNotEmpty) {
-      return;
-    }
-    final available = await InAppPurchase.instance.isAvailable();
-    if (!available) {
-      _storeState = StoreState.notAvailable;
-      return;
-    }
-    final ids = <String>{
-      _storeKeySubscriptionMonth,
-      _storeKeySubscriptionYear,
-    };
-    final response = await InAppPurchase.instance.queryProductDetails(ids);
-    for (final element in response.notFoundIDs) {
-      _log.finer('Purchase $element not found');
-    }
-    _products =
-        response.productDetails.map((e) => PurchasableProduct(e)).toList();
-    _storeState = StoreState.available;
-  }
-
-  static Future<void> buy(PurchasableProduct product) async {
-    final purchaseParam = PurchaseParam(productDetails: product.productDetails);
-    if (product.id == _storeKeySubscriptionMonth ||
-        product.id == _storeKeySubscriptionYear) {
-      await InAppPurchase.instance
-          .buyNonConsumable(purchaseParam: purchaseParam);
-    } else {
-      _log.severe(
-          product.productDetails, '${product.id} is not a known product');
+  static Future<void> setUserId(String id) async {
+    try {
+      await Purchases.logIn(id);
+      fetchUserSubscription();
+    } catch (e) {
+      _log.severe('Failed to set user id', e);
     }
   }
 
-  static void _onPurchaseUpdate(List<PurchaseDetails> purchaseDetailsList) {
-    purchaseDetailsList.forEach(_handlePurchase);
+  static Future<void> removeUserId() async {
+    try {
+      await Purchases.logOut();
+      fetchUserSubscription();
+    } catch (e) {
+      _log.severe('Failed to remove user id', e);
+    }
   }
 
-  static Future<void> _handlePurchase(PurchaseDetails purchaseDetails) async {
-    if (purchaseDetails.status == PurchaseStatus.purchased) {
-      _log.finer('Purchased ${purchaseDetails.productID}');
-      final now = DateTime.now();
-      final expiresAt = purchaseDetails.productID == _storeKeySubscriptionMonth
-          ? DateTime(
-              now.year,
-              now.month + 1,
-              now.day,
-              now.hour,
-              now.minute,
-            )
-          : DateTime(
-              now.year + 1,
-              now.month,
-              now.day,
-              now.hour,
-              now.minute,
-            );
-      if (AuthenticationService.currentUser != null) {
-        await FoodlyUserService.subscribeToPremium(
-          AuthenticationService.currentUser!.uid,
-          expiresAt,
-        );
-      } else {
-        _log.severe('ERR! No user logged in');
+  static Future<bool> buy(String productIdentifier) async {
+    try {
+      final customerInfo = await Purchases.purchaseProduct(productIdentifier);
+      fetchUserSubscription();
+      return _customerHasPremium(customerInfo);
+    } on PlatformException catch (e) {
+      final errorCode = PurchasesErrorHelper.getErrorCode(e);
+      if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
+        _log.severe(e);
       }
     }
-
-    if (purchaseDetails.pendingCompletePurchase) {
-      await InAppPurchase.instance.completePurchase(purchaseDetails);
-    }
-    _$purchaseStatus.add(purchaseDetails.status);
+    return false;
   }
 
-  static Future<void> restore() async {
-    // TODO: handle validation: https://pub.dev/packages/in_app_purchase#restoring-previous-purchases
+  static Future<bool> restore() async {
     try {
-      await InAppPurchase.instance.restorePurchases();
+      final restoredInfo = await Purchases.restorePurchases();
+      fetchUserSubscription();
+      return _customerHasPremium(restoredInfo);
+    } catch (e) {
+      _log.severe(e);
+    }
+    return false;
+  }
+
+  static Future<void> fetchUserSubscription() async {
+    try {
+      final customerInfo = await Purchases.getCustomerInfo();
+      _userIsSubscribed = _customerHasPremium(customerInfo);
     } catch (e) {
       _log.severe(e);
     }
   }
 
-  static void _updateStreamOnDone() {
-    _$purchases.cancel();
+  static bool _customerHasPremium(CustomerInfo customerInfo) {
+    final entitlementInfo =
+        customerInfo.entitlements.all[_premiumEntitlementId];
+    return entitlementInfo != null && entitlementInfo.isActive;
   }
 
-  static void _updateStreamOnError(dynamic error) {
-    _log.severe('ERR! in app purchase stream', error);
+  static Future<void> _loadOfferings() async {
+    if (_products.isNotEmpty) {
+      return;
+    }
+    try {
+      final Offerings offerings = await Purchases.getOfferings();
+      if (offerings.current != null &&
+          offerings.current!.availablePackages.isNotEmpty) {
+        _products = offerings.current!.availablePackages
+            .map((e) => e.storeProduct)
+            .toList();
+      }
+    } catch (e) {
+      _log.severe('Failed to get offerings', e);
+    }
   }
 }

@@ -47,7 +47,7 @@ dependencies:
   package_info_plus: ^1.4.2
   update_available: ^2.1.0
   envied: ^0.2.3
-  in_app_purchase: ^3.0.8
+  purchases_flutter: ^4.4.1
   rxdart: ^0.27.6
 
   # Firebase

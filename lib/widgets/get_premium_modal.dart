@@ -4,7 +4,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logging/logging.dart';
 
 import '../constants.dart';
@@ -29,7 +28,7 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
   late final AutoDisposeStateProvider<_PurchaseState> _$purchaseState;
   late final AutoDisposeStateProvider<int> _$selectedPremiumDuration;
 
-  final premiumDurations = [
+  final products = [
     _PremiumDuration('get_premium_modal_monthly'),
     _PremiumDuration('get_premium_modal_yearly'),
   ];
@@ -37,15 +36,16 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
   @override
   void initState() {
     _$titleShowShadow = AutoDisposeStateProvider((_) => false);
-    _$purchaseState =
-        AutoDisposeStateProvider((_) => _getCurrentPurchaseStateFromService());
+    _$purchaseState = AutoDisposeStateProvider((_) =>
+        InAppPurchaseService.userIsSubscribed
+            ? _PurchaseState.purchased
+            : _PurchaseState.none);
     _$selectedPremiumDuration = AutoDisposeStateProvider((_) => 1);
     _scrollController = ScrollController();
     _scrollController.addListener(_handleTitleShadowState);
     super.initState();
 
-    _listenOnPurchaseStatus();
-    _getPricesFromService();
+    _getAdditionalProductInfo();
 
     // TODO: add "Und viele weitere Vorteile in der Zukunft. Evtl. mit Link auf offene Issues?"
   }
@@ -186,7 +186,7 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
         final purchaseState = ref.watch(_$purchaseState);
         final selectedDuration = ref.watch(_$selectedPremiumDuration);
         return Container(
-          decoration: purchaseState == _PurchaseState.pending
+          decoration: purchaseState == _PurchaseState.none
               ? BoxDecoration(
                   borderRadius: BorderRadius.circular(kRadius),
                   color: Colors.grey[200],
@@ -213,8 +213,8 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                           ),
                         )
                       ]
-                    : premiumDurations.map((e) {
-                        final index = premiumDurations.indexOf(e);
+                    : products.map((e) {
+                        final index = products.indexOf(e);
                         final isSelected = selectedDuration == index;
                         return InkWell(
                           onTap: () => ref
@@ -254,21 +254,6 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
     );
   }
 
-  _PurchaseState _getCurrentPurchaseStateFromService() {
-    final status = InAppPurchaseService.currentPurchaseStatus;
-    if (status == PurchaseStatus.purchased ||
-        status == PurchaseStatus.restored) {
-      return _PurchaseState.purchased;
-    } else if (status == PurchaseStatus.error ||
-        status == PurchaseStatus.canceled) {
-      return _PurchaseState.error;
-    } else if (status == PurchaseStatus.pending) {
-      return _PurchaseState.pending;
-    } else {
-      return _PurchaseState.none;
-    }
-  }
-
   void _close() {
     if (!mounted) {
       return;
@@ -285,26 +270,10 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
     }
   }
 
-  void _listenOnPurchaseStatus() {
-    InAppPurchaseService.$purchaseStatus.listen((status) {
-      if (status == PurchaseStatus.purchased ||
-          status == PurchaseStatus.restored) {
-        ref.read(_$purchaseState.state).state = _PurchaseState.purchased;
-        Future.delayed(const Duration(seconds: 3), () => _close());
-      }
-      if (status == PurchaseStatus.error || status == PurchaseStatus.canceled) {
-        ref.read(_$purchaseState.state).state = _PurchaseState.error;
-      }
-      if (status == PurchaseStatus.pending) {
-        ref.read(_$purchaseState.state).state = _PurchaseState.pending;
-      }
-    }).canceledBy(this);
-  }
-
-  void _getPricesFromService() {
+  void _getAdditionalProductInfo() {
     try {
-      premiumDurations[0].price = InAppPurchaseService.products[0].price;
-      premiumDurations[1].price = InAppPurchaseService.products[1].price;
+      products[0].price = InAppPurchaseService.products[0].priceString;
+      products[1].price = InAppPurchaseService.products[1].priceString;
     } catch (e) {
       _log.severe(e);
     }
@@ -325,7 +294,8 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
 
   Future<void> _restorePurchase() async {
     ref.read(_$purchaseState.state).state = _PurchaseState.pending;
-    await InAppPurchaseService.restore();
+    final success = await InAppPurchaseService.restore();
+    await _handlePurchase(success);
   }
 
   Future<void> _subscribeToPremium() async {
@@ -333,7 +303,19 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
     final index = ref.read(_$selectedPremiumDuration);
     final products = InAppPurchaseService.products;
     if (products.isNotEmpty) {
-      await InAppPurchaseService.buy(products[index]);
+      final success =
+          await InAppPurchaseService.buy(products[index].identifier);
+      await _handlePurchase(success);
+    }
+  }
+
+  Future<void> _handlePurchase(bool success) async {
+    if (success) {
+      ref.read(_$purchaseState.state).state = _PurchaseState.purchased;
+      await Future<dynamic>.delayed(const Duration(seconds: 1));
+      _close();
+    } else {
+      ref.read(_$purchaseState.state).state = _PurchaseState.none;
     }
   }
 }
@@ -349,5 +331,6 @@ enum _PurchaseState {
   none,
   pending,
   purchased,
+  // ignore: unused_field
   error,
 }

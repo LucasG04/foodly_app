@@ -186,6 +186,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
         return;
       }
       ref.read(userProvider.state).state = user;
+      InAppPurchaseService.setUserId(user.id!);
     } else {
       FirebaseCrashlytics.instance.setUserIdentifier('');
       BasicUtils.afterBuild(() => ref.read(userProvider.state).state = null);
