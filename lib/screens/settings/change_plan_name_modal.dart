@@ -9,21 +9,22 @@ import '../../../widgets/main_button.dart';
 import '../../../widgets/main_text_field.dart';
 import '../../../widgets/progress_button.dart';
 
-class ChangePlanNameModal extends StatefulWidget {
+class ChangePlanNameModal extends ConsumerStatefulWidget {
   const ChangePlanNameModal({Key? key}) : super(key: key);
 
   @override
-  State<ChangePlanNameModal> createState() => _ChangePlanNameModalState();
+  // ignore: library_private_types_in_public_api
+  _ChangePlanNameModalState createState() => _ChangePlanNameModalState();
 }
 
-class _ChangePlanNameModalState extends State<ChangePlanNameModal> {
+class _ChangePlanNameModalState extends ConsumerState<ChangePlanNameModal> {
   final TextEditingController _textEditingController = TextEditingController();
   ButtonState _buttonState = ButtonState.normal;
   bool _nameValid = true;
 
   @override
   void initState() {
-    final currentName = context.read(planProvider).state!.name;
+    final currentName = ref.read(planProvider)!.name;
     _textEditingController.text = currentName!;
     super.initState();
   }
@@ -102,7 +103,7 @@ class _ChangePlanNameModalState extends State<ChangePlanNameModal> {
     setState(() {
       _buttonState = ButtonState.inProgress;
     });
-    final newPlan = context.read(planProvider).state!;
+    final newPlan = ref.read(planProvider)!;
     newPlan.name = newName;
     await PlanService.updatePlan(newPlan);
     setState(() {

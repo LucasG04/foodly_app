@@ -25,14 +25,15 @@ import 'home_screen_dialogs.dart';
 import 'plan_history_view.dart';
 import 'tab_navigation_view.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  // ignore: library_private_types_in_public_api
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with DisposableWidget {
+class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
   final Logger _log = Logger('HomeScreen');
   final PageController _pageController = PageController(initialPage: 1);
 
@@ -40,8 +41,8 @@ class _HomeScreenState extends State<HomeScreen> with DisposableWidget {
   void initState() {
     _showAlerts();
     super.initState();
-    context
-        .read(planHistoryPageChanged)
+    ref
+        .read(planHistoryPageChanged.state)
         .stream
         .listen((_) => _changePage())
         .canceledBy(this);
@@ -55,10 +56,10 @@ class _HomeScreenState extends State<HomeScreen> with DisposableWidget {
 
   @override
   Widget build(BuildContext _) {
-    return Consumer(builder: (context, watch, _) {
-      final initialUserLoading = watch(initialUserLoadingProvider).state;
-      final initialPlanLoading = watch(initialPlanLoadingProvider).state;
-      final user = watch(userProvider).state;
+    return Consumer(builder: (context, ref, _) {
+      final initialUserLoading = ref.watch(initialUserLoadingProvider);
+      final initialPlanLoading = ref.watch(initialPlanLoadingProvider);
+      final user = ref.watch(userProvider);
 
       if (SettingsService.isFirstUsage) {
         AutoRouter.of(context).replace(OnboardingScreenRoute());
@@ -216,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> with DisposableWidget {
   }
 
   bool _checkLockPlan() {
-    final plan = context.read(planProvider).state;
+    final plan = ref.read(planProvider);
     if (plan == null) {
       return false;
     }
@@ -244,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen> with DisposableWidget {
   void _showLockPlanAlert() {
     void onLock() {
       Navigator.of(context).pop();
-      PlanService.lockPlan(context.read(planProvider).state!.id!);
+      PlanService.lockPlan(ref.read(planProvider)!.id!);
     }
 
     void onDismiss() => Navigator.of(context).pop();

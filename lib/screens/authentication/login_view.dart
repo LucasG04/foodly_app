@@ -29,7 +29,7 @@ import 'authentication_keys.dart';
 import 'reset_password_modal.dart';
 import 'select_plan_modal.dart';
 
-class LoginView extends StatefulWidget {
+class LoginView extends ConsumerStatefulWidget {
   final bool? isCreatingPlan;
   final Plan? plan;
   final void Function() navigateBack;
@@ -42,10 +42,11 @@ class LoginView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  // ignore: library_private_types_in_public_api
+  _LoginViewState createState() => _LoginViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
+class _LoginViewState extends ConsumerState<LoginView> {
   ButtonState? _buttonState;
   late bool _isRegistering;
   late bool _forgotPlan;
@@ -322,7 +323,7 @@ class _LoginViewState extends State<LoginView> {
     setState(() {
       _buttonState = ButtonState.inProgress;
     });
-    BasicUtils.clearAllProvider(context);
+    BasicUtils.clearAllProvider(ref);
   }
 
   Future<void> _processAuthentication(String? userId, String platform) async {
@@ -378,8 +379,8 @@ class _LoginViewState extends State<LoginView> {
     } else {
       FirebaseAnalytics.instance.logLogin(loginMethod: platform);
     }
-    context.read(planProvider).state = plan;
-    context.read(userProvider).state = foodlyUser;
+    ref.read(planProvider.state).state = plan;
+    ref.read(userProvider.state).state = foodlyUser;
     AutoRouter.of(context).replace(const HomeScreenRoute());
   }
 

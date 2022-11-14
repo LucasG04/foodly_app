@@ -24,7 +24,7 @@ import '../../../widgets/skeleton_container.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import 'plan_move_meal_modal.dart';
 
-class PlanDayMealTile extends StatefulWidget {
+class PlanDayMealTile extends ConsumerStatefulWidget {
   final bool enableVoting;
   final PlanMeal planMeal;
   final bool readonly;
@@ -37,10 +37,10 @@ class PlanDayMealTile extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<PlanDayMealTile> createState() => _PlanDayMealTileState();
+  PlanDayMealTileState createState() => PlanDayMealTileState();
 }
 
-class _PlanDayMealTileState extends State<PlanDayMealTile> {
+class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
   bool _voteIsLoading = false;
 
   @override
@@ -69,7 +69,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                       child: _buildDataRow(context, meal: meal),
                     );
                   } else {
-                    final currentPlanId = context.read(planProvider).state!.id;
+                    final currentPlanId = ref.read(planProvider)!.id;
                     PlanService.deletePlanMealFromPlan(
                         currentPlanId, widget.planMeal.id);
                     return _buildSkeletonLoading();
@@ -187,7 +187,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
                 onPressed: _voteIsLoading
                     ? null
                     : () => _voteMeal(
-                          context.read(planProvider).state!.id,
+                          ref.read(planProvider)!.id,
                           AuthenticationService.currentUser!.uid,
                         ),
                 splashRadius: 15.0,
@@ -205,8 +205,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
         if (!widget.readonly)
           IconButton(
             icon: const Icon(EvaIcons.moreHorizontalOutline),
-            onPressed: () =>
-                _showOptionsModal(context.read(planProvider).state!.id!),
+            onPressed: () => _showOptionsModal(ref.read(planProvider)!.id!),
           ),
       ],
     );
@@ -279,7 +278,7 @@ class _PlanDayMealTileState extends State<PlanDayMealTile> {
   }
 
   Future<void> _editPlaceholder() async {
-    final planId = context.read(planProvider).state!.id!;
+    final planId = ref.read(planProvider)!.id!;
     final text = await WidgetUtils.showPlaceholderEditDialog(
       context,
       initialText: widget.planMeal.meal.split(kPlaceholderSymbol)[1],

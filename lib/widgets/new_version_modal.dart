@@ -12,7 +12,7 @@ import '../services/version_service.dart';
 import '../utils/widget_utils.dart';
 import 'main_button.dart';
 
-class NewVersionModal extends StatefulWidget {
+class NewVersionModal extends ConsumerStatefulWidget {
   final List<String> versions;
   final List<VersionNote> versionNotes;
 
@@ -25,7 +25,8 @@ class NewVersionModal extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<NewVersionModal> createState() => _NewVersionModalState();
+  // ignore: library_private_types_in_public_api
+  _NewVersionModalState createState() => _NewVersionModalState();
 
   static Future<void> open(BuildContext context) async {
     final Version lastCheckedVersion =
@@ -85,7 +86,7 @@ class NewVersionModal extends StatefulWidget {
   }
 }
 
-class _NewVersionModalState extends State<NewVersionModal> {
+class _NewVersionModalState extends ConsumerState<NewVersionModal> {
   late final ScrollController _scrollController;
   late final AutoDisposeStateProvider<bool> _$titleShowShadow;
 
@@ -110,7 +111,7 @@ class _NewVersionModalState extends State<NewVersionModal> {
       children: [
         Consumer(
           builder: (context, ref, child) {
-            final showShadow = ref(_$titleShowShadow).state;
+            final showShadow = ref.watch(_$titleShowShadow);
             return Container(
               padding: const EdgeInsets.all(kPadding / 2),
               decoration: BoxDecoration(
@@ -229,11 +230,11 @@ class _NewVersionModalState extends State<NewVersionModal> {
   }
 
   void _handleTitleShadowState() {
-    final showShadow = context.read(_$titleShowShadow).state;
+    final showShadow = ref.read(_$titleShowShadow);
     if (_scrollController.offset > 0 && !showShadow) {
-      context.read(_$titleShowShadow).state = true;
+      ref.read(_$titleShowShadow.state).state = true;
     } else if (_scrollController.offset <= 0 && showShadow) {
-      context.read(_$titleShowShadow).state = false;
+      ref.read(_$titleShowShadow.state).state = false;
     }
   }
 }

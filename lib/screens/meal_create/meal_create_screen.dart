@@ -32,16 +32,17 @@ import 'edit_ingredients.dart';
 import 'edit_list_content_modal.dart';
 import 'save_changes_modal.dart';
 
-class MealCreateScreen extends StatefulWidget {
+class MealCreateScreen extends ConsumerStatefulWidget {
   final String id;
 
   const MealCreateScreen({required this.id, Key? key}) : super(key: key);
 
   @override
-  State<MealCreateScreen> createState() => _MealCreateScreenState();
+  // ignore: library_private_types_in_public_api
+  _MealCreateScreenState createState() => _MealCreateScreenState();
 }
 
-class _MealCreateScreenState extends State<MealCreateScreen> {
+class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
   bool _mealSaved = false;
   ButtonState _buttonState = ButtonState.normal;
   final ScrollController _scrollController = ScrollController();
@@ -103,8 +104,8 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
             ],
           ),
           body: Consumer(
-            builder: (context, watch, _) {
-              final plan = watch(planProvider).state;
+            builder: (context, ref, _) {
+              final plan = ref.watch(planProvider);
               _meal.planId = plan?.id;
               _fetchAllTagsIfNotExist();
               return Stack(
@@ -126,8 +127,9 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                                   controller: _titleController,
                                   title: 'meal_create_title_title'.tr(),
                                   required: true,
-                                  onChange: (newText) => context
-                                      .read(initSearchWebImagePickerProvider)
+                                  onChange: (newText) => ref
+                                      .read(initSearchWebImagePickerProvider
+                                          .state)
                                       .state = newText,
                                 ),
                                 const Divider(),
@@ -214,7 +216,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
                                     ),
                                     child: Consumer(
                                       builder: (_, ref, __) => LinkPreview(
-                                        ref(_$sourceLinkMetadata).state ?? '',
+                                        ref.watch(_$sourceLinkMetadata) ?? '',
                                       ),
                                     ),
                                   ),
@@ -373,7 +375,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
         if (!mounted) {
           return false;
         }
-        BasicUtils.emitMealsChanged(context, newMeal?.id ?? '');
+        BasicUtils.emitMealsChanged(ref, newMeal?.id ?? '');
         AutoRouter.of(context).pop();
         return true;
       } catch (e) {
@@ -437,7 +439,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
 
   void _openMealTagEdit() async {
     _existingMealTags ??=
-        await MealService.getAllTags(context.read(planProvider).state!.id!);
+        await MealService.getAllTags(ref.read(planProvider)!.id!);
     final allTags = [
       ..._existingMealTags ?? <String>[],
       ..._getMissingTagsInExisting()
@@ -472,7 +474,7 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
   }
 
   void _fetchAllTagsIfNotExist() async {
-    final plan = context.read(planProvider).state;
+    final plan = ref.read(planProvider);
     if (plan == null || plan.id == null || _existingMealTags != null) {
       return;
     }
@@ -498,12 +500,12 @@ class _MealCreateScreenState extends State<MealCreateScreen> {
 
   void _onSourceTextChange(String newText) {
     if (newText.isEmpty) {
-      context.read(_$sourceLinkMetadata).state = null;
+      ref.read(_$sourceLinkMetadata.state).state = null;
       return;
     }
     final textIsUri = BasicUtils.isValidUri(newText);
     if (textIsUri) {
-      context.read(_$sourceLinkMetadata).state = newText;
+      ref.read(_$sourceLinkMetadata.state).state = newText;
     }
   }
 }

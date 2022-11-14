@@ -14,14 +14,14 @@ import 'list_tile_card.dart';
 import 'main_button.dart';
 import 'small_circular_progress_indicator.dart';
 
-class GetPremiumModal extends StatefulWidget {
+class GetPremiumModal extends ConsumerStatefulWidget {
   const GetPremiumModal({Key? key}) : super(key: key);
 
   @override
-  State<GetPremiumModal> createState() => _GetPremiumModalState();
+  _GetPremiumModalState createState() => _GetPremiumModalState();
 }
 
-class _GetPremiumModalState extends State<GetPremiumModal>
+class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
     with DisposableWidget {
   final _log = Logger('GetPremiumModal');
   late final ScrollController _scrollController;
@@ -63,7 +63,7 @@ class _GetPremiumModalState extends State<GetPremiumModal>
       children: [
         Consumer(
           builder: (context, ref, child) {
-            final showShadow = ref(_$titleShowShadow).state;
+            final showShadow = ref.watch(_$titleShowShadow);
             return Container(
               padding: const EdgeInsets.all(kPadding / 2),
               decoration: BoxDecoration(
@@ -182,9 +182,9 @@ class _GetPremiumModalState extends State<GetPremiumModal>
   Widget _buildPremiumDurationSelector(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     return Consumer(
-      builder: (context, watch, _) {
-        final purchaseState = watch(_$purchaseState).state;
-        final selectedDuration = watch(_$selectedPremiumDuration).state;
+      builder: (context, ref, _) {
+        final purchaseState = ref.watch(_$purchaseState);
+        final selectedDuration = ref.watch(_$selectedPremiumDuration);
         return Container(
           decoration: purchaseState == _PurchaseState.pending
               ? BoxDecoration(
@@ -217,8 +217,9 @@ class _GetPremiumModalState extends State<GetPremiumModal>
                         final index = premiumDurations.indexOf(e);
                         final isSelected = selectedDuration == index;
                         return InkWell(
-                          onTap: () =>
-                              watch(_$selectedPremiumDuration).state = index,
+                          onTap: () => ref
+                              .read(_$selectedPremiumDuration.state)
+                              .state = index,
                           child: Container(
                             height: width * 0.2,
                             width: width * 0.3,
@@ -276,11 +277,11 @@ class _GetPremiumModalState extends State<GetPremiumModal>
   }
 
   void _handleTitleShadowState() {
-    final showShadow = context.read(_$titleShowShadow).state;
+    final showShadow = ref.read(_$titleShowShadow);
     if (_scrollController.offset > 0 && !showShadow) {
-      context.read(_$titleShowShadow).state = true;
+      ref.read(_$titleShowShadow.state).state = true;
     } else if (_scrollController.offset <= 0 && showShadow) {
-      context.read(_$titleShowShadow).state = false;
+      ref.read(_$titleShowShadow.state).state = false;
     }
   }
 
@@ -288,14 +289,14 @@ class _GetPremiumModalState extends State<GetPremiumModal>
     InAppPurchaseService.$purchaseStatus.listen((status) {
       if (status == PurchaseStatus.purchased ||
           status == PurchaseStatus.restored) {
-        context.read(_$purchaseState).state = _PurchaseState.purchased;
+        ref.read(_$purchaseState.state).state = _PurchaseState.purchased;
         Future.delayed(const Duration(seconds: 3), () => _close());
       }
       if (status == PurchaseStatus.error || status == PurchaseStatus.canceled) {
-        context.read(_$purchaseState).state = _PurchaseState.error;
+        ref.read(_$purchaseState.state).state = _PurchaseState.error;
       }
       if (status == PurchaseStatus.pending) {
-        context.read(_$purchaseState).state = _PurchaseState.pending;
+        ref.read(_$purchaseState.state).state = _PurchaseState.pending;
       }
     }).canceledBy(this);
   }
@@ -323,13 +324,13 @@ class _GetPremiumModalState extends State<GetPremiumModal>
   }
 
   Future<void> _restorePurchase() async {
-    context.read(_$purchaseState).state = _PurchaseState.pending;
+    ref.read(_$purchaseState.state).state = _PurchaseState.pending;
     await InAppPurchaseService.restore();
   }
 
   Future<void> _subscribeToPremium() async {
-    context.read(_$purchaseState).state = _PurchaseState.pending;
-    final index = context.read(_$selectedPremiumDuration).state;
+    ref.read(_$purchaseState.state).state = _PurchaseState.pending;
+    final index = ref.read(_$selectedPremiumDuration);
     final products = InAppPurchaseService.products;
     if (products.isNotEmpty) {
       await InAppPurchaseService.buy(products[index]);

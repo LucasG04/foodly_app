@@ -7,14 +7,15 @@ import '../../../providers/state_providers.dart';
 import '../../../services/lunix_api_service.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 
-class TagFilterModal extends StatefulWidget {
+class TagFilterModal extends ConsumerStatefulWidget {
   const TagFilterModal({Key? key}) : super(key: key);
 
   @override
-  State<TagFilterModal> createState() => _TagFilterModalState();
+  // ignore: library_private_types_in_public_api
+  _TagFilterModalState createState() => _TagFilterModalState();
 }
 
-class _TagFilterModalState extends State<TagFilterModal> {
+class _TagFilterModalState extends ConsumerState<TagFilterModal> {
   // empty_space is a distance of empty padding, only after scrolling through it the content starts getting under the app bar.
   static const double kEmptySpace = kPadding / 2;
 
@@ -57,7 +58,7 @@ class _TagFilterModalState extends State<TagFilterModal> {
                     const SizedBox(height: kPadding / 2),
                     FutureBuilder<List<String>>(
                         future: LunixApiService.getAllTagsInPlan(
-                          context.read(planProvider).state!.id!,
+                          ref.read(planProvider)!.id!,
                         ),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
@@ -67,9 +68,9 @@ class _TagFilterModalState extends State<TagFilterModal> {
 
                           final tags = snapshot.data ?? [];
 
-                          return Consumer(builder: (context, watch, _) {
+                          return Consumer(builder: (context, ref, _) {
                             final selectedTags =
-                                watch(mealTagFilterProvider).state;
+                                ref.watch(mealTagFilterProvider);
                             return Wrap(
                               runSpacing: kPadding / 2,
                               spacing: kPadding / 2,
@@ -131,7 +132,7 @@ class _TagFilterModalState extends State<TagFilterModal> {
             const Spacer(),
             IconButton(
               icon: const Icon(EvaIcons.trash2Outline),
-              onPressed: () => context.read(mealTagFilterProvider).state = [],
+              onPressed: () => ref.read(mealTagFilterProvider.state).state = [],
             ),
             const SizedBox(width: kPadding / 2),
             IconButton(
@@ -158,14 +159,14 @@ class _TagFilterModalState extends State<TagFilterModal> {
       selectedShadowColor: Theme.of(context).primaryColor.withOpacity(0.3),
       onSelected: (selected) {
         if (selected) {
-          context.read(mealTagFilterProvider).state = [
+          ref.read(mealTagFilterProvider.state).state = [
             ...selectedTags,
             tagText
           ];
         } else {
-          context.read(mealTagFilterProvider).state = [];
+          ref.read(mealTagFilterProvider.state).state = [];
           selectedTags.remove(tagText);
-          context.read(mealTagFilterProvider).state = selectedTags;
+          ref.read(mealTagFilterProvider.state).state = selectedTags;
         }
       },
     );

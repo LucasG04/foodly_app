@@ -14,14 +14,15 @@ import '../../widgets/small_circular_progress_indicator.dart';
 import 'plan_view/plan_day_card.dart';
 import 'plan_view/plan_tab_view.dart';
 
-class PlanHistoryView extends StatefulWidget {
+class PlanHistoryView extends ConsumerStatefulWidget {
   const PlanHistoryView({Key? key}) : super(key: key);
 
   @override
-  State<PlanHistoryView> createState() => _PlanHistoryViewState();
+  // ignore: library_private_types_in_public_api
+  _PlanHistoryViewState createState() => _PlanHistoryViewState();
 }
 
-class _PlanHistoryViewState extends State<PlanHistoryView> {
+class _PlanHistoryViewState extends ConsumerState<PlanHistoryView> {
   final ScrollController _scrollController = ScrollController();
   bool initialScrolledDown = false;
 
@@ -45,7 +46,7 @@ class _PlanHistoryViewState extends State<PlanHistoryView> {
           ),
         ],
       ),
-      body: context.read(planProvider).state != null
+      body: ref.read(planProvider) != null
           ? SingleChildScrollView(
               controller: _scrollController,
               child: Column(
@@ -55,7 +56,7 @@ class _PlanHistoryViewState extends State<PlanHistoryView> {
                       width: BasicUtils.contentWidth(context),
                       child: FutureBuilder<List<PlanMeal>>(
                         future: PlanService.getPlanMealHistoryByPlanId(
-                          context.read(planProvider).state!.id!,
+                          ref.read(planProvider)!.id!,
                         ),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
@@ -106,7 +107,7 @@ class _PlanHistoryViewState extends State<PlanHistoryView> {
   }
 
   List<PlanDay> _getPlanDays(List<PlanMeal> meals) {
-    final Plan plan = context.read(planProvider).state!;
+    final Plan plan = ref.read(planProvider)!;
     final List<PlanDay> days = [];
     final List<PlanMeal> updatedMeals = [...meals];
 
@@ -146,7 +147,7 @@ class _PlanHistoryViewState extends State<PlanHistoryView> {
   }
 
   void navigateBack() {
-    context.read(planHistoryPageChanged).state =
+    ref.read(planHistoryPageChanged.state).state =
         DateTime.now().millisecondsSinceEpoch;
   }
 }

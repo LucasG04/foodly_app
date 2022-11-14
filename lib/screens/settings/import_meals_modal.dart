@@ -85,16 +85,17 @@ class ImportMealsModal extends StatelessWidget {
   }
 }
 
-class CopyPlanMealsTile extends StatefulWidget {
+class CopyPlanMealsTile extends ConsumerStatefulWidget {
   final Plan plan;
 
   const CopyPlanMealsTile(this.plan, {Key? key}) : super(key: key);
 
   @override
-  State<CopyPlanMealsTile> createState() => _CopyPlanMealsTileState();
+  // ignore: library_private_types_in_public_api
+  _CopyPlanMealsTileState createState() => _CopyPlanMealsTileState();
 }
 
-class _CopyPlanMealsTileState extends State<CopyPlanMealsTile> {
+class _CopyPlanMealsTileState extends ConsumerState<CopyPlanMealsTile> {
   CopyButtonState _buttonState = CopyButtonState.normal;
 
   @override
@@ -116,7 +117,7 @@ class _CopyPlanMealsTileState extends State<CopyPlanMealsTile> {
                     ),
         ),
         onPressed: () => _copyMeals(
-          context.read(planProvider).state!.id!,
+          ref.read(planProvider)!.id!,
         ),
       ),
     );
@@ -133,7 +134,7 @@ class _CopyPlanMealsTileState extends State<CopyPlanMealsTile> {
     if (!mounted) {
       return;
     }
-    BasicUtils.emitMealsChanged(context);
+    BasicUtils.emitMealsChanged(ref);
     setState(() {
       _buttonState = CopyButtonState.done;
     });

@@ -17,7 +17,7 @@ import '../skeleton_container.dart';
 import '../small_circular_progress_indicator.dart';
 import '../user_information.dart';
 
-class WebImagePicker extends StatefulWidget {
+class WebImagePicker extends ConsumerStatefulWidget {
   final Function(String) onPick;
   final Function() onClose;
 
@@ -28,10 +28,11 @@ class WebImagePicker extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<WebImagePicker> createState() => _WebImagePickerState();
+  // ignore: library_private_types_in_public_api
+  _WebImagePickerState createState() => _WebImagePickerState();
 }
 
-class _WebImagePickerState extends State<WebImagePicker> {
+class _WebImagePickerState extends ConsumerState<WebImagePicker> {
   final _log = app_logger.Logger('LogRecordService');
 
   final TextEditingController _inputController = TextEditingController();
@@ -53,8 +54,7 @@ class _WebImagePickerState extends State<WebImagePicker> {
   @override
   Widget build(BuildContext context) {
     if (_firstBuild) {
-      final initialSearch =
-          context.read(initSearchWebImagePickerProvider).state;
+      final initialSearch = ref.read(initSearchWebImagePickerProvider);
       if (initialSearch.isNotEmpty) {
         _inputController.text = initialSearch;
         _search();
@@ -92,13 +92,13 @@ class _WebImagePickerState extends State<WebImagePicker> {
                     Expanded(
                       child: MainTextField(
                         controller: _inputController,
-                        onSubmit: () => _search(),
+                        onSubmit: _search,
                         placeholder: 'image_link_picker_input_placeholder'.tr(),
                         onChange: (_) => _clearResults(),
                       ),
                     ),
                     IconButton(
-                      onPressed: () => _search,
+                      onPressed: _search,
                       icon: const Icon(EvaIcons.searchOutline),
                     ),
                   ],

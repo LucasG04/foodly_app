@@ -16,7 +16,7 @@ import '../../../widgets/suggestion_tile.dart';
 import '../models/grocery.dart';
 import '../models/ingredient.dart';
 
-class IngredientEditModal extends StatefulWidget {
+class IngredientEditModal extends ConsumerStatefulWidget {
   final Ingredient ingredient;
   final Future<void> Function(Ingredient)? onSaved;
 
@@ -27,10 +27,11 @@ class IngredientEditModal extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<IngredientEditModal> createState() => _IngredientEditModalState();
+  // ignore: library_private_types_in_public_api
+  _IngredientEditModalState createState() => _IngredientEditModalState();
 }
 
-class _IngredientEditModalState extends State<IngredientEditModal> {
+class _IngredientEditModalState extends ConsumerState<IngredientEditModal> {
   static final _log = Logger('IngredientEditModal');
   late Debouncer _nameDebouncer;
   late TextEditingController _nameController;
@@ -93,14 +94,14 @@ class _IngredientEditModalState extends State<IngredientEditModal> {
           children: <Widget>[
             Consumer(builder: (_, ref, __) {
               return SizedBox(
-                height: ref(_$suggestions).state.isNotEmpty ? kPadding : 0,
+                height: ref.watch(_$suggestions).isNotEmpty ? kPadding : 0,
               );
             }),
             Consumer(builder: (_, ref, __) {
               return Wrap(
                 spacing: kPadding / 2,
                 runSpacing: kPadding / 2,
-                children: ref(_$suggestions).state.take(6).map((grocery) {
+                children: ref.watch(_$suggestions).take(6).map((grocery) {
                   return SuggestionTile(
                     text: grocery.name.toString(),
                     onTap: () => _applyGroceryFromSuggestion(grocery),
@@ -110,7 +111,7 @@ class _IngredientEditModalState extends State<IngredientEditModal> {
             }),
             const SizedBox(height: kPadding / 2),
             Consumer(builder: (_, ref, __) {
-              ref(_$buttonState);
+              ref.watch(_$buttonState);
               return MainTextField(
                 controller: _nameController,
                 focusNode: _nameFocusNode,
@@ -159,7 +160,7 @@ class _IngredientEditModalState extends State<IngredientEditModal> {
                 return MainButton(
                   text: 'save'.tr(),
                   isProgress: true,
-                  buttonState: ref(_$buttonState).state,
+                  buttonState: ref.watch(_$buttonState),
                   onTap: _saveGrocery,
                 );
               }),
@@ -177,7 +178,7 @@ class _IngredientEditModalState extends State<IngredientEditModal> {
 
   Future<void> _saveGrocery() async {
     if (_formIsValid()) {
-      context.read(_$buttonState).state = ButtonState.inProgress;
+      ref.read(_$buttonState.state).state = ButtonState.inProgress;
       widget.ingredient.name = _nameController.text.trim();
       widget.ingredient.amount =
           double.tryParse(_amountController.text.trim().replaceAll(',', '.'));
@@ -195,11 +196,11 @@ class _IngredientEditModalState extends State<IngredientEditModal> {
         return;
       }
 
-      context.read(_$buttonState).state = ButtonState.normal;
+      ref.read(_$buttonState.state).state = ButtonState.normal;
       Navigator.of(context).pop(widget.ingredient);
     } else {
       _errorText = 'edit_grocery_modal_error'.tr();
-      context.read(_$buttonState).state = ButtonState.error;
+      ref.read(_$buttonState.state).state = ButtonState.error;
     }
   }
 
@@ -211,8 +212,8 @@ class _IngredientEditModalState extends State<IngredientEditModal> {
   Future<void> _loadSuggestions(String text) async {
     text = text.trim();
     if (text.length < 3) {
-      if (context.read(_$suggestions).state.isNotEmpty) {
-        context.read(_$suggestions).state = [];
+      if (ref.read(_$suggestions).isNotEmpty) {
+        ref.read(_$suggestions.state).state = [];
       }
       return;
     }
@@ -220,11 +221,11 @@ class _IngredientEditModalState extends State<IngredientEditModal> {
     final suggestions = await LunixApiService.getGrocerySuggestions(
       text,
       BasicUtils.getActiveLanguage(context),
-      context.read(planProvider).state?.id ?? '',
+      ref.read(planProvider)?.id ?? '',
     );
 
     if (mounted) {
-      context.read(_$suggestions).state = suggestions;
+      ref.read(_$suggestions.state).state = suggestions;
     }
   }
 
@@ -235,14 +236,14 @@ class _IngredientEditModalState extends State<IngredientEditModal> {
       widget.ingredient.productGroup = grocery.group.toString();
     }
 
-    context.read(_$suggestions).state = [];
+    ref.read(_$suggestions.state).state = [];
     _amountFocusNode.requestFocus();
   }
 
   void _onNameFocusChanged() {
     if (!_nameFocusNode.hasFocus) {
-      context.read(_$suggestions).state = [];
-    } else if (context.read(_$suggestions).state.isEmpty &&
+      ref.read(_$suggestions.state).state = [];
+    } else if (ref.read(_$suggestions).isEmpty &&
         _nameController.text.isNotEmpty) {
       _nameDebouncer.run(() => _loadSuggestions(_nameController.text));
     }

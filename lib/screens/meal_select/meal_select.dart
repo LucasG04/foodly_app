@@ -25,7 +25,7 @@ import '../tab_navigation/meal_list_view/meal_list_tile.dart';
 import 'search_bar.dart';
 import 'select_meal_tile.dart';
 
-class MealSelectScreen extends StatefulWidget {
+class MealSelectScreen extends ConsumerStatefulWidget {
   final DateTime date;
   final MealType mealType;
 
@@ -33,10 +33,11 @@ class MealSelectScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<MealSelectScreen> createState() => _MealSelectScreenState();
+  // ignore: library_private_types_in_public_api
+  _MealSelectScreenState createState() => _MealSelectScreenState();
 }
 
-class _MealSelectScreenState extends State<MealSelectScreen> {
+class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
   late AutoDisposeStateProvider<bool> _$isSearching;
 
   final ScrollController _scrollController = ScrollController();
@@ -51,7 +52,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final activePlan = context.read(planProvider).state!;
+    final activePlan = ref.read(planProvider)!;
 
     return Scaffold(
       appBar: MainAppBar(
@@ -65,8 +66,8 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
             SearchBar(
               onSearch: _onSearchEvent,
             ),
-            Consumer(builder: (context, watch, _) {
-              final isSearching = watch(_$isSearching).state;
+            Consumer(builder: (context, ref, _) {
+              final isSearching = ref.watch(_$isSearching);
 
               if (isSearching) {
                 return _buildLoader();
@@ -121,15 +122,15 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
         ? _buildContainer(
             EvaIcons.code,
             'meal_select_placeholder'.tr(),
-            () => _showPlaceholderDialog(),
+            () => _showPlaceholderDialog(ref),
           )
         : (index == 1)
             ? _buildContainer(
                 EvaIcons.plus,
                 'meal_select_new'.tr(),
-                () => _createNewMeal(),
+                () => _createNewMeal(ref),
               )
-            : context.read(_$isSearching).state
+            : ref.read(_$isSearching)
                 ? UserInformation(
                     assetPath: 'assets/images/undraw_empty.png',
                     title: 'meal_select_no_results'.tr(),
@@ -141,7 +142,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
   }
 
   Widget _buildPreviewMeals() {
-    final planId = context.read(planProvider).state!.id!;
+    final planId = ref.read(planProvider)!.id!;
     return FutureBuilder<List<Meal>>(
       future: MealStatService.getMealRecommendations(planId),
       builder: (context, snapshot) {
@@ -206,7 +207,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
   }
 
   Widget _buildPaginatedMealList() {
-    final planId = context.read(planProvider).state!.id!;
+    final planId = ref.read(planProvider)!.id!;
     return MealPagination(
       loadNextMeals: (lastMealId) => MealService.getMealsPaginated(
         planId,
@@ -285,26 +286,27 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
 
   void _onSearchEvent(String query) async {
     if (query.isNotEmpty && query.length > 2) {
-      context.read(_$isSearching).state = true;
-      searchedMeals = await _searchMeal(query);
+      ref.read(_$isSearching.state).state = true;
+      searchedMeals = await _searchMeal(ref, query);
       if (!mounted) {
         return;
       }
-      context.read(_$isSearching).state = false;
+      ref.read(_$isSearching.state).state = false;
       FirebaseAnalytics.instance.logEvent(
         name: 'search_meal_select',
         parameters: {'query': query},
       );
     } else {
-      if (context.read(_$isSearching).state) {}
+      // TODO: check if
+      if (ref.read(_$isSearching)) {}
       searchedMeals = [];
-      context.read(_$isSearching).state = false;
+      ref.read(_$isSearching.state).state = false;
       setState(() {});
     }
   }
 
-  Future<void> _showPlaceholderDialog() async {
-    final planId = context.read(planProvider).state!.id!;
+  Future<void> _showPlaceholderDialog(WidgetRef ref) async {
+    final planId = ref.read(planProvider)!.id!;
     final text = await WidgetUtils.showPlaceholderEditDialog(context);
 
     if (text == null || text.isEmpty) {
@@ -321,8 +323,8 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     AutoRouter.of(context).pop();
   }
 
-  Future<void> _createNewMeal() async {
-    final planId = context.read(planProvider).state!.id!;
+  Future<void> _createNewMeal(WidgetRef ref) async {
+    final planId = ref.read(planProvider)!.id!;
     final meal =
         await AutoRouter.of(context).push(MealCreateScreenRoute(id: 'create'));
 
@@ -356,9 +358,9 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     );
   }
 
-  Future<List<Meal>> _searchMeal(String query) {
+  Future<List<Meal>> _searchMeal(WidgetRef ref, String query) {
     return LunixApiService.searchMeals(
-      context.read(planProvider).state!.id!,
+      ref.read(planProvider)!.id!,
       query,
     );
   }

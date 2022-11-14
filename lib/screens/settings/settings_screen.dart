@@ -33,16 +33,18 @@ import 'settings_alerts.dart';
 import 'settings_reauthenticate_modal.dart';
 import 'settings_tile.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  // ignore: library_private_types_in_public_api
+  _SettingsScreenState createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final Logger _log = Logger('SettingsScreen');
   final ScrollController _scrollController = ScrollController();
-  final _$loadingChangePlanLockState = AutoDisposeStateProvider((_) => false);
+  final _$loadingChangePlanLockState =
+      AutoDisposeStateProvider<bool>((_) => false);
   bool isLoading = false;
 
   @override
@@ -53,9 +55,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         scrollController: _scrollController,
       ),
       body: Consumer(
-        builder: (context, watch, _) {
-          final plan = watch(planProvider).state;
-          final foodlyUser = watch(userProvider).state;
+        builder: (context, ref, _) {
+          final plan = ref.watch(planProvider);
+          final foodlyUser = ref.watch(userProvider);
           final firebaseUser = AuthenticationService.currentUser;
           return plan != null && foodlyUser != null && !isLoading
               ? SingleChildScrollView(
@@ -107,7 +109,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             text:
                                 'settings_section_customization_multiple_meals'
                                     .tr(),
-                            trailing: Consumer(builder: (context, watch, _) {
+                            trailing: Consumer(builder: (context, ref, _) {
                               return Switch.adaptive(
                                 value: SettingsService.multipleMealsPerTime,
                                 onChanged: (value) {
@@ -123,7 +125,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             leadingIcon: EvaIcons.trendingUpOutline,
                             text: 'settings_section_customization_suggestions'
                                 .tr(),
-                            trailing: Consumer(builder: (context, watch, _) {
+                            trailing: Consumer(builder: (context, ref, _) {
                               return Switch.adaptive(
                                 value: SettingsService.showSuggestions,
                                 onChanged: (value) {
@@ -138,7 +140,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             leadingIcon: EvaIcons.trash2Outline,
                             text: 'settings_section_customization_remove_bought'
                                 .tr(),
-                            trailing: Consumer(builder: (context, watch, _) {
+                            trailing: Consumer(builder: (context, ref, _) {
                               return Switch.adaptive(
                                 value: SettingsService.removeBoughtImmediately,
                                 onChanged: (value) {
@@ -154,7 +156,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             leadingIcon: Icons.emoji_food_beverage_rounded,
                             text:
                                 'settings_section_customization_breakfast'.tr(),
-                            trailing: Consumer(builder: (context, watch, _) {
+                            trailing: Consumer(builder: (context, ref, _) {
                               return Switch.adaptive(
                                 value: SettingsService.planWithBreakfast,
                                 onChanged: (value) {
@@ -193,9 +195,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           SettingsTile(
                             leadingIcon: EvaIcons.lockOutline,
                             text: 'settings_section_plan_change_locked'.tr(),
-                            trailing: Consumer(builder: (context, watch, _) {
+                            trailing: Consumer(builder: (context, ref, _) {
                               final isLoadingLockState =
-                                  watch(_$loadingChangePlanLockState).state;
+                                  ref.watch(_$loadingChangePlanLockState);
                               return isLoadingLockState
                                   ? const SmallCircularProgressIndicator()
                                   : Switch.adaptive(
@@ -243,7 +245,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             onTap: () => Navigator.push(
                               context,
                               ConcentricPageRoute<OnboardingScreen>(
-                                  builder: (_) => OnboardingScreen()),
+                                builder: (_) => const OnboardingScreen(),
+                              ),
                             ),
                             leadingIcon: EvaIcons.questionMarkCircleOutline,
                             text: 'settings_section_help_intro'.tr(),
@@ -405,18 +408,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       isLoading = false;
     });
-    context.read(planProvider).state = plan;
+    ref.read(planProvider.state).state = plan;
   }
 
   Future<void> _changePlanLockState(Plan plan, bool locked) async {
-    context.read(_$loadingChangePlanLockState).state = true;
+    ref.read(_$loadingChangePlanLockState.state).state = true;
     plan.locked = locked;
     await PlanService.updatePlan(plan);
     if (!mounted) {
       return;
     }
-    context.read(_$loadingChangePlanLockState).state = false;
-    context.read(planProvider).state = plan;
+    ref.read(_$loadingChangePlanLockState.state).state = false;
+    ref.read(planProvider.state).state = plan;
   }
 
   void _leavePlan(String? planId, BuildContext context) async {
@@ -429,7 +432,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final String userId = AuthenticationService.currentUser!.uid;
     PlanService.leavePlan(planId, userId).then((_) {
       AuthenticationService.signOut();
-      BasicUtils.clearAllProvider(context);
+      BasicUtils.clearAllProvider(ref);
     });
   }
 

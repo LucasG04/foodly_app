@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class MarkdownEditor extends StatefulWidget {
+class MarkdownEditor extends ConsumerStatefulWidget {
   final TextEditingController textEditingController;
 
   const MarkdownEditor({
@@ -16,10 +16,11 @@ class MarkdownEditor extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<MarkdownEditor> createState() => _MarkdownEditorState();
+  // ignore: library_private_types_in_public_api
+  _MarkdownEditorState createState() => _MarkdownEditorState();
 }
 
-class _MarkdownEditorState extends State<MarkdownEditor>
+class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
     with TickerProviderStateMixin {
   static final log = Logger('MarkdownEditor');
 
@@ -99,7 +100,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                       controller: widget.textEditingController,
                       maxLines: null,
                       onChanged: (data) =>
-                          context.read(_$currentText).state = data,
+                          ref.read(_$currentText.state).state = data,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText:
@@ -118,7 +119,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
                     thickness: 2.5,
                     child: SingleChildScrollView(
                       child: Consumer(builder: (context, ref, child) {
-                        final text = ref(_$currentText).state;
+                        final text = ref.watch(_$currentText);
                         return MarkdownBody(
                           data: text,
                           selectable: true,
