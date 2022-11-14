@@ -48,14 +48,18 @@ class FoodlyUserService {
     return _firestore.doc(userId).delete();
   }
 
-  static Future<void> subscribeToPremium(String userId, DateTime expiresAt) {
+  static Future<void> subscribeToPremium(
+    String userId,
+    DateTime expiresAt,
+  ) async {
     log.finer('Call subscribeToPremium with $userId and $expiresAt');
-    return _firestore.doc(userId).set(
-          <String, dynamic>{
-            'isPremium': true,
-            'premiumExpiresAt': expiresAt,
-          } as FoodlyUser,
-          SetOptions(merge: true),
-        );
+    final user = await getUserById(userId);
+    if (user == null) {
+      log.severe('#subscribeToPremium User $userId not found');
+      return;
+    }
+    user.isPremium = true;
+    user.premiumExpiresAt = expiresAt;
+    return _firestore.doc(userId).update(user.toMap());
   }
 }

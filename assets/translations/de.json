@@ -264,5 +264,6 @@
     "get_premium_modal_3_title": "{} unterstützen",
     "get_premium_modal_3_description": "Mit deinem Beitrag förderst du die Weiterentwicklung der App, hältst die App werbefrei und unterstützt bei der Deckung von Serverkosten.",
     "get_premium_modal_4_title": "Priorisierter Support",
-    "get_premium_modal_4_description": "Über die Feedback-Funktion erhältst du vorrangige Unterstützung."
+    "get_premium_modal_4_description": "Über die Feedback-Funktion erhältst du vorrangige Unterstützung.",
+    "get_premium_modal_thanks": "Danke {}"
 }

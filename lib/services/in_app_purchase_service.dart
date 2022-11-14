@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logging/logging.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../models/purchasable_product.dart';
 import '../models/store_state.dart';
@@ -18,9 +19,14 @@ class InAppPurchaseService {
   static StoreState _storeState = StoreState.loading;
   static List<PurchasableProduct> _products = [];
   static late StreamSubscription<List<PurchaseDetails>> _$purchases;
+  static late BehaviorSubject<PurchaseStatus> _$purchaseStatus;
 
   static List<PurchasableProduct> get products => _products;
   static StoreState get storeState => _storeState;
+  static Stream<PurchaseStatus> get $purchaseStatus =>
+      _$purchaseStatus.asBroadcastStream();
+  static PurchaseStatus? get currentPurchaseStatus =>
+      _$purchaseStatus.valueOrNull;
 
   static Future<void> initialize() async {
     _$purchases = InAppPurchase.instance.purchaseStream.listen(
@@ -28,6 +34,7 @@ class InAppPurchaseService {
       onDone: _updateStreamOnDone,
       onError: _updateStreamOnError,
     );
+    _$purchaseStatus = BehaviorSubject();
     await _loadPurchases();
   }
 
@@ -69,34 +76,39 @@ class InAppPurchaseService {
     purchaseDetailsList.forEach(_handlePurchase);
   }
 
-  static void _handlePurchase(PurchaseDetails purchaseDetails) {
+  static Future<void> _handlePurchase(PurchaseDetails purchaseDetails) async {
     if (purchaseDetails.status == PurchaseStatus.purchased) {
-      if (purchaseDetails.productID == _storeKeySubscriptionMonth) {
-        _log.finer('Purchased month subscription');
-        final now = DateTime.now();
-        final expiresAt = DateTime(
-          now.year,
-          now.month + 1,
-          now.day,
-          now.hour,
-          now.minute,
+      _log.finer('Purchased ${purchaseDetails.productID}');
+      final now = DateTime.now();
+      final expiresAt = purchaseDetails.productID == _storeKeySubscriptionMonth
+          ? DateTime(
+              now.year,
+              now.month + 1,
+              now.day,
+              now.hour,
+              now.minute,
+            )
+          : DateTime(
+              now.year + 1,
+              now.month,
+              now.day,
+              now.hour,
+              now.minute,
+            );
+      if (AuthenticationService.currentUser != null) {
+        await FoodlyUserService.subscribeToPremium(
+          AuthenticationService.currentUser!.uid,
+          expiresAt,
         );
-        if (AuthenticationService.currentUser != null) {
-          FoodlyUserService.subscribeToPremium(
-            AuthenticationService.currentUser!.uid,
-            expiresAt,
-          );
-        } else {
-          _log.severe('ERR! No user logged in');
-        }
-      } else if (purchaseDetails.productID == _storeKeySubscriptionYear) {
-        _log.finer('Purchased year subscription');
+      } else {
+        _log.severe('ERR! No user logged in');
       }
     }
 
     if (purchaseDetails.pendingCompletePurchase) {
-      InAppPurchase.instance.completePurchase(purchaseDetails);
+      await InAppPurchase.instance.completePurchase(purchaseDetails);
     }
+    _$purchaseStatus.add(purchaseDetails.status);
   }
 
   static Future<void> restore() async {

@@ -264,5 +264,6 @@
   "get_premium_modal_3_title": "Support {}",
   "get_premium_modal_3_description": "With your contribution you support the further development of the app, keep the app ad-free and help cover server costs.",
   "get_premium_modal_4_title": "Prioritized support",
-  "get_premium_modal_4_description": "You will receive priority support via the feedback feature."
+  "get_premium_modal_4_description": "You will receive priority support via the feedback feature.",
+  "get_premium_modal_thanks": "Thanks {}"
 }

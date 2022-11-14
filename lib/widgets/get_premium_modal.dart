@@ -4,12 +4,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logging/logging.dart';
 
 import '../constants.dart';
 import '../services/in_app_purchase_service.dart';
+import 'disposable_widget.dart';
 import 'list_tile_card.dart';
 import 'main_button.dart';
+import 'small_circular_progress_indicator.dart';
 
 class GetPremiumModal extends StatefulWidget {
   const GetPremiumModal({Key? key}) : super(key: key);
@@ -18,10 +21,12 @@ class GetPremiumModal extends StatefulWidget {
   State<GetPremiumModal> createState() => _GetPremiumModalState();
 }
 
-class _GetPremiumModalState extends State<GetPremiumModal> {
+class _GetPremiumModalState extends State<GetPremiumModal>
+    with DisposableWidget {
   final _log = Logger('GetPremiumModal');
   late final ScrollController _scrollController;
   late final AutoDisposeStateProvider<bool> _$titleShowShadow;
+  late final AutoDisposeStateProvider<_PurchaseState> _$purchaseState;
   late final AutoDisposeStateProvider<int> _$selectedPremiumDuration;
 
   final premiumDurations = [
@@ -32,11 +37,14 @@ class _GetPremiumModalState extends State<GetPremiumModal> {
   @override
   void initState() {
     _$titleShowShadow = AutoDisposeStateProvider((_) => false);
+    _$purchaseState =
+        AutoDisposeStateProvider((_) => _getCurrentPurchaseStateFromService());
     _$selectedPremiumDuration = AutoDisposeStateProvider((_) => 1);
     _scrollController = ScrollController();
     _scrollController.addListener(_handleTitleShadowState);
     super.initState();
 
+    _listenOnPurchaseStatus();
     _getPricesFromService();
 
     // TODO: add "Und viele weitere Vorteile in der Zukunft. Evtl. mit Link auf offene Issues?"
@@ -45,13 +53,13 @@ class _GetPremiumModalState extends State<GetPremiumModal> {
   @override
   void dispose() {
     _scrollController.dispose();
+    cancelSubscriptions();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      // mainAxisSize: MainAxisSize.min,
       children: [
         Consumer(
           builder: (context, ref, child) {
@@ -148,7 +156,7 @@ class _GetPremiumModalState extends State<GetPremiumModal> {
               _buildPremiumDurationSelector(context),
               const SizedBox(height: kPadding / 2),
               MainButton(
-                onTap: subscribeToPremium,
+                onTap: _subscribeToPremium,
                 text: 'get_premium_modal_cta'.tr(args: [kAppName]),
               ),
               Row(
@@ -159,7 +167,7 @@ class _GetPremiumModalState extends State<GetPremiumModal> {
                     child: Text('get_premium_modal_not_now'.tr()),
                   ),
                   TextButton(
-                    onPressed: () => InAppPurchaseService.restore(),
+                    onPressed: _restorePurchase,
                     child: Text('get_premium_modal_restore'.tr()),
                   ),
                 ],
@@ -171,59 +179,99 @@ class _GetPremiumModalState extends State<GetPremiumModal> {
     );
   }
 
-  Container _buildPremiumDurationSelector(BuildContext context) {
+  Widget _buildPremiumDurationSelector(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(kRadius),
-        color: Colors.grey[200],
-      ),
-      child: Consumer(
-        builder: (context, ref, _) {
-          final selectedDuration = ref(_$selectedPremiumDuration).state;
-          return Row(
+    return Consumer(
+      builder: (context, watch, _) {
+        final purchaseState = watch(_$purchaseState).state;
+        final selectedDuration = watch(_$selectedPremiumDuration).state;
+        return Container(
+          decoration: purchaseState == _PurchaseState.pending
+              ? BoxDecoration(
+                  borderRadius: BorderRadius.circular(kRadius),
+                  color: Colors.grey[200],
+                )
+              : null,
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: premiumDurations.map((e) {
-              final index = premiumDurations.indexOf(e);
-              final isSelected = selectedDuration == index;
-              return InkWell(
-                onTap: () => ref(_$selectedPremiumDuration).state = index,
-                child: Container(
-                  height: width * 0.2,
-                  width: width * 0.3,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(kRadius),
-                    border: isSelected
-                        ? Border.all(
-                            color: Theme.of(context).primaryColor,
-                            width: 2.5,
-                          )
-                        : null,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        e.title.tr(),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(e.price ?? ''),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          );
-        },
-      ),
+            children: purchaseState == _PurchaseState.pending
+                ? [
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: kPadding),
+                      child: SmallCircularProgressIndicator(),
+                    )
+                  ]
+                : purchaseState == _PurchaseState.purchased
+                    ? [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: kPadding,
+                          ),
+                          child: Text(
+                            'get_premium_modal_thanks'.tr(args: ['🙂']),
+                          ),
+                        )
+                      ]
+                    : premiumDurations.map((e) {
+                        final index = premiumDurations.indexOf(e);
+                        final isSelected = selectedDuration == index;
+                        return InkWell(
+                          onTap: () =>
+                              watch(_$selectedPremiumDuration).state = index,
+                          child: Container(
+                            height: width * 0.2,
+                            width: width * 0.3,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(kRadius),
+                              border: isSelected
+                                  ? Border.all(
+                                      color: Theme.of(context).primaryColor,
+                                      width: 2.5,
+                                    )
+                                  : null,
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  e.title.tr(),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(e.price ?? ''),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+          ),
+        );
+      },
     );
   }
 
+  _PurchaseState _getCurrentPurchaseStateFromService() {
+    final status = InAppPurchaseService.currentPurchaseStatus;
+    if (status == PurchaseStatus.purchased ||
+        status == PurchaseStatus.restored) {
+      return _PurchaseState.purchased;
+    } else if (status == PurchaseStatus.error ||
+        status == PurchaseStatus.canceled) {
+      return _PurchaseState.error;
+    } else if (status == PurchaseStatus.pending) {
+      return _PurchaseState.pending;
+    } else {
+      return _PurchaseState.none;
+    }
+  }
+
   void _close() {
+    if (!mounted) {
+      return;
+    }
     Navigator.pop(context);
   }
 
@@ -234,6 +282,22 @@ class _GetPremiumModalState extends State<GetPremiumModal> {
     } else if (_scrollController.offset <= 0 && showShadow) {
       context.read(_$titleShowShadow).state = false;
     }
+  }
+
+  void _listenOnPurchaseStatus() {
+    InAppPurchaseService.$purchaseStatus.listen((status) {
+      if (status == PurchaseStatus.purchased ||
+          status == PurchaseStatus.restored) {
+        context.read(_$purchaseState).state = _PurchaseState.purchased;
+        Future.delayed(const Duration(seconds: 3), () => _close());
+      }
+      if (status == PurchaseStatus.error || status == PurchaseStatus.canceled) {
+        context.read(_$purchaseState).state = _PurchaseState.error;
+      }
+      if (status == PurchaseStatus.pending) {
+        context.read(_$purchaseState).state = _PurchaseState.pending;
+      }
+    }).canceledBy(this);
   }
 
   void _getPricesFromService() {
@@ -248,9 +312,9 @@ class _GetPremiumModalState extends State<GetPremiumModal> {
   IconData _getSupportAppIcon() {
     final icons = [
       EvaIcons.heartOutline,
-      Icons.rocket_launch_outlined,
-      Icons.star_border_outlined,
+      EvaIcons.starOutline,
       EvaIcons.flashOutline,
+      Icons.rocket_launch_outlined,
       Icons.cookie_outlined,
     ];
 
@@ -258,11 +322,17 @@ class _GetPremiumModalState extends State<GetPremiumModal> {
     return icons[index];
   }
 
-  void subscribeToPremium() {
+  Future<void> _restorePurchase() async {
+    context.read(_$purchaseState).state = _PurchaseState.pending;
+    await InAppPurchaseService.restore();
+  }
+
+  Future<void> _subscribeToPremium() async {
+    context.read(_$purchaseState).state = _PurchaseState.pending;
     final index = context.read(_$selectedPremiumDuration).state;
     final products = InAppPurchaseService.products;
     if (products.isNotEmpty) {
-      InAppPurchaseService.buy(products[index]);
+      await InAppPurchaseService.buy(products[index]);
     }
   }
 }
@@ -272,4 +342,11 @@ class _PremiumDuration {
   String? price;
 
   _PremiumDuration(this.title);
+}
+
+enum _PurchaseState {
+  none,
+  pending,
+  purchased,
+  error,
 }
