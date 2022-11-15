@@ -119,27 +119,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 onChanged: (value) {
                                   setState(() {
                                     SettingsService.setMultipleMealsPerTime(
-                                        value);
+                                      value,
+                                    );
                                   });
                                 },
                               );
                             }),
                           ),
-                          SettingsTile(
-                            leadingIcon: EvaIcons.trendingUpOutline,
-                            text: 'settings_section_customization_suggestions'
-                                .tr(),
-                            trailing: Consumer(builder: (context, ref, _) {
-                              return Switch.adaptive(
-                                value: SettingsService.showSuggestions,
-                                onChanged: (value) {
-                                  setState(() {
-                                    SettingsService.setShowSuggestions(value);
-                                  });
-                                },
-                              );
-                            }),
-                          ),
+                          if (InAppPurchaseService.userIsSubscribed)
+                            SettingsTile(
+                              leadingIcon: EvaIcons.trendingUpOutline,
+                              text: 'settings_section_customization_suggestions'
+                                  .tr(),
+                              trailing: Consumer(builder: (context, ref, _) {
+                                return Switch.adaptive(
+                                  value: SettingsService.showSuggestions,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      SettingsService.setShowSuggestions(value);
+                                    });
+                                  },
+                                );
+                              }),
+                            ),
                           SettingsTile(
                             leadingIcon: EvaIcons.trash2Outline,
                             text: 'settings_section_customization_remove_bought'
