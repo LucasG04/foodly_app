@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
+import '../../app_router.gr.dart';
 import '../../constants.dart';
 import '../../models/page_data.dart';
 import '../../services/authentication_service.dart';
@@ -12,7 +13,14 @@ import '../../widgets/page_card.dart';
 import '../authentication/authentication_screen.dart';
 import 'onboarding_keys.dart';
 
-class OnboardingScreen extends StatelessWidget {
+class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({Key? key}) : super(key: key);
+
+  @override
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<PageData> pages = [
     PageData(
       assetPath: 'assets/onboarding/welcome.png',
@@ -46,8 +54,6 @@ class OnboardingScreen extends StatelessWidget {
     ),
   ];
 
-  OnboardingScreen({Key? key}) : super(key: key);
-
   List<Color> get _colors => pages.map((p) => p.background).toList();
 
   @override
@@ -80,7 +86,7 @@ class OnboardingScreen extends StatelessWidget {
     );
   }
 
-  void _finishOnboarding(BuildContext context) {
+  Future<void> _finishOnboarding(BuildContext context) async {
     if (SettingsService.isFirstUsage) {
       SettingsService.setFirstUsageFalse();
     }
@@ -89,10 +95,14 @@ class OnboardingScreen extends StatelessWidget {
       Navigator.push(
         context,
         ConcentricPageRoute<AuthenticationScreen>(
-            builder: (_) => const AuthenticationScreen()),
+          builder: (_) => const AuthenticationScreen(),
+        ),
       );
     } else {
-      AutoRouter.of(context).pop();
+      final popSucceeded = await AutoRouter.of(context).pop();
+      if (!popSucceeded && mounted) {
+        AutoRouter.of(context).replace(const HomeScreenRoute());
+      }
     }
   }
 }

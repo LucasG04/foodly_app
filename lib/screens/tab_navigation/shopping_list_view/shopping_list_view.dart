@@ -40,8 +40,8 @@ class _ShoppingListViewState extends State<ShoppingListView>
   Widget build(BuildContext context) {
     super.build(context);
     return Consumer(
-      builder: (context, watch, child) {
-        final planId = watch(planProvider).state?.id;
+      builder: (context, ref, child) {
+        final planId = ref.watch(planProvider)?.id;
         return planId != null
             ? FutureBuilder<ShoppingList>(
                 future: ShoppingListService.getShoppingListByPlanId(planId),

@@ -23,13 +23,13 @@ import '../../../widgets/small_circular_progress_indicator.dart';
 import 'plan_day_card.dart';
 import 'plan_download_modal.dart';
 
-class PlanTabView extends StatefulWidget {
+class PlanTabView extends ConsumerStatefulWidget {
   const PlanTabView({Key? key}) : super(key: key);
   @override
-  State<PlanTabView> createState() => _PlanTabViewState();
+  PlanTabViewState createState() => PlanTabViewState();
 }
 
-class _PlanTabViewState extends State<PlanTabView>
+class PlanTabViewState extends ConsumerState<PlanTabView>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
@@ -37,69 +37,65 @@ class _PlanTabViewState extends State<PlanTabView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Consumer(
-      builder: (context, watch, _) {
-        final activePlan = watch(planProvider).state;
+    final activePlan = ref.watch(planProvider);
 
-        return activePlan != null
-            ? SingleChildScrollView(
-                child: AnimationLimiter(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: kPadding),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 5.0),
-                        child: PageTitle(
-                          text: 'plan_title'.tr(),
-                          actions: [
-                            IconButton(
-                              onPressed: () => AutoRouter.of(context).push(
-                                const SettingsScreenRoute(),
-                              ),
-                              icon: const Icon(EvaIcons.settings2Outline),
-                            ),
-                            IconButton(
-                              onPressed: () => _showOptionsSheet(activePlan),
-                              icon: const Icon(EvaIcons.moreHorizontalOutline),
-                            )
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: BasicUtils.contentWidth(context),
-                        child: StreamBuilder<List<PlanMeal>>(
-                          stream: PlanService.streamPlanMealsByPlanId(
-                            activePlan.id,
+    return activePlan != null
+        ? SingleChildScrollView(
+            child: AnimationLimiter(
+              child: Column(
+                children: [
+                  const SizedBox(height: kPadding),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 5.0),
+                    child: PageTitle(
+                      text: 'plan_title'.tr(),
+                      actions: [
+                        IconButton(
+                          onPressed: () => AutoRouter.of(context).push(
+                            const SettingsScreenRoute(),
                           ),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              return ListView(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                children: _getDaysByMeals(snapshot.data!)
-                                    .map(
-                                      (e) => PlanDayCard(
-                                        date: e.date,
-                                        meals: e.meals,
-                                      ),
-                                    )
-                                    .toList(),
-                              );
-                            } else {
-                              return const Center(
-                                child: SmallCircularProgressIndicator(),
-                              );
-                            }
-                          },
+                          icon: const Icon(EvaIcons.settings2Outline),
                         ),
-                      ),
-                    ],
+                        IconButton(
+                          onPressed: () => _showOptionsSheet(activePlan),
+                          icon: const Icon(EvaIcons.moreHorizontalOutline),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              )
-            : const LoadingLogut();
-      },
-    );
+                  SizedBox(
+                    width: BasicUtils.contentWidth(context),
+                    child: StreamBuilder<List<PlanMeal>>(
+                      stream: PlanService.streamPlanMealsByPlanId(
+                        activePlan.id,
+                      ),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return ListView(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: _getDaysByMeals(snapshot.data!)
+                                .map(
+                                  (e) => PlanDayCard(
+                                    date: e.date,
+                                    meals: e.meals,
+                                  ),
+                                )
+                                .toList(),
+                          );
+                        } else {
+                          return const Center(
+                            child: SmallCircularProgressIndicator(),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+        : const LoadingLogut();
   }
 
   void _showOptionsSheet(Plan plan) {
@@ -110,7 +106,7 @@ class _PlanTabViewState extends State<PlanTabView>
           title: 'plan_history_title'.tr(),
           icon: EvaIcons.clockOutline,
           onTap: () {
-            context.read(planHistoryPageChanged).state =
+            ref.read(planHistoryPageChanged.state).state =
                 DateTime.now().millisecondsSinceEpoch;
           },
         ),
@@ -124,12 +120,12 @@ class _PlanTabViewState extends State<PlanTabView>
   }
 
   List<PlanDay> _getDaysByMeals(List<PlanMeal> meals) {
-    context.read(planProvider).state!.meals = meals;
+    ref.read(planProvider)!.meals = meals;
     return _updateMealsForDays(meals);
   }
 
   List<PlanDay> _updateMealsForDays(List<PlanMeal> planMeals) {
-    final Plan plan = context.read(planProvider).state!;
+    final Plan plan = ref.read(planProvider)!;
     final List<PlanDay> days = [];
     final List<PlanMeal> updatedMeals = [...planMeals];
 

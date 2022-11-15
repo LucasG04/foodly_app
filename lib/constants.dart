@@ -25,6 +25,8 @@ const kWhiteColor = Color.fromRGBO(255, 255, 255, 0.5);
 const kHeadlineColor = Color(0xFF161616);
 const kLightTextColor = Color(0xFF828282);
 const kLightAccentColor = Color.fromRGBO(252, 163, 17, 0.4);
+const kPremiumColor = Color.fromRGBO(251, 198, 61, 1);
+const kGreyBackgroundColor = Color.fromRGBO(238, 238, 238, 1);
 
 /// other
 /// The shadow for small elements in the app.

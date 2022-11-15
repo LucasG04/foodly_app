@@ -20,14 +20,14 @@ import '../../settings/help_slides/help_slide_share_import.dart';
 import 'meal_list_tile.dart';
 import 'meal_list_title.dart';
 
-class MealListView extends StatefulWidget {
+class MealListView extends ConsumerStatefulWidget {
   const MealListView({Key? key}) : super(key: key);
 
   @override
-  State<MealListView> createState() => _MealListViewState();
+  _MealListViewState createState() => _MealListViewState();
 }
 
-class _MealListViewState extends State<MealListView>
+class _MealListViewState extends ConsumerState<MealListView>
     with AutomaticKeepAliveClientMixin, DisposableWidget {
   late AutoDisposeStateProvider<bool> _$isLoading;
   late StateProvider<bool> _$isLoadingPagination;
@@ -50,9 +50,9 @@ class _MealListViewState extends State<MealListView>
     _$loadedMeals = StateProvider<List<Meal>>((_) => []);
     _$filteredMeals = StateProvider<List<Meal>>((_) => []);
 
-    _loadNextMeals().then((_) => context.read(_$isLoading).state = false);
+    _loadNextMeals(ref).then((_) => ref.read(_$isLoading.state).state = false);
     _scrollController.addListener(_scrollListener);
-    _listenForMealsChange();
+    _listenForMealsChange(ref);
     super.initState();
   }
 
@@ -78,13 +78,13 @@ class _MealListViewState extends State<MealListView>
                   _searchDebouncer.run(() => _searchMeal(query));
                 }
               },
-              onSearchClose: () => context.read(_$isSearching).state = false,
+              onSearchClose: () => ref.read(_$isSearching.state).state = false,
               onRefresh: _refreshMeals,
             ),
             Consumer(
-              builder: (context, watch, _) {
-                final isLoading = watch(_$isLoading).state;
-                final selectedTags = watch(mealTagFilterProvider).state;
+              builder: (context, ref, _) {
+                final isLoading = ref.watch(_$isLoading);
+                final selectedTags = ref.watch(mealTagFilterProvider);
 
                 if (isLoading) {
                   return _buildLoadingMealList();
@@ -95,8 +95,8 @@ class _MealListViewState extends State<MealListView>
                     : _buildGroupedTagList(selectedTags);
               },
             ),
-            Consumer(builder: (context, watch, _) {
-              final isLoadingPagination = watch(_$isLoadingPagination).state;
+            Consumer(builder: (context, ref, _) {
+              final isLoadingPagination = ref.watch(_$isLoadingPagination);
               return isLoadingPagination
                   ? const Padding(
                       padding: EdgeInsets.symmetric(vertical: kPadding / 2),
@@ -144,15 +144,15 @@ class _MealListViewState extends State<MealListView>
   }
 
   Widget _buildMealList() {
-    return Consumer(builder: (context, watch, _) {
-      final isSearching = watch(_$isSearching).state;
+    return Consumer(builder: (context, ref, _) {
+      final isSearching = ref.watch(_$isSearching);
       return isSearching ? _buildSearchedMealList() : _buildPaginatedMealList();
     });
   }
 
   Consumer _buildSearchedMealList() {
-    return Consumer(builder: (context, watch, _) {
-      final filteredMeals = watch(_$filteredMeals).state;
+    return Consumer(builder: (context, ref, _) {
+      final filteredMeals = ref.watch(_$filteredMeals);
 
       if (filteredMeals.isEmpty) {
         return _buildEmptySearchedMeals();
@@ -171,8 +171,8 @@ class _MealListViewState extends State<MealListView>
   }
 
   Consumer _buildPaginatedMealList() {
-    return Consumer(builder: (context, watch, _) {
-      final loadedMeals = watch(_$loadedMeals).state;
+    return Consumer(builder: (context, ref, _) {
+      final loadedMeals = ref.watch(_$loadedMeals);
 
       if (loadedMeals.isEmpty) {
         return _buildEmptyMeals();
@@ -228,7 +228,7 @@ class _MealListViewState extends State<MealListView>
   Widget _buildGroupedTagList(List<String> selectedTags) {
     return FutureBuilder<List<Meal>>(
         future: LunixApiService.searchMealsByTags(
-          context.read(planProvider).state!.id!,
+          ref.read(planProvider)!.id!,
           selectedTags,
         ),
         builder: (context, snapshot) {
@@ -270,18 +270,18 @@ class _MealListViewState extends State<MealListView>
     if (query.isEmpty) {
       return;
     }
-    context.read(_$isLoading).state = true;
-    context.read(mealTagFilterProvider).state = [];
-    context.read(_$filteredMeals).state = await LunixApiService.searchMeals(
-      context.read(planProvider).state!.id!,
+    ref.read(_$isLoading.state).state = true;
+    ref.read(mealTagFilterProvider.state).state = [];
+    ref.read(_$filteredMeals.state).state = await LunixApiService.searchMeals(
+      ref.read(planProvider)!.id!,
       query,
     );
 
     if (!mounted) {
       return;
     }
-    context.read(_$isSearching).state = true;
-    context.read(_$isLoading).state = false;
+    ref.read(_$isSearching.state).state = true;
+    ref.read(_$isLoading.state).state = false;
     FirebaseAnalytics.instance.logEvent(
       name: 'search_meal_list',
       parameters: {'query': query},
@@ -298,16 +298,16 @@ class _MealListViewState extends State<MealListView>
     if (!loadNew) {
       return;
     }
-    _loadNextMeals();
+    _loadNextMeals(ref);
   }
 
-  Future<void> _loadNextMeals() async {
-    context.read(_$isLoadingPagination).state = true;
+  Future<void> _loadNextMeals(WidgetRef ref) async {
+    ref.read(_$isLoadingPagination.state).state = true;
     const pageSize = 30;
-    final currentMeals = context.read(_$loadedMeals).state;
+    final currentMeals = ref.read(_$loadedMeals);
 
     final nextMeals = await MealService.getMealsPaginated(
-      context.read(planProvider).state!.id!,
+      ref.read(planProvider)!.id!,
       lastMealId: currentMeals.isEmpty ? null : currentMeals.last.id,
       amount: pageSize, // ignore: avoid_redundant_argument_values
     );
@@ -318,35 +318,35 @@ class _MealListViewState extends State<MealListView>
       return;
     }
 
-    context.read(_$loadedMeals).state = [...currentMeals, ...nextMeals];
-    context.read(_$isLoadingPagination).state = false;
+    ref.read(_$loadedMeals.state).state = [...currentMeals, ...nextMeals];
+    ref.read(_$isLoadingPagination.state).state = false;
   }
 
   bool _paginationActive() {
-    return context.read(mealTagFilterProvider).state.isEmpty &&
-        !context.read(_$isLoading).state &&
-        !context.read(_$isSearching).state &&
-        context.read(_$loadedMeals).state.isNotEmpty;
+    return ref.read(mealTagFilterProvider).isEmpty &&
+        !ref.read(_$isLoading) &&
+        !ref.read(_$isSearching) &&
+        ref.read(_$loadedMeals).isNotEmpty;
   }
 
   void _refreshMeals() async {
-    context.read(_$isLoading).state = true;
-    context.read(_$loadedMeals).state = [];
-    context.read(_$filteredMeals).state = [];
-    context.read(_$isLoadingPagination).state = false;
-    context.read(_$isSearching).state = false;
-    context.read(mealTagFilterProvider).state = [];
-    await _loadNextMeals();
+    ref.read(_$isLoading.state).state = true;
+    ref.read(_$loadedMeals.state).state = [];
+    ref.read(_$filteredMeals.state).state = [];
+    ref.read(_$isLoadingPagination.state).state = false;
+    ref.read(_$isSearching.state).state = false;
+    ref.read(mealTagFilterProvider.state).state = [];
+    await _loadNextMeals(ref);
     if (!mounted) {
       return;
     }
-    context.read(_$isLoading).state = false;
+    ref.read(_$isLoading.state).state = false;
   }
 
-  void _listenForMealsChange() {
+  void _listenForMealsChange(WidgetRef ref) {
     BasicUtils.afterBuild(
-      () => context
-          .read(lastChangedMealProvider)
+      () => ref
+          .read(lastChangedMealProvider.state)
           .stream
           .where((mealId) => mealId != null)
           .listen((_) => _refreshMeals())

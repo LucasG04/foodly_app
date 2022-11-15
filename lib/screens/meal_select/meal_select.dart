@@ -11,6 +11,7 @@ import '../../constants.dart';
 import '../../models/meal.dart';
 import '../../models/plan_meal.dart';
 import '../../providers/state_providers.dart';
+import '../../services/in_app_purchase_service.dart';
 import '../../services/lunix_api_service.dart';
 import '../../services/meal_service.dart';
 import '../../services/meal_stat_service.dart';
@@ -18,6 +19,7 @@ import '../../services/plan_service.dart';
 import '../../services/settings_service.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/widget_utils.dart';
+import '../../widgets/get_premium_info.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/meal_pagination.dart';
 import '../../widgets/user_information.dart';
@@ -25,7 +27,7 @@ import '../tab_navigation/meal_list_view/meal_list_tile.dart';
 import 'search_bar.dart';
 import 'select_meal_tile.dart';
 
-class MealSelectScreen extends StatefulWidget {
+class MealSelectScreen extends ConsumerStatefulWidget {
   final DateTime date;
   final MealType mealType;
 
@@ -33,10 +35,10 @@ class MealSelectScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<MealSelectScreen> createState() => _MealSelectScreenState();
+  _MealSelectScreenState createState() => _MealSelectScreenState();
 }
 
-class _MealSelectScreenState extends State<MealSelectScreen> {
+class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
   late AutoDisposeStateProvider<bool> _$isSearching;
 
   final ScrollController _scrollController = ScrollController();
@@ -51,7 +53,7 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final activePlan = context.read(planProvider).state!;
+    final activePlan = ref.read(planProvider)!;
 
     return Scaffold(
       appBar: MainAppBar(
@@ -65,8 +67,8 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
             SearchBar(
               onSearch: _onSearchEvent,
             ),
-            Consumer(builder: (context, watch, _) {
-              final isSearching = watch(_$isSearching).state;
+            Consumer(builder: (context, ref, _) {
+              final isSearching = ref.watch(_$isSearching);
 
               if (isSearching) {
                 return _buildLoader();
@@ -121,15 +123,15 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
         ? _buildContainer(
             EvaIcons.code,
             'meal_select_placeholder'.tr(),
-            () => _showPlaceholderDialog(),
+            () => _showPlaceholderDialog(ref),
           )
         : (index == 1)
             ? _buildContainer(
                 EvaIcons.plus,
                 'meal_select_new'.tr(),
-                () => _createNewMeal(),
+                () => _createNewMeal(ref),
               )
-            : context.read(_$isSearching).state
+            : ref.read(_$isSearching)
                 ? UserInformation(
                     assetPath: 'assets/images/undraw_empty.png',
                     title: 'meal_select_no_results'.tr(),
@@ -141,72 +143,89 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
   }
 
   Widget _buildPreviewMeals() {
-    final planId = context.read(planProvider).state!.id!;
-    return FutureBuilder<List<Meal>>(
-      future: MealStatService.getMealRecommendations(planId),
-      builder: (context, snapshot) {
-        final meals = snapshot.hasData ? snapshot.data! : <Meal>[];
-
-        return ListView.builder(
-          shrinkWrap: true,
-          padding: const EdgeInsets.symmetric(vertical: kPadding),
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: meals.isEmpty
-              ? 0
-              : meals.length +
-                  1, // +1 to make space for title and 0 to not show title
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: kPadding,
-                  vertical: kPadding / 4,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'meal_select_recommendations',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ).tr(),
-                    IconButton(
-                      onPressed: _showRecommendationsInfo,
-                      icon: Icon(
-                        EvaIcons.infoOutline,
-                        color: Theme.of(context).textTheme.bodyText1?.color ??
-                            Theme.of(context).primaryColor,
-                      ),
-                      splashRadius: 25.0,
-                    ),
-                  ],
-                ),
-              );
-            }
-            index--;
-            return AnimationConfiguration.staggeredList(
-              position: index,
-              duration: const Duration(milliseconds: 375),
-              child: SlideAnimation(
-                verticalOffset: 50.0,
-                child: FadeInAnimation(
-                  child: SelectMealTile(
-                    meal: meals[index],
-                    onAddMeal: () => _addMealToPlan(meals[index].id!, planId),
-                  ),
-                ),
+    final planId = ref.read(planProvider)!.id!;
+    return Consumer(builder: (context, ref, _) {
+      return !ref.watch(InAppPurchaseService.$userIsSubscribed)
+          ? Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: kPadding,
+                vertical: kPadding / 2,
               ),
+              child: GetPremiumInfo(
+                title: 'get_premium_modal_2_title'.tr(),
+                description: 'get_premium_modal_2_description_ad'.tr(),
+              ),
+            )
+          : FutureBuilder<List<Meal>>(
+              future: MealStatService.getMealRecommendations(planId),
+              builder: (context, snapshot) {
+                final meals = snapshot.hasData ? snapshot.data! : <Meal>[];
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.symmetric(vertical: kPadding),
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: meals.isEmpty
+                      ? 0
+                      : meals.length +
+                          1, // +1 to make space for title and 0 to not show title
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: kPadding,
+                          vertical: kPadding / 4,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'meal_select_recommendations',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ).tr(),
+                            IconButton(
+                              onPressed: _showRecommendationsInfo,
+                              icon: Icon(
+                                EvaIcons.infoOutline,
+                                color: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1
+                                        ?.color ??
+                                    Theme.of(context).primaryColor,
+                              ),
+                              splashRadius: 25.0,
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    index--;
+                    return AnimationConfiguration.staggeredList(
+                      position: index,
+                      duration: const Duration(milliseconds: 375),
+                      child: SlideAnimation(
+                        verticalOffset: 50.0,
+                        child: FadeInAnimation(
+                          child: SelectMealTile(
+                            meal: meals[index],
+                            onAddMeal: () =>
+                                _addMealToPlan(meals[index].id!, planId),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
             );
-          },
-        );
-      },
-    );
+    });
   }
 
   Widget _buildPaginatedMealList() {
-    final planId = context.read(planProvider).state!.id!;
+    final planId = ref.read(planProvider)!.id!;
     return MealPagination(
       loadNextMeals: (lastMealId) => MealService.getMealsPaginated(
         planId,
@@ -285,26 +304,27 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
 
   void _onSearchEvent(String query) async {
     if (query.isNotEmpty && query.length > 2) {
-      context.read(_$isSearching).state = true;
-      searchedMeals = await _searchMeal(query);
+      ref.read(_$isSearching.state).state = true;
+      searchedMeals = await _searchMeal(ref, query);
       if (!mounted) {
         return;
       }
-      context.read(_$isSearching).state = false;
+      ref.read(_$isSearching.state).state = false;
       FirebaseAnalytics.instance.logEvent(
         name: 'search_meal_select',
         parameters: {'query': query},
       );
     } else {
-      if (context.read(_$isSearching).state) {}
+      // TODO: check if
+      if (ref.read(_$isSearching)) {}
       searchedMeals = [];
-      context.read(_$isSearching).state = false;
+      ref.read(_$isSearching.state).state = false;
       setState(() {});
     }
   }
 
-  Future<void> _showPlaceholderDialog() async {
-    final planId = context.read(planProvider).state!.id!;
+  Future<void> _showPlaceholderDialog(WidgetRef ref) async {
+    final planId = ref.read(planProvider)!.id!;
     final text = await WidgetUtils.showPlaceholderEditDialog(context);
 
     if (text == null || text.isEmpty) {
@@ -321,8 +341,8 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     AutoRouter.of(context).pop();
   }
 
-  Future<void> _createNewMeal() async {
-    final planId = context.read(planProvider).state!.id!;
+  Future<void> _createNewMeal(WidgetRef ref) async {
+    final planId = ref.read(planProvider)!.id!;
     final meal =
         await AutoRouter.of(context).push(MealCreateScreenRoute(id: 'create'));
 
@@ -356,9 +376,9 @@ class _MealSelectScreenState extends State<MealSelectScreen> {
     );
   }
 
-  Future<List<Meal>> _searchMeal(String query) {
+  Future<List<Meal>> _searchMeal(WidgetRef ref, String query) {
     return LunixApiService.searchMeals(
-      context.read(planProvider).state!.id!,
+      ref.read(planProvider)!.id!,
       query,
     );
   }

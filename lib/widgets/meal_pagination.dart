@@ -9,7 +9,7 @@ import '../utils/basic_utils.dart';
 import 'small_circular_progress_indicator.dart';
 import 'user_information.dart';
 
-class MealPagination extends StatefulWidget {
+class MealPagination extends ConsumerStatefulWidget {
   /// Returns the next page of meals.
   /// The last loaded meal id will be passed
   /// (if it's the first load, `null` is passed).
@@ -28,10 +28,10 @@ class MealPagination extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<MealPagination> createState() => _MealPaginationState();
+  _MealPaginationState createState() => _MealPaginationState();
 }
 
-class _MealPaginationState extends State<MealPagination> {
+class _MealPaginationState extends ConsumerState<MealPagination> {
   late AutoDisposeStateProvider<bool> _$isLoading;
   late StateProvider<bool> _$isLoadingPagination;
   late StateProvider<List<Meal>> _$loadedMeals;
@@ -44,7 +44,7 @@ class _MealPaginationState extends State<MealPagination> {
     _$isLoadingPagination = StateProvider<bool>((_) => false);
     _$loadedMeals = StateProvider<List<Meal>>((_) => []);
 
-    _loadNextMeals().then((_) => context.read(_$isLoading).state = false);
+    _loadNextMeals().then((_) => ref.read(_$isLoading.state).state = false);
     widget.scrollController.addListener(_scrollListener);
     super.initState();
   }
@@ -58,8 +58,8 @@ class _MealPaginationState extends State<MealPagination> {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, watch, _) {
-      final loadedMeals = watch(_$loadedMeals).state;
-      final isLoading = watch(_$isLoading).state;
+      final loadedMeals = ref.watch(_$loadedMeals);
+      final isLoading = ref.watch(_$isLoading);
 
       if (isLoading) {
         return _buildLoadingMealList();
@@ -81,7 +81,7 @@ class _MealPaginationState extends State<MealPagination> {
             ),
           ),
           Consumer(builder: (context, watch, _) {
-            final isLoadingPagination = watch(_$isLoadingPagination).state;
+            final isLoadingPagination = ref.watch(_$isLoadingPagination);
             return isLoadingPagination
                 ? Container(
                     margin: const EdgeInsets.only(
@@ -143,9 +143,9 @@ class _MealPaginationState extends State<MealPagination> {
       return;
     }
     BasicUtils.afterBuild(
-        () => context.read(_$isLoadingPagination).state = true);
+        () => ref.read(_$isLoadingPagination.state).state = true);
     const pageSize = 30;
-    final currentMeals = context.read(_$loadedMeals).state;
+    final currentMeals = ref.read(_$loadedMeals);
 
     final nextMeals = await widget.loadNextMeals(
       currentMeals.isEmpty ? null : currentMeals.last.id,
@@ -157,7 +157,7 @@ class _MealPaginationState extends State<MealPagination> {
       return;
     }
 
-    context.read(_$loadedMeals).state = [...currentMeals, ...nextMeals];
-    context.read(_$isLoadingPagination).state = false;
+    ref.read(_$loadedMeals.state).state = [...currentMeals, ...nextMeals];
+    ref.read(_$isLoadingPagination.state).state = false;
   }
 }

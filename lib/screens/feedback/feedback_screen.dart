@@ -11,20 +11,21 @@ import '../../constants.dart';
 import '../../models/foodly_feedback.dart';
 import '../../providers/state_providers.dart';
 import '../../services/feedback_service.dart';
+import '../../services/in_app_purchase_service.dart';
 import '../../utils/main_snackbar.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
 
-class FeedbackScreen extends StatefulWidget {
+class FeedbackScreen extends ConsumerStatefulWidget {
   const FeedbackScreen({Key? key}) : super(key: key);
 
   @override
-  State<FeedbackScreen> createState() => _FeedbackScreenState();
+  _FeedbackScreenState createState() => _FeedbackScreenState();
 }
 
-class _FeedbackScreenState extends State<FeedbackScreen> {
+class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -147,13 +148,14 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     }
 
     final feedback = FoodlyFeedback(
-      userId: context.read(userProvider).state!.id!,
-      planId: context.read(planProvider).state!.id!,
+      userId: ref.read(userProvider)!.id!,
+      planId: ref.read(planProvider)!.id!,
       date: DateTime.now(),
       title: _titleController.text.trim(),
       email: _emailController.text.trim(),
       description: _textController.text.trim(),
       version: '${appInfo.version} (${Platform.operatingSystem})',
+      isSubscribedToPremium: ref.read(InAppPurchaseService.$userIsSubscribed),
     );
 
     await FeedbackService.create(feedback);

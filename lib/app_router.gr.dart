@@ -50,10 +50,8 @@ class AppRouter extends _i10.RootStackRouter {
               date: args.date, mealType: args.mealType, key: args.key));
     },
     OnboardingScreenRoute.name: (routeData) {
-      final args = routeData.argsAs<OnboardingScreenRouteArgs>(
-          orElse: () => const OnboardingScreenRouteArgs());
       return _i10.CupertinoPageX<dynamic>(
-          routeData: routeData, child: _i5.OnboardingScreen(key: args.key));
+          routeData: routeData, child: const _i5.OnboardingScreen());
     },
     FeedbackScreenRoute.name: (routeData) {
       return _i10.CupertinoPageX<dynamic>(
@@ -152,25 +150,11 @@ class MealSelectScreenRouteArgs {
 
 /// generated route for
 /// [_i5.OnboardingScreen]
-class OnboardingScreenRoute
-    extends _i10.PageRouteInfo<OnboardingScreenRouteArgs> {
-  OnboardingScreenRoute({_i11.Key? key})
-      : super(OnboardingScreenRoute.name,
-            path: '/onboarding-screen',
-            args: OnboardingScreenRouteArgs(key: key));
+class OnboardingScreenRoute extends _i10.PageRouteInfo<void> {
+  const OnboardingScreenRoute()
+      : super(OnboardingScreenRoute.name, path: '/onboarding-screen');
 
   static const String name = 'OnboardingScreenRoute';
-}
-
-class OnboardingScreenRouteArgs {
-  const OnboardingScreenRouteArgs({this.key});
-
-  final _i11.Key? key;
-
-  @override
-  String toString() {
-    return 'OnboardingScreenRouteArgs{key: $key}';
-  }
 }
 
 /// generated route for

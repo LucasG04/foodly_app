@@ -8,4 +8,10 @@ part 'env.g.dart';
 abstract class Env {
   @EnviedField(varName: 'LUNIX_API_KEY', obfuscate: true)
   static final lunixApiKey = _Env.lunixApiKey;
+
+  @EnviedField(varName: 'REVENUECAT_APPLE_KEY', obfuscate: true)
+  static final revenuecatAppleKey = _Env.revenuecatAppleKey;
+
+  @EnviedField(varName: 'REVENUECAT_GOOGLE_KEY', obfuscate: true)
+  static final revenuecatGoogleKey = _Env.revenuecatGoogleKey;
 }
