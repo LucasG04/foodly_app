@@ -11,6 +11,7 @@ import '../../constants.dart';
 import '../../models/meal.dart';
 import '../../models/plan_meal.dart';
 import '../../providers/state_providers.dart';
+import '../../services/in_app_purchase_service.dart';
 import '../../services/lunix_api_service.dart';
 import '../../services/meal_service.dart';
 import '../../services/meal_stat_service.dart';
@@ -18,6 +19,7 @@ import '../../services/plan_service.dart';
 import '../../services/settings_service.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/widget_utils.dart';
+import '../../widgets/get_premium_info.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/meal_pagination.dart';
 import '../../widgets/user_information.dart';
@@ -42,6 +44,8 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
   final ScrollController _scrollController = ScrollController();
 
   List<Meal> searchedMeals = [];
+
+  bool get showSuggestions => InAppPurchaseService.userIsSubscribed;
 
   @override
   void initState() {
@@ -142,67 +146,82 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
 
   Widget _buildPreviewMeals() {
     final planId = ref.read(planProvider)!.id!;
-    return FutureBuilder<List<Meal>>(
-      future: MealStatService.getMealRecommendations(planId),
-      builder: (context, snapshot) {
-        final meals = snapshot.hasData ? snapshot.data! : <Meal>[];
+    return !showSuggestions
+        ? Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: kPadding,
+              vertical: kPadding / 2,
+            ),
+            child: GetPremiumInfo(
+              title: 'get_premium_modal_2_title'.tr(),
+              description: 'get_premium_modal_2_description_ad'.tr(),
+            ),
+          )
+        : FutureBuilder<List<Meal>>(
+            future: MealStatService.getMealRecommendations(planId),
+            builder: (context, snapshot) {
+              final meals = snapshot.hasData ? snapshot.data! : <Meal>[];
 
-        return ListView.builder(
-          shrinkWrap: true,
-          padding: const EdgeInsets.symmetric(vertical: kPadding),
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: meals.isEmpty
-              ? 0
-              : meals.length +
-                  1, // +1 to make space for title and 0 to not show title
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: kPadding,
-                  vertical: kPadding / 4,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'meal_select_recommendations',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+              return ListView.builder(
+                shrinkWrap: true,
+                padding: const EdgeInsets.symmetric(vertical: kPadding),
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: meals.isEmpty
+                    ? 0
+                    : meals.length +
+                        1, // +1 to make space for title and 0 to not show title
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: kPadding,
+                        vertical: kPadding / 4,
                       ),
-                    ).tr(),
-                    IconButton(
-                      onPressed: _showRecommendationsInfo,
-                      icon: Icon(
-                        EvaIcons.infoOutline,
-                        color: Theme.of(context).textTheme.bodyText1?.color ??
-                            Theme.of(context).primaryColor,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'meal_select_recommendations',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ).tr(),
+                          IconButton(
+                            onPressed: _showRecommendationsInfo,
+                            icon: Icon(
+                              EvaIcons.infoOutline,
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1
+                                      ?.color ??
+                                  Theme.of(context).primaryColor,
+                            ),
+                            splashRadius: 25.0,
+                          ),
+                        ],
                       ),
-                      splashRadius: 25.0,
+                    );
+                  }
+                  index--;
+                  return AnimationConfiguration.staggeredList(
+                    position: index,
+                    duration: const Duration(milliseconds: 375),
+                    child: SlideAnimation(
+                      verticalOffset: 50.0,
+                      child: FadeInAnimation(
+                        child: SelectMealTile(
+                          meal: meals[index],
+                          onAddMeal: () =>
+                              _addMealToPlan(meals[index].id!, planId),
+                        ),
+                      ),
                     ),
-                  ],
-                ),
+                  );
+                },
               );
-            }
-            index--;
-            return AnimationConfiguration.staggeredList(
-              position: index,
-              duration: const Duration(milliseconds: 375),
-              child: SlideAnimation(
-                verticalOffset: 50.0,
-                child: FadeInAnimation(
-                  child: SelectMealTile(
-                    meal: meals[index],
-                    onAddMeal: () => _addMealToPlan(meals[index].id!, planId),
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
+            },
+          );
   }
 
   Widget _buildPaginatedMealList() {

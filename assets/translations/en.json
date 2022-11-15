@@ -262,6 +262,7 @@
   "get_premium_modal_1_description_ad": "With Premium you will see matching suggestions as you type in groceries.",
   "get_premium_modal_2_title": "Suggestions from dishes",
   "get_premium_modal_2_description": "Suggestions of dishes for the next few days.",
+  "get_premium_modal_2_description_ad": "With Premium you will see suggestions of dishes for the next days.",
   "get_premium_modal_3_title": "Support {}",
   "get_premium_modal_3_description": "With your contribution you support the further development of the app, keep the app ad-free and help cover server costs.",
   "get_premium_modal_4_title": "Prioritized support",
