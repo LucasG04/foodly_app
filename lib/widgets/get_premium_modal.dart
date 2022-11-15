@@ -36,10 +36,11 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
   @override
   void initState() {
     _$titleShowShadow = AutoDisposeStateProvider((_) => false);
-    _$purchaseState = AutoDisposeStateProvider((_) =>
-        InAppPurchaseService.userIsSubscribed
-            ? _PurchaseState.purchased
-            : _PurchaseState.none);
+    _$purchaseState = AutoDisposeStateProvider(
+      (ref) => ref.read(InAppPurchaseService.$userIsSubscribed)
+          ? _PurchaseState.purchased
+          : _PurchaseState.none,
+    );
     _$selectedPremiumDuration = AutoDisposeStateProvider((_) => 1);
     _scrollController = ScrollController();
     _scrollController.addListener(_handleTitleShadowState);

@@ -91,8 +91,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               },
                             ),
                           ),
-                          if (!InAppPurchaseService.userIsSubscribed)
-                            SettingsTile(
+                          WidgetUtils.userIsSubscribed(
+                            ref: ref,
+                            negate: true,
+                            child: SettingsTile(
                               onTap: _openGetPremium,
                               leadingIcon: EvaIcons.awardOutline,
                               text: 'settings_section_general_premium'
@@ -103,6 +105,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               ),
                               colorIcon: kPremiumColor,
                             ),
+                          ),
                         ], context),
                         _buildSectionTitle(
                           'settings_section_customization'.tr(),
@@ -126,8 +129,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               );
                             }),
                           ),
-                          if (InAppPurchaseService.userIsSubscribed)
-                            SettingsTile(
+                          WidgetUtils.userIsSubscribed(
+                            ref: ref,
+                            child: SettingsTile(
                               leadingIcon: EvaIcons.trendingUpOutline,
                               text: 'settings_section_customization_suggestions'
                                   .tr(),
@@ -142,6 +146,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 );
                               }),
                             ),
+                          ),
                           SettingsTile(
                             leadingIcon: EvaIcons.trash2Outline,
                             text: 'settings_section_customization_remove_bought'
@@ -324,20 +329,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             colorText: Colors.red,
                           ),
                         ], context),
-                        RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            style: Theme.of(context).textTheme.bodyText1,
-                            children: <TextSpan>[
-                              TextSpan(text: 'settings_sign_in_as'.tr()),
-                              TextSpan(
-                                text: '\n${firebaseUser!.email!}',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        Consumer(
+                          builder: (context, ref, _) {
+                            final isSubscribed = ref
+                                .watch(InAppPurchaseService.$userIsSubscribed);
+                            return RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(
+                                style: Theme.of(context).textTheme.bodyText1,
+                                children: <TextSpan>[
+                                  TextSpan(text: 'settings_sign_in_as'.tr()),
+                                  TextSpan(
+                                    text:
+                                        '\n${firebaseUser!.email!}${isSubscribed ? ' ⭐️' : ''}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
                         const SizedBox(height: kPadding),
                       ],

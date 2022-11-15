@@ -46,7 +46,7 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal> {
   late AutoDisposeStateProvider<List<Grocery>> _$suggestions;
   String? _errorText;
 
-  bool get showSuggestions => InAppPurchaseService.userIsSubscribed;
+  bool get showSuggestions => ref.read(InAppPurchaseService.$userIsSubscribed);
 
   @override
   void initState() {
@@ -100,28 +100,30 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal> {
                 height: ref.watch(_$suggestions).isNotEmpty ? kPadding : 0,
               );
             }),
-            if (showSuggestions)
-              Consumer(builder: (_, ref, __) {
-                return Wrap(
-                  spacing: kPadding / 2,
-                  runSpacing: kPadding / 2,
-                  children: ref.watch(_$suggestions).take(6).map((grocery) {
-                    return SuggestionTile(
-                      text: grocery.name.toString(),
-                      onTap: () => _applyGroceryFromSuggestion(grocery),
+            Consumer(builder: (context, ref, __) {
+              return ref.watch(InAppPurchaseService.$userIsSubscribed)
+                  ? Consumer(builder: (_, ref, __) {
+                      return Wrap(
+                        spacing: kPadding / 2,
+                        runSpacing: kPadding / 2,
+                        children:
+                            ref.watch(_$suggestions).take(6).map((grocery) {
+                          return SuggestionTile(
+                            text: grocery.name.toString(),
+                            onTap: () => _applyGroceryFromSuggestion(grocery),
+                          );
+                        }).toList(),
+                      );
+                    })
+                  : Padding(
+                      padding: const EdgeInsets.only(top: kPadding / 2),
+                      child: GetPremiumInfo(
+                        title: 'get_premium_modal_1_title'.tr(),
+                        description: 'get_premium_modal_1_description_ad'.tr(),
+                        displayProbability: 0.25,
+                      ),
                     );
-                  }).toList(),
-                );
-              })
-            else
-              Padding(
-                padding: const EdgeInsets.only(top: kPadding / 2),
-                child: GetPremiumInfo(
-                  title: 'get_premium_modal_1_title'.tr(),
-                  description: 'get_premium_modal_1_description_ad'.tr(),
-                  displayProbability: 0.25,
-                ),
-              ),
+            }),
             const SizedBox(height: kPadding / 2),
             Consumer(builder: (_, ref, __) {
               ref.watch(_$buttonState);

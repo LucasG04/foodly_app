@@ -3,7 +3,10 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+
+import '../services/in_app_purchase_service.dart';
 
 class WidgetUtils {
   /// Shows a `BarModalBottomSheet` with rounded corners. Used as wrapper.
@@ -45,5 +48,17 @@ class WidgetUtils {
     );
 
     return result?.first;
+  }
+
+  static Consumer userIsSubscribed({
+    required WidgetRef ref,
+    bool negate = false,
+    required Widget child,
+  }) {
+    return Consumer(builder: (context, ref, _) {
+      final isSubscribed = ref.watch(InAppPurchaseService.$userIsSubscribed);
+      final show = negate ? !isSubscribed : isSubscribed;
+      return show ? child : const SizedBox();
+    });
   }
 }

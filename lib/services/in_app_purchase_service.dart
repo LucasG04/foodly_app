@@ -2,22 +2,24 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../utils/env.dart';
+
+final _userIsSubscribedProvider = StateProvider<bool>((_) => false);
 
 class InAppPurchaseService {
   InAppPurchaseService._();
 
   static final _log = Logger('InAppPurchaseService');
   static const _premiumEntitlementId = 'premium';
-
+  static WidgetRef? _ref;
   static List<StoreProduct> _products = [];
-  static bool _userIsSubscribed = false;
 
   static List<StoreProduct> get products => _products;
-  static bool get userIsSubscribed => _userIsSubscribed;
+  static StateProvider<bool> get $userIsSubscribed => _userIsSubscribedProvider;
 
   static Future<void> initialize() async {
     await Purchases.setDebugLogsEnabled(true);
@@ -34,6 +36,12 @@ class InAppPurchaseService {
     }
 
     await _loadOfferings();
+    fetchUserSubscription();
+  }
+
+  // ignore: use_setters_to_change_properties
+  static void setRef(WidgetRef ref) {
+    _ref = ref;
     fetchUserSubscription();
   }
 
@@ -59,7 +67,7 @@ class InAppPurchaseService {
     try {
       final customerInfo = await Purchases.purchaseProduct(productIdentifier);
       fetchUserSubscription();
-      return _customerHasPremium(customerInfo);
+      return _customerisSubscribed(customerInfo);
     } on PlatformException catch (e) {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);
       if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
@@ -73,7 +81,7 @@ class InAppPurchaseService {
     try {
       final restoredInfo = await Purchases.restorePurchases();
       fetchUserSubscription();
-      return _customerHasPremium(restoredInfo);
+      return _customerisSubscribed(restoredInfo);
     } catch (e) {
       _log.severe(e);
     }
@@ -83,13 +91,14 @@ class InAppPurchaseService {
   static Future<void> fetchUserSubscription() async {
     try {
       final customerInfo = await Purchases.getCustomerInfo();
-      _userIsSubscribed = _customerHasPremium(customerInfo);
+      _ref?.read($userIsSubscribed.state).state =
+          _customerisSubscribed(customerInfo);
     } catch (e) {
       _log.severe(e);
     }
   }
 
-  static bool _customerHasPremium(CustomerInfo customerInfo) {
+  static bool _customerisSubscribed(CustomerInfo customerInfo) {
     final entitlementInfo =
         customerInfo.entitlements.all[_premiumEntitlementId];
     return entitlementInfo != null && entitlementInfo.isActive;

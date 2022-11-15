@@ -110,6 +110,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     _initializeLogger();
     _listenForShareIntent();
     super.initState();
+    InAppPurchaseService.setRef(ref);
   }
 
   @override
