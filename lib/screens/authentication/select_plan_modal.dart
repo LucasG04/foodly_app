@@ -2,7 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../constants.dart';
 import '../../models/foodly_user.dart';
@@ -11,13 +10,13 @@ import '../../services/foodly_user_service.dart';
 import '../../services/plan_service.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
-class SelectPlanModal extends ConsumerWidget {
+class SelectPlanModal extends StatelessWidget {
   final String userId;
 
   const SelectPlanModal(this.userId, {Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, watch) {
+  Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final width =
         size.width > 599 ? 580.0 : MediaQuery.of(context).size.width * 0.8;

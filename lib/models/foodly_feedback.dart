@@ -6,6 +6,7 @@ class FoodlyFeedback {
   String description;
   DateTime date;
   String? version;
+  bool? isSubscribedToPremium;
 
   FoodlyFeedback({
     required this.userId,
@@ -15,6 +16,7 @@ class FoodlyFeedback {
     this.title,
     this.email,
     this.version,
+    this.isSubscribedToPremium,
   });
 
   Map<String, dynamic> toMap() {
@@ -26,6 +28,7 @@ class FoodlyFeedback {
       'description': description,
       'date': date.millisecondsSinceEpoch,
       'version': version,
+      'isSubscribedToPremium': isSubscribedToPremium,
     };
   }
 
@@ -38,11 +41,12 @@ class FoodlyFeedback {
       description: map['description'] as String? ?? '',
       date: DateTime.fromMillisecondsSinceEpoch(map['date'] as int),
       version: map['version'] as String? ?? '',
+      isSubscribedToPremium: map['isSubscribedToPremium'] as bool?,
     );
   }
 
   @override
   String toString() {
-    return 'FoodlyDeedback(userId: $userId, planId: $planId, title: $title, email: $email, description: $description, date: $date, version: $version)';
+    return 'FoodlyDeedback(userId: $userId, planId: $planId, title: $title, email: $email, description: $description, date: $date, version: $version, isSubscribedToPremium: $isSubscribedToPremium)';
   }
 }

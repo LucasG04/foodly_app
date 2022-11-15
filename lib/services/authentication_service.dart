@@ -8,6 +8,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../utils/firebase_auth_providers.dart';
 import 'foodly_user_service.dart';
+import 'in_app_purchase_service.dart';
 
 class AuthenticationService {
   AuthenticationService._();
@@ -39,6 +40,7 @@ class AuthenticationService {
 
   static Future<void> signOut() async {
     _log.finer('Call signOut');
+    InAppPurchaseService.removeUserId();
     return _auth.signOut();
   }
 

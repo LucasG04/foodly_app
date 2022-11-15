@@ -8,21 +8,23 @@ class SettingsTile extends StatelessWidget {
   final IconData? leadingIcon;
   final Widget? trailing;
   final void Function()? onTap;
-  final Color? color;
+  final Color? colorIcon;
+  final Color? colorText;
 
   const SettingsTile({
     required this.text,
     this.leadingIcon,
     this.trailing,
     this.onTap,
-    this.color,
+    this.colorIcon,
+    this.colorText,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final Color? textColor =
-        color ?? Theme.of(context).textTheme.bodyText1!.color;
+        colorText ?? Theme.of(context).textTheme.bodyText1!.color;
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -32,7 +34,7 @@ class SettingsTile extends StatelessWidget {
         child: Row(
           children: [
             if (leadingIcon != null)
-              Icon(leadingIcon, color: textColor)
+              Icon(leadingIcon, color: colorIcon)
             else
               const SizedBox(),
             const SizedBox(width: kPadding),

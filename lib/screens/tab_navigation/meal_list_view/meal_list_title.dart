@@ -64,9 +64,9 @@ class _MealListTitleState extends State<MealListTitle> {
               const SizedBox(width: kPadding / 2),
               if (!_searchActive)
                 Consumer(
-                  builder: (context, watch, child) {
+                  builder: (context, ref, child) {
                     final tagFilterLength =
-                        watch(mealTagFilterProvider).state.length;
+                        ref.watch(mealTagFilterProvider).length;
                     return Badge(
                       animationDuration: const Duration(milliseconds: 250),
                       position: BadgePosition.topEnd(top: 0, end: 3),

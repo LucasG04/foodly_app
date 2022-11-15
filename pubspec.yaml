@@ -15,7 +15,7 @@ dependencies:
     sdk: flutter
 
   # Util
-  flutter_riverpod: ^0.14.0
+  flutter_riverpod: ^1.0.1
   auto_route: ^4.0.1
   intl: ^0.17.0
   hive: ^2.0.4
@@ -47,6 +47,7 @@ dependencies:
   package_info_plus: ^1.4.2
   update_available: ^2.1.0
   envied: ^0.2.3
+  purchases_flutter: ^4.4.1
 
   # Firebase
   firebase_core: ^1.21.1

@@ -12,7 +12,7 @@ import '../../../utils/basic_utils.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/progress_button.dart';
 
-class PlanMoveMealModal extends StatefulWidget {
+class PlanMoveMealModal extends ConsumerStatefulWidget {
   final bool isMoving;
   final PlanMeal? planMeal;
   final Meal? meal;
@@ -26,10 +26,10 @@ class PlanMoveMealModal extends StatefulWidget {
         super(key: key);
 
   @override
-  State<PlanMoveMealModal> createState() => _PlanMoveMealModalState();
+  PlanMoveMealModalState createState() => PlanMoveMealModalState();
 }
 
-class _PlanMoveMealModalState extends State<PlanMoveMealModal> {
+class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal> {
   late DateTime _selectedDate;
   late MealType _selectedMealType;
   late final List<DateTime> _dropdownValues;
@@ -152,8 +152,8 @@ class _PlanMoveMealModalState extends State<PlanMoveMealModal> {
   }
 
   List<DateTime> getDropdownValues() {
-    final dates = BasicUtils.getPlanDateTimes(
-        context.read(planProvider).state!.hourDiffToUtc!);
+    final dates =
+        BasicUtils.getPlanDateTimes(ref.read(planProvider)!.hourDiffToUtc!);
     for (var date in dates) {
       date = DateTime(date.year, date.month, date.day);
     }
@@ -177,12 +177,12 @@ class _PlanMoveMealModalState extends State<PlanMoveMealModal> {
     });
     if (widget.isMoving) {
       await PlanService.updatePlanMealFromPlan(
-        context.read(planProvider).state!.id,
+        ref.read(planProvider)!.id,
         widget.planMeal!,
       );
     } else {
       await PlanService.addPlanMealToPlan(
-        context.read(planProvider).state!.id!,
+        ref.read(planProvider)!.id!,
         newPlanMeal!,
       );
     }

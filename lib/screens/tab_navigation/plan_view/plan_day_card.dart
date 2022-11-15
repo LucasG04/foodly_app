@@ -49,6 +49,7 @@ class PlanDayCard extends StatelessWidget {
                           .format(date),
                       style: kCardTitle,
                     ),
+                    const SizedBox(width: kPadding / 2),
                     Flexible(
                       child: Text(
                         DateFormat(

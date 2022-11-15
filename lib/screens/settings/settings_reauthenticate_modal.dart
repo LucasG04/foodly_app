@@ -14,21 +14,21 @@ import '../../widgets/progress_button.dart';
 /// Reauthenticates the user with password.
 ///
 /// Returns `true` (via Navigator), if the authentication was successful.
-class SettingsReauthenticateModal extends StatefulWidget {
+class SettingsReauthenticateModal extends ConsumerStatefulWidget {
   const SettingsReauthenticateModal({Key? key}) : super(key: key);
 
   @override
-  State<SettingsReauthenticateModal> createState() =>
+  _SettingsReauthenticateModalState createState() =>
       _SettingsReauthenticateModalState();
 }
 
 class _SettingsReauthenticateModalState
-    extends State<SettingsReauthenticateModal> {
+    extends ConsumerState<SettingsReauthenticateModal> {
   final TextEditingController _passwordController = TextEditingController();
   final AutoDisposeStateProvider<ButtonState> _$buttonState =
-      StateProvider.autoDispose((_) => ButtonState.normal);
+      StateProvider.autoDispose<ButtonState>((_) => ButtonState.normal);
   final AutoDisposeStateProvider<String?> _$errorText =
-      StateProvider.autoDispose((_) => null);
+      StateProvider.autoDispose<String?>((_) => null);
 
   @override
   Widget build(BuildContext context) {
@@ -97,8 +97,8 @@ class _SettingsReauthenticateModalState
   List<Widget> _buildPassword() {
     return [
       const SizedBox(height: kPadding),
-      Consumer(builder: (context, watch, _) {
-        final errorText = watch(_$errorText).state;
+      Consumer(builder: (context, ref, _) {
+        final errorText = ref.watch(_$errorText);
         return MainTextField(
           controller: _passwordController,
           title: 'settings_reauthenticate_input_title'.tr(),
@@ -112,8 +112,8 @@ class _SettingsReauthenticateModalState
       }),
       const SizedBox(height: kPadding * 2),
       Center(
-        child: Consumer(builder: (context, watch, _) {
-          final buttonState = watch(_$buttonState).state;
+        child: Consumer(builder: (context, ref, _) {
+          final buttonState = ref.watch(_$buttonState);
           return MainButton(
             text: 'settings_reauthenticate_action'.tr(),
             isProgress: true,
@@ -126,8 +126,8 @@ class _SettingsReauthenticateModalState
   }
 
   Future<void> _reauthenticate(String firebaseAuthProvider) async {
-    context.read(_$buttonState).state = ButtonState.inProgress;
-    context.read(_$errorText).state = null;
+    ref.read(_$buttonState.state).state = ButtonState.inProgress;
+    ref.read(_$errorText.state).state = null;
 
     bool successful = false;
     if (firebaseAuthProvider == FirebaseAuthProvider.password) {
@@ -140,8 +140,8 @@ class _SettingsReauthenticateModalState
       return;
     }
 
-    context.read(_$buttonState).state = ButtonState.normal;
-    context.read(_$errorText).state = null;
+    ref.read(_$buttonState.state).state = ButtonState.normal;
+    ref.read(_$errorText.state).state = null;
     Navigator.of(context).pop(true);
   }
 
@@ -149,8 +149,8 @@ class _SettingsReauthenticateModalState
     final password = _passwordController.text.trim();
 
     if (password.isEmpty) {
-      context.read(_$buttonState).state = ButtonState.error;
-      context.read(_$errorText).state =
+      ref.read(_$buttonState.state).state = ButtonState.error;
+      ref.read(_$errorText.state).state =
           'settings_reauthenticate_input_error_empty';
       return false;
     }
@@ -159,8 +159,8 @@ class _SettingsReauthenticateModalState
       await AuthenticationService.reauthenticatePassword(password);
     } catch (e) {
       if (e is FirebaseAuthException) {
-        context.read(_$buttonState).state = ButtonState.error;
-        context.read(_$errorText).state =
+        ref.read(_$buttonState.state).state = ButtonState.error;
+        ref.read(_$errorText.state).state =
             'settings_reauthenticate_input_error_wrong';
         return false;
       }
@@ -173,8 +173,8 @@ class _SettingsReauthenticateModalState
       await AuthenticationService.reauthenticateApple();
     } catch (e) {
       if (e is FirebaseAuthException) {
-        context.read(_$buttonState).state = ButtonState.error;
-        context.read(_$errorText).state = null;
+        ref.read(_$buttonState.state).state = ButtonState.error;
+        ref.read(_$errorText.state).state = null;
         return false;
       }
     }

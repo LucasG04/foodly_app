@@ -590,7 +590,7 @@ packages:
       name: flutter_riverpod
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.14.0+3"
+    version: "1.0.4"
   flutter_slidable:
     dependency: "direct main"
     description:
@@ -635,7 +635,7 @@ packages:
       name: freezed_annotation
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.14.3"
+    version: "2.2.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -799,7 +799,7 @@ packages:
       name: json_annotation
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.5.0"
+    version: "4.7.0"
   keyboard_service:
     dependency: "direct main"
     description:
@@ -813,7 +813,7 @@ packages:
       name: lints
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "2.0.1"
   logging:
     dependency: "direct main"
     description:
@@ -1059,6 +1059,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.0"
+  purchases_flutter:
+    dependency: "direct main"
+    description:
+      name: purchases_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.4.1"
   receive_sharing_intent:
     dependency: "direct main"
     description:
@@ -1072,14 +1079,14 @@ packages:
       name: riverpod
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.14.0+3"
+    version: "1.0.3"
   rxdart:
     dependency: transitive
     description:
       name: rxdart
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.27.4"
+    version: "0.27.6"
   share_plus:
     dependency: "direct main"
     description:

@@ -26,6 +26,7 @@ import 'services/app_review_service.dart';
 import 'services/authentication_service.dart';
 import 'services/foodly_user_service.dart';
 import 'services/image_cache_service.dart';
+import 'services/in_app_purchase_service.dart';
 import 'services/link_metadata_service.dart';
 import 'services/plan_service.dart';
 import 'services/settings_service.dart';
@@ -88,17 +89,18 @@ Future<void> initializeHive() async {
     ImageCacheService.initialize(),
     AppReviewService.initialize(),
     PlanService.initialize(),
+    InAppPurchaseService.initialize(),
   ]);
 }
 
-class FoodlyApp extends StatefulWidget {
+class FoodlyApp extends ConsumerStatefulWidget {
   const FoodlyApp({foundation.Key? key}) : super(key: key);
 
   @override
-  State<FoodlyApp> createState() => _FoodlyAppState();
+  _FoodlyAppState createState() => _FoodlyAppState();
 }
 
-class _FoodlyAppState extends State<FoodlyApp> with DisposableWidget {
+class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   final Logger _log = Logger('FoodlyApp');
 
   final _appRouter = AppRouter();
@@ -108,6 +110,7 @@ class _FoodlyAppState extends State<FoodlyApp> with DisposableWidget {
     _initializeLogger();
     _listenForShareIntent();
     super.initState();
+    InAppPurchaseService.setRef(ref);
   }
 
   @override
@@ -123,11 +126,11 @@ class _FoodlyAppState extends State<FoodlyApp> with DisposableWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active ||
             snapshot.connectionState == ConnectionState.done) {
-          _loadActivePlan(context);
-          _loadActiveUser(context);
+          _loadActivePlan();
+          _loadActiveUser();
           return Consumer(
-            builder: (context, watch, _) {
-              final plan = watch(planProvider).state;
+            builder: (context, ref, _) {
+              final plan = ref.watch(planProvider);
               _log.finer('PlanProvider Update: ${plan?.id}');
 
               return MaterialApp.router(
@@ -154,8 +157,8 @@ class _FoodlyAppState extends State<FoodlyApp> with DisposableWidget {
     );
   }
 
-  Future<void> _loadActivePlan(BuildContext context) async {
-    final currentPlan = context.read(planProvider).state;
+  Future<void> _loadActivePlan() async {
+    final currentPlan = ref.read(planProvider);
     if (currentPlan == null) {
       final String? planId = await PlanService.getCurrentPlanId();
 
@@ -164,16 +167,16 @@ class _FoodlyAppState extends State<FoodlyApp> with DisposableWidget {
         if (!mounted) {
           return;
         }
-        context.read(planProvider).state = newPlan;
+        ref.read(planProvider.state).state = newPlan;
       }
     }
 
     BasicUtils.afterBuild(
-      () => context.read(initialPlanLoadingProvider).state = false,
+      () => ref.read(initialPlanLoadingProvider.state).state = false,
     );
   }
 
-  Future<void> _loadActiveUser(BuildContext context) async {
+  Future<void> _loadActiveUser() async {
     final firebaseUser = AuthenticationService.currentUser;
     if (firebaseUser != null) {
       FirebaseCrashlytics.instance.setUserIdentifier(firebaseUser.uid);
@@ -182,14 +185,19 @@ class _FoodlyAppState extends State<FoodlyApp> with DisposableWidget {
       if (!mounted || user == null) {
         return;
       }
-      context.read(userProvider).state = user;
+      ref.read(userProvider.state).state = user;
+      InAppPurchaseService.setUserId(user.id!).then((_) {
+        if (user.isPremium != null && user.isPremium!) {
+          ref.read(InAppPurchaseService.$userIsSubscribed.state).state = true;
+        }
+      });
     } else {
       FirebaseCrashlytics.instance.setUserIdentifier('');
-      BasicUtils.afterBuild(() => context.read(userProvider).state = null);
+      BasicUtils.afterBuild(() => ref.read(userProvider.state).state = null);
     }
 
     BasicUtils.afterBuild(
-      () => context.read(initialUserLoadingProvider).state = false,
+      () => ref.read(initialUserLoadingProvider.state).state = false,
     );
   }
 

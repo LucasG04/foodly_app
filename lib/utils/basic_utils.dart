@@ -9,9 +9,9 @@ import '../providers/state_providers.dart';
 // ignore: avoid_classes_with_only_static_members
 class BasicUtils {
   /// Clears all state providers.
-  static void clearAllProvider(BuildContext context) {
-    context.read(planProvider).state = null;
-    context.read(userProvider).state = null;
+  static void clearAllProvider(WidgetRef ref) {
+    ref.read(planProvider.state).state = null;
+    ref.read(userProvider.state).state = null;
   }
 
   /// Returns if the given image url/string is a image from Firebase Storage
@@ -53,8 +53,8 @@ class BasicUtils {
     return List.generate(amount, (i) => today.add(Duration(days: i)));
   }
 
-  static void emitMealsChanged(BuildContext context, [String id = '']) {
-    context.read(lastChangedMealProvider).state = id;
+  static void emitMealsChanged(WidgetRef ref, [String id = '']) {
+    ref.read(lastChangedMealProvider.state).state = id;
   }
 
   static void afterBuild(void Function() callback) {

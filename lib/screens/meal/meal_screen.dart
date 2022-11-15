@@ -29,23 +29,23 @@ import 'border_icon.dart';
 import 'confirm_delete_modal.dart';
 import 'tag_tile.dart';
 
-class MealScreen extends StatefulWidget {
+class MealScreen extends ConsumerStatefulWidget {
   final String id;
 
   const MealScreen({required this.id, Key? key}) : super(key: key);
 
   @override
-  State<MealScreen> createState() => _MealScreenState();
+  _MealScreenState createState() => _MealScreenState();
 }
 
-class _MealScreenState extends State<MealScreen> with DisposableWidget {
+class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
   bool _isDeleting = false;
 
   @override
   void initState() {
     super.initState();
-    context
-        .read(lastChangedMealProvider)
+    ref
+        .read(lastChangedMealProvider.state)
         .stream
         .where((mealId) => mealId != null && widget.id == mealId)
         .listen((_) => setState(() {}))
@@ -62,7 +62,7 @@ class _MealScreenState extends State<MealScreen> with DisposableWidget {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     const sidePadding = EdgeInsets.symmetric(horizontal: kPadding);
-    final currentPlanId = context.read(planProvider).state!.id;
+    final currentPlanId = ref.read(planProvider)!.id;
 
     return Scaffold(
       body: Stack(
@@ -422,7 +422,7 @@ class _MealScreenState extends State<MealScreen> with DisposableWidget {
       if (!mounted) {
         return;
       }
-      BasicUtils.emitMealsChanged(context, meal.id ?? '');
+      BasicUtils.emitMealsChanged(ref, meal.id ?? '');
       AutoRouter.of(context).pop();
     }
   }
@@ -431,7 +431,7 @@ class _MealScreenState extends State<MealScreen> with DisposableWidget {
     setState(() {
       _isDeleting = true;
     });
-    final plan = context.read(planProvider).state!;
+    final plan = ref.read(planProvider)!;
     await MealService.deleteMeal(mealId);
     await MealStatService.deleteStatByMealId(plan.id, mealId);
 
