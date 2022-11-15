@@ -806,8 +806,6 @@ PODS:
   - GTMSessionFetcher/Core (2.0.0)
   - image_picker (0.0.1):
     - Flutter
-  - in_app_purchase_storekit (0.0.1):
-    - Flutter
   - in_app_review (0.2.0):
     - Flutter
   - integration_test (0.0.1):
@@ -861,7 +859,6 @@ DEPENDENCIES:
   - flutter_file_dialog (from `.symlinks/plugins/flutter_file_dialog/ios`)
   - flutter_native_image (from `.symlinks/plugins/flutter_native_image/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
-  - in_app_purchase_storekit (from `.symlinks/plugins/in_app_purchase_storekit/ios`)
   - in_app_review (from `.symlinks/plugins/in_app_review/ios`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
@@ -930,8 +927,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_native_image/ios"
   image_picker:
     :path: ".symlinks/plugins/image_picker/ios"
-  in_app_purchase_storekit:
-    :path: ".symlinks/plugins/in_app_purchase_storekit/ios"
   in_app_review:
     :path: ".symlinks/plugins/in_app_review/ios"
   integration_test:
@@ -991,7 +986,6 @@ SPEC CHECKSUMS:
   gRPC-Core: 943e491cb0d45598b0b0eb9e910c88080369290b
   GTMSessionFetcher: 681175626052e03fdde7952f7e9c7a9785719506
   image_picker: 50e7c7ff960e5f58faa4d1f4af84a771c671bc4a
-  in_app_purchase_storekit: d7fcf4646136ec258e237872755da8ea6c1b6096
   in_app_review: 4a97249f7a2f539a0f294c2d9196b7fe35e49541
   integration_test: a1e7d09bd98eca2fc37aefd79d4f41ad37bdbbe5
   leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729

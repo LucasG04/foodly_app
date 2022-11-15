@@ -200,7 +200,7 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: kPadding),
                       child: SmallCircularProgressIndicator(),
-                    )
+                    ),
                   ]
                 : purchaseState == _PurchaseState.purchased
                     ? [
@@ -210,8 +210,9 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                           ),
                           child: Text(
                             'get_premium_modal_thanks'.tr(args: ['🙂']),
+                            style: const TextStyle(fontSize: 18),
                           ),
-                        )
+                        ),
                       ]
                     : products.map((e) {
                         final index = products.indexOf(e);

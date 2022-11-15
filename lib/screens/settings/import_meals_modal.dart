@@ -91,7 +91,6 @@ class CopyPlanMealsTile extends ConsumerStatefulWidget {
   const CopyPlanMealsTile(this.plan, {Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _CopyPlanMealsTileState createState() => _CopyPlanMealsTileState();
 }
 

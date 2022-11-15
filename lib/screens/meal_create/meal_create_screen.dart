@@ -38,7 +38,6 @@ class MealCreateScreen extends ConsumerStatefulWidget {
   const MealCreateScreen({required this.id, Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _MealCreateScreenState createState() => _MealCreateScreenState();
 }
 

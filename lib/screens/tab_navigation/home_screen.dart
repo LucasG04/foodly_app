@@ -29,7 +29,6 @@ class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _HomeScreenState createState() => _HomeScreenState();
 }
 
@@ -62,7 +61,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
       final user = ref.watch(userProvider);
 
       if (SettingsService.isFirstUsage) {
-        AutoRouter.of(context).replace(OnboardingScreenRoute());
+        AutoRouter.of(context).replace(const OnboardingScreenRoute());
         return const Scaffold();
       } else if (!initialUserLoading && user == null) {
         AutoRouter.of(context).replace(const AuthenticationScreenRoute());

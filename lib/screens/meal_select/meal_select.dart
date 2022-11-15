@@ -33,7 +33,6 @@ class MealSelectScreen extends ConsumerStatefulWidget {
       : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _MealSelectScreenState createState() => _MealSelectScreenState();
 }
 
