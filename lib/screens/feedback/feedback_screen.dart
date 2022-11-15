@@ -11,6 +11,7 @@ import '../../constants.dart';
 import '../../models/foodly_feedback.dart';
 import '../../providers/state_providers.dart';
 import '../../services/feedback_service.dart';
+import '../../services/in_app_purchase_service.dart';
 import '../../utils/main_snackbar.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/main_button.dart';
@@ -154,6 +155,7 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
       email: _emailController.text.trim(),
       description: _textController.text.trim(),
       version: '${appInfo.version} (${Platform.operatingSystem})',
+      isSubscribedToPremium: ref.read(InAppPurchaseService.$userIsSubscribed),
     );
 
     await FeedbackService.create(feedback);
