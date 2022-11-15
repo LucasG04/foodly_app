@@ -47,19 +47,4 @@ class FoodlyUserService {
     log.finer('Call deleteUserById with $userId');
     return _firestore.doc(userId).delete();
   }
-
-  static Future<void> subscribeToPremium(
-    String userId,
-    DateTime expiresAt,
-  ) async {
-    log.finer('Call subscribeToPremium with $userId and $expiresAt');
-    final user = await getUserById(userId);
-    if (user == null) {
-      log.severe('#subscribeToPremium User $userId not found');
-      return;
-    }
-    user.isPremium = true;
-    user.premiumExpiresAt = expiresAt;
-    return _firestore.doc(userId).update(user.toMap());
-  }
 }

@@ -36,7 +36,7 @@ class InAppPurchaseService {
     }
 
     await _loadOfferings();
-    fetchUserSubscription();
+    await fetchUserSubscription();
   }
 
   // ignore: use_setters_to_change_properties
@@ -48,7 +48,7 @@ class InAppPurchaseService {
   static Future<void> setUserId(String id) async {
     try {
       await Purchases.logIn(id);
-      fetchUserSubscription();
+      await fetchUserSubscription();
     } catch (e) {
       _log.severe('Failed to set user id', e);
     }
@@ -57,7 +57,7 @@ class InAppPurchaseService {
   static Future<void> removeUserId() async {
     try {
       await Purchases.logOut();
-      fetchUserSubscription();
+      await fetchUserSubscription();
     } catch (e) {
       _log.severe('Failed to remove user id', e);
     }
@@ -66,7 +66,7 @@ class InAppPurchaseService {
   static Future<bool> buy(String productIdentifier) async {
     try {
       final customerInfo = await Purchases.purchaseProduct(productIdentifier);
-      fetchUserSubscription();
+      await fetchUserSubscription();
       return _customerisSubscribed(customerInfo);
     } on PlatformException catch (e) {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);
@@ -80,7 +80,7 @@ class InAppPurchaseService {
   static Future<bool> restore() async {
     try {
       final restoredInfo = await Purchases.restorePurchases();
-      fetchUserSubscription();
+      await fetchUserSubscription();
       return _customerisSubscribed(restoredInfo);
     } catch (e) {
       _log.severe(e);
