@@ -189,7 +189,7 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
           decoration: purchaseState == _PurchaseState.none
               ? BoxDecoration(
                   borderRadius: BorderRadius.circular(kRadius),
-                  color: Colors.grey[200],
+                  color: kGreyBackgroundColor,
                 )
               : null,
           child: Row(

@@ -15,6 +15,8 @@ import '../../../widgets/progress_button.dart';
 import '../../../widgets/suggestion_tile.dart';
 import '../models/grocery.dart';
 import '../models/ingredient.dart';
+import '../services/in_app_purchase_service.dart';
+import 'get_premium_info.dart';
 
 class IngredientEditModal extends ConsumerStatefulWidget {
   final Ingredient ingredient;
@@ -43,6 +45,8 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal> {
   late AutoDisposeStateProvider<ButtonState> _$buttonState;
   late AutoDisposeStateProvider<List<Grocery>> _$suggestions;
   String? _errorText;
+
+  bool get showSuggestions => InAppPurchaseService.userIsSubscribed;
 
   @override
   void initState() {
@@ -96,18 +100,28 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal> {
                 height: ref.watch(_$suggestions).isNotEmpty ? kPadding : 0,
               );
             }),
-            Consumer(builder: (_, ref, __) {
-              return Wrap(
-                spacing: kPadding / 2,
-                runSpacing: kPadding / 2,
-                children: ref.watch(_$suggestions).take(6).map((grocery) {
-                  return SuggestionTile(
-                    text: grocery.name.toString(),
-                    onTap: () => _applyGroceryFromSuggestion(grocery),
-                  );
-                }).toList(),
-              );
-            }),
+            if (showSuggestions)
+              Consumer(builder: (_, ref, __) {
+                return Wrap(
+                  spacing: kPadding / 2,
+                  runSpacing: kPadding / 2,
+                  children: ref.watch(_$suggestions).take(6).map((grocery) {
+                    return SuggestionTile(
+                      text: grocery.name.toString(),
+                      onTap: () => _applyGroceryFromSuggestion(grocery),
+                    );
+                  }).toList(),
+                );
+              })
+            else
+              Padding(
+                padding: const EdgeInsets.only(top: kPadding / 2),
+                child: GetPremiumInfo(
+                  title: 'get_premium_modal_1_title'.tr(),
+                  description: 'get_premium_modal_1_description_ad'.tr(),
+                  displayProbability: 0.25,
+                ),
+              ),
             const SizedBox(height: kPadding / 2),
             Consumer(builder: (_, ref, __) {
               ref.watch(_$buttonState);
@@ -209,6 +223,9 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal> {
   }
 
   Future<void> _loadSuggestions(String text) async {
+    if (!showSuggestions) {
+      return;
+    }
     text = text.trim();
     if (text.length < 3) {
       if (ref.read(_$suggestions).isNotEmpty) {

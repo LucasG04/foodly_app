@@ -22,6 +22,7 @@ import '../../../utils/main_snackbar.dart';
 import '../../../utils/widget_utils.dart';
 import '../../../widgets/loading_logout.dart';
 import '../../models/plan.dart';
+import '../../services/in_app_purchase_service.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
@@ -90,14 +91,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               },
                             ),
                           ),
-                          SettingsTile(
-                            onTap: _openGetPremium,
-                            leadingIcon: EvaIcons.awardOutline,
-                            text: 'settings_section_general_premium'.tr(),
-                            trailing: const Icon(
-                              EvaIcons.arrowIosForwardOutline,
+                          if (!InAppPurchaseService.userIsSubscribed)
+                            SettingsTile(
+                              onTap: _openGetPremium,
+                              leadingIcon: EvaIcons.awardOutline,
+                              text: 'settings_section_general_premium'
+                                  .tr(args: ['✨']),
+                              trailing: const Icon(
+                                EvaIcons.arrowIosForwardOutline,
+                                color: kPremiumColor,
+                              ),
+                              colorIcon: kPremiumColor,
                             ),
-                          ),
                         ], context),
                         _buildSectionTitle(
                           'settings_section_customization'.tr(),
@@ -214,7 +219,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               EvaIcons.arrowIosForwardOutline,
                               color: Colors.red,
                             ),
-                            color: Colors.red,
+                            colorIcon: Colors.red,
+                            colorText: Colors.red,
                           ),
                         ], context),
                         if (foodlyUser.oldPlans!.length > 1)
@@ -301,7 +307,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               EvaIcons.arrowIosForwardOutline,
                               color: Colors.red,
                             ),
-                            color: Colors.red,
+                            colorIcon: Colors.red,
+                            colorText: Colors.red,
                           ),
                           SettingsTile(
                             onTap: () => AuthenticationService.signOut(),
@@ -311,7 +318,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               EvaIcons.arrowIosForwardOutline,
                               color: Colors.red,
                             ),
-                            color: Colors.red,
+                            colorIcon: Colors.red,
+                            colorText: Colors.red,
                           ),
                         ], context),
                         RichText(
