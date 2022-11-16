@@ -7,15 +7,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
-import '../../../models/grocery.dart';
 import '../../../models/meal.dart';
 import '../../../models/plan_meal.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/authentication_service.dart';
 import '../../../services/meal_service.dart';
 import '../../../services/plan_service.dart';
-import '../../../services/shopping_list_service.dart';
 import '../../../utils/widget_utils.dart';
+import '../../../widgets/add_to_shopping_list_modal.dart';
 import '../../../widgets/foodly_network_image.dart';
 import '../../../widgets/meal_tag.dart';
 import '../../../widgets/options_modal/options_modal.dart';
@@ -230,24 +229,14 @@ class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
             title: 'plan_ingredients_to_list'.tr(),
             icon: EvaIcons.fileAddOutline,
             onTap: () async {
-              final meal = await MealService.getMealById(widget.planMeal.meal);
-              if (meal == null || meal.ingredients == null) {
-                return;
-              }
-              final listId =
-                  (await ShoppingListService.getShoppingListByPlanId(planId))
-                      .id;
-              for (final ingredient in meal.ingredients!) {
-                ShoppingListService.addGrocery(
-                  listId!,
-                  Grocery(
-                    name: ingredient.name,
-                    amount: ingredient.amount,
-                    unit: ingredient.unit,
-                    lastBoughtEdited: DateTime.now(),
-                  ),
-                );
-              }
+              // Navigator.of(context).pop();
+              WidgetUtils.showFoodlyBottomSheet<void>(
+                scrollable: true,
+                context: context,
+                builder: (_) => AddToShoppingListModal(
+                  mealId: widget.planMeal.meal,
+                ),
+              );
             },
           ),
         OptionsSheetOptions(

@@ -13,6 +13,7 @@ class WidgetUtils {
   static Future<T?> showFoodlyBottomSheet<T>({
     required BuildContext context,
     required Widget Function(BuildContext) builder,
+    bool scrollable = false,
   }) {
     return showBarModalBottomSheet<T>(
       shape: const RoundedRectangleBorder(
@@ -21,7 +22,12 @@ class WidgetUtils {
         ),
       ),
       context: context,
-      builder: builder,
+      builder: !scrollable
+          ? builder
+          : (context) => SingleChildScrollView(
+                controller: ModalScrollController.of(context),
+                child: builder(context),
+              ),
     );
   }
 
