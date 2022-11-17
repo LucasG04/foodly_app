@@ -48,6 +48,7 @@ dependencies:
   update_available: ^2.1.0
   envied: ^0.2.3
   purchases_flutter: ^4.4.1
+  permission_handler: ^10.2.0
 
   # Firebase
   firebase_core: ^1.21.1

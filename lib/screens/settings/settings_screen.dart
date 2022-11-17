@@ -400,16 +400,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _shareCode(String code, bool? isPlanLocked) async {
-    await Share.share(
-      'settings_share_msg'.tr(args: [kAppName, code, kAppDownloadUrl]),
-      subject: 'settings_share_msg_short'.tr(args: [kAppName, code]),
-    );
-    if (isPlanLocked != null && isPlanLocked && mounted) {
+    if (isPlanLocked != null && isPlanLocked) {
       MainSnackbar(
         message: 'settings_share_plan_locked'.tr(),
         infinite: true,
       ).show(context);
+      return;
     }
+    await Share.share(
+      'settings_share_msg'.tr(args: [kAppName, code, kAppDownloadUrl]),
+      subject: 'settings_share_msg_short'.tr(args: [kAppName, code]),
+    );
     FirebaseAnalytics.instance.logEvent(name: 'share_code');
   }
 
