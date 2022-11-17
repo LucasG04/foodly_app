@@ -1,8 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logging/logging.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../constants.dart';
 import '../../services/storage_service.dart';
@@ -18,21 +20,13 @@ class SelectPickerDialog extends StatefulWidget {
 }
 
 class _SelectPickerDialogState extends State<SelectPickerDialog> {
-  late Logger _log;
+  final Logger _log = Logger('SelectPickerDialog');
+  final ImagePicker _imagePicker = ImagePicker();
+  final _kPhotoAccessDeniedKey = 'photo_access_denied';
+  final _kCameraAccessDeniedKey = 'camera_access_denied';
 
-  late bool _isLoading;
-  late ImagePicker _imagePicker;
-  late bool _showWebPicker;
-
-  @override
-  void initState() {
-    _log = Logger('SelectPickerDialog');
-    _isLoading = false;
-    _imagePicker = ImagePicker();
-    _showWebPicker = false;
-
-    super.initState();
-  }
+  bool _isLoading = false;
+  bool _showWebPicker = false;
 
   @override
   Widget build(BuildContext context) {
@@ -96,8 +90,27 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
   }
 
   void _uploadLocalImage(ImageSource source) async {
+    PickedFile? image;
     try {
-      final image = await _imagePicker.getImage(source: source);
+      image = await _imagePicker.getImage(source: source);
+      // if none is picked, `getImage` will `return` automatically
+      // so show error if `image` is null
+      if (image == null) {
+        _showErrorSnackBar('image_picker_dialog_error_not_found'.tr());
+        return;
+      }
+    } catch (e) {
+      if (e is PlatformException &&
+          [_kCameraAccessDeniedKey, _kPhotoAccessDeniedKey].contains(e.code)) {
+        _checkPermission(source);
+        return;
+      }
+      _log.severe('Error getImage', e);
+      _showErrorSnackBar('image_picker_dialog_error_not_found'.tr());
+      return;
+    }
+
+    try {
       final upload = await StorageService.uploadFile(image);
       setState(() {
         _isLoading = true;
@@ -120,10 +133,7 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
       setState(() {
         _isLoading = false;
       });
-      MainSnackbar(
-        message: 'image_picker_dialog_error_not_found'.tr(),
-        isError: true,
-      ).show(context);
+      _showErrorSnackBar('image_picker_dialog_error_not_found'.tr());
     }
   }
 
@@ -132,5 +142,36 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
     if (parsedUri != null && parsedUri.isAbsolute) {
       Navigator.pop(context, url);
     }
+  }
+
+  Future<void> _checkPermission(ImageSource source) async {
+    final status = await (source == ImageSource.camera
+        ? Permission.camera.request()
+        : Permission.photos.request());
+
+    if (_permissionStatusIsInvalid(status)) {
+      _showErrorSnackBar(
+        (source == ImageSource.camera
+                ? 'image_picker_dialog_camera_access_denied'
+                : 'image_picker_dialog_photo_access_denied')
+            .tr(),
+      );
+    }
+  }
+
+  bool _permissionStatusIsInvalid(PermissionStatus status) {
+    return status == PermissionStatus.denied ||
+        status == PermissionStatus.permanentlyDenied;
+  }
+
+  void _showErrorSnackBar(String message) {
+    if (!mounted) {
+      return;
+    }
+    MainSnackbar(
+      message: message,
+      isError: true,
+      isDismissible: true,
+    ).show(context);
   }
 }

@@ -195,6 +195,8 @@
     "image_picker_dialog_camera": "Kamera",
     "image_picker_dialog_gallery": "Gallerie",
     "image_picker_dialog_web": "Web",
+    "image_picker_dialog_camera_access_denied": "Du hast Zugriff auf deine Kamera verweigert. Bitte erlaube den Zugriff in den Einstellungen.",
+    "image_picker_dialog_photo_access_denied": "Du hast Zugriff auf deine Fotos verweigert. Bitte erlaube den Zugriff in den Einstellungen.",
     "image_picker_dialog_error_not_found": "Das Bild konnte leider nicht gespeichert werden. Wähle ein anderes Bild oder versuche es später erneut.",
     "image_link_picker_input_error": "Der Link konnte nicht aufgerufen werden. Bitte überprüfe ihn oder verwende die \"Gallerie\"-Funktion.",
     "image_link_picker_input_placeholder": "Pizza oder http://food.com/img/123",
