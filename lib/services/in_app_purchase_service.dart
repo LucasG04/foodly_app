@@ -35,7 +35,7 @@ class InAppPurchaseService {
       await Purchases.configure(configuration);
     }
 
-    await _loadOfferings();
+    _loadOfferings();
     await fetchUserSubscription();
   }
 
