@@ -9,6 +9,7 @@ import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/settings/settings_screen.dart';
 import 'screens/tab_navigation/home_screen.dart';
 import 'screens/unknown_route/unknown_route_screen.dart';
+import 'screens/upcoming_features/upcoming_features_screen.dart';
 
 // generate with `flutter packages pub run build_runner build`
 // generate with `flutter packages pub run build_runner watch`
@@ -21,6 +22,7 @@ import 'screens/unknown_route/unknown_route_screen.dart';
     CupertinoRoute<dynamic>(page: MealSelectScreen),
     CupertinoRoute<dynamic>(page: OnboardingScreen),
     CupertinoRoute<dynamic>(page: FeedbackScreen),
+    CupertinoRoute<dynamic>(page: UpcomingFeaturesScreen),
     CupertinoRoute<dynamic>(path: '/meal-create/:id', page: MealCreateScreen),
     CupertinoRoute<dynamic>(path: '/meal/:id', page: MealScreen),
     CupertinoRoute<dynamic>(path: '*', page: UnknownRouteScreen),

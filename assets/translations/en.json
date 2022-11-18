@@ -28,6 +28,7 @@
   "settings_section_general": "General",
   "settings_section_general_language": "Language",
   "settings_section_general_premium": "Get Premium {}",
+  "settings_section_general_upcoming": "Upcoming features",
   "settings_section_customization": "Customization",
   "settings_section_customization_multiple_meals": "Multiple dishes per meal",
   "settings_section_customization_suggestions": "Show suggestions",
@@ -270,5 +271,6 @@
   "get_premium_modal_3_description": "With your contribution you support the further development of the app, keep the app ad-free and help cover server costs.",
   "get_premium_modal_4_title": "Prioritized support",
   "get_premium_modal_4_description": "You will receive priority support via the feedback feature.",
-  "get_premium_modal_thanks": "Thanks {}"
+  "get_premium_modal_thanks": "Thanks {}",
+  "upcoming_features_title": "Upcoming Features"
 }
