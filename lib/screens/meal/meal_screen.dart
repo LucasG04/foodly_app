@@ -299,11 +299,11 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                                   builder: (context, ref, child) {
                                     final isSubscribed = ref.watch(
                                         InAppPurchaseService.$userIsSubscribed);
-                                    return isSubscribed
+                                    return !isSubscribed
                                         ? child!
                                         : _buildMealStatBlur(context, child!);
                                   },
-                                  child: _buildMealStatBody(mealStat),
+                                  child: _buildMealStatBody(meal, mealStat),
                                 ),
                               ),
                             const SizedBox(height: 100.0),
@@ -426,7 +426,8 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     );
   }
 
-  Widget _buildMealStatBody(MealStat mealStat) {
+  Widget _buildMealStatBody(Meal meal, MealStat mealStat) {
+    print(meal.createdAt);
     return Wrap(
       runSpacing: kPadding,
       spacing: kPadding,
@@ -443,6 +444,11 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                   .format(mealStat.lastTimePlanned!)
               : '-',
         ),
+        if (meal.createdAt != null)
+          _buildMealStatInfo(
+            'Erstellt',
+            DateFormat.yMd(context.locale.languageCode).format(meal.createdAt!),
+          ),
       ],
     );
   }

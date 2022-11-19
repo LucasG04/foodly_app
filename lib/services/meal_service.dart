@@ -80,6 +80,7 @@ class MealService {
     _log.finer('Call createMeal with ${meal.toMap()}');
 
     try {
+      meal.createdAt = DateTime.now();
       final created = await _firestore.add(meal);
       meal.id = created.id;
       await MealStatService.bumpStat(meal.planId!, meal.id!);
