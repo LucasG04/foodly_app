@@ -151,6 +151,9 @@
   "meal_details_duration_trailing": "{} minutes",
   "meal_details_ingredient": "Ingredients",
   "meal_details_instructions": "Instructions",
+  "meal_details_stats": "Stats",
+  "meal_details_stats_locked": "Statistics are only available for premium users",
+  "meal_details_stats_unlock": "Get Premium",
   "modal_delete_sure_leading": "Are you sure you want the dish",
   "modal_delete_sure_trailing": "to be deleted forever? It cannot be restored nor accessed by anyone.",
   "modal_delete_trailing": "Delete permanently",
@@ -269,8 +272,8 @@
   "get_premium_modal_2_description_ad": "With Premium you will see suggestions of dishes for the next days.",
   "get_premium_modal_3_title": "Support {}",
   "get_premium_modal_3_description": "With your contribution you support the further development of the app, keep the app ad-free and help cover server costs.",
-  "get_premium_modal_4_title": "Prioritized support",
-  "get_premium_modal_4_description": "You will receive priority support via the feedback feature.",
+  "get_premium_modal_4_title": "Statistics for dishes",
+  "get_premium_modal_4_description": "You can view statistics about your dishes. For example, how often you have planned a dish or when you planned it last time.",
   "get_premium_modal_thanks": "Thanks {}",
   "upcoming_features_title": "Upcoming Features"
 }

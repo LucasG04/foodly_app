@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:blur/blur.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,9 @@ import '../../app_router.gr.dart';
 import '../../constants.dart';
 import '../../models/ingredient.dart';
 import '../../models/meal.dart';
+import '../../models/meal_stat.dart';
 import '../../providers/state_providers.dart';
+import '../../services/in_app_purchase_service.dart';
 import '../../services/meal_service.dart';
 import '../../services/meal_stat_service.dart';
 import '../../services/plan_service.dart';
@@ -20,6 +23,7 @@ import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/foodly_network_image.dart';
 import '../../widgets/full_screen_loader.dart';
+import '../../widgets/get_premium_modal.dart';
 import '../../widgets/link_preview.dart';
 import '../../widgets/options_modal/options_modal.dart';
 import '../../widgets/options_modal/options_modal_option.dart';
@@ -67,11 +71,18 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     return Scaffold(
       body: Stack(
         children: [
-          FutureBuilder<Meal?>(
-            future: MealService.getMealById(widget.id),
+          FutureBuilder(
+            future: Future.wait<dynamic>([
+              MealService.getMealById(widget.id),
+              MealStatService.getStat(currentPlanId!, widget.id),
+            ]),
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                final meal = snapshot.data!;
+              final dataIsNotNull = snapshot.data != null &&
+                  (snapshot.data as List<dynamic>?)![0] != null;
+              if (snapshot.hasData && dataIsNotNull) {
+                final Meal meal = (snapshot.data as List<dynamic>?)![0] as Meal;
+                final mealStat =
+                    (snapshot.data as List<dynamic>?)![1] as MealStat?;
                 return CustomScrollView(
                   slivers: [
                     SliverAppBar(
@@ -281,6 +292,20 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                               ),
                             ],
                             const SizedBox(height: kPadding),
+                            if (mealStat != null)
+                              ..._buildSection(
+                                'meal_details_stats'.tr(),
+                                Consumer(
+                                  builder: (context, ref, child) {
+                                    final isSubscribed = ref.watch(
+                                        InAppPurchaseService.$userIsSubscribed);
+                                    return isSubscribed
+                                        ? child!
+                                        : _buildMealStatBlur(context, child!);
+                                  },
+                                  child: _buildMealStatBody(mealStat),
+                                ),
+                              ),
                             const SizedBox(height: 100.0),
                           ]
                               .map(
@@ -362,6 +387,98 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     ];
   }
 
+  Widget _buildMealStatBlur(BuildContext context, Widget child) {
+    return Blur(
+      overlay: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Text(
+            'meal_details_stats_locked'.tr(),
+            style: const TextStyle(fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+          ElevatedButton(
+            onPressed: _openGetPremium,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).textTheme.bodyText1!.color,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'meal_details_stats_unlock'.tr(),
+                  style: TextStyle(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                  ),
+                ),
+                Icon(
+                  EvaIcons.arrowIosForwardOutline,
+                  size: Theme.of(context).textTheme.bodyText1!.fontSize! + 5,
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildMealStatBody(MealStat mealStat) {
+    return Wrap(
+      runSpacing: kPadding,
+      spacing: kPadding,
+      alignment: WrapAlignment.spaceEvenly,
+      children: [
+        _buildMealStatInfo(
+          'Geplant',
+          '${mealStat.plannedCount} x',
+        ),
+        _buildMealStatInfo(
+          'Letzte Mal geplant',
+          mealStat.plannedCount != null && mealStat.plannedCount! > 0
+              ? DateFormat.yMd(context.locale.languageCode)
+                  .format(mealStat.lastTimePlanned!)
+              : '-',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMealStatInfo(String title, String stat) {
+    return Container(
+      width: 150,
+      padding: const EdgeInsets.all(kPadding / 2),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(kRadius),
+        boxShadow: const [kSmallShadow],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(kPadding / 2),
+        child: Column(
+          children: [
+            AutoSizeText(
+              stat,
+              style: const TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+              minFontSize: 14,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: kPadding / 2),
+            Text(title, textAlign: TextAlign.center),
+          ],
+        ),
+      ),
+    );
+  }
+
   String _formatSourceString(String source) {
     return BasicUtils.isValidUri(source)
         ? Uri.parse(source).host.replaceAll('www.', '')
@@ -394,6 +511,13 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
           onTap: () => _openConfirmDelete(meal),
         ),
       ]),
+    );
+  }
+
+  void _openGetPremium() {
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => const GetPremiumModal(),
     );
   }
 

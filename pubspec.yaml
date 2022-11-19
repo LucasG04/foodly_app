@@ -46,7 +46,7 @@ dependencies:
   version: ^2.0.0
   package_info_plus: ^1.4.2
   update_available: ^2.1.0
-  envied: ^0.2.3
+  envied: ^0.2.4
   purchases_flutter: ^4.4.1
   permission_handler: ^10.2.0
 
@@ -82,6 +82,7 @@ dependencies:
   dotted_border: ^2.0.0+2
   in_app_review: ^2.0.4
   like_button: ^2.0.5
+  blur: ^3.1.0
 
   # Icons/Styles/Animations
   cupertino_icons: ^1.0.4

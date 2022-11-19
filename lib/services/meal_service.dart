@@ -82,7 +82,7 @@ class MealService {
     try {
       final created = await _firestore.add(meal);
       meal.id = created.id;
-      await MealStatService.bumpStat(meal.planId!, meal.id!);
+      await MealStatService.bumpStat(meal.planId!, meal.id!, bumpCount: false);
       AppReviewService.logMealCreated();
 
       return meal;
