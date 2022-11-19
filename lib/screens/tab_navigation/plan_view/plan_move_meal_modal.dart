@@ -192,6 +192,6 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal> {
     if (!mounted) {
       return;
     }
-    Navigator.pop(context);
+    Navigator.pop(context, true);
   }
 }

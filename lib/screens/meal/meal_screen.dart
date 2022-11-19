@@ -522,10 +522,13 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
   }
 
   void _openAddToPlan(Meal meal) async {
-    WidgetUtils.showFoodlyBottomSheet<void>(
+    final moved = await WidgetUtils.showFoodlyBottomSheet<bool?>(
       context: context,
       builder: (_) => PlanMoveMealModal(isMoving: false, meal: meal),
     );
+    if (moved != null && moved) {
+      setState(() {});
+    }
   }
 
   void _openConfirmDelete(Meal meal) async {

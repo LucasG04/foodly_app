@@ -99,7 +99,7 @@ class MealStatService {
   }
 
   static Future<void> bumpStat(String planId, String mealId,
-      {bool bumpCount = true, bool? bumpLastPlanned}) async {
+      {bool bumpCount = false, bool bumpLastPlanned = false}) async {
     _log.finer('Call bumpStat for plan $planId');
     if (planId.startsWith(kPlaceholderSymbol)) {
       _log.finer(
@@ -131,7 +131,7 @@ class MealStatService {
         if (bumpCount) {
           stat.plannedCount = (stat.plannedCount ?? 0) + 1;
         }
-        if (bumpLastPlanned!) {
+        if (bumpLastPlanned) {
           stat.lastTimePlanned = DateTime.now();
         }
         await _firestore
