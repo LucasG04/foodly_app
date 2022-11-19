@@ -303,7 +303,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                                         ? child!
                                         : _buildMealStatBlur(context, child!);
                                   },
-                                  child: _buildMealStatBody(mealStat),
+                                  child: _buildMealStatBody(meal, mealStat),
                                 ),
                               ),
                             const SizedBox(height: 100.0),
@@ -426,7 +426,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     );
   }
 
-  Widget _buildMealStatBody(MealStat mealStat) {
+  Widget _buildMealStatBody(Meal meal, MealStat mealStat) {
     return Wrap(
       runSpacing: kPadding,
       spacing: kPadding,
@@ -443,6 +443,11 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                   .format(mealStat.lastTimePlanned!)
               : '-',
         ),
+        if (meal.createdAt != null)
+          _buildMealStatInfo(
+            'Erstellt',
+            DateFormat.yMd(context.locale.languageCode).format(meal.createdAt!),
+          ),
       ],
     );
   }
@@ -522,10 +527,13 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
   }
 
   void _openAddToPlan(Meal meal) async {
-    WidgetUtils.showFoodlyBottomSheet<void>(
+    final moved = await WidgetUtils.showFoodlyBottomSheet<bool?>(
       context: context,
       builder: (_) => PlanMoveMealModal(isMoving: false, meal: meal),
     );
+    if (moved != null && moved) {
+      setState(() {});
+    }
   }
 
   void _openConfirmDelete(Meal meal) async {
