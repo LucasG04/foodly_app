@@ -299,7 +299,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                                   builder: (context, ref, child) {
                                     final isSubscribed = ref.watch(
                                         InAppPurchaseService.$userIsSubscribed);
-                                    return !isSubscribed
+                                    return isSubscribed
                                         ? child!
                                         : _buildMealStatBlur(context, child!);
                                   },
@@ -427,7 +427,6 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
   }
 
   Widget _buildMealStatBody(Meal meal, MealStat mealStat) {
-    print(meal.createdAt);
     return Wrap(
       runSpacing: kPadding,
       spacing: kPadding,
