@@ -85,6 +85,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.2"
+  blur:
+    dependency: "direct main"
+    description:
+      name: blur
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.1.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -351,7 +358,7 @@ packages:
       name: envied
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.3"
+    version: "0.2.4"
   envied_generator:
     dependency: "direct dev"
     description:
@@ -807,6 +814,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.2"
+  like_button:
+    dependency: "direct main"
+    description:
+      name: like_button
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.5"
   lints:
     dependency: "direct dev"
     description:

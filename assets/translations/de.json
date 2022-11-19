@@ -28,6 +28,7 @@
     "settings_section_general": "Allgemein",
     "settings_section_general_language": "Sprache",
     "settings_section_general_premium": "Hol dir Premium {}",
+    "settings_section_general_upcoming": "Zukünftige Funktionen",
     "settings_section_customization": "Anpassung",
     "settings_section_customization_multiple_meals": "Mehrere Gerichte pro Mahlzeit",
     "settings_section_customization_suggestions": "Vorschläge anzeigen",
@@ -150,6 +151,9 @@
     "meal_details_duration_trailing": "{} Minuten",
     "meal_details_ingredient": "Zutaten",
     "meal_details_instructions": "Anleitung",
+    "meal_details_stats": "Statistiken",
+    "meal_details_stats_locked": "Statistiken sind nur für Premium-Nutzer verfügbar",
+    "meal_details_stats_unlock": "Hol dir Premium",
     "modal_delete_sure_leading": "Bist du dir sicher, dass du das Gericht",
     "modal_delete_sure_trailing": "für immer löschen möchtest. Es kann nicht wiederhergestellt noch von jemanden aufgerufen werden.",
     "modal_delete_delete": "Permanent löschen",
@@ -268,7 +272,8 @@
     "get_premium_modal_2_description_ad": "Mit Premium werden dir hier Vorschläge von Gerichten für die nächsten Tage angezeigt.",
     "get_premium_modal_3_title": "{} unterstützen",
     "get_premium_modal_3_description": "Mit deinem Beitrag förderst du die Weiterentwicklung der App, hältst die App werbefrei und unterstützt bei der Deckung von Serverkosten.",
-    "get_premium_modal_4_title": "Priorisierter Support",
-    "get_premium_modal_4_description": "Über die Feedback-Funktion erhältst du vorrangige Unterstützung.",
-    "get_premium_modal_thanks": "Danke {}"
+    "get_premium_modal_4_title": "Statistiken für Gerichte",
+    "get_premium_modal_4_description": "Du kannst Statistiken zu deinen Gerichten einsehen. Beispielsweise wie oft du ein Gericht eingeplant hast oder wann du es das letzte Mal geplant hast.",
+    "get_premium_modal_thanks": "Danke {}",
+    "upcoming_features_title": "Zukünftige Funktionen"
 }

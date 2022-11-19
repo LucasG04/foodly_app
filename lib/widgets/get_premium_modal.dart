@@ -127,7 +127,7 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                         description: 'get_premium_modal_2_description'.tr(),
                       ),
                       ListTileCard(
-                        iconData: EvaIcons.messageCircleOutline,
+                        iconData: EvaIcons.activityOutline,
                         title: 'get_premium_modal_4_title'.tr(),
                         description: 'get_premium_modal_4_description'.tr(),
                       ),

@@ -14,6 +14,7 @@ import '../models/lunix_image.dart';
 import '../models/meal.dart';
 import '../models/plan.dart';
 import '../models/plan_meal.dart';
+import '../models/upcoming_feature.dart';
 import '../utils/basic_utils.dart';
 import '../utils/env.dart';
 import 'meal_service.dart';
@@ -317,6 +318,26 @@ class LunixApiService {
     final data = (response.data as List<dynamic>)
         .map(
             (dynamic e) => Grocery.fromApiSuggestion(e as Map<String, dynamic>))
+        .toList();
+    return data;
+  }
+
+  static Future<List<UpcomingFeature>> getUpcomingFeatures() async {
+    _log.finer('Call getUpcomingFeatures()');
+    Response? response;
+    try {
+      response = await _dio.get<List<dynamic>>(
+        '$_lunixApiEndpoint/open-issues',
+      );
+    } catch (e) {
+      print(e);
+      _log.severe('ERR in getUpcomingFeatures. API Request failed', e);
+    }
+    if (response == null || response.data == null) {
+      return [];
+    }
+    final data = (response.data as List<dynamic>)
+        .map((dynamic e) => UpcomingFeature.fromMap(e as Map<String, dynamic>))
         .toList();
     return data;
   }

@@ -207,6 +207,10 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       Logger.root.onRecord.listen((record) {
         // ignore: avoid_print
         print('${record.level.name}: ${record.loggerName}: ${record.message}');
+        if (record.error != null) {
+          // ignore: avoid_print
+          print(record.error);
+        }
       }).canceledBy(this);
     } else {
       Logger.root.level = Level.ALL;
