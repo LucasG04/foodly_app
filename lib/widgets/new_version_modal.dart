@@ -56,7 +56,8 @@ class NewVersionModal extends ConsumerStatefulWidget {
     }
 
     // get every single note and flatten the list
-    final versionNotes = versions.map((e) => e.notes).expand((i) => i).toList();
+    var versionNotes = versions.map((e) => e.notes).expand((i) => i).toList();
+    versionNotes = checkVersionNotesForVariables(versionNotes);
 
     _log.finest(
       'open() with versionNotes: ${versionNotes.map((e) => '${e.title}(${e.language})')}',
@@ -82,6 +83,20 @@ class NewVersionModal extends ConsumerStatefulWidget {
   static Future<List<Version>> _getPublishedVersions() async {
     final versions = await LunixApiService.getAllPublishedVersions();
     return versions.map((e) => Version.parse(e)).toList();
+  }
+
+  @visibleForTesting
+  static List<FoodlyVersionNote> checkVersionNotesForVariables(
+      List<FoodlyVersionNote> notes) {
+    return notes.map((e) {
+      if (e.title.contains('{appName}')) {
+        e.title = e.title.replaceAll('{appName}', kAppName);
+      }
+      if (e.description.contains('{appName}')) {
+        e.description = e.description.replaceAll('{appName}', kAppName);
+      }
+      return e;
+    }).toList();
   }
 }
 
