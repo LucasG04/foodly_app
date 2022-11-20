@@ -28,7 +28,7 @@ const kLightAccentColor = Color.fromRGBO(252, 163, 17, 0.4);
 const kPremiumColor = Color.fromRGBO(251, 198, 61, 1);
 const kGreyBackgroundColor = Color.fromRGBO(238, 238, 238, 1);
 
-/// other
+/// Other
 /// The shadow for small elements in the app.
 const kSmallShadow = BoxShadow(
   offset: Offset(0, 1),
