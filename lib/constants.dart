@@ -7,6 +7,12 @@ final kAppName = Platform.isIOS || Platform.isMacOS ? 'Foodster' : 'Foodly';
 const kPlaceholderSymbol = 'p--';
 const kChefkochShareEndpoint = 'https://www.chefkoch.de/rezepte';
 const kAppDownloadUrl = 'https://golenia.dev';
+final kAppPrivacyUrl = Platform.isIOS || Platform.isMacOS
+    ? 'https://golenia.dev/privacy/foodster.html'
+    : 'https://golenia.dev/privacy/foodly.html';
+final kAppTermsOfUseUrl = Platform.isIOS || Platform.isMacOS
+    ? 'https://golenia.dev/eula/foodster.html'
+    : 'https://golenia.dev/eula/foodly.html';
 
 /// Styling
 const kPadding = 20.0;
