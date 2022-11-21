@@ -18,6 +18,7 @@
 		A04D7DFB282005CD000551F7 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A04D7DFA282005CD000551F7 /* ShareViewController.swift */; };
 		A04D7DFE282005CD000551F7 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A04D7DFC282005CD000551F7 /* MainInterface.storyboard */; };
 		A04D7E02282005CD000551F7 /* ReceiveShare.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = A04D7DF8282005CD000551F7 /* ReceiveShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A0D25C74292B63D3009359B9 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0D25C73292B63D3009359B9 /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,6 +81,7 @@
 		A04D7DFF282005CD000551F7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A04D7E0828200CB6000551F7 /* Chefkoch-Import.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Chefkoch-Import.entitlements"; sourceTree = "<group>"; };
 		A0608D9C28E05C930023D226 /* RunnerDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RunnerDebug.entitlements; sourceTree = "<group>"; };
+		A0D25C73292B63D3009359B9 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		A3A40DAC4CF4A10F0A6F30DD /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		FE764329E68D75F6D2FA40F9 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -90,6 +92,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1AA3A0750EBBBE36F5FE7246 /* Pods_Runner.framework in Frameworks */,
+				A0D25C74292B63D3009359B9 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,6 +109,7 @@
 		4839025C1337F83FE68FA509 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A0D25C73292B63D3009359B9 /* StoreKit.framework */,
 				46057AA27EFD389338CC204F /* Pods_Runner.framework */,
 			);
 			name = Frameworks;
