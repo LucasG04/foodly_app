@@ -55,6 +55,8 @@
     "settings_section_account_delete": "Account löschen",
     "settings_section_account_logout": "Abmelden",
     "settings_sign_in_as": "Angemeldet als",
+    "settings_privacy": "Datenschutz",
+    "settings_terms_of_use": "Nutzungsbedingungen",
     "settings_share_msg_short": "Tritt meinem Essensplan bei {} mit dem Code \"{}\" bei.",
     "settings_share_msg": "Tritt meinem Essensplan bei {} mit dem Code \"{}\" bei.\nDownload für iOS und Android: {}",
     "settings_import_title": "GERICHTE IMPORTIEREN",

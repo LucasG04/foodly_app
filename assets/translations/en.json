@@ -55,6 +55,8 @@
   "settings_section_account_delete": "Delete account",
   "settings_section_account_logout": "Logout",
   "settings_sign_in_as": "Logged in as",
+  "settings_privacy": "Privacy policy",
+  "settings_terms_of_use": "Terms of use",
   "settings_share_msg_short": "Join my meal plan at {} with code \"{}\".",
   "settings_share_msg": "Join my meal plan at {} with code \"{}\".\nDownload for iOS and Android: {}",
   "settings_import_title": "IMPORT COURSES",

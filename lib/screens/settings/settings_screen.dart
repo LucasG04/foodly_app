@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:auto_route/auto_route.dart';
 import 'package:concentric_transition/page_route.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -10,6 +12,7 @@ import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
@@ -351,7 +354,34 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             );
                           },
                         ),
-                        const SizedBox(height: kPadding),
+                        if (Platform.isIOS || Platform.isMacOS)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: kPadding),
+                            child: Wrap(
+                              alignment: WrapAlignment.spaceEvenly,
+                              children: [
+                                TextButton(
+                                  onPressed: () => _launchUrl(kAppPrivacyUrl),
+                                  child: Text(
+                                    'settings_privacy'.tr(),
+                                    style:
+                                        Theme.of(context).textTheme.bodyText1,
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      _launchUrl(kAppTermsOfUseUrl),
+                                  child: Text(
+                                    'settings_terms_of_use'.tr(),
+                                    style:
+                                        Theme.of(context).textTheme.bodyText1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          const SizedBox(height: kPadding),
                       ],
                     ),
                   ),
@@ -509,5 +539,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context: context,
       builder: (_) => const GetPremiumModal(),
     );
+  }
+
+  void _launchUrl(String href) async {
+    final url = Uri.parse(href);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      _log.severe('Could not launch $href');
+    }
   }
 }
