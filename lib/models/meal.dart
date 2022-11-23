@@ -6,6 +6,7 @@ class Meal {
   String? source;
   String? instructions;
   int? duration;
+  int servings;
   List<Ingredient>? ingredients;
   List<String>? tags;
   String? imageUrl;
@@ -20,6 +21,7 @@ class Meal {
     this.source,
     this.instructions,
     this.duration,
+    this.servings = 1,
     this.ingredients,
     this.tags,
     this.imageUrl,
@@ -35,6 +37,7 @@ class Meal {
       'source': source,
       'instructions': instructions,
       'duration': duration,
+      'servings': servings,
       'ingredients': ingredients?.map((x) => x.toMap()).toList(),
       'tags': tags,
       'imageUrl': imageUrl ?? '',
@@ -53,6 +56,7 @@ class Meal {
       instructions: map['instructions'] as String?,
       imageUrl: (map['imageUrl'] as String?) ?? '',
       duration: int.tryParse(map['duration'].toString()) ?? 0,
+      servings: int.tryParse(map['servings'].toString()) ?? 1,
       ingredients: List<Ingredient>.from(
         (map['ingredients'] as List<dynamic>).map<dynamic>(
             (dynamic x) => Ingredient.fromMap(x as Map<String, dynamic>)),
@@ -69,6 +73,6 @@ class Meal {
 
   @override
   String toString() {
-    return 'Meal(id: $id, name: $name, source: $source, instruction: $instructions, duration: $duration, ingredients: $ingredients, tags: $tags, createdAt: $createdAt)';
+    return 'Meal(id: $id, name: $name, source: $source, servings: $servings, instruction: $instructions, duration: $duration, ingredients: $ingredients, tags: $tags, createdAt: $createdAt)';
   }
 }

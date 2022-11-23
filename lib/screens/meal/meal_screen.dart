@@ -22,12 +22,12 @@ import '../../utils/convert_util.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/foodly_network_image.dart';
-import '../../widgets/full_screen_loader.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/link_preview.dart';
 import '../../widgets/options_modal/options_modal.dart';
 import '../../widgets/options_modal/options_modal_option.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
+import '../../widgets/small_number_input.dart';
 import '../tab_navigation/plan_view/plan_move_meal_modal.dart';
 import 'border_icon.dart';
 import 'confirm_delete_modal.dart';
@@ -43,16 +43,24 @@ class MealScreen extends ConsumerStatefulWidget {
 }
 
 class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
-  bool _isDeleting = false;
+  final _$isLoading = AutoDisposeStateProvider<bool>((_) => true);
+  final _$meal = AutoDisposeStateProvider<Meal?>((_) => null);
+  final _$mealStat = AutoDisposeStateProvider<MealStat?>((_) => null);
+  late final AutoDisposeStateProvider<int> _$servings;
 
   @override
   void initState() {
     super.initState();
+    _$servings = AutoDisposeStateProvider<int>(
+      (ref) => ref.watch(_$meal)?.servings ?? 1,
+    );
+
+    _fetchMealAndStats();
     ref
         .read(lastChangedMealProvider.state)
         .stream
         .where((mealId) => mealId != null && widget.id == mealId)
-        .listen((_) => setState(() {}))
+        .listen((_) => _fetchMealAndStats())
         .canceledBy(this);
   }
 
@@ -67,276 +75,244 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     final Size size = MediaQuery.of(context).size;
     const sidePadding = EdgeInsets.symmetric(horizontal: kPadding);
     final currentPlanId = ref.read(planProvider)!.id;
+    final meal = ref.watch(_$meal);
 
     return Scaffold(
-      body: Stack(
-        children: [
-          FutureBuilder(
-            future: Future.wait<dynamic>([
-              MealService.getMealById(widget.id),
-              MealStatService.getStat(currentPlanId!, widget.id),
-            ]),
-            builder: (context, snapshot) {
-              final dataIsNotNull = snapshot.data != null &&
-                  (snapshot.data as List<dynamic>?)![0] != null;
-              if (snapshot.hasData && dataIsNotNull) {
-                final Meal meal = (snapshot.data as List<dynamic>?)![0] as Meal;
-                final mealStat =
-                    (snapshot.data as List<dynamic>?)![1] as MealStat?;
-                return CustomScrollView(
-                  slivers: [
-                    SliverAppBar(
-                      expandedHeight: size.width > 700.0 ? 400.0 : 250.0,
-                      backgroundColor:
-                          Theme.of(context).scaffoldBackgroundColor,
-                      elevation: 4,
-                      stretch: true,
-                      flexibleSpace: FlexibleSpaceBar(
-                        // ignore: avoid_redundant_argument_values
-                        stretchModes: const <StretchMode>[
-                          StretchMode.zoomBackground
-                        ],
-                        titlePadding: EdgeInsets.zero,
-                        background: Stack(
-                          children: [
-                            if (meal.imageUrl != null &&
-                                meal.imageUrl!.isNotEmpty)
-                              Positioned.fill(
-                                child: FoodlyNetworkImage(meal.imageUrl!),
-                              )
-                            else
-                              Positioned.fill(
-                                child: Image.asset(
-                                  'assets/images/food_fallback.png',
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            Positioned(
-                              width: size.width,
-                              top: kPadding / 2 +
-                                  MediaQuery.of(context).padding.top,
-                              child: Padding(
-                                padding: sidePadding,
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    InkWell(
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const BorderIcon(
-                                        height: 50,
-                                        width: 50,
-                                        child: Icon(
-                                          EvaIcons.arrowBackOutline,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                    if (meal.planId == currentPlanId)
-                                      BorderIcon(
-                                        height: 50,
-                                        width: 50,
-                                        child: IconButton(
-                                          icon: const Icon(
-                                            EvaIcons.moreHorizontalOutline,
-                                          ),
-                                          padding: EdgeInsets.zero,
-                                          onPressed: () => _showOptionsSheet(
-                                            meal,
-                                            currentPlanId,
-                                          ),
-                                        ),
-                                      )
-                                    else
-                                      const SizedBox(),
-                                  ],
-                                ),
-                              ),
+      body: ref.watch(_$isLoading) || meal == null
+          ? const Center(child: SmallCircularProgressIndicator())
+          : CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  expandedHeight: size.width > 700.0 ? 400.0 : 250.0,
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  elevation: 4,
+                  stretch: true,
+                  flexibleSpace: FlexibleSpaceBar(
+                    // ignore: avoid_redundant_argument_values
+                    stretchModes: const <StretchMode>[
+                      StretchMode.zoomBackground
+                    ],
+                    titlePadding: EdgeInsets.zero,
+                    background: Stack(
+                      children: [
+                        if (meal.imageUrl != null && meal.imageUrl!.isNotEmpty)
+                          Positioned.fill(
+                            child: FoodlyNetworkImage(meal.imageUrl!),
+                          )
+                        else
+                          Positioned.fill(
+                            child: Image.asset(
+                              'assets/images/food_fallback.png',
+                              fit: BoxFit.cover,
                             ),
-                          ],
-                        ),
-                      ),
-                      title: const SizedBox(),
-                      leading: const SizedBox(),
-                    ),
-                    const SliverToBoxAdapter(
-                      child: SizedBox(height: kPadding),
-                    ),
-                    SliverToBoxAdapter(
-                      child: Center(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Padding(
-                              padding: sidePadding,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        AutoSizeText(
-                                          meal.name,
-                                          style: const TextStyle(
-                                            fontSize: 26.0,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 5.0),
-                                        Text(
-                                          meal.source != null &&
-                                                  meal.source!.isNotEmpty
-                                              ? 'meal_details_source_known'.tr(
-                                                  args: [
-                                                      _formatSourceString(
-                                                          meal.source!)
-                                                    ])
-                                              : 'meal_details_source_unknown'
-                                                  .tr(),
-                                          style: TextStyle(
-                                            fontSize: 16.0,
-                                            fontWeight: FontWeight.bold,
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .bodyText1!
-                                                .color!
-                                                .withOpacity(0.5),
-                                          ),
-                                        ),
-                                      ],
+                          ),
+                        Positioned(
+                          width: size.width,
+                          top:
+                              kPadding / 2 + MediaQuery.of(context).padding.top,
+                          child: Padding(
+                            padding: sidePadding,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const BorderIcon(
+                                    height: 50,
+                                    width: 50,
+                                    child: Icon(
+                                      EvaIcons.arrowBackOutline,
+                                      color: Colors.black,
                                     ),
                                   ),
+                                ),
+                                if (meal.planId == currentPlanId)
                                   BorderIcon(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 15,
-                                      horizontal: 15,
-                                    ),
-                                    withBorder: true,
-                                    child: Text(
-                                      'meal_details_duration_trailing'.tr(
-                                        args: [
-                                          (meal.duration ?? '?').toString(),
-                                        ],
+                                    height: 50,
+                                    width: 50,
+                                    child: IconButton(
+                                      icon: const Icon(
+                                        EvaIcons.moreHorizontalOutline,
                                       ),
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () => _showOptionsSheet(
+                                        meal,
+                                        currentPlanId,
+                                      ),
+                                    ),
+                                  )
+                                else
+                                  const SizedBox(),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  title: const SizedBox(),
+                  leading: const SizedBox(),
+                ),
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: kPadding),
+                ),
+                SliverToBoxAdapter(
+                  child: Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: sidePadding,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    AutoSizeText(
+                                      meal.name,
                                       style: const TextStyle(
-                                        fontSize: 20.0,
+                                        fontSize: 26.0,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            if (meal.source != null &&
-                                meal.source!.isNotEmpty) ...[
-                              const SizedBox(height: kPadding),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: kPadding),
-                                child: LinkPreview(meal.source!),
-                              ),
-                            ],
-                            const SizedBox(height: kPadding),
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              physics: const BouncingScrollPhysics(),
-                              child: Row(
-                                children: [
-                                  ...meal.tags!.map((e) => TagTile(e)).toList(),
-                                  const SizedBox(width: kPadding),
-                                ],
-                              ),
-                            ),
-                            if (meal.ingredients != null &&
-                                meal.ingredients!.isNotEmpty) ...[
-                              const SizedBox(height: kPadding),
-                              ..._buildSection(
-                                'meal_details_ingredient'.tr(),
-                                ListView.separated(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: meal.ingredients!.length,
-                                  separatorBuilder: (context, index) =>
-                                      const Divider(),
-                                  itemBuilder: (context, index) =>
-                                      _buildIngredientTile(
-                                    meal.ingredients![index],
-                                  ),
-                                  padding: EdgeInsets.zero,
-                                ),
-                              )
-                            ],
-                            if (meal.instructions != null &&
-                                meal.instructions!.isNotEmpty) ...[
-                              const SizedBox(height: kPadding),
-                              ..._buildSection(
-                                'meal_details_instructions'.tr(),
-                                MarkdownBody(
-                                  data: meal.instructions ?? '',
-                                  styleSheet: MarkdownStyleSheet.fromTheme(
-                                    ThemeData(
-                                      textTheme: const TextTheme(
-                                        bodyText1: TextStyle(fontSize: 16),
-                                        bodyText2: TextStyle(fontSize: 16),
+                                    const SizedBox(height: 5.0),
+                                    Text(
+                                      meal.source != null &&
+                                              meal.source!.isNotEmpty
+                                          ? 'meal_details_source_known'
+                                              .tr(args: [
+                                              _formatSourceString(meal.source!)
+                                            ])
+                                          : 'meal_details_source_unknown'.tr(),
+                                      style: TextStyle(
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyText1!
+                                            .color!
+                                            .withOpacity(0.5),
                                       ),
                                     ),
+                                  ],
+                                ),
+                              ),
+                              BorderIcon(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 15,
+                                  horizontal: 15,
+                                ),
+                                withBorder: true,
+                                child: Text(
+                                  'meal_details_duration_trailing'.tr(
+                                    args: [
+                                      (meal.duration ?? '?').toString(),
+                                    ],
+                                  ),
+                                  style: const TextStyle(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
                             ],
-                            const SizedBox(height: kPadding),
-                            if (mealStat != null)
-                              ..._buildSection(
-                                'meal_details_stats'.tr(),
-                                Consumer(
-                                  builder: (context, ref, child) {
-                                    final isSubscribed = ref.watch(
-                                        InAppPurchaseService.$userIsSubscribed);
-                                    return isSubscribed
-                                        ? child!
-                                        : _buildMealStatBlur(context, child!);
-                                  },
-                                  child: _buildMealStatBody(meal, mealStat),
+                          ),
+                        ),
+                        if (meal.source != null && meal.source!.isNotEmpty) ...[
+                          const SizedBox(height: kPadding),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: kPadding),
+                            child: LinkPreview(meal.source!),
+                          ),
+                        ],
+                        const SizedBox(height: kPadding),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          child: Row(
+                            children: [
+                              ...meal.tags!.map((e) => TagTile(e)).toList(),
+                              const SizedBox(width: kPadding),
+                            ],
+                          ),
+                        ),
+                        _buildMealStatSection(meal),
+                        _buildIngredientSection(meal),
+                        if (meal.instructions != null &&
+                            meal.instructions!.isNotEmpty) ...[
+                          const SizedBox(height: kPadding),
+                          _buildSection(
+                            'meal_details_instructions'.tr(),
+                            MarkdownBody(
+                              data: meal.instructions ?? '',
+                              styleSheet: MarkdownStyleSheet.fromTheme(
+                                ThemeData(
+                                  textTheme: const TextTheme(
+                                    bodyText1: TextStyle(fontSize: 16),
+                                    bodyText2: TextStyle(fontSize: 16),
+                                  ),
                                 ),
                               ),
-                            const SizedBox(height: 100.0),
-                          ]
-                              .map(
-                                (child) => SizedBox(
-                                  width: BasicUtils.contentWidth(
-                                    context,
-                                    smallMultiplier: 1,
-                                  ),
-                                  child: child,
-                                ),
-                              )
-                              .toList(),
-                        ),
-                      ),
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: kPadding),
+                        _buildMealStatSection(meal),
+                        const SizedBox(height: 100.0),
+                      ]
+                          .map(
+                            (child) => SizedBox(
+                              width: BasicUtils.contentWidth(
+                                context,
+                                smallMultiplier: 1,
+                              ),
+                              child: child,
+                            ),
+                          )
+                          .toList(),
                     ),
-                  ],
-                );
-              } else {
-                return const Center(child: SmallCircularProgressIndicator());
-              }
-            },
-          ),
-          if (_isDeleting)
-            const FullScreenLoader(
-              backgroundColor: Colors.black45,
-            )
-          else
-            const SizedBox(),
-        ],
-      ),
+                  ),
+                ),
+              ],
+            ),
     );
+  }
+
+  Widget _buildIngredientSection(Meal meal) {
+    final isEmpty = meal.ingredients == null || meal.ingredients!.isEmpty;
+    return isEmpty
+        ? const SizedBox()
+        : Padding(
+            padding: const EdgeInsets.only(top: kPadding),
+            child: _buildSection(
+              'meal_details_ingredient'.tr(),
+              meal.ingredients != null
+                  ? ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: meal.ingredients!.length,
+                      separatorBuilder: (_, __) => const Divider(),
+                      itemBuilder: (_, index) => _buildIngredientTile(
+                        meal.ingredients![index],
+                      ),
+                      padding: EdgeInsets.zero,
+                    )
+                  : const SizedBox(),
+              SmallNumberInput(
+                initialValue: meal.servings,
+                minValue: 1,
+                maxValue: 30,
+                onChanged: (value) => ref.read(_$servings.state).state = value,
+              ),
+            ),
+          );
   }
 
   Widget _buildIngredientTile(Ingredient ingredient) {
@@ -349,11 +325,17 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
           children: [
             SizedBox(
               width: constraints.maxWidth * 0.3 - kPadding / 2,
-              child: Text(
-                ConvertUtil.amountToString(ingredient.amount, ingredient.unit),
-                textAlign: TextAlign.end,
-                style: const TextStyle(fontSize: 18.0),
-              ),
+              child: Consumer(builder: (context, ref, _) {
+                final amount =
+                    ingredient.amount != null && ingredient.amount != 0
+                        ? ref.watch(_$servings) * ingredient.amount!
+                        : null;
+                return Text(
+                  ConvertUtil.amountToString(amount, ingredient.unit),
+                  textAlign: TextAlign.end,
+                  style: const TextStyle(fontSize: 18.0),
+                );
+              }),
             ),
             SizedBox(
               width: constraints.maxWidth * 0.5 - kPadding / 2,
@@ -369,22 +351,75 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     );
   }
 
-  List<Widget> _buildSection(String title, Widget content) {
+  Widget _buildSection(String title, Widget content, [Widget? trailing]) {
     const sidePadding = EdgeInsets.symmetric(horizontal: kPadding);
-    return [
-      Padding(
-        padding: sidePadding,
-        child: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 22.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+    final titleText = Text(
+      title,
+      style: const TextStyle(
+        fontSize: 22.0,
+        fontWeight: FontWeight.bold,
       ),
-      const SizedBox(height: kPadding),
-      Padding(padding: sidePadding, child: content),
-    ];
+      overflow: TextOverflow.ellipsis,
+    );
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: sidePadding,
+          child: trailing == null
+              ? titleText
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(child: titleText),
+                    trailing,
+                  ],
+                ),
+        ),
+        const SizedBox(height: kPadding),
+        Padding(padding: sidePadding, child: content),
+      ],
+    );
+  }
+
+  Widget _buildMealStatSection(Meal meal) {
+    final mealStat = ref.watch(_$mealStat);
+    return mealStat == null
+        ? const SizedBox(child: Text('no stats'))
+        : _buildSection(
+            'meal_details_stats'.tr(),
+            Consumer(
+              builder: (context, ref, child) {
+                final isSubscribed =
+                    ref.watch(InAppPurchaseService.$userIsSubscribed);
+                return isSubscribed
+                    ? child!
+                    : _buildMealStatBlur(context, child!);
+              },
+              child: _buildMealStatBody(meal, mealStat),
+            ),
+          );
+    // return Consumer(
+    //   builder: (context, ref, _) {
+    //     final mealStat = ref.watch(_$mealStat);
+    //     return mealStat == null
+    //         ? const SizedBox(child: Text('no stats'))
+    //         : _buildSection(
+    //             'meal_details_stats'.tr(),
+    //             Consumer(
+    //               builder: (context, ref, child) {
+    //                 final isSubscribed =
+    //                     ref.watch(InAppPurchaseService.$userIsSubscribed);
+    //                 return isSubscribed
+    //                     ? child!
+    //                     : _buildMealStatBlur(context, child!);
+    //               },
+    //               child: _buildMealStatBody(meal, mealStat),
+    //             ),
+    //           );
+    //   },
+    // );
   }
 
   Widget _buildMealStatBlur(BuildContext context, Widget child) {
@@ -484,6 +519,18 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     );
   }
 
+  Future<void> _fetchMealAndStats() async {
+    ref.read(_$isLoading.state).state = true;
+    final result = await Future.wait<dynamic>([
+      MealService.getMealById(widget.id),
+      MealStatService.getStat(ref.read(planProvider)!.id!, widget.id),
+    ]);
+
+    ref.read(_$meal.state).state = result[0] as Meal?;
+    ref.read(_$mealStat.state).state = result[1] as MealStat?;
+    ref.read(_$isLoading.state).state = false;
+  }
+
   String _formatSourceString(String source) {
     return BasicUtils.isValidUri(source)
         ? Uri.parse(source).host.replaceAll('www.', '')
@@ -526,14 +573,11 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     );
   }
 
-  void _openAddToPlan(Meal meal) async {
-    final moved = await WidgetUtils.showFoodlyBottomSheet<bool?>(
+  void _openAddToPlan(Meal meal) {
+    WidgetUtils.showFoodlyBottomSheet<bool?>(
       context: context,
       builder: (_) => PlanMoveMealModal(isMoving: false, meal: meal),
     );
-    if (moved != null && moved) {
-      setState(() {});
-    }
   }
 
   void _openConfirmDelete(Meal meal) async {
@@ -560,9 +604,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
   }
 
   Future<void> _deleteMeal(String mealId) async {
-    setState(() {
-      _isDeleting = true;
-    });
+    ref.read(_$isLoading.state).state = true;
     final plan = ref.read(planProvider)!;
     await MealService.deleteMeal(mealId);
     await MealStatService.deleteStatByMealId(plan.id, mealId);
@@ -572,6 +614,6 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
         await PlanService.deletePlanMealFromPlan(plan.id, planMeal.id);
       }
     }
-    _isDeleting = false;
+    ref.read(_$isLoading.state).state = true;
   }
 }
