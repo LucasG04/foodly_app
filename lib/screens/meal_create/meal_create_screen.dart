@@ -128,7 +128,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
                                   required: true,
                                   onChange: (newText) => ref
                                       .read(initSearchWebImagePickerProvider
-                                          .state)
+                                          .notifier)
                                       .state = newText,
                                 ),
                                 const Divider(),
@@ -499,12 +499,12 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
 
   void _onSourceTextChange(String newText) {
     if (newText.isEmpty) {
-      ref.read(_$sourceLinkMetadata.state).state = null;
+      ref.read(_$sourceLinkMetadata.notifier).state = null;
       return;
     }
     final textIsUri = BasicUtils.isValidUri(newText);
     if (textIsUri) {
-      ref.read(_$sourceLinkMetadata.state).state = newText;
+      ref.read(_$sourceLinkMetadata.notifier).state = newText;
     }
   }
 }

@@ -31,7 +31,7 @@ class _SmallNumberInputState extends ConsumerState<SmallNumberInput>
   void initState() {
     _$currentValue = AutoDisposeStateProvider((ref) => widget.initialValue);
     ref
-        .read(_$currentValue.state)
+        .read(_$currentValue.notifier)
         .stream
         .listen((int next) => widget.onChanged(next))
         .canceledBy(this);
@@ -82,13 +82,13 @@ class _SmallNumberInputState extends ConsumerState<SmallNumberInput>
     if (ref.read(_$currentValue) <= widget.minValue) {
       return;
     }
-    ref.read(_$currentValue.state).state--;
+    ref.read(_$currentValue.notifier).state--;
   }
 
   void _increase() {
     if (ref.read(_$currentValue) >= widget.maxValue) {
       return;
     }
-    ref.read(_$currentValue.state).state++;
+    ref.read(_$currentValue.notifier).state++;
   }
 }

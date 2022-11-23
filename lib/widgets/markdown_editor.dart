@@ -99,7 +99,7 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
                       controller: widget.textEditingController,
                       maxLines: null,
                       onChanged: (data) =>
-                          ref.read(_$currentText.state).state = data,
+                          ref.read(_$currentText.notifier).state = data,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText:

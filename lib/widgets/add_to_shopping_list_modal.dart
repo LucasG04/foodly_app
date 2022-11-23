@@ -47,11 +47,12 @@ class _AddToShoppingListModalState
     if (_isMealValid()) {
       _ingredientStates = _getIngredientStates(widget.meal!);
     } else {
-      BasicUtils.afterBuild(() => ref.read(_$loadingData.state).state = true);
+      BasicUtils.afterBuild(
+          () => ref.read(_$loadingData.notifier).state = true);
       MealService.getMealById(widget.mealId!).then((value) {
         if (value != null) {
           _ingredientStates = _getIngredientStates(value);
-          ref.read(_$loadingData.state).state = false;
+          ref.read(_$loadingData.notifier).state = false;
         }
       });
     }
@@ -151,7 +152,7 @@ class _AddToShoppingListModalState
             return CheckboxListTile(
               value: isChecked,
               onChanged: (value) => ref
-                  .read(_ingredientStates![index].$isChecked.state)
+                  .read(_ingredientStates![index].$isChecked.notifier)
                   .state = value ?? true,
               title: AutoSizeText(ingredient.name ?? ''),
               subtitle: Text(
@@ -184,7 +185,7 @@ class _AddToShoppingListModalState
   }
 
   Future<void> _addToShoppingList() async {
-    ref.read(_$buttonState.state).state = ButtonState.inProgress;
+    ref.read(_$buttonState.notifier).state = ButtonState.inProgress;
     final planId = ref.read(planProvider)!.id!;
     final shoppingList =
         await ShoppingListService.getShoppingListByPlanId(planId);
@@ -207,7 +208,7 @@ class _AddToShoppingListModalState
     );
 
     await Future.wait(addFutures);
-    ref.read(_$buttonState.state).state = ButtonState.normal;
+    ref.read(_$buttonState.notifier).state = ButtonState.normal;
     _close();
   }
 }

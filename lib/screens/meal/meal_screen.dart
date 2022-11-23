@@ -54,10 +54,9 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     _$servings = AutoDisposeStateProvider<int>(
       (ref) => ref.watch(_$meal)?.servings ?? 1,
     );
-
     _fetchMealAndStats();
     ref
-        .read(lastChangedMealProvider.state)
+        .read(lastChangedMealProvider.notifier)
         .stream
         .where((mealId) => mealId != null && widget.id == mealId)
         .listen((_) => _fetchMealAndStats())
@@ -243,7 +242,6 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                             ],
                           ),
                         ),
-                        _buildMealStatSection(meal),
                         _buildIngredientSection(meal),
                         if (meal.instructions != null &&
                             meal.instructions!.isNotEmpty) ...[
@@ -309,7 +307,8 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                 initialValue: meal.servings,
                 minValue: 1,
                 maxValue: 30,
-                onChanged: (value) => ref.read(_$servings.state).state = value,
+                onChanged: (value) =>
+                    ref.read(_$servings.notifier).state = value,
               ),
             ),
           );
@@ -384,42 +383,26 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
   }
 
   Widget _buildMealStatSection(Meal meal) {
-    final mealStat = ref.watch(_$mealStat);
-    return mealStat == null
-        ? const SizedBox(child: Text('no stats'))
-        : _buildSection(
-            'meal_details_stats'.tr(),
-            Consumer(
-              builder: (context, ref, child) {
-                final isSubscribed =
-                    ref.watch(InAppPurchaseService.$userIsSubscribed);
-                return isSubscribed
-                    ? child!
-                    : _buildMealStatBlur(context, child!);
-              },
-              child: _buildMealStatBody(meal, mealStat),
-            ),
-          );
-    // return Consumer(
-    //   builder: (context, ref, _) {
-    //     final mealStat = ref.watch(_$mealStat);
-    //     return mealStat == null
-    //         ? const SizedBox(child: Text('no stats'))
-    //         : _buildSection(
-    //             'meal_details_stats'.tr(),
-    //             Consumer(
-    //               builder: (context, ref, child) {
-    //                 final isSubscribed =
-    //                     ref.watch(InAppPurchaseService.$userIsSubscribed);
-    //                 return isSubscribed
-    //                     ? child!
-    //                     : _buildMealStatBlur(context, child!);
-    //               },
-    //               child: _buildMealStatBody(meal, mealStat),
-    //             ),
-    //           );
-    //   },
-    // );
+    return Consumer(
+      builder: (context, ref, _) {
+        final mealStat = ref.watch(_$mealStat);
+        return mealStat == null
+            ? const SizedBox(child: Text('no stats'))
+            : _buildSection(
+                'meal_details_stats'.tr(),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final isSubscribed =
+                        ref.watch(InAppPurchaseService.$userIsSubscribed);
+                    return isSubscribed
+                        ? child!
+                        : _buildMealStatBlur(context, child!);
+                  },
+                  child: _buildMealStatBody(meal, mealStat),
+                ),
+              );
+      },
+    );
   }
 
   Widget _buildMealStatBlur(BuildContext context, Widget child) {
@@ -520,15 +503,21 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
   }
 
   Future<void> _fetchMealAndStats() async {
-    ref.read(_$isLoading.state).state = true;
-    final result = await Future.wait<dynamic>([
-      MealService.getMealById(widget.id),
-      MealStatService.getStat(ref.read(planProvider)!.id!, widget.id),
-    ]);
+    ref.read(_$isLoading.notifier).state = true;
+    await Future.wait<void>([_fetchMeal()]);
+    ref.read(_$isLoading.notifier).state = false;
+    _fetchStats(); // call after is loading, to avoid riverpod issues
+  }
 
-    ref.read(_$meal.state).state = result[0] as Meal?;
-    ref.read(_$mealStat.state).state = result[1] as MealStat?;
-    ref.read(_$isLoading.state).state = false;
+  Future<void> _fetchMeal() async {
+    final result = await MealService.getMealById(widget.id);
+    ref.read(_$meal.notifier).state = result;
+  }
+
+  Future<void> _fetchStats() async {
+    final result =
+        await MealStatService.getStat(ref.read(planProvider)!.id!, widget.id);
+    ref.read(_$mealStat.notifier).state = result;
   }
 
   String _formatSourceString(String source) {
@@ -573,11 +562,15 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     );
   }
 
-  void _openAddToPlan(Meal meal) {
-    WidgetUtils.showFoodlyBottomSheet<bool?>(
+  void _openAddToPlan(Meal meal) async {
+    final added = await WidgetUtils.showFoodlyBottomSheet<bool?>(
       context: context,
       builder: (_) => PlanMoveMealModal(isMoving: false, meal: meal),
     );
+
+    if (added != null && added) {
+      await _fetchStats();
+    }
   }
 
   void _openConfirmDelete(Meal meal) async {
@@ -604,7 +597,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
   }
 
   Future<void> _deleteMeal(String mealId) async {
-    ref.read(_$isLoading.state).state = true;
+    ref.read(_$isLoading.notifier).state = true;
     final plan = ref.read(planProvider)!;
     await MealService.deleteMeal(mealId);
     await MealStatService.deleteStatByMealId(plan.id, mealId);
@@ -614,6 +607,6 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
         await PlanService.deletePlanMealFromPlan(plan.id, planMeal.id);
       }
     }
-    ref.read(_$isLoading.state).state = true;
+    ref.read(_$isLoading.notifier).state = true;
   }
 }

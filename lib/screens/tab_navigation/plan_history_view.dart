@@ -146,7 +146,7 @@ class _PlanHistoryViewState extends ConsumerState<PlanHistoryView> {
   }
 
   void navigateBack() {
-    ref.read(planHistoryPageChanged.state).state =
+    ref.read(planHistoryPageChanged.notifier).state =
         DateTime.now().millisecondsSinceEpoch;
   }
 }

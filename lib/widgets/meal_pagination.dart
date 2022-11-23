@@ -44,7 +44,7 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
     _$isLoadingPagination = StateProvider<bool>((_) => false);
     _$loadedMeals = StateProvider<List<Meal>>((_) => []);
 
-    _loadNextMeals().then((_) => ref.read(_$isLoading.state).state = false);
+    _loadNextMeals().then((_) => ref.read(_$isLoading.notifier).state = false);
     widget.scrollController.addListener(_scrollListener);
     super.initState();
   }
@@ -143,7 +143,7 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
       return;
     }
     BasicUtils.afterBuild(
-        () => ref.read(_$isLoadingPagination.state).state = true);
+        () => ref.read(_$isLoadingPagination.notifier).state = true);
     const pageSize = 30;
     final currentMeals = ref.read(_$loadedMeals);
 
@@ -157,7 +157,7 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
       return;
     }
 
-    ref.read(_$loadedMeals.state).state = [...currentMeals, ...nextMeals];
-    ref.read(_$isLoadingPagination.state).state = false;
+    ref.read(_$loadedMeals.notifier).state = [...currentMeals, ...nextMeals];
+    ref.read(_$isLoadingPagination.notifier).state = false;
   }
 }

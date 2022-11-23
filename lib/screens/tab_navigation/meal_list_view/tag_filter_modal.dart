@@ -131,7 +131,8 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal> {
             const Spacer(),
             IconButton(
               icon: const Icon(EvaIcons.trash2Outline),
-              onPressed: () => ref.read(mealTagFilterProvider.state).state = [],
+              onPressed: () =>
+                  ref.read(mealTagFilterProvider.notifier).state = [],
             ),
             const SizedBox(width: kPadding / 2),
             IconButton(
@@ -158,14 +159,14 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal> {
       selectedShadowColor: Theme.of(context).primaryColor.withOpacity(0.3),
       onSelected: (selected) {
         if (selected) {
-          ref.read(mealTagFilterProvider.state).state = [
+          ref.read(mealTagFilterProvider.notifier).state = [
             ...selectedTags,
             tagText
           ];
         } else {
-          ref.read(mealTagFilterProvider.state).state = [];
+          ref.read(mealTagFilterProvider.notifier).state = [];
           selectedTags.remove(tagText);
-          ref.read(mealTagFilterProvider.state).state = selectedTags;
+          ref.read(mealTagFilterProvider.notifier).state = selectedTags;
         }
       },
     );

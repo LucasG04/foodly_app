@@ -53,7 +53,7 @@ class _EditListContentModalState extends ConsumerState<EditListContentModal> {
     _textEditingController.addListener(() {
       _debouncer.run(_filterAllContent);
       if (ref.read(_$showInfoText) && _textEditingController.text.isNotEmpty) {
-        ref.read(_$showInfoText.state).state = false;
+        ref.read(_$showInfoText.notifier).state = false;
       }
     });
     super.initState();
@@ -205,8 +205,8 @@ class _EditListContentModalState extends ConsumerState<EditListContentModal> {
     _textEditingController.clear();
 
     // set to `[]`, to force state change, to correctly display selected items
-    ref.read(_$filteredList.state).state = [];
-    ref.read(_$filteredList.state).state = _allContent;
+    ref.read(_$filteredList.notifier).state = [];
+    ref.read(_$filteredList.notifier).state = _allContent;
   }
 
   bool _isSelected(String value) {
@@ -219,7 +219,7 @@ class _EditListContentModalState extends ConsumerState<EditListContentModal> {
         .where((e) => e.toLowerCase().contains(filter.toLowerCase()))
         .toList();
 
-    ref.read(_$filteredList.state).state = filtered;
+    ref.read(_$filteredList.notifier).state = filtered;
   }
 
   void _closeModal() {
