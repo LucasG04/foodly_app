@@ -124,6 +124,7 @@
     "meal_create_title_edit": "Gericht bearbeiten",
     "meal_create_title_title": "Name",
     "meal_create_ingredients_title": "Zutaten",
+    "meal_create_servings_title": "Portionen",
     "meal_create_instruction_title": "Anleitung",
     "meal_create_source_title": "Quelle",
     "meal_create_source_placeholder": "Kochbuch von Oma",

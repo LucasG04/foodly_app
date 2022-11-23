@@ -124,6 +124,7 @@
   "meal_create_title_edit": "Edit meal",
   "meal_create_title_title": "Name",
   "meal_create_ingredients_title": "Ingredients",
+  "meal_create_servings_title": "Servings",
   "meal_create_instruction_title": "Instruction",
   "meal_create_source_title": "Source",
   "meal_create_source_placeholder": "Grandma's cookbook",

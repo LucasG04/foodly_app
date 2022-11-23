@@ -26,6 +26,7 @@ import '../../widgets/main_text_field.dart';
 import '../../widgets/markdown_editor.dart';
 import '../../widgets/meal_tag.dart';
 import '../../widgets/progress_button.dart';
+import '../../widgets/small_number_input.dart';
 import '../../widgets/wrapped_image_picker/wrapped_image_picker.dart';
 import 'chefkoch_import_modal.dart';
 import 'edit_ingredients.dart';
@@ -149,6 +150,30 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
                                     },
                                     title: 'meal_create_ingredients_title'.tr(),
                                   ),
+                                const Divider(),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        'meal_create_servings_title',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ).tr(),
+                                    ),
+                                    SmallNumberInput(
+                                      initialValue: _meal.servings,
+                                      onChanged: (value) =>
+                                          _meal.servings = value,
+                                      minValue: 1,
+                                      maxValue: 30,
+                                    ),
+                                  ],
+                                ),
                                 const Divider(),
                                 SizedBox(
                                   width: double.infinity,
