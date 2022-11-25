@@ -329,7 +329,11 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
               width: constraints.maxWidth * 0.3 - kPadding / 2,
               child: Consumer(builder: (context, ref, _) {
                 final servings = ref.watch(_$servings);
-                final amount = _calculateAmount(ingredient.amount, servings);
+                final amount = ConvertUtil.calculateServingsAmount(
+                  requestedServings: servings,
+                  mealServings: ref.read(_$meal)?.servings ?? 0,
+                  amount: ingredient.amount,
+                );
                 return Text(
                   ConvertUtil.amountToString(amount, ingredient.unit),
                   textAlign: TextAlign.end,
@@ -609,17 +613,5 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
       }
     }
     ref.read(_$isLoading.notifier).state = true;
-  }
-
-  num _calculateAmount(double? amount, int requestedServings) {
-    if (amount == null) {
-      return 0;
-    }
-    final mealServings = ref.read(_$meal)?.servings;
-    if (mealServings == null || mealServings == 0) {
-      return amount;
-    }
-    final actualAmount = amount * requestedServings / mealServings;
-    return num.tryParse(actualAmount.toStringAsFixed(2)) ?? actualAmount;
   }
 }

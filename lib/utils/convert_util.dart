@@ -52,4 +52,19 @@ class ConvertUtil {
       'stackTrace': jsonEncode(record.stackTrace),
     };
   }
+
+  static num calculateServingsAmount({
+    required int requestedServings,
+    required int mealServings,
+    double? amount,
+  }) {
+    if (amount == null) {
+      return 0;
+    }
+    if (mealServings == 0) {
+      return amount;
+    }
+    final actualAmount = amount * requestedServings / mealServings;
+    return num.tryParse(actualAmount.toStringAsFixed(2)) ?? actualAmount;
+  }
 }
