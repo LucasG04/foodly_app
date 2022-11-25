@@ -58,7 +58,7 @@ class Meal {
       duration: int.tryParse(map['duration'].toString()) ?? 0,
       servings: int.tryParse(map['servings'].toString()) ?? 1,
       ingredients: List<Ingredient>.from(
-        (map['ingredients'] as List<dynamic>).map<dynamic>(
+        ((map['ingredients'] as List<dynamic>?) ?? <dynamic>[]).map<dynamic>(
             (dynamic x) => Ingredient.fromMap(x as Map<String, dynamic>)),
       ),
       tags: List<String>.from((map['tags'] as List<dynamic>?) ?? <String>[]),

@@ -18,7 +18,6 @@ import '../../services/storage_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/widget_utils.dart';
-import '../../widgets/full_screen_loader.dart';
 import '../../widgets/link_preview.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/main_button.dart';
@@ -26,6 +25,7 @@ import '../../widgets/main_text_field.dart';
 import '../../widgets/markdown_editor.dart';
 import '../../widgets/meal_tag.dart';
 import '../../widgets/progress_button.dart';
+import '../../widgets/small_circular_progress_indicator.dart';
 import '../../widgets/small_number_input.dart';
 import '../../widgets/wrapped_image_picker/wrapped_image_picker.dart';
 import 'chefkoch_import_modal.dart';
@@ -44,37 +44,51 @@ class MealCreateScreen extends ConsumerStatefulWidget {
 
 class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
   bool _mealSaved = false;
-  ButtonState _buttonState = ButtonState.normal;
   final ScrollController _scrollController = ScrollController();
 
   late bool _isCreatingMeal;
-  late bool _isLoadingMeal;
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _durationController = TextEditingController();
   final TextEditingController _instructionsController = TextEditingController();
   final TextEditingController _sourceController = TextEditingController();
 
+  final _$buttonState =
+      AutoDisposeStateProvider<ButtonState>((_) => ButtonState.normal);
+  final _$isLoading = AutoDisposeStateProvider<bool>((_) => true);
   final _$sourceLinkMetadata = AutoDisposeStateProvider<String?>((_) => null);
+  late final AutoDisposeStateProvider<Meal> _$meal;
 
-  Meal _meal = Meal(name: '');
   Meal _originalMeal = Meal(name: '');
   String? _updatedImage;
   List<String>? _existingMealTags;
 
   @override
   void initState() {
-    _initialParseId();
+    // TODO: clean up
+    _sourceController
+        .addListener(() => _onSourceTextChange(_sourceController.text));
+    final plan = ref.read(planProvider);
+    _$meal = AutoDisposeStateProvider<Meal>(
+      (_) => Meal(name: '', planId: plan?.id),
+    );
+    _initialParseId().then((meal) {
+      if (meal != null) {
+        BasicUtils.afterBuild(() {
+          ref.read(_$meal.notifier).state = meal;
+          _onSourceTextChange(_sourceController.text);
+        });
+      }
+      ref.read(_$isLoading.notifier).state = false;
+    });
+    _fetchAllTagsIfNotExist();
+
     super.initState();
   }
 
   @override
   void dispose() {
-    if (_updatedImage != null &&
-        !_mealSaved &&
-        BasicUtils.isStorageMealImage(_updatedImage!)) {
-      StorageService.removeFile(_updatedImage);
-    }
+    _removeUnsavedStorageImage();
     super.dispose();
   }
 
@@ -105,14 +119,10 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
           ),
           body: Consumer(
             builder: (context, ref, _) {
-              final plan = ref.watch(planProvider);
-              _meal.planId = plan?.id;
-              _fetchAllTagsIfNotExist();
-              return Stack(
-                children: [
-                  if (_isLoadingMeal || plan == null) const FullScreenLoader(),
-                  if (plan != null)
-                    SafeArea(
+              final isLoading = ref.watch(_$isLoading);
+              return isLoading
+                  ? const Center(child: SmallCircularProgressIndicator())
+                  : SafeArea(
                       bottom: false,
                       child: SingleChildScrollView(
                         controller: _scrollController,
@@ -133,23 +143,15 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
                                       .state = newText,
                                 ),
                                 const Divider(),
-                                if (_isLoadingMeal)
-                                  EditIngredients(
-                                    key: UniqueKey(),
-                                    content: const [],
-                                    onChanged: null,
+                                Consumer(builder: (context, ref, _) {
+                                  final meal = ref.watch(_$meal);
+                                  return EditIngredients(
+                                    content: meal.ingredients ?? [],
+                                    onChanged: (value) => _changeMealValue(
+                                        (meal) => meal.ingredients = value),
                                     title: 'meal_create_ingredients_title'.tr(),
-                                  )
-                                else
-                                  EditIngredients(
-                                    content: _meal.ingredients ?? [],
-                                    onChanged: (results) {
-                                      setState(() {
-                                        _meal.ingredients = results;
-                                      });
-                                    },
-                                    title: 'meal_create_ingredients_title'.tr(),
-                                  ),
+                                  );
+                                }),
                                 const Divider(),
                                 Row(
                                   mainAxisAlignment:
@@ -165,13 +167,17 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
                                         overflow: TextOverflow.ellipsis,
                                       ).tr(),
                                     ),
-                                    SmallNumberInput(
-                                      initialValue: _meal.servings,
-                                      onChanged: (value) =>
-                                          _meal.servings = value,
-                                      minValue: 1,
-                                      maxValue: 30,
-                                    ),
+                                    Consumer(builder: (context, ref, _) {
+                                      final servings = ref.watch(
+                                          _$meal.select((v) => v.servings));
+                                      return SmallNumberInput(
+                                        value: servings,
+                                        onChanged: (value) => _changeMealValue(
+                                            (meal) => meal.servings = value),
+                                        minValue: 1,
+                                        maxValue: 30,
+                                      );
+                                    }),
                                   ],
                                 ),
                                 const Divider(),
@@ -183,28 +189,21 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
                                         Theme.of(context).textTheme.bodyText1,
                                   ).tr(),
                                 ),
-                                if (_isLoadingMeal)
-                                  MarkdownEditor(
-                                    key: UniqueKey(),
-                                    textEditingController:
-                                        TextEditingController(),
-                                  )
-                                else
-                                  MarkdownEditor(
-                                    textEditingController:
-                                        _instructionsController,
-                                  ),
+                                MarkdownEditor(
+                                  textEditingController:
+                                      _instructionsController,
+                                ),
                                 const Divider(),
-                                if (_isLoadingMeal)
-                                  WrappedImagePicker(
-                                    key: UniqueKey(),
-                                    onPick: null,
-                                  )
-                                else
-                                  WrappedImagePicker(
-                                    imageUrl: _meal.imageUrl,
-                                    onPick: (value) => _updatedImage = value,
-                                  ),
+                                Consumer(builder: (context, ref, _) {
+                                  final imageUrl = ref
+                                      .watch(_$meal.select((m) => m.imageUrl));
+                                  return WrappedImagePicker(
+                                    key: ValueKey(imageUrl),
+                                    imageUrl: imageUrl,
+                                    onPick: (value) =>
+                                        _updatedImage = value, // TODO: check
+                                  );
+                                }),
                                 const Divider(),
                                 Row(
                                   children: [
@@ -233,62 +232,62 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
                                     ),
                                   ],
                                 ),
-                                if (!_isLoadingMeal)
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: kPadding / 2,
-                                    ),
-                                    child: Consumer(
-                                      builder: (_, ref, __) => LinkPreview(
-                                        ref.watch(_$sourceLinkMetadata) ?? '',
-                                      ),
-                                    ),
-                                  ),
-                                const Divider(),
-                                if (!_isLoadingMeal) ...[
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text('meal_create_tags_title'.tr()),
-                                      IconButton(
-                                        onPressed: _openMealTagEdit,
-                                        icon: const Icon(EvaIcons.edit2Outline),
-                                      )
-                                    ],
-                                  ),
-                                  if (_meal.tags != null &&
-                                      _meal.tags!.isNotEmpty)
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: Wrap(
-                                        clipBehavior: Clip.hardEdge,
-                                        children: _meal.tags!
-                                            .map((e) => MealTag(e))
-                                            .toList(),
-                                      ),
-                                    )
-                                  else
-                                    const Text('-')
-                                ],
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
-                                      vertical: kPadding),
-                                  child: MainButton(
-                                    text: 'save'.tr(),
-                                    onTap: _saveMeal,
-                                    isProgress: true,
-                                    buttonState: _buttonState,
+                                    vertical: kPadding / 2,
                                   ),
+                                  child: Consumer(
+                                    builder: (_, ref, __) => LinkPreview(
+                                      ref.watch(_$sourceLinkMetadata) ?? '',
+                                    ),
+                                  ),
+                                ),
+                                const Divider(),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('meal_create_tags_title'.tr()),
+                                    IconButton(
+                                      onPressed: _openMealTagEdit,
+                                      icon: const Icon(EvaIcons.edit2Outline),
+                                    )
+                                  ],
+                                ),
+                                Consumer(builder: (context, ref, _) {
+                                  final meal = ref.watch(_$meal);
+                                  return meal.tags == null || meal.tags!.isEmpty
+                                      ? const Text('-')
+                                      : SizedBox(
+                                          width: double.infinity,
+                                          child: Wrap(
+                                            clipBehavior: Clip.hardEdge,
+                                            children: meal.tags!
+                                                .map((e) => MealTag(e))
+                                                .toList(),
+                                          ),
+                                        );
+                                }),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: kPadding,
+                                  ),
+                                  child: Consumer(builder: (context, ref, _) {
+                                    final state = ref.watch(_$buttonState);
+                                    return MainButton(
+                                      text: 'save'.tr(),
+                                      onTap: _saveMeal,
+                                      isProgress: true,
+                                      buttonState: state,
+                                    );
+                                  }),
                                 ),
                               ],
                             ),
                           ),
                         ),
                       ),
-                    ),
-                ],
-              );
+                    );
             },
           ),
         ),
@@ -296,58 +295,53 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
     );
   }
 
-  void _initialParseId() {
+  Future<Meal?> _initialParseId() async {
     if (widget.id == 'create') {
-      _isLoadingMeal = false;
       _isCreatingMeal = true;
-      _meal.ingredients = [];
-      _meal.tags = [];
+      final meal = ref.read(_$meal.notifier).state;
+      meal.ingredients = [];
+      meal.tags = [];
+      return meal;
     } else if (widget.id.startsWith('https') &&
         Uri.decodeComponent(widget.id).startsWith(kChefkochShareEndpoint)) {
-      _isLoadingMeal = true;
       _isCreatingMeal = true;
-      ChefkochService.getMealFromChefkochUrl(Uri.decodeComponent(widget.id))
-          .then((meal) {
-        if (meal != null) {
-          _meal = meal;
-          meal.imageUrl = meal.imageUrl!.replaceFirst('http:', 'https:');
-          _titleController.text = meal.name;
-          _sourceController.text = meal.source ?? '';
-          _durationController.text = (meal.duration ?? '').toString();
-          _instructionsController.text = meal.instructions ?? '';
-          _meal.ingredients = _meal.ingredients ?? [];
-          _meal.tags = _meal.tags ?? [];
-          _originalMeal = Meal.fromMap(_meal.id, _meal.toMap());
-        }
-
-        setState(() {
-          _isLoadingMeal = false;
-        });
-      });
+      final meal = await ChefkochService.getMealFromChefkochUrl(
+          Uri.decodeComponent(widget.id));
+      if (meal != null) {
+        meal.imageUrl = meal.imageUrl!.replaceFirst('http:', 'https:');
+        _titleController.text = meal.name;
+        _sourceController.text = meal.source ?? '';
+        _onSourceTextChange(meal.source ?? '');
+        _durationController.text = (meal.duration ?? '').toString();
+        _instructionsController.text = meal.instructions ?? '';
+        meal.ingredients = meal.ingredients ?? [];
+        meal.tags = meal.tags ?? [];
+        _originalMeal = Meal.fromMap(meal.id, meal.toMap());
+        ref.read(_$meal.notifier).state = meal;
+      }
+      return meal;
     } else {
-      _isLoadingMeal = true;
       _isCreatingMeal = false;
-      MealService.getMealById(widget.id).then((meal) {
-        if (meal != null) {
-          _meal = meal;
-          _titleController.text = meal.name;
-          _sourceController.text = meal.source ?? '';
-          _durationController.text = (meal.duration ?? '').toString();
-          _instructionsController.text = meal.instructions ?? '';
-          _meal.ingredients = _meal.ingredients ?? [];
-          _meal.tags = _meal.tags ?? [];
-          _originalMeal = Meal.fromMap(_meal.id, _meal.toMap());
-        }
-
-        setState(() {
-          _isLoadingMeal = false;
-        });
-      });
+      final meal = await MealService.getMealById(widget.id);
+      if (meal != null) {
+        _titleController.text = meal.name;
+        _sourceController.text = meal.source ?? '';
+        _onSourceTextChange(meal.source ?? '');
+        _durationController.text = (meal.duration ?? '').toString();
+        _instructionsController.text = meal.instructions ?? '';
+        meal.ingredients = meal.ingredients ?? [];
+        meal.tags = meal.tags ?? [];
+        _originalMeal = Meal.fromMap(meal.id, meal.toMap());
+        ref.read(_$meal.notifier).state = meal;
+      }
+      return meal;
     }
   }
 
   Future<bool> _pageWillPop() async {
-    if (_isLoadingMeal || _mealSaved || !_formHasChanges()) {
+    if (ref.read(_$isLoading.notifier).state ||
+        _mealSaved ||
+        !_formHasChanges()) {
       return true;
     }
 
@@ -357,13 +351,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
     );
 
     if (result == SaveChangesResult.save && _formIsValid()) {
-      setState(() {
-        _isLoadingMeal = true;
-      });
+      ref.read(_$isLoading.notifier).state = true;
       final savedMealSuccessful = await _saveMeal();
-      setState(() {
-        _isLoadingMeal = false;
-      });
+      ref.read(_$isLoading.notifier).state = false;
       return savedMealSuccessful;
     } else if (result == SaveChangesResult.discard) {
       return true;
@@ -373,28 +363,27 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
   }
 
   Future<bool> _saveMeal() async {
-    setState(() {
-      _buttonState = ButtonState.inProgress;
-    });
+    ref.read(_$buttonState.notifier).state = ButtonState.inProgress;
 
-    _meal.name = _titleController.text;
-    _meal.source = _sourceController.text;
-    _meal.duration = int.tryParse(_durationController.text.trim());
-    _meal.instructions = _instructionsController.text;
-    _meal.createdBy = _isCreatingMeal
+    final meal = ref.read(_$meal.notifier).state;
+    meal.name = _titleController.text;
+    meal.source = _sourceController.text;
+    meal.duration = int.tryParse(_durationController.text.trim());
+    meal.instructions = _instructionsController.text;
+    meal.createdBy = _isCreatingMeal
         ? AuthenticationService.currentUser!.uid
-        : _meal.createdBy;
+        : meal.createdBy;
 
-    _meal.imageUrl = _updatedImage ??
-        (await LinkMetadataService.get(_meal.source!))?.image ??
-        _meal.imageUrl;
+    meal.imageUrl = _updatedImage ??
+        (await LinkMetadataService.get(meal.source!))?.image ??
+        meal.imageUrl;
 
     if (_formIsValid()) {
       try {
         final newMeal = _isCreatingMeal
-            ? await MealService.createMeal(_meal)
-            : await MealService.updateMeal(_meal);
-        _buttonState = ButtonState.normal;
+            ? await MealService.createMeal(meal)
+            : await MealService.updateMeal(meal);
+        ref.read(_$buttonState.notifier).state = ButtonState.normal;
         _mealSaved = true;
         if (!mounted) {
           return false;
@@ -410,7 +399,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
           message: 'meal_create_error_unknown'.tr(),
           isError: true,
         ).show(context);
-        _buttonState = ButtonState.error;
+        ref.read(_$buttonState.notifier).state = ButtonState.error;
         return false;
       }
     } else {
@@ -421,7 +410,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
         message: 'meal_create_error_missing_input'.tr(),
         isError: true,
       ).show(context);
-      _buttonState = ButtonState.error;
+      ref.read(_$buttonState.notifier).state = ButtonState.error;
       return false;
     }
   }
@@ -431,14 +420,15 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
   }
 
   bool _formHasChanges() {
+    final meal = ref.read(_$meal.notifier).state;
     return _titleController.text != _originalMeal.name ||
         _sourceController.text != (_originalMeal.source ?? '') ||
         _durationController.text != (_originalMeal.duration ?? '').toString() ||
         _instructionsController.text != (_originalMeal.instructions ?? '') ||
         _updatedImage != null ||
         !_ingredientsEquals(
-            _meal.ingredients ?? [], _originalMeal.ingredients ?? []) ||
-        !listEquals<String>(_meal.tags ?? [], _originalMeal.tags ?? []);
+            meal.ingredients ?? [], _originalMeal.ingredients ?? []) ||
+        !listEquals<String>(meal.tags ?? [], _originalMeal.tags ?? []);
   }
 
   void _openChefkochImport() async {
@@ -448,16 +438,16 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
     );
 
     if (result != null) {
-      setState(() {
-        _titleController.text = result.name;
-        _meal.imageUrl = result.imageUrl;
-        _sourceController.text = result.source!;
-        _durationController.text = (result.duration ?? '').toString();
-        _instructionsController.text = result.instructions!;
-        _meal.ingredients = result.ingredients ?? [];
-
-        _meal.tags = result.tags;
-      });
+      final meal = ref.read(_$meal.notifier).state;
+      _titleController.text = result.name;
+      meal.imageUrl = result.imageUrl;
+      _sourceController.text = result.source!;
+      _durationController.text = (result.duration ?? '').toString();
+      _instructionsController.text = result.instructions!;
+      meal.ingredients = result.ingredients ?? [];
+      meal.servings = result.servings;
+      meal.tags = result.tags;
+      ref.read(_$meal.notifier).state = Meal.fromMap(meal.id, meal.toMap());
     }
   }
 
@@ -472,27 +462,26 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
       context: context,
       builder: (_) => EditListContentModal(
         title: 'meal_create_tags_title'.tr(),
-        selectedContent: _meal.tags ?? [],
+        selectedContent: ref.read(_$meal.notifier).state.tags ?? [],
         allContent: allTags,
         textFieldInfo: 'meal_create_edit_tags_info'.tr(),
       ),
     );
 
     if (result != null) {
-      setState(() {
-        _meal.tags = result;
-      });
+      _changeMealValue((meal) => meal.tags = result);
     }
   }
 
   List<String> _getMissingTagsInExisting() {
-    if (_meal.tags == null || _meal.tags!.isEmpty) {
+    final meal = ref.read(_$meal.notifier).state;
+    if (meal.tags == null || meal.tags!.isEmpty) {
       return [];
     }
     if (_existingMealTags == null || _existingMealTags!.isEmpty) {
-      return _meal.tags!;
+      return meal.tags!;
     }
-    return _meal.tags!
+    return meal.tags!
         .where((tag) => !_existingMealTags!.contains(tag))
         .toList();
   }
@@ -531,5 +520,20 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
     if (textIsUri) {
       ref.read(_$sourceLinkMetadata.notifier).state = newText;
     }
+  }
+
+  void _removeUnsavedStorageImage() {
+    if (_updatedImage != null &&
+        !_mealSaved &&
+        BasicUtils.isStorageMealImage(_updatedImage!)) {
+      StorageService.removeFile(_updatedImage);
+    }
+  }
+
+  void _changeMealValue(Function(Meal) changeProperty) {
+    final meal = ref.read(_$meal);
+    final copy = Meal.fromMap(meal.id, meal.toMap());
+    changeProperty(copy);
+    ref.read(_$meal.notifier).state = copy;
   }
 }

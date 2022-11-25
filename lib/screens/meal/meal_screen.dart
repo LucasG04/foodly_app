@@ -303,13 +303,16 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                       padding: EdgeInsets.zero,
                     )
                   : const SizedBox(),
-              SmallNumberInput(
-                initialValue: meal.servings,
-                minValue: 1,
-                maxValue: 30,
-                onChanged: (value) =>
-                    ref.read(_$servings.notifier).state = value,
-              ),
+              Consumer(builder: (context, ref, _) {
+                final servings = ref.watch(_$servings);
+                return SmallNumberInput(
+                  value: servings,
+                  minValue: 1,
+                  maxValue: 30,
+                  onChanged: (value) =>
+                      ref.read(_$servings.notifier).state = value,
+                );
+              }),
             ),
           );
   }
