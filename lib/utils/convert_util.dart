@@ -23,7 +23,7 @@ class ConvertUtil {
   }
 
   /// Converts the amount and the unit (optional) to a better readable string
-  static String amountToString(double? amount, [String? unit = '']) {
+  static String amountToString(num? amount, [String? unit = '']) {
     amount ??= 0;
     unit ??= '';
     String number = amount.toString();
