@@ -16,6 +16,7 @@ import '../utils/convert_util.dart';
 import 'main_button.dart';
 import 'progress_button.dart';
 import 'small_circular_progress_indicator.dart';
+import 'small_number_input.dart';
 
 class AddToShoppingListModal extends ConsumerStatefulWidget {
   final String? mealId;
@@ -38,8 +39,11 @@ class _AddToShoppingListModalState
       AutoDisposeStateProvider((_) => ButtonState.normal);
   final AutoDisposeStateProvider<bool> _$loadingData =
       AutoDisposeStateProvider((_) => false);
+  final AutoDisposeStateProvider<int> _$servings =
+      AutoDisposeStateProvider((_) => 1);
 
   List<IngredientState>? _ingredientStates;
+  int? _mealServings;
 
   @override
   void initState() {
@@ -47,11 +51,16 @@ class _AddToShoppingListModalState
     if (_isMealValid()) {
       _ingredientStates = _getIngredientStates(widget.meal!);
     } else {
-      BasicUtils.afterBuild(() => ref.read(_$loadingData.state).state = true);
+      BasicUtils.afterBuild(
+          () => ref.read(_$loadingData.notifier).state = true);
       MealService.getMealById(widget.mealId!).then((value) {
         if (value != null) {
           _ingredientStates = _getIngredientStates(value);
-          ref.read(_$loadingData.state).state = false;
+          _mealServings = value.servings;
+          BasicUtils.afterBuild(
+            () => ref.read(_$servings.notifier).state = _mealServings!,
+          );
+          ref.read(_$loadingData.notifier).state = false;
         }
       });
     }
@@ -139,29 +148,65 @@ class _AddToShoppingListModalState
     if (_ingredientStates == null) {
       return const SizedBox();
     }
-    return ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemCount: _ingredientStates!.length,
-      itemBuilder: (context, index) {
-        return Consumer(
-          builder: (context, ref, _) {
-            final isChecked = ref.watch(_ingredientStates![index].$isChecked);
-            final ingredient = _ingredientStates![index].ingredient;
-            return CheckboxListTile(
-              value: isChecked,
-              onChanged: (value) => ref
-                  .read(_ingredientStates![index].$isChecked.state)
-                  .state = value ?? true,
-              title: AutoSizeText(ingredient.name ?? ''),
-              subtitle: Text(
-                ConvertUtil.amountToString(ingredient.amount, ingredient.unit),
-              ),
+    return Column(
+      children: [
+        ListTile(
+          title: Text(
+            'add_to_shopping_list_modal_servings'.tr(),
+            style: const TextStyle(fontWeight: FontWeight.bold),
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: Consumer(
+            builder: (context, ref, _) => SmallNumberInput(
+              value: ref.watch(_$servings),
+              onChanged: (value) {
+                ref.read(_$servings.notifier).state = value;
+              },
+            ),
+          ),
+        ),
+        ListView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemCount: _ingredientStates!.length,
+          itemBuilder: (context, index) {
+            return Consumer(
+              builder: (context, ref, _) {
+                final isChecked =
+                    ref.watch(_ingredientStates![index].$isChecked);
+                final ingredient = _ingredientStates![index].ingredient;
+                final amountString = ConvertUtil.amountToString(
+                    ingredient.amount, ingredient.unit);
+                return CheckboxListTile(
+                  value: isChecked,
+                  onChanged: (value) => ref
+                      .read(_ingredientStates![index].$isChecked.notifier)
+                      .state = value ?? true,
+                  title: AutoSizeText(ingredient.name ?? ''),
+                  subtitle: amountString.isEmpty
+                      ? null
+                      : _buildAmountSubtitle(ingredient),
+                );
+              },
             );
           },
-        );
-      },
+        ),
+      ],
     );
+  }
+
+  Consumer _buildAmountSubtitle(Ingredient ingredient) {
+    return Consumer(builder: (context, ref, _) {
+      final servings = ref.watch(_$servings);
+      final amount = ConvertUtil.calculateServingsAmount(
+        requestedServings: servings,
+        mealServings: _mealServings ?? 0,
+        amount: ingredient.amount,
+      );
+      final amountWithServings =
+          ConvertUtil.amountToString(amount, ingredient.unit);
+      return Text(amountWithServings);
+    });
   }
 
   void _close() {
@@ -184,7 +229,7 @@ class _AddToShoppingListModalState
   }
 
   Future<void> _addToShoppingList() async {
-    ref.read(_$buttonState.state).state = ButtonState.inProgress;
+    ref.read(_$buttonState.notifier).state = ButtonState.inProgress;
     final planId = ref.read(planProvider)!.id!;
     final shoppingList =
         await ShoppingListService.getShoppingListByPlanId(planId);
@@ -192,6 +237,14 @@ class _AddToShoppingListModalState
         .where((state) => ref.read(state.$isChecked))
         .map((state) => state.ingredient)
         .toList();
+
+    for (final ingredient in ingredientsToAdd) {
+      ingredient.amount = ConvertUtil.calculateServingsAmount(
+        requestedServings: ref.read(_$servings),
+        mealServings: _mealServings ?? 0,
+        amount: ingredient.amount,
+      ).toDouble();
+    }
 
     final addFutures = ingredientsToAdd.map(
       (e) => ShoppingListService.addGrocery(
@@ -207,7 +260,7 @@ class _AddToShoppingListModalState
     );
 
     await Future.wait(addFutures);
-    ref.read(_$buttonState.state).state = ButtonState.normal;
+    ref.read(_$buttonState.notifier).state = ButtonState.normal;
     _close();
   }
 }

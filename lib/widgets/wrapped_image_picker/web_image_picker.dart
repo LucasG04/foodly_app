@@ -306,13 +306,24 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
         throw Exception('API Response is null');
       }
 
+      if (!mounted) {
+        return;
+      }
       setState(() {
         _images = response.images.map((e) => e.url).toList();
         _noResults = _images.isEmpty;
       });
     } catch (e) {
       _log.severe('ERR: searchImages with $search');
-      _noResults = true;
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _noResults = true;
+      });
+    }
+    if (!mounted) {
+      return;
     }
     setState(() {
       _isLoading = false;

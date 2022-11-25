@@ -10,8 +10,8 @@ import '../providers/state_providers.dart';
 class BasicUtils {
   /// Clears all state providers.
   static void clearAllProvider(WidgetRef ref) {
-    ref.read(planProvider.state).state = null;
-    ref.read(userProvider.state).state = null;
+    ref.read(planProvider.notifier).state = null;
+    ref.read(userProvider.notifier).state = null;
   }
 
   /// Returns if the given image url/string is a image from Firebase Storage
@@ -54,7 +54,7 @@ class BasicUtils {
   }
 
   static void emitMealsChanged(WidgetRef ref, [String id = '']) {
-    ref.read(lastChangedMealProvider.state).state = id;
+    ref.read(lastChangedMealProvider.notifier).state = id;
   }
 
   static void afterBuild(void Function() callback) {

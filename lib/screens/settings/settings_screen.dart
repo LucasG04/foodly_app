@@ -460,18 +460,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     setState(() {
       isLoading = false;
     });
-    ref.read(planProvider.state).state = plan;
+    ref.read(planProvider.notifier).state = plan;
   }
 
   Future<void> _changePlanLockState(Plan plan, bool locked) async {
-    ref.read(_$loadingChangePlanLockState.state).state = true;
+    ref.read(_$loadingChangePlanLockState.notifier).state = true;
     plan.locked = locked;
     await PlanService.updatePlan(plan);
     if (!mounted) {
       return;
     }
-    ref.read(_$loadingChangePlanLockState.state).state = false;
-    ref.read(planProvider.state).state = plan;
+    ref.read(_$loadingChangePlanLockState.notifier).state = false;
+    ref.read(planProvider.notifier).state = plan;
   }
 
   void _leavePlan(String? planId, BuildContext context) async {

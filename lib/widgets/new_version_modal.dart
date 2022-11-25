@@ -246,9 +246,9 @@ class _NewVersionModalState extends ConsumerState<NewVersionModal> {
   void _handleTitleShadowState() {
     final showShadow = ref.read(_$titleShowShadow);
     if (_scrollController.offset > 0 && !showShadow) {
-      ref.read(_$titleShowShadow.state).state = true;
+      ref.read(_$titleShowShadow.notifier).state = true;
     } else if (_scrollController.offset <= 0 && showShadow) {
-      ref.read(_$titleShowShadow.state).state = false;
+      ref.read(_$titleShowShadow.notifier).state = false;
     }
   }
 }

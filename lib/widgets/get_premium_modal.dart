@@ -47,8 +47,6 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
     super.initState();
 
     _getAdditionalProductInfo();
-
-    // TODO: add "Und viele weitere Vorteile in der Zukunft. Evtl. mit Link auf offene Issues?"
   }
 
   @override
@@ -220,7 +218,7 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                         final isSelected = selectedDuration == index;
                         return InkWell(
                           onTap: () => ref
-                              .read(_$selectedPremiumDuration.state)
+                              .read(_$selectedPremiumDuration.notifier)
                               .state = index,
                           child: Container(
                             height: width * 0.2,
@@ -266,9 +264,9 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
   void _handleTitleShadowState() {
     final showShadow = ref.read(_$titleShowShadow);
     if (_scrollController.offset > 0 && !showShadow) {
-      ref.read(_$titleShowShadow.state).state = true;
+      ref.read(_$titleShowShadow.notifier).state = true;
     } else if (_scrollController.offset <= 0 && showShadow) {
-      ref.read(_$titleShowShadow.state).state = false;
+      ref.read(_$titleShowShadow.notifier).state = false;
     }
   }
 
@@ -295,13 +293,13 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
   }
 
   Future<void> _restorePurchase() async {
-    ref.read(_$purchaseState.state).state = _PurchaseState.pending;
+    ref.read(_$purchaseState.notifier).state = _PurchaseState.pending;
     final success = await InAppPurchaseService.restore();
     await _handlePurchase(success);
   }
 
   Future<void> _subscribeToPremium() async {
-    ref.read(_$purchaseState.state).state = _PurchaseState.pending;
+    ref.read(_$purchaseState.notifier).state = _PurchaseState.pending;
     final index = ref.read(_$selectedPremiumDuration);
     final products = InAppPurchaseService.products;
     if (products.isNotEmpty) {
@@ -313,11 +311,11 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
 
   Future<void> _handlePurchase(bool success) async {
     if (success) {
-      ref.read(_$purchaseState.state).state = _PurchaseState.purchased;
+      ref.read(_$purchaseState.notifier).state = _PurchaseState.purchased;
       await Future<dynamic>.delayed(const Duration(seconds: 1));
       _close();
     } else {
-      ref.read(_$purchaseState.state).state = _PurchaseState.none;
+      ref.read(_$purchaseState.notifier).state = _PurchaseState.none;
     }
   }
 }
