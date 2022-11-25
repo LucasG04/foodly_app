@@ -106,7 +106,7 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
           title: 'plan_history_title'.tr(),
           icon: EvaIcons.clockOutline,
           onTap: () {
-            ref.read(planHistoryPageChanged.state).state =
+            ref.read(planHistoryPageChanged.notifier).state =
                 DateTime.now().millisecondsSinceEpoch;
           },
         ),

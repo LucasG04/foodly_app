@@ -30,7 +30,7 @@ class _UpcomingFeaturesScreenState
 
     LunixApiService.getUpcomingFeatures().then((value) {
       _upcomingFeatures = value;
-      ref.read(_$isLoading.state).state = false;
+      ref.read(_$isLoading.notifier).state = false;
     });
   }
 

@@ -330,7 +330,6 @@ class LunixApiService {
         '$_lunixApiEndpoint/open-issues',
       );
     } catch (e) {
-      print(e);
       _log.severe('ERR in getUpcomingFeatures. API Request failed', e);
     }
     if (response == null || response.data == null) {

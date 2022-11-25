@@ -126,8 +126,8 @@ class _SettingsReauthenticateModalState
   }
 
   Future<void> _reauthenticate(String firebaseAuthProvider) async {
-    ref.read(_$buttonState.state).state = ButtonState.inProgress;
-    ref.read(_$errorText.state).state = null;
+    ref.read(_$buttonState.notifier).state = ButtonState.inProgress;
+    ref.read(_$errorText.notifier).state = null;
 
     bool successful = false;
     if (firebaseAuthProvider == FirebaseAuthProvider.password) {
@@ -140,8 +140,8 @@ class _SettingsReauthenticateModalState
       return;
     }
 
-    ref.read(_$buttonState.state).state = ButtonState.normal;
-    ref.read(_$errorText.state).state = null;
+    ref.read(_$buttonState.notifier).state = ButtonState.normal;
+    ref.read(_$errorText.notifier).state = null;
     Navigator.of(context).pop(true);
   }
 
@@ -149,8 +149,8 @@ class _SettingsReauthenticateModalState
     final password = _passwordController.text.trim();
 
     if (password.isEmpty) {
-      ref.read(_$buttonState.state).state = ButtonState.error;
-      ref.read(_$errorText.state).state =
+      ref.read(_$buttonState.notifier).state = ButtonState.error;
+      ref.read(_$errorText.notifier).state =
           'settings_reauthenticate_input_error_empty';
       return false;
     }
@@ -159,8 +159,8 @@ class _SettingsReauthenticateModalState
       await AuthenticationService.reauthenticatePassword(password);
     } catch (e) {
       if (e is FirebaseAuthException) {
-        ref.read(_$buttonState.state).state = ButtonState.error;
-        ref.read(_$errorText.state).state =
+        ref.read(_$buttonState.notifier).state = ButtonState.error;
+        ref.read(_$errorText.notifier).state =
             'settings_reauthenticate_input_error_wrong';
         return false;
       }
@@ -173,8 +173,8 @@ class _SettingsReauthenticateModalState
       await AuthenticationService.reauthenticateApple();
     } catch (e) {
       if (e is FirebaseAuthException) {
-        ref.read(_$buttonState.state).state = ButtonState.error;
-        ref.read(_$errorText.state).state = null;
+        ref.read(_$buttonState.notifier).state = ButtonState.error;
+        ref.read(_$errorText.notifier).state = null;
         return false;
       }
     }

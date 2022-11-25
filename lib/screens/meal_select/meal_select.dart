@@ -304,12 +304,12 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
 
   void _onSearchEvent(String query) async {
     if (query.isNotEmpty && query.length > 2) {
-      ref.read(_$isSearching.state).state = true;
+      ref.read(_$isSearching.notifier).state = true;
       searchedMeals = await _searchMeal(ref, query);
       if (!mounted) {
         return;
       }
-      ref.read(_$isSearching.state).state = false;
+      ref.read(_$isSearching.notifier).state = false;
       FirebaseAnalytics.instance.logEvent(
         name: 'search_meal_select',
         parameters: {'query': query},
@@ -318,7 +318,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
       // TODO: check if
       if (ref.read(_$isSearching)) {}
       searchedMeals = [];
-      ref.read(_$isSearching.state).state = false;
+      ref.read(_$isSearching.notifier).state = false;
       setState(() {});
     }
   }

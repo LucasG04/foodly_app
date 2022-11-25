@@ -378,8 +378,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
     } else {
       FirebaseAnalytics.instance.logLogin(loginMethod: platform);
     }
-    ref.read(planProvider.state).state = plan;
-    ref.read(userProvider.state).state = foodlyUser;
+    ref.read(planProvider.notifier).state = plan;
+    ref.read(userProvider.notifier).state = foodlyUser;
     AutoRouter.of(context).replace(const HomeScreenRoute());
   }
 

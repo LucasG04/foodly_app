@@ -193,7 +193,7 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal> {
 
   Future<void> _saveGrocery() async {
     if (_formIsValid()) {
-      ref.read(_$buttonState.state).state = ButtonState.inProgress;
+      ref.read(_$buttonState.notifier).state = ButtonState.inProgress;
       widget.ingredient.name = _nameController.text.trim();
       widget.ingredient.amount =
           double.tryParse(_amountController.text.trim().replaceAll(',', '.'));
@@ -211,11 +211,11 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal> {
         return;
       }
 
-      ref.read(_$buttonState.state).state = ButtonState.normal;
+      ref.read(_$buttonState.notifier).state = ButtonState.normal;
       Navigator.of(context).pop(widget.ingredient);
     } else {
       _errorText = 'edit_grocery_modal_error'.tr();
-      ref.read(_$buttonState.state).state = ButtonState.error;
+      ref.read(_$buttonState.notifier).state = ButtonState.error;
     }
   }
 
@@ -231,7 +231,7 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal> {
     text = text.trim();
     if (text.length < 3) {
       if (ref.read(_$suggestions).isNotEmpty) {
-        ref.read(_$suggestions.state).state = [];
+        ref.read(_$suggestions.notifier).state = [];
       }
       return;
     }
@@ -243,7 +243,7 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal> {
     );
 
     if (mounted) {
-      ref.read(_$suggestions.state).state = suggestions;
+      ref.read(_$suggestions.notifier).state = suggestions;
     }
   }
 
@@ -254,13 +254,13 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal> {
       widget.ingredient.productGroup = grocery.group.toString();
     }
 
-    ref.read(_$suggestions.state).state = [];
+    ref.read(_$suggestions.notifier).state = [];
     _amountFocusNode.requestFocus();
   }
 
   void _onNameFocusChanged() {
     if (!_nameFocusNode.hasFocus) {
-      ref.read(_$suggestions.state).state = [];
+      ref.read(_$suggestions.notifier).state = [];
     } else if (ref.read(_$suggestions).isEmpty &&
         _nameController.text.isNotEmpty) {
       _nameDebouncer.run(() => _loadSuggestions(_nameController.text));

@@ -41,7 +41,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
     _showAlerts();
     super.initState();
     ref
-        .read(planHistoryPageChanged.state)
+        .read(planHistoryPageChanged.notifier)
         .stream
         .listen((_) => _changePage())
         .canceledBy(this);

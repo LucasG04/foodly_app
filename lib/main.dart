@@ -167,12 +167,12 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
         if (!mounted) {
           return;
         }
-        ref.read(planProvider.state).state = newPlan;
+        ref.read(planProvider.notifier).state = newPlan;
       }
     }
 
     BasicUtils.afterBuild(
-      () => ref.read(initialPlanLoadingProvider.state).state = false,
+      () => ref.read(initialPlanLoadingProvider.notifier).state = false,
     );
   }
 
@@ -185,19 +185,20 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       if (!mounted || user == null) {
         return;
       }
-      ref.read(userProvider.state).state = user;
+      ref.read(userProvider.notifier).state = user;
       InAppPurchaseService.setUserId(user.id!).then((_) {
         if (user.isPremium != null && user.isPremium!) {
-          ref.read(InAppPurchaseService.$userIsSubscribed.state).state = true;
+          ref.read(InAppPurchaseService.$userIsSubscribed.notifier).state =
+              true;
         }
       });
     } else {
       FirebaseCrashlytics.instance.setUserIdentifier('');
-      BasicUtils.afterBuild(() => ref.read(userProvider.state).state = null);
+      BasicUtils.afterBuild(() => ref.read(userProvider.notifier).state = null);
     }
 
     BasicUtils.afterBuild(
-      () => ref.read(initialUserLoadingProvider.state).state = false,
+      () => ref.read(initialUserLoadingProvider.notifier).state = false,
     );
   }
 

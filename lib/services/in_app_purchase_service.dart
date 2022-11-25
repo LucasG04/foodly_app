@@ -91,7 +91,7 @@ class InAppPurchaseService {
   static Future<void> fetchUserSubscription() async {
     try {
       final customerInfo = await Purchases.getCustomerInfo();
-      _ref?.read($userIsSubscribed.state).state =
+      _ref?.read($userIsSubscribed.notifier).state =
           _customerisSubscribed(customerInfo);
     } catch (e) {
       _log.severe(e);
