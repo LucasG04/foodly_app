@@ -137,10 +137,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
                 routerDelegate: _appRouter.delegate(),
                 routeInformationParser: _appRouter.defaultRouteParser(),
                 debugShowCheckedModeBanner: false,
-                theme: ThemeData(
-                  // Nunito default font?
-                  brightness: Brightness.light,
-                ),
+                themeMode: ThemeMode.light,
                 localizationsDelegates: [
                   ...context.localizationDelegates,
                   const LocaleNamesLocalizationsDelegate(),
