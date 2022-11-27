@@ -12,6 +12,7 @@ class BasicUtils {
   static void clearAllProvider(WidgetRef ref) {
     ref.read(planProvider.notifier).state = null;
     ref.read(userProvider.notifier).state = null;
+    ref.read(shoppingListIdProvider.notifier).state = null;
   }
 
   /// Returns if the given image url/string is a image from Firebase Storage

@@ -10,7 +10,6 @@ import 'package:share_plus/share_plus.dart';
 import '../../../constants.dart';
 import '../../../models/grocery.dart';
 import '../../../models/ingredient.dart';
-import '../../../models/shopping_list.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/app_review_service.dart';
 import '../../../services/settings_service.dart';
@@ -40,41 +39,30 @@ class _ShoppingListViewState extends State<ShoppingListView>
   Widget build(BuildContext context) {
     super.build(context);
     return Consumer(
-      builder: (context, ref, child) {
-        final planId = ref.watch(planProvider)?.id;
-        return planId != null
-            ? FutureBuilder<ShoppingList>(
-                future: ShoppingListService.getShoppingListByPlanId(planId),
-                builder: (_, shoppingListSnap) {
-                  if (!shoppingListSnap.hasData) {
+      builder: (context, ref, _) {
+        final shoppingListId = ref.watch(shoppingListIdProvider);
+        return shoppingListId != null
+            ? StreamBuilder<List<Grocery>>(
+                stream: ShoppingListService.streamShoppingList(shoppingListId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting ||
+                      snapshot.connectionState == ConnectionState.none) {
                     return _buildLoader();
                   }
+                  final data = snapshot.data ?? [];
+                  final List<Grocery> todoItems =
+                      data.where((e) => !e.bought).toList();
+                  final List<Grocery> boughtItems =
+                      data.where((e) => e.bought).toList();
+                  boughtItems.sort(
+                    (a, b) => b.lastBoughtEdited.compareTo(a.lastBoughtEdited),
+                  );
 
-                  final listId = shoppingListSnap.data!.id!;
-                  return StreamBuilder<List<Grocery>>(
-                    stream: ShoppingListService.streamShoppingList(listId),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting ||
-                          snapshot.connectionState == ConnectionState.none) {
-                        return _buildLoader();
-                      }
-                      final data = snapshot.data ?? [];
-                      final List<Grocery> todoItems =
-                          data.where((e) => !e.bought).toList();
-                      final List<Grocery> boughtItems =
-                          data.where((e) => e.bought).toList();
-                      boughtItems.sort(
-                        (a, b) =>
-                            b.lastBoughtEdited.compareTo(a.lastBoughtEdited),
-                      );
-
-                      return _buildShoppingList(
-                        todoItems,
-                        boughtItems,
-                        context,
-                        listId,
-                      );
-                    },
+                  return _buildShoppingList(
+                    context,
+                    todoItems,
+                    boughtItems,
+                    shoppingListId,
                   );
                 },
               )
@@ -83,8 +71,8 @@ class _ShoppingListViewState extends State<ShoppingListView>
     );
   }
 
-  SingleChildScrollView _buildShoppingList(List<Grocery> todoItems,
-      List<Grocery> boughtItems, BuildContext context, String listId) {
+  SingleChildScrollView _buildShoppingList(BuildContext context,
+      List<Grocery> todoItems, List<Grocery> boughtItems, String listId) {
     return SingleChildScrollView(
       child: Column(
         children: [

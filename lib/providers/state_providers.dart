@@ -15,6 +15,9 @@ final initialUserLoadingProvider = StateProvider<bool>((_) => true);
 /// Provides if the top level stream is loading the plan
 final initialPlanLoadingProvider = StateProvider<bool>((_) => true);
 
+/// Provides the active shopping list id.
+final shoppingListIdProvider = StateProvider<String?>((_) => null);
+
 /// Provides the current filter for the meal list.
 final mealTagFilterProvider = StateProvider<List<String>>((_) => []);
 
