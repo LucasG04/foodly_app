@@ -10,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../constants.dart';
 import '../../../models/grocery.dart';
 import '../../../models/ingredient.dart';
+import '../../../providers/data_provider.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/app_review_service.dart';
 import '../../../services/settings_service.dart';
@@ -23,15 +24,18 @@ import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import '../../../widgets/user_information.dart';
 import 'animated_shopping_list.dart';
+import 'grouped_shopping_list.dart';
 
-class ShoppingListView extends StatefulWidget {
+class ShoppingListView extends ConsumerStatefulWidget {
   const ShoppingListView({Key? key}) : super(key: key);
   @override
-  State<ShoppingListView> createState() => _ShoppingListViewState();
+  ConsumerState<ShoppingListView> createState() => _ShoppingListViewState();
 }
 
-class _ShoppingListViewState extends State<ShoppingListView>
+class _ShoppingListViewState extends ConsumerState<ShoppingListView>
     with AutomaticKeepAliveClientMixin {
+  final _scrollController = ScrollController();
+
   @override
   bool get wantKeepAlive => true;
 
@@ -41,7 +45,8 @@ class _ShoppingListViewState extends State<ShoppingListView>
     return Consumer(
       builder: (context, ref, _) {
         final shoppingListId = ref.watch(shoppingListIdProvider);
-        return shoppingListId != null
+        final groceryGroups = ref.watch(dataGroceryGroupsProvider);
+        return shoppingListId != null && groceryGroups != null
             ? StreamBuilder<List<Grocery>>(
                 stream: ShoppingListService.streamShoppingList(shoppingListId),
                 builder: (context, snapshot) {
@@ -74,6 +79,7 @@ class _ShoppingListViewState extends State<ShoppingListView>
   SingleChildScrollView _buildShoppingList(BuildContext context,
       List<Grocery> todoItems, List<Grocery> boughtItems, String listId) {
     return SingleChildScrollView(
+      controller: _scrollController,
       child: Column(
         children: [
           const SizedBox(height: kPadding),
@@ -85,8 +91,8 @@ class _ShoppingListViewState extends State<ShoppingListView>
               context,
               smallMultiplier: 1,
             ),
-            child: AnimatedShoppingList(
-              groceries: todoItems,
+            child: GroupedShoppingList(
+              groups: _groceriesToGroups(todoItems),
               onEdit: (e) => _editGrocery(listId, e),
               onTap: (item) => _removeBoughtGrocery(
                 listId,
@@ -94,6 +100,7 @@ class _ShoppingListViewState extends State<ShoppingListView>
                 todoItems,
                 boughtItems,
               ),
+              pageScrollController: _scrollController,
             ),
           ),
           const SizedBox(height: kPadding),
@@ -178,6 +185,34 @@ class _ShoppingListViewState extends State<ShoppingListView>
       assetPath: 'assets/images/undraw_empty_cart.png',
       message: 'shopping_list_empty_subtitle'.tr(),
     );
+  }
+
+  List<ShoppingListGroup> _groceriesToGroups(List<Grocery> groceries) {
+    final groups = ref.read(dataGroceryGroupsProvider) ?? [];
+    final uncategorized = groceries;
+    final listGroups = groups.map(
+      (group) {
+        final items = groceries.where((g) => g.group == group.id).toList();
+        uncategorized.removeWhere((g) => items.contains(g));
+        return ShoppingListGroup(
+          groupId: group.id,
+          name: group.name,
+          groceries: items,
+        );
+      },
+    ).toList();
+
+    if (uncategorized.isNotEmpty) {
+      listGroups.add(
+        ShoppingListGroup(
+          groupId: 'null',
+          name: 'shopping_list_uncategorized'.tr(),
+          groceries: uncategorized,
+        ),
+      );
+    }
+
+    return listGroups;
   }
 
   void _editGrocery(String listId, [Grocery? grocery]) async {

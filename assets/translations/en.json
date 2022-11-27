@@ -16,6 +16,7 @@
   "shopping_list_empty_title": "So empty",
   "shopping_list_empty_subtitle": "You can add new entries for your list via the \"+\" button or you can directly add all the ingredients of a dish via the meal plan.",
   "shopping_list_share_error": "Your shopping list is empty. Add entries to share it.",
+  "shopping_list_uncategorized": "Other",
   "edit_grocery_modal_add": "ADD",
   "edit_grocery_modal_edit": "EDIT",
   "edit_grocery_modal_ctrl_name_title": "Title",

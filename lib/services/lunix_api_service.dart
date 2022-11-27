@@ -290,8 +290,8 @@ class LunixApiService {
     if (response == null || response.data == null) {
       return [];
     }
-    final data = (response.data as List<Map<String, dynamic>>)
-        .map((Map<String, dynamic> e) => GroceryGroup.fromMap(e))
+    final data = (response.data as List<dynamic>)
+        .map((dynamic e) => GroceryGroup.fromMap(e as Map<String, dynamic>))
         .toList();
     return data;
   }

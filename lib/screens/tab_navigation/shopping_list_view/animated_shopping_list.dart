@@ -12,12 +12,12 @@ class AnimatedShoppingList extends StatelessWidget {
 
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
 
-  AnimatedShoppingList(
-      {required this.groceries,
-      required this.onTap,
-      required this.onEdit,
-      Key? key})
-      : super(key: key);
+  AnimatedShoppingList({
+    required this.groceries,
+    required this.onTap,
+    required this.onEdit,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,5 @@
 class GroceryGroup {
-  int id;
+  String id;
   String name;
 
   GroceryGroup({
@@ -8,7 +8,7 @@ class GroceryGroup {
   });
 
   GroceryGroup copyWith({
-    int? id,
+    String? id,
     String? name,
   }) {
     return GroceryGroup(
@@ -25,9 +25,8 @@ class GroceryGroup {
   }
 
   factory GroceryGroup.fromMap(Map<String, dynamic> map) {
-    final id = int.tryParse(map['id'].toString()) ?? -1;
     return GroceryGroup(
-      id: id,
+      id: map['id'].toString(),
       name: map['name'] as String? ?? '',
     );
   }

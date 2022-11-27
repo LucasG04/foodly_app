@@ -83,6 +83,7 @@ dependencies:
   in_app_review: ^2.0.4
   like_button: ^2.0.5
   blur: ^3.1.0
+  sticky_headers: ^0.3.0+2
 
   # Icons/Styles/Animations
   cupertino_icons: ^1.0.4

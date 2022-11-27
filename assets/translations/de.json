@@ -16,6 +16,7 @@
     "shopping_list_empty_subtitle": "Du kannst neue Einträge für die Liste über den \"+\" Button hinzufügen oder direkt alle Zutaten von einem Gericht über den Essensplan.",
     "shopping_list_grocery_removed": "{} entfernt",
     "shopping_list_share_error": "Deine Einkaufsliste ist leer. Füge Einträge hinzu, um sie zu teilen.",
+    "shopping_list_uncategorized": "Sonstige",
     "edit_grocery_modal_add": "HINZUFÜGEN",
     "edit_grocery_modal_edit": "BEARBEITEN",
     "edit_grocery_modal_ctrl_name_title": "Bezeichnung",
