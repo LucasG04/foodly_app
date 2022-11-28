@@ -3,6 +3,7 @@ import 'package:logging/logging.dart';
 
 import '../models/grocery.dart';
 import '../models/shopping_list.dart';
+import 'lunix_api_service.dart';
 
 class ShoppingListService {
   static final _log = Logger('ShoppingListService');
@@ -58,7 +59,8 @@ class ShoppingListService {
         .update(grocery.toMap());
   }
 
-  static Future<void> addGrocery(String listId, Grocery grocery) async {
+  static Future<void> addGrocery(
+      String listId, Grocery grocery, String langCode) async {
     _log.finer(
         'Call addGrocery with listId: $listId | Grocery: ${grocery.toMap()}');
 
@@ -66,6 +68,15 @@ class ShoppingListService {
       _log.finest('addGrocery: adding prevented and existing one updated');
       return;
     }
+    if ((grocery.group == null || grocery.group!.isEmpty) &&
+        grocery.name != null) {
+      final groups = await LunixApiService.getFirstGroceryGroupByQueries(
+          [grocery.name!], '');
+      if (groups.isNotEmpty) {
+        grocery.group = groups.first.id;
+      }
+    }
+    // TODO: check the group of the grocery with the api
     await _firestore.doc(listId).collection('groceries').add(grocery.toMap());
   }
 

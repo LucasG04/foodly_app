@@ -9,6 +9,7 @@ import '../../models/grocery.dart';
 import '../../models/ingredient.dart';
 import '../../providers/state_providers.dart';
 import '../../services/shopping_list_service.dart';
+import '../../utils/basic_utils.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/ingredient_edit_modal.dart';
 import 'meal_list_view/meal_list_view.dart';
@@ -117,7 +118,11 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView> {
         ingredient: Ingredient(),
         onSaved: (result) async {
           final grocery = Grocery.fromIngredient(result);
-          await ShoppingListService.addGrocery(_activeListId!, grocery);
+          await ShoppingListService.addGrocery(
+            _activeListId!,
+            grocery,
+            BasicUtils.getActiveLanguage(context),
+          );
         },
       ),
     );

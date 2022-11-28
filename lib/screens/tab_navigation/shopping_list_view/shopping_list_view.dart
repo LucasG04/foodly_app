@@ -224,7 +224,11 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
         onSaved: (result) async {
           final updatedGrocery = Grocery.fromIngredient(result);
           if (isCreating) {
-            await ShoppingListService.addGrocery(listId, updatedGrocery);
+            await ShoppingListService.addGrocery(
+              listId,
+              updatedGrocery,
+              BasicUtils.getActiveLanguage(context),
+            );
           } else {
             updatedGrocery.id = grocery!.id;
             await ShoppingListService.updateGrocery(listId, updatedGrocery);
@@ -273,7 +277,11 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
       action: IconButton(
         icon: Icon(EvaIcons.undoOutline, color: Theme.of(context).primaryColor),
         onPressed: () {
-          ShoppingListService.addGrocery(listId, grocery);
+          ShoppingListService.addGrocery(
+            listId,
+            grocery,
+            BasicUtils.getActiveLanguage(context),
+          );
           Navigator.of(context).maybePop();
         },
       ),

@@ -322,6 +322,36 @@ class LunixApiService {
     return data;
   }
 
+  static Future<List<GroceryGroup>> getFirstGroceryGroupByQueries(
+      List<String> queries, String langCode) async {
+    _log.finer('Call getFirstGroceryByQueries()');
+    Response? response;
+    try {
+      response = await _dio.post<List<dynamic>>(
+        '$_lunixApiEndpoint/grocery-group-by-grocery',
+        queryParameters: <String, dynamic>{
+          'language': langCode,
+        },
+        data: <String, dynamic>{
+          'names': queries,
+        },
+      );
+    } catch (e) {
+      _log.severe('ERR in getFirstGroceryByQueries. Response is null', e);
+    }
+    if (response == null || response.data == null) {
+      return [];
+    }
+    final data = (response.data as List<dynamic>)
+        .map(
+          (dynamic e) =>
+              // ignore: avoid_dynamic_calls
+              GroceryGroup.fromApi(e['grocery'] as Map<String, dynamic>),
+        )
+        .toList();
+    return data;
+  }
+
   static Future<List<UpcomingFeature>> getUpcomingFeatures() async {
     _log.finer('Call getUpcomingFeatures()');
     Response? response;

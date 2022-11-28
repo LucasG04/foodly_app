@@ -256,6 +256,7 @@ class _AddToShoppingListModalState
           group: e.productGroup,
           lastBoughtEdited: DateTime.now(),
         ),
+        BasicUtils.getActiveLanguage(context),
       ),
     );
 

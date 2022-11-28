@@ -31,6 +31,13 @@ class GroceryGroup {
     );
   }
 
+  factory GroceryGroup.fromApi(Map<String, dynamic> map) {
+    return GroceryGroup(
+      id: map['groupId'].toString(),
+      name: map['group'] as String? ?? '',
+    );
+  }
+
   @override
   String toString() => 'GroceryGroup(id: $id, name: $name)';
 }
