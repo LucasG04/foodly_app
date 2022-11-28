@@ -27,7 +27,13 @@ class LinkMetadataService {
 
   static Future<LinkMetadata?> getFromApi(String link) async {
     log.finer('Call getFromApi with $link');
-    final data = await MetadataFetch.extract(link);
+    Metadata? data;
+    try {
+      data = await MetadataFetch.extract(link);
+    } catch (e) {
+      log.severe('Error while fetching metadata for $link', e);
+      return null;
+    }
 
     if (data == null) {
       return null;
