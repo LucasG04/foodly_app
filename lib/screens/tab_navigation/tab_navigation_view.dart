@@ -80,7 +80,7 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView> {
         },
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(EvaIcons.shoppingBagOutline),
+            icon: Icon(Icons.checklist_rounded),
             label: 'shopping',
           ),
           BottomNavigationBarItem(

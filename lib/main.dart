@@ -30,6 +30,7 @@ import 'services/in_app_purchase_service.dart';
 import 'services/link_metadata_service.dart';
 import 'services/plan_service.dart';
 import 'services/settings_service.dart';
+import 'services/shopping_list_service.dart';
 import 'services/version_service.dart';
 import 'utils/basic_utils.dart';
 import 'widgets/disposable_widget.dart';
@@ -126,7 +127,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active ||
             snapshot.connectionState == ConnectionState.done) {
-          _loadActivePlan();
+          _loadActivePlan().then((_) => _loadActiveShoppingList());
           _loadActiveUser();
           return Consumer(
             builder: (context, ref, _) {
@@ -137,10 +138,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
                 routerDelegate: _appRouter.delegate(),
                 routeInformationParser: _appRouter.defaultRouteParser(),
                 debugShowCheckedModeBanner: false,
-                theme: ThemeData(
-                  // Nunito default font?
-                  brightness: Brightness.light,
-                ),
+                themeMode: ThemeMode.light,
                 localizationsDelegates: [
                   ...context.localizationDelegates,
                   const LocaleNamesLocalizationsDelegate(),
@@ -186,12 +184,10 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
         return;
       }
       ref.read(userProvider.notifier).state = user;
-      InAppPurchaseService.setUserId(user.id!).then((_) {
-        if (user.isPremium != null && user.isPremium!) {
-          ref.read(InAppPurchaseService.$userIsSubscribed.notifier).state =
-              true;
-        }
-      });
+      await InAppPurchaseService.setUserId(user.id!);
+      if (user.isPremium != null && user.isPremium!) {
+        ref.read(InAppPurchaseService.$userIsSubscribed.notifier).state = true;
+      }
     } else {
       FirebaseCrashlytics.instance.setUserIdentifier('');
       BasicUtils.afterBuild(() => ref.read(userProvider.notifier).state = null);
@@ -200,6 +196,17 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     BasicUtils.afterBuild(
       () => ref.read(initialUserLoadingProvider.notifier).state = false,
     );
+  }
+
+  Future<void> _loadActiveShoppingList() async {
+    final planId = ref.read(planProvider)?.id;
+    if (planId == null) {
+      return;
+    }
+    final shoppingList = await ShoppingListService.getShoppingListByPlanId(
+      planId,
+    );
+    ref.read(shoppingListIdProvider.notifier).state = shoppingList.id;
   }
 
   void _initializeLogger() {
