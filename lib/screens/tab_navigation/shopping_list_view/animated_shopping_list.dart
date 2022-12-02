@@ -62,11 +62,14 @@ class AnimatedShoppingList extends StatelessWidget {
   }
 
   void _tapItem(int index) {
-    listKey.currentState!.removeItem(
-      index,
-      (ctx, animation) => _buildSlideTile(index, animation, ctx),
-      duration: const Duration(milliseconds: 250),
-    );
+    try {
+      listKey.currentState!.removeItem(
+        index,
+        (ctx, animation) => _buildSlideTile(index, animation, ctx),
+        duration: const Duration(milliseconds: 250),
+      );
+      // ignore: empty_catches
+    } catch (e) {}
 
     Future<void>.delayed(
       const Duration(milliseconds: 250),

@@ -202,14 +202,26 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
       },
     ).toList();
 
+    // handle uncategorized groceries
     if (uncategorized.isNotEmpty) {
-      listGroups.add(
-        ShoppingListGroup(
-          groupId: 'null',
-          name: 'shopping_list_uncategorized'.tr(),
-          groceries: uncategorized,
-        ),
-      );
+      final uncategorizedIndex =
+          listGroups.indexWhere((element) => element.groupId == '99');
+      if (uncategorizedIndex != -1) {
+        listGroups[uncategorizedIndex].groceries.addAll(uncategorized);
+        if (listGroups.length > 1) {
+          // move group to end
+          final uncategorizedGroup = listGroups.removeAt(uncategorizedIndex);
+          listGroups.add(uncategorizedGroup);
+        }
+      } else {
+        listGroups.add(
+          ShoppingListGroup(
+            groupId: 'null',
+            name: 'shopping_list_uncategorized'.tr(),
+            groceries: uncategorized,
+          ),
+        );
+      }
     }
 
     return listGroups;

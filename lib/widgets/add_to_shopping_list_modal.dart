@@ -246,16 +246,29 @@ class _AddToShoppingListModalState
       ).toDouble();
     }
 
-    final addFutures = ingredientsToAdd.map(
-      (e) => ShoppingListService.addGrocery(
+    final groceries = ingredientsToAdd
+        .map((e) => Grocery(
+              name: e.name,
+              amount: e.amount,
+              unit: e.unit,
+              group: e.productGroup,
+              lastBoughtEdited: DateTime.now(),
+            ))
+        .toList();
+
+    if (!mounted) {
+      return;
+    }
+
+    final groceriesWithGroups = await ShoppingListService.getGroceryGroups(
+      groceries,
+      BasicUtils.getActiveLanguage(context),
+    );
+
+    final addFutures = groceriesWithGroups.map(
+      (grocery) => ShoppingListService.addGrocery(
         shoppingList.id!,
-        Grocery(
-          name: e.name,
-          amount: e.amount,
-          unit: e.unit,
-          group: e.productGroup,
-          lastBoughtEdited: DateTime.now(),
-        ),
+        grocery,
         BasicUtils.getActiveLanguage(context),
       ),
     );

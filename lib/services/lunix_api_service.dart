@@ -16,18 +16,18 @@ import '../models/plan.dart';
 import '../models/plan_meal.dart';
 import '../models/upcoming_feature.dart';
 import '../utils/basic_utils.dart';
-import '../utils/env.dart';
 import 'meal_service.dart';
 
 class LunixApiService {
   LunixApiService._();
 
   static final _log = Logger('LunixApiService');
-  static const String _lunixApiEndpoint =
-      'https://lunix-api.herokuapp.com/foodly';
+  static const String _lunixApiEndpoint = 'http://localhost:3001/foodly';
+  // 'https://lunix-api.herokuapp.com/foodly';
   static final Dio _dio = Dio(
     BaseOptions(
-      headers: <String, dynamic>{'x-api-key': Env.lunixApiKey},
+      headers: <String, dynamic>{'x-api-key': '123'},
+      // headers: <String, dynamic>{'x-api-key': Env.lunixApiKey},
     ),
   );
 
@@ -281,7 +281,7 @@ class LunixApiService {
     Response? response;
     try {
       response = await _dio.get<List<dynamic>>(
-        '$_lunixApiEndpoint/grocery-groups',
+        '$_lunixApiEndpoint/grocery/groups',
         queryParameters: <String, dynamic>{'language': langCode},
       );
     } catch (e) {
@@ -302,7 +302,7 @@ class LunixApiService {
     Response? response;
     try {
       response = await _dio.get<List<dynamic>>(
-        '$_lunixApiEndpoint/get-grocery-suggestion',
+        '$_lunixApiEndpoint/grocery/suggestion',
         queryParameters: <String, dynamic>{
           'language': langCode,
           'query': query,
@@ -322,13 +322,13 @@ class LunixApiService {
     return data;
   }
 
-  static Future<List<GroceryGroup>> getFirstGroceryGroupByQueries(
+  static Future<List<GroceryGroup?>> getFirstGroceryGroupByQueries(
       List<String> queries, String langCode) async {
-    _log.finer('Call getFirstGroceryByQueries()');
+    _log.finer('Call getFirstGroceryByQueries() witch $langCode and $queries');
     Response? response;
     try {
       response = await _dio.post<List<dynamic>>(
-        '$_lunixApiEndpoint/grocery-group-by-grocery',
+        '$_lunixApiEndpoint/grocery/group-by-grocery',
         queryParameters: <String, dynamic>{
           'language': langCode,
         },
@@ -344,9 +344,38 @@ class LunixApiService {
     }
     final data = (response.data as List<dynamic>)
         .map(
+          // ignore: avoid_dynamic_calls
+          (dynamic e) => e['grocery'] != null
+              // ignore: avoid_dynamic_calls
+              ? GroceryGroup.fromApi(e['grocery'] as Map<String, dynamic>)
+              : null,
+        )
+        .toList();
+    return data;
+  }
+
+  static Future<List<GroceryGroup>> mapChefkochGroupsToGroupIds(
+      List<String> chefkochGroups) async {
+    _log.finer('Call mapChefkochGroupsToGroupIds() with $chefkochGroups');
+    Response? response;
+    try {
+      response = await _dio.post<List<dynamic>>(
+        '$_lunixApiEndpoint/grocery/map-chefkoch-to-group-id',
+        data: <String, dynamic>{
+          'groups': chefkochGroups,
+        },
+      );
+    } catch (e) {
+      _log.severe('ERR in mapChefkochGroupsToGroupIds. Response is null', e);
+    }
+    if (response == null || response.data == null) {
+      return [];
+    }
+    final data = (response.data as List<dynamic>)
+        .map(
           (dynamic e) =>
               // ignore: avoid_dynamic_calls
-              GroceryGroup.fromApi(e['grocery'] as Map<String, dynamic>),
+              GroceryGroup.fromMap(e as Map<String, dynamic>),
         )
         .toList();
     return data;

@@ -61,28 +61,6 @@ class _GroupedShoppingListState extends State<GroupedShoppingList> {
                   onEdit: widget.onEdit,
                 ),
               );
-        // : Column(
-        //     mainAxisSize: MainAxisSize.min,
-        //     crossAxisAlignment: CrossAxisAlignment.start,
-        //     children: [
-        //       const Divider(),
-        //       ListTile(
-        //         dense: true,
-        //         title: Text(
-        //           group.name,
-        //           style: const TextStyle(
-        //             fontSize: 18.0,
-        //             fontWeight: FontWeight.bold,
-        //           ),
-        //         ),
-        //       ),
-        //       AnimatedShoppingList(
-        //         groceries: group.groceries,
-        //         onTap: widget.onTap,
-        //         onEdit: widget.onEdit,
-        //       ),
-        //     ],
-        //   );
       },
     );
   }

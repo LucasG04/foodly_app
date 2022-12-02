@@ -59,6 +59,41 @@ class ShoppingListService {
         .update(grocery.toMap());
   }
 
+  static Future<List<Grocery>> getGroceryGroups(
+      List<Grocery> groceries, String langCode) async {
+    _log.finer('Call getGroceryGroups with $groceries');
+    final withChefkochGroup =
+        groceries.where((e) => e.group != null && e.group!.length > 2).toList();
+    final noGroup = groceries
+        .where((e) =>
+            ((e.group == null || e.group!.isEmpty) && e.name != null) &&
+            !withChefkochGroup.contains(e))
+        .toList();
+
+    if (withChefkochGroup.isNotEmpty) {
+      final groups = await LunixApiService.mapChefkochGroupsToGroupIds(
+          withChefkochGroup.map((e) => e.group ?? '').toList());
+      for (var i = 0; i < withChefkochGroup.length; i++) {
+        withChefkochGroup[i].group = groups[i].id;
+      }
+    }
+
+    if (noGroup.isNotEmpty) {
+      final groups = await LunixApiService.getFirstGroceryGroupByQueries(
+          noGroup.map((e) => e.group ?? '').toList(), langCode);
+      for (var i = 0; i < noGroup.length; i++) {
+        noGroup[i].group = groups[i]?.id ?? '';
+      }
+    }
+
+    final groceriesWithGroup = groceries
+        .where((element) =>
+            !withChefkochGroup.contains(element) && !noGroup.contains(element))
+        .toList();
+
+    return [...withChefkochGroup, ...noGroup, ...groceriesWithGroup];
+  }
+
   static Future<void> addGrocery(
       String listId, Grocery grocery, String langCode) async {
     _log.finer(
@@ -71,12 +106,19 @@ class ShoppingListService {
     if ((grocery.group == null || grocery.group!.isEmpty) &&
         grocery.name != null) {
       final groups = await LunixApiService.getFirstGroceryGroupByQueries(
-          [grocery.name!], '');
+        [grocery.name!],
+        langCode,
+      );
+      if (groups.isNotEmpty) {
+        grocery.group = groups.first?.id ?? '';
+      }
+    } else if (grocery.group != null && grocery.group!.length > 2) {
+      final groups =
+          await LunixApiService.mapChefkochGroupsToGroupIds([grocery.group!]);
       if (groups.isNotEmpty) {
         grocery.group = groups.first.id;
       }
     }
-    // TODO: check the group of the grocery with the api
     await _firestore.doc(listId).collection('groceries').add(grocery.toMap());
   }
 
