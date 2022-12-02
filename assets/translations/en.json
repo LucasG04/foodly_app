@@ -35,6 +35,8 @@
   "settings_section_customization_suggestions": "Show suggestions",
   "settings_section_customization_remove_bought": "Remove bought groceries immediately",
   "settings_section_customization_breakfast": "Plan breakfast in meal plan",
+  "settings_section_customization_shoppinglist_sort": "Shopping list sort",
+  "settings_section_customization_shoppinglist_group_order": "Order of the product groups",
   "settings_section_plan": "Plan",
   "settings_section_plan_change_name": "Change plan name",
   "settings_section_plan_change_name_error": "Enter a new name",
@@ -280,5 +282,7 @@
   "get_premium_modal_4_title": "Statistics for dishes",
   "get_premium_modal_4_description": "You can view statistics about your dishes. For example, how often you have planned a dish or when you planned it last time.",
   "get_premium_modal_thanks": "Thanks {}",
-  "upcoming_features_title": "Upcoming Features"
+  "upcoming_features_title": "Upcoming Features",
+  "shopping_list_sort_name": "Name",
+  "shopping_list_sort_group": "Product group"
 }

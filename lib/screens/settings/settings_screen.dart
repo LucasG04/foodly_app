@@ -25,6 +25,7 @@ import '../../../utils/main_snackbar.dart';
 import '../../../utils/widget_utils.dart';
 import '../../../widgets/loading_logout.dart';
 import '../../models/plan.dart';
+import '../../models/shopping_list_sort.dart';
 import '../../services/in_app_purchase_service.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
@@ -49,6 +50,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _$loadingChangePlanLockState =
       AutoDisposeStateProvider<bool>((_) => false);
   bool isLoading = false;
+
+  final shoppingListSorts = [
+    _ShoppingListSortValue(
+      ShoppingListSort.name,
+      'shopping_list_sort_name'.tr(),
+    ),
+    _ShoppingListSortValue(
+      ShoppingListSort.group,
+      'shopping_list_sort_group'.tr(),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -181,6 +193,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               );
                             }),
                           ),
+                          _buildShoppingListSortTile(),
                         ], context),
                         _buildSectionTitle('settings_section_plan'.tr()),
                         _buildSection([
@@ -392,6 +405,37 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
+  Widget _buildShoppingListSortTile() {
+    return SettingsTile(
+      leadingIcon: Icons.sort_rounded,
+      text: 'settings_section_customization_shoppinglist_sort'.tr(),
+      trailing: StreamBuilder(
+          stream: SettingsService.streamShoppingListSort(),
+          builder: (context, _) {
+            final sortObject = shoppingListSorts.firstWhere(
+              (element) => element.value == SettingsService.shoppingListSort,
+              orElse: () => shoppingListSorts.first,
+            );
+            return DropdownButton<_ShoppingListSortValue>(
+              value: sortObject,
+              items: shoppingListSorts
+                  .map((sort) => DropdownMenuItem<_ShoppingListSortValue>(
+                        value: sort,
+                        child: Text(
+                          sort.label,
+                        ),
+                      ))
+                  .toList(),
+              onChanged: (_ShoppingListSortValue? sort) async {
+                if (sort != null) {
+                  await _updateShoppingListSort(sort.value);
+                }
+              },
+            );
+          }),
+    );
+  }
+
   Widget _buildSection(List<Widget> widgets, BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.9,
@@ -427,6 +471,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _updateShoppingListSort(ShoppingListSort sort) async {
+    await SettingsService.setShoppingListSort(sort);
   }
 
   void _shareCode(String code, bool? isPlanLocked) async {
@@ -549,4 +597,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       _log.severe('Could not launch $href');
     }
   }
+}
+
+class _ShoppingListSortValue {
+  const _ShoppingListSortValue(this.value, this.label);
+
+  final ShoppingListSort value;
+  final String label;
 }

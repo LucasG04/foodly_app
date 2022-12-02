@@ -10,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../constants.dart';
 import '../../../models/grocery.dart';
 import '../../../models/ingredient.dart';
+import '../../../models/shopping_list_sort.dart';
 import '../../../providers/data_provider.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/app_review_service.dart';
@@ -91,17 +92,36 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
               context,
               smallMultiplier: 1,
             ),
-            child: GroupedShoppingList(
-              groups: _groceriesToGroups(todoItems),
-              onEdit: (e) => _editGrocery(listId, e),
-              onTap: (item) => _removeBoughtGrocery(
-                listId,
-                item,
-                todoItems,
-                boughtItems,
-              ),
-              pageScrollController: _scrollController,
-            ),
+            child: StreamBuilder(
+                stream: SettingsService.streamShoppingListSort(),
+                builder: (context, _) {
+                  final todoCopy = todoItems
+                      .map((e) => Grocery.fromMap(e.id!, e.toMap()))
+                      .toList();
+                  return SettingsService.shoppingListSort ==
+                          ShoppingListSort.group
+                      ? GroupedShoppingList(
+                          groups: _groceriesToGroups(todoCopy),
+                          pageScrollController: _scrollController,
+                          onEdit: (e) => _editGrocery(listId, e),
+                          onTap: (item) => _removeBoughtGrocery(
+                            listId,
+                            item,
+                            todoItems,
+                            boughtItems,
+                          ),
+                        )
+                      : AnimatedShoppingList(
+                          groceries: todoCopy,
+                          onEdit: (e) => _editGrocery(listId, e),
+                          onTap: (item) => _removeBoughtGrocery(
+                            listId,
+                            item,
+                            todoItems,
+                            boughtItems,
+                          ),
+                        );
+                }),
           ),
           const SizedBox(height: kPadding),
           if (boughtItems.isNotEmpty)
