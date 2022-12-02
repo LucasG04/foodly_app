@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
+import 'package:restart_app/restart_app.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -103,6 +104,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   .toList(),
                               onChanged: (Locale? locale) async {
                                 await context.setLocale(locale!);
+                                Restart.restartApp();
                               },
                             ),
                           ),
