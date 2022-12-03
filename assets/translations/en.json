@@ -284,5 +284,6 @@
   "get_premium_modal_thanks": "Thanks {}",
   "upcoming_features_title": "Upcoming Features",
   "shopping_list_sort_name": "Name",
-  "shopping_list_sort_group": "Product group"
+  "shopping_list_sort_group": "Product group",
+  "reorder_product_groups_title": "Product Groups"
 }

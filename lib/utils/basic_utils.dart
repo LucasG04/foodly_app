@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/grocery_group.dart';
 import '../providers/state_providers.dart';
 
 // ignore: avoid_classes_with_only_static_members
@@ -71,5 +72,19 @@ class BasicUtils {
     return context.locale.languageCode == 'en'
         ? Platform.localeName.split('_')[0]
         : context.locale.languageCode;
+  }
+
+  static List<GroceryGroup> sortGroceryGroups(
+    List<GroceryGroup> groups,
+    List<String> sort,
+  ) {
+    final List<GroceryGroup> sorted = [];
+    for (final id in sort) {
+      final group = groups.firstWhere((element) => element.id == id);
+      sorted.add(group);
+    }
+    final List<GroceryGroup> unSorted =
+        groups.where((element) => !sort.contains(element.id)).toList();
+    return [...sorted, ...unSorted];
   }
 }

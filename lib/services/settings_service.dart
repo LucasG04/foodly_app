@@ -50,6 +50,14 @@ class SettingsService {
     return ShoppingListSort.name;
   }
 
+  static List<String> get productGroupOrder {
+    final value = _settingsBox.get('productGroupOrder') as List<dynamic>?;
+    if (value == null) {
+      return <String>[];
+    }
+    return value.cast<String>();
+  }
+
   static Future<void> setMultipleMealsPerTime(bool value) async {
     await _settingsBox.put('multipleMealsPerTime', value);
   }
@@ -74,6 +82,10 @@ class SettingsService {
     await _settingsBox.put('shoppingListSort', value.index);
   }
 
+  static Future<void> setProductGroupOrder(List<String> value) async {
+    await _settingsBox.put('productGroupOrder', value);
+  }
+
   static Stream<BoxEvent> streamShoppingListSort() {
     return _settingsBox.watch(key: 'shoppingListSort');
   }
@@ -86,5 +98,11 @@ class SettingsService {
     return _settingsBox
         .watch(key: 'planWithBreakfast')
         .map((event) => event.value == true);
+  }
+
+  static Stream<List<String>> streamProductGroupOrder() {
+    return _settingsBox
+        .watch(key: 'productGroupOrder')
+        .map((event) => event.value as List<String>);
   }
 }

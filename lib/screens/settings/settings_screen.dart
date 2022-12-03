@@ -196,6 +196,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             }),
                           ),
                           _buildShoppingListSortTile(),
+                          WidgetUtils.userIsSubscribed(
+                            ref: ref,
+                            child: SettingsTile(
+                              onTap: _openReorderProductGroups,
+                              leadingIcon: EvaIcons.menu,
+                              text:
+                                  'settings_section_customization_shoppinglist_group_order'
+                                      .tr(),
+                              trailing:
+                                  const Icon(EvaIcons.arrowIosForwardOutline),
+                            ),
+                          ),
                         ], context),
                         _buildSectionTitle('settings_section_plan'.tr()),
                         _buildSection([
@@ -401,40 +413,43 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ),
                 )
-              : const LoadingLogut();
+              : const LoadingLogout();
         },
       ),
     );
   }
 
   Widget _buildShoppingListSortTile() {
-    return SettingsTile(
-      leadingIcon: Icons.sort_rounded,
-      text: 'settings_section_customization_shoppinglist_sort'.tr(),
-      trailing: StreamBuilder(
-          stream: SettingsService.streamShoppingListSort(),
-          builder: (context, _) {
-            final sortObject = shoppingListSorts.firstWhere(
-              (element) => element.value == SettingsService.shoppingListSort,
-              orElse: () => shoppingListSorts.first,
-            );
-            return DropdownButton<_ShoppingListSortValue>(
-              value: sortObject,
-              items: shoppingListSorts
-                  .map((sort) => DropdownMenuItem<_ShoppingListSortValue>(
-                        value: sort,
-                        child: Text(
-                          sort.label,
-                        ),
-                      ))
-                  .toList(),
-              onChanged: (_ShoppingListSortValue? sort) async {
-                if (sort != null) {
-                  await _updateShoppingListSort(sort.value);
-                }
-              },
-            );
-          }),
+    return WidgetUtils.userIsSubscribed(
+      ref: ref,
+      child: SettingsTile(
+        leadingIcon: Icons.sort_rounded,
+        text: 'settings_section_customization_shoppinglist_sort'.tr(),
+        trailing: StreamBuilder(
+            stream: SettingsService.streamShoppingListSort(),
+            builder: (context, _) {
+              final sortObject = shoppingListSorts.firstWhere(
+                (element) => element.value == SettingsService.shoppingListSort,
+                orElse: () => shoppingListSorts.first,
+              );
+              return DropdownButton<_ShoppingListSortValue>(
+                value: sortObject,
+                items: shoppingListSorts
+                    .map((sort) => DropdownMenuItem<_ShoppingListSortValue>(
+                          value: sort,
+                          child: Text(
+                            sort.label,
+                          ),
+                        ))
+                    .toList(),
+                onChanged: (_ShoppingListSortValue? sort) async {
+                  if (sort != null) {
+                    await _updateShoppingListSort(sort.value);
+                  }
+                },
+              );
+            }),
+      ),
     );
   }
 
@@ -543,6 +558,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context: context,
       builder: (_) => ImportMealsModal(planIds),
     );
+  }
+
+  void _openReorderProductGroups() {
+    AutoRouter.of(context).push(const ReorderProductGroupsScreenRoute());
   }
 
   void _openChangePlanNameModal() {
