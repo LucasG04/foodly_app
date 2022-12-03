@@ -22,8 +22,8 @@ class LunixApiService {
   LunixApiService._();
 
   static final _log = Logger('LunixApiService');
-  static const String _lunixApiEndpoint = 'http://localhost:3001/foodly';
-  // 'https://lunix-api.herokuapp.com/foodly';
+  static const String _lunixApiEndpoint =
+      'https://lunix-api.herokuapp.com/foodly';
   static final Dio _dio = Dio(
     BaseOptions(
       headers: <String, dynamic>{'x-api-key': '123'},
