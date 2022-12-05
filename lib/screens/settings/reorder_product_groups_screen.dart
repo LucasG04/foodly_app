@@ -29,6 +29,20 @@ class _ReorderProductGroupsScreenState
       appBar: MainAppBar(
         text: 'reorder_product_groups_title'.tr(),
         scrollController: _scrollController,
+        actions: [
+          IconButton(
+            icon: Icon(
+              EvaIcons.refreshOutline,
+              color:
+                  Theme.of(context).textTheme.bodyText1?.color ?? Colors.black,
+            ),
+            splashRadius: kPadding,
+            tooltip: 'reset'.tr(),
+            onPressed: () {
+              SettingsService.setProductGroupOrder([]);
+            },
+          ),
+        ],
       ),
       body: SizedBox(
         width: BasicUtils.contentWidth(context, smallMultiplier: 1),

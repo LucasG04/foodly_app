@@ -16,6 +16,7 @@ import '../models/plan.dart';
 import '../models/plan_meal.dart';
 import '../models/upcoming_feature.dart';
 import '../utils/basic_utils.dart';
+import '../utils/env.dart';
 import 'meal_service.dart';
 
 class LunixApiService {
@@ -26,8 +27,7 @@ class LunixApiService {
       'https://lunix-api.herokuapp.com/foodly';
   static final Dio _dio = Dio(
     BaseOptions(
-      headers: <String, dynamic>{'x-api-key': '123'},
-      // headers: <String, dynamic>{'x-api-key': Env.lunixApiKey},
+      headers: <String, dynamic>{'x-api-key': Env.lunixApiKey},
     ),
   );
 
