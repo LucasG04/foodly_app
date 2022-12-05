@@ -49,9 +49,11 @@ class _ReorderProductGroupsScreenState
         child: Consumer(builder: (context, ref, _) {
           final productGroups = ref.watch(dataGroceryGroupsProvider);
           return productGroups == null
-              ? const SizedBox(
-                  height: 200,
-                  child: SmallCircularProgressIndicator(),
+              ? const SingleChildScrollView(
+                  child: SizedBox(
+                    height: 200,
+                    child: SmallCircularProgressIndicator(),
+                  ),
                 )
               : SingleChildScrollView(
                   controller: _scrollController,
