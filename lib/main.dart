@@ -192,7 +192,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       ref.read(userProvider.notifier).state = user;
       await InAppPurchaseService.setUserId(user.id!);
       if (user.isPremium != null && user.isPremium!) {
-        // ref.read(InAppPurchaseService.$userIsSubscribed.notifier).state = true;
+        ref.read(InAppPurchaseService.$userIsSubscribed.notifier).state = true;
       }
     } else {
       FirebaseCrashlytics.instance.setUserIdentifier('');
