@@ -98,11 +98,10 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                   return StreamBuilder(
                       stream: SettingsService.streamProductGroupOrder(),
                       builder: (context, snapshot) {
-                        final List<Grocery> todoCopy = List.from(todoItems);
                         if (SettingsService.shoppingListSort ==
                             ShoppingListSort.group) {
                           var groceriesWithGroups =
-                              _groceriesToGroups(todoCopy);
+                              _groceriesToGroups(todoItems);
                           groceriesWithGroups =
                               _sortGroceriesWithGroups(groceriesWithGroups);
                           return GroupedShoppingList(
@@ -118,7 +117,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                           );
                         }
                         return AnimatedShoppingList(
-                          groceries: todoCopy,
+                          groceries: todoItems,
                           onEdit: (e) => _editGrocery(listId, e),
                           onTap: (item) => _removeBoughtGrocery(
                             listId,
@@ -215,11 +214,12 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
   }
 
   List<ShoppingListGroup> _groceriesToGroups(List<Grocery> groceries) {
+    final groceriesCopy = List.of(groceries);
     final groups = ref.read(dataGroceryGroupsProvider) ?? [];
-    final uncategorized = groceries;
+    final uncategorized = groceriesCopy;
     final listGroups = groups.map(
       (group) {
-        final items = groceries.where((g) => g.group == group.id).toList();
+        final items = groceriesCopy.where((g) => g.group == group.id).toList();
         uncategorized.removeWhere((g) => items.contains(g));
         return ShoppingListGroup(
           groupId: group.id,
@@ -294,15 +294,37 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
       ).show(context);
       return;
     }
-    final list = groceries.map((e) {
-      final amount = ConvertUtil.amountToString(e.amount, e.unit);
-      return amount.isEmpty ? '- ${e.name}' : '- $amount ${e.name}';
-    }).toList();
-    final shareText = list.join('\n');
+    final shareText = SettingsService.shoppingListSort == ShoppingListSort.name
+        ? _getShareTextSortByNames(groceries)
+        : _getShareTextSortByGroups(groceries);
     final subject = shareText
         .substring(0, shareText.length > 50 ? 50 : shareText.length)
         .trim();
     Share.share(shareText, subject: '$subject...');
+  }
+
+  String _getShareTextSortByNames(List<Grocery> groceries) {
+    final list = groceries.map((e) {
+      final amount = ConvertUtil.amountToString(e.amount, e.unit);
+      return amount.isEmpty ? '- ${e.name}' : '- $amount ${e.name}';
+    }).toList();
+    return list.join('\n');
+  }
+
+  String _getShareTextSortByGroups(List<Grocery> groceries) {
+    var groceriesWithGroups = _groceriesToGroups(groceries);
+    groceriesWithGroups = _sortGroceriesWithGroups(groceriesWithGroups);
+    groceriesWithGroups =
+        groceriesWithGroups.where((e) => e.groceries.isNotEmpty).toList();
+    final list = groceriesWithGroups.map((group) {
+      final groupText = group.name;
+      final items = group.groceries.map((e) {
+        final amount = ConvertUtil.amountToString(e.amount, e.unit);
+        return amount.isEmpty ? '- ${e.name}' : '- $amount ${e.name}';
+      }).toList();
+      return '$groupText\n${items.join('\n')}';
+    }).toList();
+    return list.join('\n\n');
   }
 
   void _removeBoughtGrocery(String listId, Grocery grocery, List<Grocery> items,
