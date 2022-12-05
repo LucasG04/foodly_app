@@ -282,6 +282,8 @@
   "get_premium_modal_3_description": "With your contribution you support the further development of the app, keep the app ad-free and help cover server costs.",
   "get_premium_modal_4_title": "Statistics for dishes",
   "get_premium_modal_4_description": "You can view statistics about your dishes. For example, how often you have planned a dish or when you planned it last time.",
+  "get_premium_modal_5_title": "Sorting the shopping list by product groups",
+  "get_premium_modal_5_description": "Your shopping list will be sorted by product groups to make shopping easier for you. You can also adjust the sorting to your store at any time.",
   "get_premium_modal_thanks": "Thanks {}",
   "upcoming_features_title": "Upcoming Features",
   "shopping_list_sort_name": "Name",

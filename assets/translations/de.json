@@ -282,6 +282,8 @@
   "get_premium_modal_3_description": "Mit deinem Beitrag förderst du die Weiterentwicklung der App, hältst die App werbefrei und unterstützt bei der Deckung von Serverkosten.",
   "get_premium_modal_4_title": "Statistiken für Gerichte",
   "get_premium_modal_4_description": "Du kannst Statistiken zu deinen Gerichten einsehen. Beispielsweise wie oft du ein Gericht eingeplant hast oder wann du es das letzte Mal geplant hast.",
+  "get_premium_modal_5_title": "Sortierung der Einkaufsliste nach Kategorien",
+  "get_premium_modal_5_description": "Deine Einkaufsliste wird nach Produktgruppen sortiert, um dir so das Einkaufen zu erleichtern. Du kannst außerdem die Sortierung jederzeit an deinen Laden anpassen.",
   "get_premium_modal_thanks": "Danke {}",
   "upcoming_features_title": "Zukünftige Funktionen",
   "shopping_list_sort_name": "Name",
