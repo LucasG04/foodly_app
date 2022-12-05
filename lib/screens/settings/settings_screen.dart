@@ -443,7 +443,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         ))
                     .toList(),
                 onChanged: (_ShoppingListSortValue? sort) async {
-                  if (sort != null) {
+                  if (sort != null &&
+                      sort.value.index != sortObject.value.index) {
                     await _updateShoppingListSort(sort.value);
                   }
                 },
