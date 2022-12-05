@@ -35,7 +35,10 @@ class _MainAppBarState extends State<MainAppBar> {
 
   @override
   void dispose() {
-    widget.scrollController.dispose();
+    try {
+      widget.scrollController.dispose();
+      // ignore: empty_catches
+    } catch (e) {}
     super.dispose();
   }
 

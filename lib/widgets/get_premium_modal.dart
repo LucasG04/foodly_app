@@ -120,6 +120,11 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                         description: 'get_premium_modal_1_description'.tr(),
                       ),
                       ListTileCard(
+                        iconData: Icons.sort_rounded,
+                        title: 'get_premium_modal_5_title'.tr(),
+                        description: 'get_premium_modal_5_description'.tr(),
+                      ),
+                      ListTileCard(
                         iconData: EvaIcons.trendingUpOutline,
                         title: 'get_premium_modal_2_title'.tr(),
                         description: 'get_premium_modal_2_description'.tr(),

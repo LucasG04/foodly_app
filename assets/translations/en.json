@@ -5,6 +5,7 @@
   "create": "Create",
   "done": "Done",
   "try_again_later": "Please try again later.",
+  "reset": "Reset",
   "breakfast": "Frühstück",
   "lunch": "Lunch",
   "dinner": "Dinner",
@@ -16,6 +17,7 @@
   "shopping_list_empty_title": "So empty",
   "shopping_list_empty_subtitle": "You can add new entries for your list via the \"+\" button or you can directly add all the ingredients of a dish via the meal plan.",
   "shopping_list_share_error": "Your shopping list is empty. Add entries to share it.",
+  "shopping_list_uncategorized": "Other",
   "edit_grocery_modal_add": "ADD",
   "edit_grocery_modal_edit": "EDIT",
   "edit_grocery_modal_ctrl_name_title": "Title",
@@ -34,6 +36,8 @@
   "settings_section_customization_suggestions": "Show suggestions",
   "settings_section_customization_remove_bought": "Remove bought groceries immediately",
   "settings_section_customization_breakfast": "Plan breakfast in meal plan",
+  "settings_section_customization_shoppinglist_sort": "Shopping list sort",
+  "settings_section_customization_shoppinglist_group_order": "Order of the product groups",
   "settings_section_plan": "Plan",
   "settings_section_plan_change_name": "Change plan name",
   "settings_section_plan_change_name_error": "Enter a new name",
@@ -278,6 +282,11 @@
   "get_premium_modal_3_description": "With your contribution you support the further development of the app, keep the app ad-free and help cover server costs.",
   "get_premium_modal_4_title": "Statistics for dishes",
   "get_premium_modal_4_description": "You can view statistics about your dishes. For example, how often you have planned a dish or when you planned it last time.",
+  "get_premium_modal_5_title": "Sorting the shopping list by product groups",
+  "get_premium_modal_5_description": "Your shopping list will be sorted by product groups to make shopping easier for you. You can also adjust the sorting to your store at any time.",
   "get_premium_modal_thanks": "Thanks {}",
-  "upcoming_features_title": "Upcoming Features"
+  "upcoming_features_title": "Upcoming Features",
+  "shopping_list_sort_name": "Name",
+  "shopping_list_sort_group": "Product group",
+  "reorder_product_groups_title": "Product Groups"
 }

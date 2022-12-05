@@ -10,6 +10,8 @@ import 'package:share_plus/share_plus.dart';
 import '../../../constants.dart';
 import '../../../models/grocery.dart';
 import '../../../models/ingredient.dart';
+import '../../../models/shopping_list_sort.dart';
+import '../../../providers/data_provider.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/app_review_service.dart';
 import '../../../services/settings_service.dart';
@@ -23,15 +25,18 @@ import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import '../../../widgets/user_information.dart';
 import 'animated_shopping_list.dart';
+import 'grouped_shopping_list.dart';
 
-class ShoppingListView extends StatefulWidget {
+class ShoppingListView extends ConsumerStatefulWidget {
   const ShoppingListView({Key? key}) : super(key: key);
   @override
-  State<ShoppingListView> createState() => _ShoppingListViewState();
+  ConsumerState<ShoppingListView> createState() => _ShoppingListViewState();
 }
 
-class _ShoppingListViewState extends State<ShoppingListView>
+class _ShoppingListViewState extends ConsumerState<ShoppingListView>
     with AutomaticKeepAliveClientMixin {
+  final _scrollController = ScrollController();
+
   @override
   bool get wantKeepAlive => true;
 
@@ -41,7 +46,8 @@ class _ShoppingListViewState extends State<ShoppingListView>
     return Consumer(
       builder: (context, ref, _) {
         final shoppingListId = ref.watch(shoppingListIdProvider);
-        return shoppingListId != null
+        final groceryGroups = ref.watch(dataGroceryGroupsProvider);
+        return shoppingListId != null && groceryGroups != null
             ? StreamBuilder<List<Grocery>>(
                 stream: ShoppingListService.streamShoppingList(shoppingListId),
                 builder: (context, snapshot) {
@@ -74,6 +80,7 @@ class _ShoppingListViewState extends State<ShoppingListView>
   SingleChildScrollView _buildShoppingList(BuildContext context,
       List<Grocery> todoItems, List<Grocery> boughtItems, String listId) {
     return SingleChildScrollView(
+      controller: _scrollController,
       child: Column(
         children: [
           const SizedBox(height: kPadding),
@@ -85,16 +92,42 @@ class _ShoppingListViewState extends State<ShoppingListView>
               context,
               smallMultiplier: 1,
             ),
-            child: AnimatedShoppingList(
-              groceries: todoItems,
-              onEdit: (e) => _editGrocery(listId, e),
-              onTap: (item) => _removeBoughtGrocery(
-                listId,
-                item,
-                todoItems,
-                boughtItems,
-              ),
-            ),
+            child: StreamBuilder(
+                stream: SettingsService.streamShoppingListSort(),
+                builder: (context, _) {
+                  return StreamBuilder(
+                      stream: SettingsService.streamProductGroupOrder(),
+                      builder: (context, snapshot) {
+                        if (SettingsService.shoppingListSort ==
+                            ShoppingListSort.group) {
+                          var groceriesWithGroups =
+                              _groceriesToGroups(todoItems);
+                          groceriesWithGroups =
+                              _sortGroceriesWithGroups(groceriesWithGroups);
+                          return GroupedShoppingList(
+                            groups: groceriesWithGroups,
+                            pageScrollController: _scrollController,
+                            onEdit: (e) => _editGrocery(listId, e),
+                            onTap: (item) => _removeBoughtGrocery(
+                              listId,
+                              item,
+                              todoItems,
+                              boughtItems,
+                            ),
+                          );
+                        }
+                        return AnimatedShoppingList(
+                          groceries: todoItems,
+                          onEdit: (e) => _editGrocery(listId, e),
+                          onTap: (item) => _removeBoughtGrocery(
+                            listId,
+                            item,
+                            todoItems,
+                            boughtItems,
+                          ),
+                        );
+                      });
+                }),
           ),
           const SizedBox(height: kPadding),
           if (boughtItems.isNotEmpty)
@@ -180,6 +213,56 @@ class _ShoppingListViewState extends State<ShoppingListView>
     );
   }
 
+  List<ShoppingListGroup> _groceriesToGroups(List<Grocery> groceries) {
+    final groceriesCopy = List.of(groceries);
+    final groups = ref.read(dataGroceryGroupsProvider) ?? [];
+    final uncategorized = groceriesCopy;
+    final listGroups = groups.map(
+      (group) {
+        final items = groceriesCopy.where((g) => g.group == group.id).toList();
+        uncategorized.removeWhere((g) => items.contains(g));
+        return ShoppingListGroup(
+          groupId: group.id,
+          name: group.name,
+          groceries: items,
+        );
+      },
+    ).toList();
+
+    // handle uncategorized groceries
+    if (uncategorized.isNotEmpty) {
+      final uncategorizedIndex =
+          listGroups.indexWhere((element) => element.groupId == '99');
+      if (uncategorizedIndex != -1) {
+        listGroups[uncategorizedIndex].groceries.addAll(uncategorized);
+      } else {
+        listGroups.add(
+          ShoppingListGroup(
+            groupId: 'null',
+            name: 'shopping_list_uncategorized'.tr(),
+            groceries: uncategorized,
+          ),
+        );
+      }
+    }
+
+    return listGroups;
+  }
+
+  List<ShoppingListGroup> _sortGroceriesWithGroups(
+      List<ShoppingListGroup> groups) {
+    final groupOrder = SettingsService.productGroupOrder;
+    final List<ShoppingListGroup> sorted = [];
+    for (final groupId in groupOrder) {
+      final group = groups.firstWhere((e) => e.groupId == groupId);
+      sorted.add(group);
+    }
+    final List<ShoppingListGroup> unSorted = groups
+        .where((element) => !groupOrder.contains(element.groupId))
+        .toList();
+    return [...sorted, ...unSorted];
+  }
+
   void _editGrocery(String listId, [Grocery? grocery]) async {
     final isCreating = grocery == null;
     await WidgetUtils.showFoodlyBottomSheet<Ingredient?>(
@@ -189,7 +272,11 @@ class _ShoppingListViewState extends State<ShoppingListView>
         onSaved: (result) async {
           final updatedGrocery = Grocery.fromIngredient(result);
           if (isCreating) {
-            await ShoppingListService.addGrocery(listId, updatedGrocery);
+            await ShoppingListService.addGrocery(
+              listId,
+              updatedGrocery,
+              BasicUtils.getActiveLanguage(context),
+            );
           } else {
             updatedGrocery.id = grocery!.id;
             await ShoppingListService.updateGrocery(listId, updatedGrocery);
@@ -207,15 +294,37 @@ class _ShoppingListViewState extends State<ShoppingListView>
       ).show(context);
       return;
     }
-    final list = groceries.map((e) {
-      final amount = ConvertUtil.amountToString(e.amount, e.unit);
-      return amount.isEmpty ? '- ${e.name}' : '- $amount ${e.name}';
-    }).toList();
-    final shareText = list.join('\n');
+    final shareText = SettingsService.shoppingListSort == ShoppingListSort.name
+        ? _getShareTextSortByNames(groceries)
+        : _getShareTextSortByGroups(groceries);
     final subject = shareText
         .substring(0, shareText.length > 50 ? 50 : shareText.length)
         .trim();
     Share.share(shareText, subject: '$subject...');
+  }
+
+  String _getShareTextSortByNames(List<Grocery> groceries) {
+    final list = groceries.map((e) {
+      final amount = ConvertUtil.amountToString(e.amount, e.unit);
+      return amount.isEmpty ? '- ${e.name}' : '- $amount ${e.name}';
+    }).toList();
+    return list.join('\n');
+  }
+
+  String _getShareTextSortByGroups(List<Grocery> groceries) {
+    var groceriesWithGroups = _groceriesToGroups(groceries);
+    groceriesWithGroups = _sortGroceriesWithGroups(groceriesWithGroups);
+    groceriesWithGroups =
+        groceriesWithGroups.where((e) => e.groceries.isNotEmpty).toList();
+    final list = groceriesWithGroups.map((group) {
+      final groupText = group.name;
+      final items = group.groceries.map((e) {
+        final amount = ConvertUtil.amountToString(e.amount, e.unit);
+        return amount.isEmpty ? '- ${e.name}' : '- $amount ${e.name}';
+      }).toList();
+      return '$groupText\n${items.join('\n')}';
+    }).toList();
+    return list.join('\n\n');
   }
 
   void _removeBoughtGrocery(String listId, Grocery grocery, List<Grocery> items,
@@ -238,7 +347,11 @@ class _ShoppingListViewState extends State<ShoppingListView>
       action: IconButton(
         icon: Icon(EvaIcons.undoOutline, color: Theme.of(context).primaryColor),
         onPressed: () {
-          ShoppingListService.addGrocery(listId, grocery);
+          ShoppingListService.addGrocery(
+            listId,
+            grocery,
+            BasicUtils.getActiveLanguage(context),
+          );
           Navigator.of(context).maybePop();
         },
       ),

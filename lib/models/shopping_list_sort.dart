@@ -1,0 +1,4 @@
+enum ShoppingListSort {
+  name,
+  group,
+}
