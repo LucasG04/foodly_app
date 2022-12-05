@@ -1,17 +1,25 @@
 import 'package:flutter/painting.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
 import '../models/shopping_list_sort.dart';
+import 'in_app_purchase_service.dart';
 
 class SettingsService {
   SettingsService._();
 
   static late Box _settingsBox;
   static bool _isReady = false;
+  static WidgetRef? _ref;
 
   static Future initialize() async {
     _settingsBox = await Hive.openBox<dynamic>('settings');
     _isReady = true;
+  }
+
+  // ignore: use_setters_to_change_properties
+  static void setRef(WidgetRef ref) {
+    _ref = ref;
   }
 
   static bool get isReady => _isReady;
@@ -26,8 +34,13 @@ class SettingsService {
   static bool get multipleMealsPerTime =>
       _settingsBox.get('multipleMealsPerTime', defaultValue: false) as bool;
 
-  static bool get showSuggestions =>
-      _settingsBox.get('showSuggestions', defaultValue: true) as bool;
+  static bool get showSuggestions {
+    final showSuggestions =
+        _settingsBox.get('showSuggestions', defaultValue: true) as bool;
+    final userHasPremium =
+        _ref?.read(InAppPurchaseService.$userIsSubscribed) ?? false;
+    return showSuggestions && userHasPremium;
+  }
 
   static bool get removeBoughtImmediately =>
       _settingsBox.get('removeBoughtImmediately', defaultValue: false) as bool;
@@ -39,15 +52,22 @@ class SettingsService {
 
   static ShoppingListSort? get shoppingListSort {
     final value = _settingsBox.get('shoppingListSort') as int?;
+    const defaultSort = ShoppingListSort.name;
     if (value == null) {
-      return ShoppingListSort.name;
+      return defaultSort;
     }
+    final userHasPremium =
+        _ref?.read(InAppPurchaseService.$userIsSubscribed) ?? false;
+    final premiumSorts = [ShoppingListSort.group];
     for (final element in ShoppingListSort.values) {
       if (element.index == value) {
+        if (premiumSorts.contains(element) && !userHasPremium) {
+          return defaultSort;
+        }
         return element;
       }
     }
-    return ShoppingListSort.name;
+    return defaultSort;
   }
 
   static List<String> get productGroupOrder {
