@@ -6,12 +6,13 @@ import 'screens/meal/meal_screen.dart';
 import 'screens/meal_create/meal_create_screen.dart';
 import 'screens/meal_select/meal_select.dart';
 import 'screens/onboarding/onboarding_screen.dart';
+import 'screens/settings/reorder_product_groups_screen.dart';
 import 'screens/settings/settings_screen.dart';
 import 'screens/tab_navigation/home_screen.dart';
 import 'screens/unknown_route/unknown_route_screen.dart';
 import 'screens/upcoming_features/upcoming_features_screen.dart';
 
-// generate with `flutter packages pub run build_runner build`
+// generate with `flutter packages pub run build_runner build --delete-conflicting-outputs`
 // generate with `flutter packages pub run build_runner watch`
 
 @MaterialAutoRouter(
@@ -23,6 +24,7 @@ import 'screens/upcoming_features/upcoming_features_screen.dart';
     CupertinoRoute<dynamic>(page: OnboardingScreen),
     CupertinoRoute<dynamic>(page: FeedbackScreen),
     CupertinoRoute<dynamic>(page: UpcomingFeaturesScreen),
+    CupertinoRoute<dynamic>(page: ReorderProductGroupsScreen),
     CupertinoRoute<dynamic>(path: '/meal-create/:id', page: MealCreateScreen),
     CupertinoRoute<dynamic>(path: '/meal/:id', page: MealScreen),
     CupertinoRoute<dynamic>(path: '*', page: UnknownRouteScreen),

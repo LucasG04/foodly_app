@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
+import 'package:restart_app/restart_app.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -25,6 +26,7 @@ import '../../../utils/main_snackbar.dart';
 import '../../../utils/widget_utils.dart';
 import '../../../widgets/loading_logout.dart';
 import '../../models/plan.dart';
+import '../../models/shopping_list_sort.dart';
 import '../../services/in_app_purchase_service.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
@@ -49,6 +51,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _$loadingChangePlanLockState =
       AutoDisposeStateProvider<bool>((_) => false);
   bool isLoading = false;
+
+  final shoppingListSorts = [
+    _ShoppingListSortValue(
+      ShoppingListSort.name,
+      'shopping_list_sort_name'.tr(),
+    ),
+    _ShoppingListSortValue(
+      ShoppingListSort.group,
+      'shopping_list_sort_group'.tr(),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +104,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   .toList(),
                               onChanged: (Locale? locale) async {
                                 await context.setLocale(locale!);
+                                Restart.restartApp();
                               },
                             ),
                           ),
@@ -180,6 +194,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 },
                               );
                             }),
+                          ),
+                          _buildShoppingListSortTile(),
+                          WidgetUtils.userIsSubscribed(
+                            ref: ref,
+                            child: SettingsTile(
+                              onTap: _openReorderProductGroups,
+                              leadingIcon: EvaIcons.menu,
+                              text:
+                                  'settings_section_customization_shoppinglist_group_order'
+                                      .tr(),
+                              trailing:
+                                  const Icon(EvaIcons.arrowIosForwardOutline),
+                            ),
                           ),
                         ], context),
                         _buildSectionTitle('settings_section_plan'.tr()),
@@ -386,8 +413,43 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ),
                 )
-              : const LoadingLogut();
+              : const LoadingLogout();
         },
+      ),
+    );
+  }
+
+  Widget _buildShoppingListSortTile() {
+    return WidgetUtils.userIsSubscribed(
+      ref: ref,
+      child: SettingsTile(
+        leadingIcon: Icons.sort_rounded,
+        text: 'settings_section_customization_shoppinglist_sort'.tr(),
+        trailing: StreamBuilder(
+            stream: SettingsService.streamShoppingListSort(),
+            builder: (context, _) {
+              final sortObject = shoppingListSorts.firstWhere(
+                (element) => element.value == SettingsService.shoppingListSort,
+                orElse: () => shoppingListSorts.first,
+              );
+              return DropdownButton<_ShoppingListSortValue>(
+                value: sortObject,
+                items: shoppingListSorts
+                    .map((sort) => DropdownMenuItem<_ShoppingListSortValue>(
+                          value: sort,
+                          child: Text(
+                            sort.label,
+                          ),
+                        ))
+                    .toList(),
+                onChanged: (_ShoppingListSortValue? sort) async {
+                  if (sort != null &&
+                      sort.value.index != sortObject.value.index) {
+                    await _updateShoppingListSort(sort.value);
+                  }
+                },
+              );
+            }),
       ),
     );
   }
@@ -427,6 +489,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _updateShoppingListSort(ShoppingListSort sort) async {
+    await SettingsService.setShoppingListSort(sort);
   }
 
   void _shareCode(String code, bool? isPlanLocked) async {
@@ -495,6 +561,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
+  void _openReorderProductGroups() {
+    AutoRouter.of(context).push(const ReorderProductGroupsScreenRoute());
+  }
+
   void _openChangePlanNameModal() {
     WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
@@ -549,4 +619,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       _log.severe('Could not launch $href');
     }
   }
+}
+
+class _ShoppingListSortValue {
+  const _ShoppingListSortValue(this.value, this.label);
+
+  final ShoppingListSort value;
+  final String label;
 }

@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
 
@@ -9,6 +10,7 @@ import '../../models/grocery.dart';
 import '../../models/ingredient.dart';
 import '../../providers/state_providers.dart';
 import '../../services/shopping_list_service.dart';
+import '../../utils/basic_utils.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/ingredient_edit_modal.dart';
 import 'meal_list_view/meal_list_view.dart';
@@ -32,18 +34,21 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: PageView(
-          controller: _pageController,
-          physics: const BouncingScrollPhysics(),
-          onPageChanged: (value) {
-            if (!_navbarAnimating) {
-              setState(() {
-                _currentIndex = value;
-              });
-            }
-          },
-          children: const [ShoppingListView(), PlanTabView(), MealListView()],
+      body: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.dark,
+        child: SafeArea(
+          child: PageView(
+            controller: _pageController,
+            physics: const BouncingScrollPhysics(),
+            onPageChanged: (value) {
+              if (!_navbarAnimating) {
+                setState(() {
+                  _currentIndex = value;
+                });
+              }
+            },
+            children: const [ShoppingListView(), PlanTabView(), MealListView()],
+          ),
         ),
       ),
       floatingActionButton: _showActionButton()
@@ -117,7 +122,11 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView> {
         ingredient: Ingredient(),
         onSaved: (result) async {
           final grocery = Grocery.fromIngredient(result);
-          await ShoppingListService.addGrocery(_activeListId!, grocery);
+          await ShoppingListService.addGrocery(
+            _activeListId!,
+            grocery,
+            BasicUtils.getActiveLanguage(context),
+          );
         },
       ),
     );

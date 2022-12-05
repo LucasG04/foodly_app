@@ -21,6 +21,7 @@ import 'constants.dart';
 import 'models/foodly_user.dart';
 import 'models/link_metadata.dart';
 import 'models/plan.dart';
+import 'providers/data_provider.dart';
 import 'providers/state_providers.dart';
 import 'services/app_review_service.dart';
 import 'services/authentication_service.dart';
@@ -28,6 +29,7 @@ import 'services/foodly_user_service.dart';
 import 'services/image_cache_service.dart';
 import 'services/in_app_purchase_service.dart';
 import 'services/link_metadata_service.dart';
+import 'services/lunix_api_service.dart';
 import 'services/plan_service.dart';
 import 'services/settings_service.dart';
 import 'services/shopping_list_service.dart';
@@ -112,6 +114,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     _listenForShareIntent();
     super.initState();
     InAppPurchaseService.setRef(ref);
+    SettingsService.setRef(ref);
   }
 
   @override
@@ -127,7 +130,10 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active ||
             snapshot.connectionState == ConnectionState.done) {
-          _loadActivePlan().then((_) => _loadActiveShoppingList());
+          _loadActivePlan().then((_) {
+            _loadActiveShoppingList();
+            _loadGroceryGroups();
+          });
           _loadActiveUser();
           return Consumer(
             builder: (context, ref, _) {
@@ -207,6 +213,12 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       planId,
     );
     ref.read(shoppingListIdProvider.notifier).state = shoppingList.id;
+  }
+
+  Future<void> _loadGroceryGroups() async {
+    final langCode = context.locale.languageCode;
+    final groups = await LunixApiService.getGroceryGroups(langCode);
+    ref.read(dataGroceryGroupsProvider.notifier).state = groups;
   }
 
   void _initializeLogger() {

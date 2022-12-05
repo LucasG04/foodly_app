@@ -95,7 +95,7 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
               ),
             ),
           )
-        : const LoadingLogut();
+        : const LoadingLogout();
   }
 
   void _showOptionsSheet(Plan plan) {
