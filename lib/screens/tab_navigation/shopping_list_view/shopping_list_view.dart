@@ -220,6 +220,9 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
     final listGroups = groups.map(
       (group) {
         final items = groceriesCopy.where((g) => g.group == group.id).toList();
+        items.sort((a, b) => (a.name ?? '')
+            .toLowerCase()
+            .compareTo((b.name ?? '').toLowerCase()));
         uncategorized.removeWhere((g) => items.contains(g));
         return ShoppingListGroup(
           groupId: group.id,
@@ -229,21 +232,27 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
       },
     ).toList();
 
+    if (uncategorized.isEmpty) {
+      return listGroups;
+    }
+
     // handle uncategorized groceries
-    if (uncategorized.isNotEmpty) {
-      final uncategorizedIndex =
-          listGroups.indexWhere((element) => element.groupId == '99');
-      if (uncategorizedIndex != -1) {
-        listGroups[uncategorizedIndex].groceries.addAll(uncategorized);
-      } else {
-        listGroups.add(
-          ShoppingListGroup(
-            groupId: 'null',
-            name: 'shopping_list_uncategorized'.tr(),
-            groceries: uncategorized,
-          ),
-        );
-      }
+    final uncategorizedIndex =
+        listGroups.indexWhere((element) => element.groupId == '99');
+    if (uncategorizedIndex != -1) {
+      listGroups[uncategorizedIndex].groceries.addAll(uncategorized);
+      listGroups[uncategorizedIndex].groceries.sort((a, b) =>
+          (a.name ?? '').toLowerCase().compareTo((b.name ?? '').toLowerCase()));
+    } else {
+      uncategorized.sort((a, b) =>
+          (a.name ?? '').toLowerCase().compareTo((b.name ?? '').toLowerCase()));
+      listGroups.add(
+        ShoppingListGroup(
+          groupId: 'null',
+          name: 'shopping_list_uncategorized'.tr(),
+          groceries: uncategorized,
+        ),
+      );
     }
 
     return listGroups;
