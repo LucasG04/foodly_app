@@ -154,6 +154,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                       ShoppingListService.updateGrocery(
                         listId,
                         item,
+                        BasicUtils.getActiveLanguage(context),
                       );
                     },
                   ),
@@ -266,6 +267,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
       final group = groups.firstWhere((e) => e.groupId == groupId);
       sorted.add(group);
     }
+
     final List<ShoppingListGroup> unSorted = groups
         .where((element) => !groupOrder.contains(element.groupId))
         .toList();
@@ -288,7 +290,11 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
             );
           } else {
             updatedGrocery.id = grocery!.id;
-            await ShoppingListService.updateGrocery(listId, updatedGrocery);
+            await ShoppingListService.updateGrocery(
+              listId,
+              updatedGrocery,
+              BasicUtils.getActiveLanguage(context),
+            );
           }
         },
       ),
@@ -342,7 +348,11 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
     if (!SettingsService.removeBoughtImmediately) {
       grocery.bought = true;
       grocery.lastBoughtEdited = DateTime.now();
-      ShoppingListService.updateGrocery(listId, grocery);
+      ShoppingListService.updateGrocery(
+        listId,
+        grocery,
+        BasicUtils.getActiveLanguage(context),
+      );
       _checkBoughtItems(listId, boughtItems);
       return;
     }

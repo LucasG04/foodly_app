@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'ingredient.dart';
 
 class Grocery {
@@ -30,6 +32,8 @@ class Grocery {
     };
   }
 
+  String toJson() => json.encode(toMap());
+
   Ingredient toIngredient() {
     return Ingredient(
       name: name,
@@ -43,7 +47,9 @@ class Grocery {
     return Grocery(
       id: id,
       name: map['name'] as String?,
-      amount: map['amount'] as double?,
+      amount: map['amount'] is int
+          ? (map['amount'] as int).toDouble()
+          : map['amount'] as double?,
       unit: map['unit'] as String?,
       group: map['group'] as String?,
       bought: map['bought'] as bool? ?? false,

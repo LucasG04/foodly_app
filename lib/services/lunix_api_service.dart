@@ -31,6 +31,9 @@ class LunixApiService {
     ),
   );
 
+  static Dio get dio => _dio;
+  static String get apiEndpoint => _lunixApiEndpoint;
+
   static Future<bool> lunixApiAvailable() async {
     Response? response;
     try {
