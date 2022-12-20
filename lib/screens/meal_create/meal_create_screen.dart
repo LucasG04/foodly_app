@@ -374,6 +374,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
     meal.createdBy = _isCreatingMeal
         ? AuthenticationService.currentUser!.uid
         : meal.createdBy;
+    meal.planId = ref.read(planProvider)!.id;
 
     meal.imageUrl = _updatedImage ??
         (await LinkMetadataService.get(meal.source!))?.image ??
