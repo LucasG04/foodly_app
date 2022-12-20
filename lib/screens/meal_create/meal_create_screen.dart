@@ -13,6 +13,7 @@ import '../../providers/state_providers.dart';
 import '../../services/authentication_service.dart';
 import '../../services/chefkoch_service.dart';
 import '../../services/link_metadata_service.dart';
+import '../../services/lunix_api_service.dart';
 import '../../services/meal_service.dart';
 import '../../services/storage_service.dart';
 import '../../utils/basic_utils.dart';
@@ -388,6 +389,10 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
         if (!mounted) {
           return false;
         }
+        LunixApiService.setGroupsForIngredients(
+          newMeal?.id ?? '',
+          BasicUtils.getActiveLanguage(context),
+        );
         BasicUtils.emitMealsChanged(ref, newMeal?.id ?? '');
         AutoRouter.of(context).pop();
         return true;
