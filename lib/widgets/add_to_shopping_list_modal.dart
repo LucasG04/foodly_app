@@ -260,20 +260,12 @@ class _AddToShoppingListModalState
       return;
     }
 
-    final groceriesWithGroups = await ShoppingListService.getGroceryGroups(
+    await ShoppingListService.addGroceries(
+      shoppingList.id!,
       groceries,
       BasicUtils.getActiveLanguage(context),
     );
 
-    final addFutures = groceriesWithGroups.map(
-      (grocery) => ShoppingListService.addGrocery(
-        shoppingList.id!,
-        grocery,
-        BasicUtils.getActiveLanguage(context),
-      ),
-    );
-
-    await Future.wait(addFutures);
     ref.read(_$buttonState.notifier).state = ButtonState.normal;
     _close();
   }

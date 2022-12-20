@@ -31,6 +31,9 @@ class LunixApiService {
     ),
   );
 
+  static Dio get dio => _dio;
+  static String get apiEndpoint => _lunixApiEndpoint;
+
   static Future<bool> lunixApiAvailable() async {
     Response? response;
     try {
@@ -322,65 +325,6 @@ class LunixApiService {
     return data;
   }
 
-  static Future<List<GroceryGroup?>> getFirstGroceryGroupByQueries(
-      List<String> queries, String langCode) async {
-    _log.finer('Call getFirstGroceryByQueries() witch $langCode and $queries');
-    Response? response;
-    try {
-      response = await _dio.post<List<dynamic>>(
-        '$_lunixApiEndpoint/grocery/group-by-grocery',
-        queryParameters: <String, dynamic>{
-          'language': langCode,
-        },
-        data: <String, dynamic>{
-          'names': queries,
-        },
-      );
-    } catch (e) {
-      _log.severe('ERR in getFirstGroceryByQueries. Response is null', e);
-    }
-    if (response == null || response.data == null) {
-      return [];
-    }
-    final data = (response.data as List<dynamic>)
-        .map(
-          // ignore: avoid_dynamic_calls
-          (dynamic e) => e['grocery'] != null
-              // ignore: avoid_dynamic_calls
-              ? GroceryGroup.fromApi(e['grocery'] as Map<String, dynamic>)
-              : null,
-        )
-        .toList();
-    return data;
-  }
-
-  static Future<List<GroceryGroup>> mapChefkochGroupsToGroupIds(
-      List<String> chefkochGroups) async {
-    _log.finer('Call mapChefkochGroupsToGroupIds() with $chefkochGroups');
-    Response? response;
-    try {
-      response = await _dio.post<List<dynamic>>(
-        '$_lunixApiEndpoint/grocery/map-chefkoch-to-group-id',
-        data: <String, dynamic>{
-          'groups': chefkochGroups,
-        },
-      );
-    } catch (e) {
-      _log.severe('ERR in mapChefkochGroupsToGroupIds. Response is null', e);
-    }
-    if (response == null || response.data == null) {
-      return [];
-    }
-    final data = (response.data as List<dynamic>)
-        .map(
-          (dynamic e) =>
-              // ignore: avoid_dynamic_calls
-              GroceryGroup.fromMap(e as Map<String, dynamic>),
-        )
-        .toList();
-    return data;
-  }
-
   static Future<List<UpcomingFeature>> getUpcomingFeatures() async {
     _log.finer('Call getUpcomingFeatures()');
     Response? response;
@@ -398,5 +342,22 @@ class LunixApiService {
         .map((dynamic e) => UpcomingFeature.fromMap(e as Map<String, dynamic>))
         .toList();
     return data;
+  }
+
+  static Future<void> setGroupsForIngredients(
+      String mealId, String langCode) async {
+    _log.finer('Call setGroupsForIngredients() with $mealId');
+    try {
+      await _dio.get<void>(
+        '$_lunixApiEndpoint/set-groups-for-ingredients',
+        queryParameters: <String, dynamic>{
+          'mealId': mealId,
+          'langCode': langCode,
+        },
+      );
+    } catch (e) {
+      _log.severe(
+          'ERR in setGroupsForIngredients with $mealId. API Request failed', e);
+    }
   }
 }
