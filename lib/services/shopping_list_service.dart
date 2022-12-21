@@ -51,6 +51,19 @@ class ShoppingListService {
             event.docs.map((e) => Grocery.fromMap(e.id, e.data())).toList());
   }
 
+  static Future<void> groceryToggleBought(String listId, Grocery grocery) {
+    _log.finer(
+        'Call groceryToggleBought with listId: $listId | Grocery: ${grocery.toMap()}');
+
+    grocery.bought = !grocery.bought;
+    grocery.lastBoughtEdited = DateTime.now();
+    return _firestore
+        .doc(listId)
+        .collection('groceries')
+        .doc(grocery.id)
+        .update(grocery.toMap());
+  }
+
   static Future<void> updateGrocery(
       String listId, Grocery grocery, String langCode) async {
     _log.finer(
