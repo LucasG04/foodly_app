@@ -206,7 +206,8 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
 
   Future<void> _loadActiveShoppingList() async {
     final planId = ref.read(planProvider)?.id;
-    if (planId == null) {
+    final userId = ref.read(userProvider.notifier).state?.id;
+    if (planId == null || userId == null) {
       return;
     }
     final shoppingList = await ShoppingListService.getShoppingListByPlanId(

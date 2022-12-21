@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 
 import '../services/image_cache_service.dart';
@@ -11,7 +12,7 @@ import '../services/storage_service.dart';
 import '../utils/basic_utils.dart';
 import 'skeleton_container.dart';
 
-class FoodlyNetworkImage extends StatefulWidget {
+class FoodlyNetworkImage extends ConsumerStatefulWidget {
   final String imageUrl;
   final BoxFit boxFit;
 
@@ -22,10 +23,10 @@ class FoodlyNetworkImage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<FoodlyNetworkImage> createState() => _FoodlyNetworkImageState();
+  ConsumerState<FoodlyNetworkImage> createState() => _FoodlyNetworkImageState();
 }
 
-class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
+class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
   static final _log = Logger('FoodlyNetworkImage');
   final _dio = Dio()
     ..interceptors.add(
@@ -33,28 +34,49 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
         options: CacheOptions(store: ImageCacheService.hiveCacheStore),
       ),
     );
+  final _$isLoading = AutoDisposeStateProvider<bool>((_) => true);
+  String _storageUrl = '';
+
+  @override
+  void initState() {
+    final isStorageImage = BasicUtils.isStorageMealImage(widget.imageUrl);
+    if (isStorageImage) {
+      StorageService.getMealImageUrl(widget.imageUrl).then((url) {
+        _storageUrl = url;
+        ref.read(_$isLoading.notifier).state = false;
+      });
+    } else {
+      _imageIsAvailable(widget.imageUrl).then((available) {
+        if (available) {
+          ref.read(_$isLoading.notifier).state = false;
+        }
+      });
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BasicUtils.isStorageMealImage(widget.imageUrl)
-        ? FutureBuilder<String>(
-            future: StorageService.getMealImageUrl(widget.imageUrl),
-            builder: (context, snapshot) {
-              return snapshot.data != null && snapshot.data!.isNotEmpty
-                  ? _buildCachedNetworkImage(snapshot.data!)
-                  : _buildLoader();
-            },
-          )
-        : _buildImageChecker(
-            child: _buildCachedNetworkImage(widget.imageUrl),
-          );
+    return Consumer(
+      builder: (context, ref, loader) {
+        if (ref.watch(_$isLoading)) {
+          return loader!;
+        }
+        return _buildCachedNetworkImage(
+          BasicUtils.isStorageMealImage(widget.imageUrl)
+              ? _storageUrl
+              : widget.imageUrl,
+        );
+      },
+      child: _buildLoader(),
+    );
   }
 
   CachedNetworkImage _buildCachedNetworkImage(String url) {
     url = url.replaceFirst('http://', 'https://');
     return CachedNetworkImage(
       imageUrl: url,
-      fit: BoxFit.cover,
+      fit: widget.boxFit,
       placeholder: (_, __) => _buildLoader(),
       errorWidget: (_, __, dynamic ___) => _buildFallbackImage(),
       errorListener: (dynamic e) {
@@ -68,18 +90,6 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
           );
         }
       },
-    );
-  }
-
-  FutureBuilder _buildImageChecker({required CachedNetworkImage child}) {
-    return FutureBuilder<bool>(
-      future: _imageIsAvailable(widget.imageUrl),
-      builder: (context, snapshot) =>
-          snapshot.connectionState == ConnectionState.waiting
-              ? _buildLoader()
-              : snapshot.hasData && snapshot.data!
-                  ? child
-                  : _buildFallbackImage(),
     );
   }
 
@@ -99,7 +109,7 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
   Future<bool> _imageIsAvailable(String url) async {
     try {
       final response = await _dio.head<dynamic>(url);
-      return response.statusCode == 200;
+      return [200, 201, 202, 203].contains(response.statusCode);
     } catch (error) {
       return false;
     }
