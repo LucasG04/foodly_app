@@ -149,12 +149,9 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                     groceries: boughtItems,
                     onEdit: (e) => _editGrocery(listId, e),
                     onTap: (item) {
-                      item.bought = false;
-                      item.lastBoughtEdited = DateTime.now();
-                      ShoppingListService.updateGrocery(
+                      ShoppingListService.groceryToggleBought(
                         listId,
                         item,
-                        BasicUtils.getActiveLanguage(context),
                       );
                     },
                   ),
@@ -346,12 +343,9 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
       List<Grocery> boughtItems) {
     AppReviewService.logGroceryBought(items.isEmpty);
     if (!SettingsService.removeBoughtImmediately) {
-      grocery.bought = true;
-      grocery.lastBoughtEdited = DateTime.now();
-      ShoppingListService.updateGrocery(
+      ShoppingListService.groceryToggleBought(
         listId,
         grocery,
-        BasicUtils.getActiveLanguage(context),
       );
       _checkBoughtItems(listId, boughtItems);
       return;
