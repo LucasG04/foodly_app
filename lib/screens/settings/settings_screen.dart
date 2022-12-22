@@ -27,6 +27,7 @@ import '../../../utils/widget_utils.dart';
 import '../../../widgets/loading_logout.dart';
 import '../../models/plan.dart';
 import '../../models/shopping_list_sort.dart';
+import '../../primary_colors.dart';
 import '../../services/in_app_purchase_service.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
@@ -36,6 +37,7 @@ import 'change_plan_name_modal.dart';
 import 'help_slides/help_slide_share_import.dart';
 import 'import_meals_modal.dart';
 import 'settings_alerts.dart';
+import 'settings_change_primary_color_modal.dart';
 import 'settings_reauthenticate_modal.dart';
 import 'settings_tile.dart';
 
@@ -179,6 +181,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 },
                               );
                             }),
+                          ),
+                          SettingsTile(
+                            onTap: _openChangePrimaryColorModal,
+                            leadingIcon: EvaIcons.colorPaletteOutline,
+                            text: 'settings_section_customization_change_color'
+                                .tr(),
+                            trailing: StreamBuilder<Color>(
+                              stream: SettingsService.streamPrimaryColor(),
+                              builder: (context, snapshot) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: kPadding / 2,
+                                ),
+                                child: CircleAvatar(
+                                  maxRadius: kPadding / 2,
+                                  backgroundColor:
+                                      snapshot.data ?? primaryBlueColor,
+                                ),
+                              ),
+                            ),
                           ),
                           SettingsTile(
                             leadingIcon: Icons.emoji_food_beverage_rounded,
@@ -569,6 +590,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) => const ChangePlanNameModal(),
+    );
+  }
+
+  void _openChangePrimaryColorModal() {
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => const SettingsChangePrimaryColorModal(),
     );
   }
 

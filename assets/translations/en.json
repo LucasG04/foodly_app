@@ -32,6 +32,7 @@
   "settings_section_general_premium": "Get Premium {}",
   "settings_section_general_upcoming": "Upcoming features",
   "settings_section_customization": "Customization",
+  "settings_section_customization_change_color": "Change primary color",
   "settings_section_customization_multiple_meals": "Multiple dishes per meal",
   "settings_section_customization_suggestions": "Show suggestions",
   "settings_section_customization_remove_bought": "Remove bought groceries immediately",

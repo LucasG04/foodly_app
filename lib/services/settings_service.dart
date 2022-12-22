@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
 import '../models/shopping_list_sort.dart';
+import '../primary_colors.dart';
 import 'in_app_purchase_service.dart';
 
 class SettingsService {
@@ -48,7 +49,10 @@ class SettingsService {
   static bool get planWithBreakfast =>
       _settingsBox.get('planWithBreakfast', defaultValue: false) as bool;
 
-  static Color? get primaryColor => _settingsBox.get('primaryColor') as Color?;
+  static Color get primaryColor {
+    final value = _settingsBox.get('primaryColor') as int?;
+    return value != null ? Color(value) : primaryBlueColor;
+  }
 
   static ShoppingListSort? get shoppingListSort {
     final value = _settingsBox.get('shoppingListSort') as int?;
@@ -95,7 +99,7 @@ class SettingsService {
   }
 
   static Future<void> setPrimaryColor(Color value) async {
-    await _settingsBox.put('primaryColor', value);
+    await _settingsBox.put('primaryColor', value.value);
   }
 
   static Future<void> setShoppingListSort(ShoppingListSort value) async {
@@ -124,5 +128,13 @@ class SettingsService {
     return _settingsBox
         .watch(key: 'productGroupOrder')
         .map((event) => event.value as List<String>);
+  }
+
+  static Stream<Color> streamPrimaryColor() {
+    return _settingsBox.watch(key: 'primaryColor').map(
+          (event) => event.value != null
+              ? Color(event.value as int)
+              : primaryBlueColor,
+        );
   }
 }
