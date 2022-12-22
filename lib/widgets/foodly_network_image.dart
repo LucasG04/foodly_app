@@ -35,21 +35,32 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
       ),
     );
   final _$isLoading = AutoDisposeStateProvider<bool>((_) => true);
+  final _$hasError = AutoDisposeStateProvider<bool>((_) => false);
   String _storageUrl = '';
 
   @override
   void initState() {
-    final isStorageImage = BasicUtils.isStorageMealImage(widget.imageUrl);
-    if (isStorageImage) {
-      StorageService.getMealImageUrl(widget.imageUrl).then((url) {
-        _storageUrl = url;
-        ref.read(_$isLoading.notifier).state = false;
-      });
-    } else {
-      _imageIsAvailable(widget.imageUrl).then((available) {
-        if (available) {
+    try {
+      final isStorageImage = BasicUtils.isStorageMealImage(widget.imageUrl);
+      if (isStorageImage) {
+        StorageService.getMealImageUrl(widget.imageUrl).then((url) {
+          _storageUrl = url;
           ref.read(_$isLoading.notifier).state = false;
-        }
+        });
+      } else {
+        _imageIsAvailable(widget.imageUrl).then((available) {
+          if (available) {
+            ref.read(_$isLoading.notifier).state = false;
+          } else {
+            ref.read(_$hasError.notifier).state = true;
+          }
+        });
+      }
+    } catch (e) {
+      _log.finer('Init of FoodlyNetworkImage failed.', e);
+      BasicUtils.afterBuild(() {
+        ref.read(_$hasError.notifier).state = true;
+        ref.read(_$isLoading.notifier).state = false;
       });
     }
     super.initState();
@@ -61,7 +72,10 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
       builder: (context, ref, loader) {
         if (ref.watch(_$isLoading)) {
           return loader!;
+        } else if (ref.watch(_$hasError)) {
+          return _buildFallbackImage();
         }
+
         return _buildCachedNetworkImage(
           BasicUtils.isStorageMealImage(widget.imageUrl)
               ? _storageUrl
@@ -96,6 +110,7 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
   Image _buildFallbackImage() {
     return Image.asset(
       'assets/images/food_fallback.png',
+      fit: widget.boxFit,
     );
   }
 

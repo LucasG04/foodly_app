@@ -3,7 +3,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
-import '../../services/chefkoch_service.dart';
+import '../../services/lunix_api_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
@@ -126,7 +126,7 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
     });
 
     try {
-      final meal = await ChefkochService.getMealFromChefkochUrl(link);
+      final meal = await LunixApiService.getMealFromChefkochUrl(link);
       _buttonState = ButtonState.normal;
       if (!mounted) {
         return;

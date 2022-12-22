@@ -11,7 +11,6 @@ import '../../models/ingredient.dart';
 import '../../models/meal.dart';
 import '../../providers/state_providers.dart';
 import '../../services/authentication_service.dart';
-import '../../services/chefkoch_service.dart';
 import '../../services/link_metadata_service.dart';
 import '../../services/lunix_api_service.dart';
 import '../../services/meal_service.dart';
@@ -306,7 +305,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
     } else if (widget.id.startsWith('https') &&
         Uri.decodeComponent(widget.id).startsWith(kChefkochShareEndpoint)) {
       _isCreatingMeal = true;
-      final meal = await ChefkochService.getMealFromChefkochUrl(
+      final meal = await LunixApiService.getMealFromChefkochUrl(
           Uri.decodeComponent(widget.id));
       if (meal != null) {
         meal.imageUrl = meal.imageUrl!.replaceFirst('http:', 'https:');

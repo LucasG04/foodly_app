@@ -360,4 +360,26 @@ class LunixApiService {
           'ERR in setGroupsForIngredients with $mealId. API Request failed', e);
     }
   }
+
+  static Future<Meal?> getMealFromChefkochUrl(String url) async {
+    _log.finer('Call getMealFromChefkochUrl() with $url');
+
+    try {
+      final response = await _dio.get<dynamic>(
+        '$_lunixApiEndpoint/import/chefkoch',
+        queryParameters: <String, dynamic>{
+          'url': url,
+        },
+      );
+      if (response.statusCode != 200) {
+        return null;
+      }
+
+      return Meal.fromMap(null, response.data as Map<String, dynamic>);
+    } catch (e) {
+      _log.severe(
+          'ERR in getMealFromChefkochUrl with $url. API Request failed', e);
+      return null;
+    }
+  }
 }
