@@ -39,18 +39,22 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
 
   @override
   void initState() {
-    final isStorageImage = BasicUtils.isStorageMealImage(widget.imageUrl);
-    if (isStorageImage) {
-      StorageService.getMealImageUrl(widget.imageUrl).then((url) {
-        _storageUrl = url;
-        ref.read(_$isLoading.notifier).state = false;
-      });
-    } else {
-      _imageIsAvailable(widget.imageUrl).then((available) {
-        if (available) {
+    try {
+      final isStorageImage = BasicUtils.isStorageMealImage(widget.imageUrl);
+      if (isStorageImage) {
+        StorageService.getMealImageUrl(widget.imageUrl).then((url) {
+          _storageUrl = url;
           ref.read(_$isLoading.notifier).state = false;
-        }
-      });
+        });
+      } else {
+        _imageIsAvailable(widget.imageUrl).then((available) {
+          if (available) {
+            ref.read(_$isLoading.notifier).state = false;
+          }
+        });
+      }
+    } catch (e) {
+      _log.finer('Init of FoodlyNetworkImage failed.', e);
     }
     super.initState();
   }
