@@ -41,6 +41,7 @@ CupertinoAlertDialog _buildIOSLeaveDialog(BuildContext context) {
         isDefaultAction: true,
         child: Text(
           'settings_plan_leave_dialog_action_cancel'.tr().toUpperCase(),
+          style: TextStyle(color: Theme.of(context).primaryColor),
         ),
       ),
     ],
@@ -69,6 +70,7 @@ AlertDialog _buildLeaveDialog(BuildContext context) {
       TextButton(
         child: Text(
           'settings_plan_leave_dialog_action_cancel'.tr(),
+          style: TextStyle(color: Theme.of(context).primaryColor),
         ),
         onPressed: () {
           Navigator.of(context).pop(false);
@@ -113,6 +115,7 @@ CupertinoAlertDialog _buildIOSDeleteConfirmDialog(BuildContext context) {
         isDefaultAction: true,
         child: Text(
           'settings_plan_delete_dialog_action_cancel'.tr().toUpperCase(),
+          style: TextStyle(color: Theme.of(context).primaryColor),
         ),
       ),
     ],
@@ -141,6 +144,7 @@ AlertDialog _buildDeleteConfirmDialog(BuildContext context) {
       TextButton(
         child: Text(
           'settings_plan_delete_dialog_action_cancel'.tr(),
+          style: TextStyle(color: Theme.of(context).primaryColor),
         ),
         onPressed: () {
           Navigator.of(context).pop(false);

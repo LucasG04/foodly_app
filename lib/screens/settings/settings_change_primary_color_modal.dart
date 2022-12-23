@@ -2,8 +2,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:restart_app/restart_app.dart';
 
 import '../../constants.dart';
 import '../../primary_colors.dart';
@@ -72,11 +72,13 @@ class _SettingsChangePrimaryColorModalState
             alignment: WrapAlignment.spaceEvenly,
             children: [
               primaryDarkColor,
+              primaryDarkGreenColor,
               primaryDarkBlueColor,
               primaryBlueColor,
-              primaryDarkGreenColor,
-              primarOrangeColor,
-              primarPinkColor,
+              primaryRedColor,
+              primaryOrangeColor,
+              primaryPurpleColor,
+              primaryPinkColor,
             ]
                 .map(
                   (color) => Container(
@@ -103,7 +105,7 @@ class _SettingsChangePrimaryColorModalState
                 )
                 .toList(),
           ),
-          const SizedBox(height: kPadding),
+          const SizedBox(height: kPadding * 2),
         ],
       ),
     );
@@ -112,6 +114,8 @@ class _SettingsChangePrimaryColorModalState
   void _changeColor(Color color) async {
     ref.read(_$selected.notifier).state = color;
     await SettingsService.setPrimaryColor(color);
-    Restart.restartApp();
+    if (mounted) {
+      Phoenix.rebirth(context);
+    }
   }
 }

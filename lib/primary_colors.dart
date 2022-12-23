@@ -16,8 +16,10 @@ MaterialColor primaryDarkBlueColor =
 MaterialColor primaryBlueColor = const MaterialColor(0xFF2196F3, _blueMap);
 MaterialColor primaryDarkGreenColor =
     const MaterialColor(0xFF004225, _darkGreenMap);
-MaterialColor primarOrangeColor = const MaterialColor(0xFFF86624, _orangeMap);
-MaterialColor primarPinkColor = const MaterialColor(0xFFDE0D92, _pinkMap);
+MaterialColor primaryPurpleColor = const MaterialColor(0xFF802097, _purpleMap);
+MaterialColor primaryPinkColor = const MaterialColor(0xFFDE0D92, _pinkMap);
+MaterialColor primaryRedColor = const MaterialColor(0xFFCE2D4F, _redMap);
+MaterialColor primaryOrangeColor = const MaterialColor(0xFFF86624, _orangeMap);
 
 const Map<int, Color> _darkColorMap = {
   50: Color.fromRGBO(89, 84, 87, .1),
@@ -71,6 +73,19 @@ const Map<int, Color> _darkGreenMap = {
   900: Color.fromRGBO(0, 66, 37, 1),
 };
 
+const Map<int, Color> _purpleMap = {
+  50: Color.fromRGBO(128, 32, 151, .1),
+  100: Color.fromRGBO(128, 32, 151, .2),
+  200: Color.fromRGBO(128, 32, 151, .3),
+  300: Color.fromRGBO(128, 32, 151, .4),
+  400: Color.fromRGBO(128, 32, 151, .5),
+  500: Color.fromRGBO(128, 32, 151, .6),
+  600: Color.fromRGBO(128, 32, 151, .7),
+  700: Color.fromRGBO(128, 32, 151, .8),
+  800: Color.fromRGBO(128, 32, 151, .9),
+  900: Color.fromRGBO(128, 32, 151, 1),
+};
+
 const Map<int, Color> _orangeMap = {
   50: Color.fromRGBO(248, 102, 36, .1),
   100: Color.fromRGBO(248, 102, 36, .2),
@@ -95,4 +110,17 @@ const Map<int, Color> _pinkMap = {
   700: Color.fromRGBO(222, 13, 146, .8),
   800: Color.fromRGBO(222, 13, 146, .9),
   900: Color.fromRGBO(222, 13, 146, 1),
+};
+
+const Map<int, Color> _redMap = {
+  50: Color.fromRGBO(206, 45, 79, .1),
+  100: Color.fromRGBO(206, 45, 79, .2),
+  200: Color.fromRGBO(206, 45, 79, .3),
+  300: Color.fromRGBO(206, 45, 79, .4),
+  400: Color.fromRGBO(206, 45, 79, .5),
+  500: Color.fromRGBO(206, 45, 79, .6),
+  600: Color.fromRGBO(206, 45, 79, .7),
+  700: Color.fromRGBO(206, 45, 79, .8),
+  800: Color.fromRGBO(206, 45, 79, .9),
+  900: Color.fromRGBO(206, 45, 79, 1),
 };

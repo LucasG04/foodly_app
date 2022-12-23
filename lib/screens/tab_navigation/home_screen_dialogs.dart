@@ -6,7 +6,8 @@ import '../../constants.dart';
 
 // ignore: avoid_classes_with_only_static_members
 class HomeScreenDialogs {
-  static CupertinoAlertDialog updateDialogCupertino({
+  static CupertinoAlertDialog updateDialogCupertino(
+    BuildContext context, {
     required void Function() onUpdate,
     required void Function() onDismiss,
   }) {
@@ -32,13 +33,17 @@ class HomeScreenDialogs {
         CupertinoDialogAction(
           onPressed: onUpdate,
           isDefaultAction: true,
-          child: Text('update_dialog_action_update'.tr().toUpperCase()),
+          child: Text(
+            'update_dialog_action_update'.tr().toUpperCase(),
+            style: TextStyle(color: Theme.of(context).primaryColor),
+          ),
         ),
       ],
     );
   }
 
-  static CupertinoAlertDialog lockPlanCupertino({
+  static CupertinoAlertDialog lockPlanCupertino(
+    BuildContext context, {
     required void Function() onLock,
     required void Function() onDismiss,
   }) {
@@ -63,7 +68,10 @@ class HomeScreenDialogs {
         CupertinoDialogAction(
           onPressed: onLock,
           isDefaultAction: true,
-          child: Text('lock_plan_dialog_action_lock'.tr().toUpperCase()),
+          child: Text(
+            'lock_plan_dialog_action_lock'.tr().toUpperCase(),
+            style: TextStyle(color: Theme.of(context).primaryColor),
+          ),
         ),
       ],
     );

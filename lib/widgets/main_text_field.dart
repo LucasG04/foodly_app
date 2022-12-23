@@ -104,6 +104,7 @@ class _MainTextFieldState extends State<MainTextField> {
         autofillHints: widget.autofillHints,
         textCapitalization:
             widget.textCapitalization ?? TextCapitalization.none,
+        cursorColor: Theme.of(context).primaryColor,
         decoration: InputDecoration(
           hintText: widget.placeholder,
           border: OutlineInputBorder(
@@ -111,6 +112,9 @@ class _MainTextFieldState extends State<MainTextField> {
           ),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.grey[300]!),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Theme.of(context).primaryColor),
           ),
           fillColor: _hasFocus
               ? Theme.of(context).scaffoldBackgroundColor

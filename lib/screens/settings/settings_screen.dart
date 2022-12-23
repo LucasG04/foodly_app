@@ -9,9 +9,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
-import 'package:restart_app/restart_app.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -27,7 +27,6 @@ import '../../../utils/widget_utils.dart';
 import '../../../widgets/loading_logout.dart';
 import '../../models/plan.dart';
 import '../../models/shopping_list_sort.dart';
-import '../../primary_colors.dart';
 import '../../services/in_app_purchase_service.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
@@ -106,7 +105,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   .toList(),
                               onChanged: (Locale? locale) async {
                                 await context.setLocale(locale!);
-                                Restart.restartApp();
+                                if (mounted) {
+                                  Phoenix.rebirth(context);
+                                }
                               },
                             ),
                           ),
@@ -187,18 +188,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             leadingIcon: EvaIcons.colorPaletteOutline,
                             text: 'settings_section_customization_change_color'
                                 .tr(),
-                            trailing: StreamBuilder<Color>(
-                              stream: SettingsService.streamPrimaryColor(),
-                              builder: (context, snapshot) => Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: kPadding / 2,
-                                ),
-                                child: CircleAvatar(
-                                  maxRadius: kPadding / 2,
-                                  backgroundColor:
-                                      snapshot.data ?? primaryBlueColor,
-                                ),
-                              ),
+                            trailing: CircleAvatar(
+                              maxRadius: kPadding / 2,
+                              backgroundColor: SettingsService.primaryColor,
                             ),
                           ),
                           SettingsTile(

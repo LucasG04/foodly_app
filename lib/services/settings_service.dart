@@ -129,12 +129,4 @@ class SettingsService {
         .watch(key: 'productGroupOrder')
         .map((event) => event.value as List<String>);
   }
-
-  static Stream<Color> streamPrimaryColor() {
-    return _settingsBox.watch(key: 'primaryColor').map(
-          (event) => event.value != null
-              ? Color(event.value as int)
-              : primaryBlueColor,
-        );
-  }
 }

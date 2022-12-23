@@ -400,7 +400,10 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
       actions: <Widget>[
         CupertinoDialogAction(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text('shopping_dialog_action_cancel'.tr().toUpperCase()),
+          child: Text(
+            'shopping_dialog_action_cancel'.tr().toUpperCase(),
+            style: TextStyle(color: Theme.of(context).primaryColor),
+          ),
         ),
         CupertinoDialogAction(
           onPressed: () {
@@ -408,7 +411,10 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
             Navigator.of(context).pop();
           },
           isDefaultAction: true,
-          child: Text('update_dialog_action_delete'.tr().toUpperCase()),
+          child: Text(
+            'update_dialog_action_delete'.tr().toUpperCase(),
+            style: TextStyle(color: Theme.of(context).primaryColor),
+          ),
         ),
       ],
     );
@@ -427,7 +433,10 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
       ),
       actions: <Widget>[
         TextButton(
-          child: Text('shopping_dialog_action_cancel'.tr()),
+          child: Text(
+            'shopping_dialog_action_cancel'.tr(),
+            style: TextStyle(color: Theme.of(context).primaryColor),
+          ),
           onPressed: () {
             Navigator.of(context).pop();
           },

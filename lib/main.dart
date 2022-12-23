@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:logging/logging.dart';
@@ -63,12 +64,14 @@ Future<void> main() async {
   runZonedGuarded<void>(
     () {
       runApp(
-        ProviderScope(
-          child: EasyLocalization(
-            supportedLocales: const [Locale('en'), Locale('de')],
-            path: 'assets/translations',
-            fallbackLocale: const Locale('en'),
-            child: const FoodlyApp(),
+        Phoenix(
+          child: ProviderScope(
+            child: EasyLocalization(
+              supportedLocales: const [Locale('en'), Locale('de')],
+              path: 'assets/translations',
+              fallbackLocale: const Locale('en'),
+              child: const FoodlyApp(),
+            ),
           ),
         ),
       );
