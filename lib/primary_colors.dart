@@ -10,6 +10,8 @@ const kPrimaryColorsHex = [
   'de0d92',
 ];
 
+MaterialColor get defaultPrimaryColor => primaryBlueColor;
+
 MaterialColor primaryDarkColor = const MaterialColor(0xFF595457, _darkColorMap);
 MaterialColor primaryDarkBlueColor =
     const MaterialColor(0xFF072AC8, _darkBlueMap);

@@ -24,7 +24,7 @@ class _SettingsChangePrimaryColorModalState
   @override
   void initState() {
     _$selected = AutoDisposeStateProvider(
-      (_) => SettingsService.primaryColor ?? primaryBlueColor,
+      (_) => SettingsService.primaryColor,
     );
     super.initState();
   }

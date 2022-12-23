@@ -22,6 +22,7 @@ import 'constants.dart';
 import 'models/foodly_user.dart';
 import 'models/link_metadata.dart';
 import 'models/plan.dart';
+import 'primary_colors.dart';
 import 'providers/data_provider.dart';
 import 'providers/state_providers.dart';
 import 'services/app_review_service.dart';
@@ -200,6 +201,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       if (user.isPremium != null && user.isPremium!) {
         ref.read(InAppPurchaseService.$userIsSubscribed.notifier).state = true;
       }
+      _checkUserSubsription();
     } else {
       FirebaseCrashlytics.instance.setUserIdentifier('');
       BasicUtils.afterBuild(() => ref.read(userProvider.notifier).state = null);
@@ -281,6 +283,27 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
           value.substring(startIndex, value.length).split(' ')[0];
       _appRouter.navigate(
           MealCreateScreenRoute(id: Uri.encodeComponent(extractedLink)));
+    }
+  }
+
+  void _checkUserSubsription() async {
+    final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
+    if (isSubscribed) {
+      return;
+    }
+
+    bool shouldRestartApp = false;
+
+    if (SettingsService.primaryColor != defaultPrimaryColor) {
+      await SettingsService.setPrimaryColor(defaultPrimaryColor);
+      shouldRestartApp = true;
+    }
+    if (SettingsService.shoppingListSort != defaultShoppingListSort) {
+      await SettingsService.setShoppingListSort(defaultShoppingListSort);
+    }
+
+    if (shouldRestartApp && mounted) {
+      Phoenix.rebirth(context);
     }
   }
 }

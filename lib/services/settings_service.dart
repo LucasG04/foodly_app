@@ -2,6 +2,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
+import '../constants.dart';
 import '../models/shopping_list_sort.dart';
 import '../primary_colors.dart';
 import 'in_app_purchase_service.dart';
@@ -51,14 +52,13 @@ class SettingsService {
 
   static Color get primaryColor {
     final value = _settingsBox.get('primaryColor') as int?;
-    return value != null ? Color(value) : primaryBlueColor;
+    return value != null ? Color(value) : defaultPrimaryColor;
   }
 
   static ShoppingListSort? get shoppingListSort {
     final value = _settingsBox.get('shoppingListSort') as int?;
-    const defaultSort = ShoppingListSort.name;
     if (value == null) {
-      return defaultSort;
+      return defaultShoppingListSort;
     }
     final userHasPremium =
         _ref?.read(InAppPurchaseService.$userIsSubscribed) ?? false;
@@ -66,12 +66,12 @@ class SettingsService {
     for (final element in ShoppingListSort.values) {
       if (element.index == value) {
         if (premiumSorts.contains(element) && !userHasPremium) {
-          return defaultSort;
+          return defaultShoppingListSort;
         }
         return element;
       }
     }
-    return defaultSort;
+    return defaultShoppingListSort;
   }
 
   static List<String> get productGroupOrder {
