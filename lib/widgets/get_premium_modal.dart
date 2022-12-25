@@ -135,6 +135,12 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                         description: 'get_premium_modal_4_description'.tr(),
                       ),
                       ListTileCard(
+                        iconData: EvaIcons.colorPaletteOutline,
+                        title: 'get_premium_modal_6_title'.tr(),
+                        description: 'get_premium_modal_6_description'
+                            .tr(args: [kAppName]),
+                      ),
+                      ListTileCard(
                         iconData: _getSupportAppIcon(),
                         iconColor: Colors.red,
                         title: 'get_premium_modal_3_title'.tr(

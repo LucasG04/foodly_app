@@ -184,16 +184,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             }),
                           ),
                           SettingsTile(
-                            onTap: _openChangePrimaryColorModal,
-                            leadingIcon: EvaIcons.colorPaletteOutline,
-                            text: 'settings_section_customization_change_color'
-                                .tr(),
-                            trailing: CircleAvatar(
-                              maxRadius: kPadding / 2,
-                              backgroundColor: SettingsService.primaryColor,
-                            ),
-                          ),
-                          SettingsTile(
                             leadingIcon: Icons.emoji_food_beverage_rounded,
                             text:
                                 'settings_section_customization_breakfast'.tr(),
@@ -207,6 +197,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 },
                               );
                             }),
+                          ),
+                          WidgetUtils.userIsSubscribed(
+                            ref: ref,
+                            child: SettingsTile(
+                              onTap: _openChangePrimaryColorModal,
+                              leadingIcon: EvaIcons.colorPaletteOutline,
+                              text:
+                                  'settings_section_customization_change_color'
+                                      .tr(),
+                              trailing: CircleAvatar(
+                                maxRadius: kPadding / 2,
+                                backgroundColor: SettingsService.primaryColor,
+                              ),
+                            ),
                           ),
                           _buildShoppingListSortTile(),
                           WidgetUtils.userIsSubscribed(
