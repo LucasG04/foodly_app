@@ -9,9 +9,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
-import 'package:restart_app/restart_app.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -36,6 +36,7 @@ import 'change_plan_name_modal.dart';
 import 'help_slides/help_slide_share_import.dart';
 import 'import_meals_modal.dart';
 import 'settings_alerts.dart';
+import 'settings_change_primary_color_modal.dart';
 import 'settings_reauthenticate_modal.dart';
 import 'settings_tile.dart';
 
@@ -104,7 +105,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   .toList(),
                               onChanged: (Locale? locale) async {
                                 await context.setLocale(locale!);
-                                Restart.restartApp();
+                                if (mounted) {
+                                  Phoenix.rebirth(context);
+                                }
                               },
                             ),
                           ),
@@ -194,6 +197,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 },
                               );
                             }),
+                          ),
+                          WidgetUtils.userIsSubscribed(
+                            ref: ref,
+                            child: SettingsTile(
+                              onTap: _openChangePrimaryColorModal,
+                              leadingIcon: EvaIcons.colorPaletteOutline,
+                              text:
+                                  'settings_section_customization_change_color'
+                                      .tr(),
+                              trailing: CircleAvatar(
+                                maxRadius: kPadding / 2,
+                                backgroundColor: SettingsService.primaryColor,
+                              ),
+                            ),
                           ),
                           _buildShoppingListSortTile(),
                           WidgetUtils.userIsSubscribed(
@@ -569,6 +586,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) => const ChangePlanNameModal(),
+    );
+  }
+
+  void _openChangePrimaryColorModal() {
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => const SettingsChangePrimaryColorModal(),
     );
   }
 

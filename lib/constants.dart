@@ -2,6 +2,8 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 
+import 'models/shopping_list_sort.dart';
+
 /// General constants
 final kAppName = Platform.isIOS || Platform.isMacOS ? 'Foodster' : 'Foodly';
 const kPlaceholderSymbol = 'p--';
@@ -59,3 +61,6 @@ const kAppBundleId = '1590739803';
 
 /// If LogView should be available
 const kLogViewEnabled = false;
+
+// default ShoppingListSort
+ShoppingListSort get defaultShoppingListSort => ShoppingListSort.name;

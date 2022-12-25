@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:logging/logging.dart';
@@ -21,6 +22,7 @@ import 'constants.dart';
 import 'models/foodly_user.dart';
 import 'models/link_metadata.dart';
 import 'models/plan.dart';
+import 'primary_colors.dart';
 import 'providers/data_provider.dart';
 import 'providers/state_providers.dart';
 import 'services/app_review_service.dart';
@@ -63,12 +65,14 @@ Future<void> main() async {
   runZonedGuarded<void>(
     () {
       runApp(
-        ProviderScope(
-          child: EasyLocalization(
-            supportedLocales: const [Locale('en'), Locale('de')],
-            path: 'assets/translations',
-            fallbackLocale: const Locale('en'),
-            child: const FoodlyApp(),
+        Phoenix(
+          child: ProviderScope(
+            child: EasyLocalization(
+              supportedLocales: const [Locale('en'), Locale('de')],
+              path: 'assets/translations',
+              fallbackLocale: const Locale('en'),
+              child: const FoodlyApp(),
+            ),
           ),
         ),
       );
@@ -151,6 +155,9 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
                 ],
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
+                theme: Theme.of(context).copyWith(
+                  primaryColor: SettingsService.primaryColor,
+                ),
               );
             },
           );
@@ -194,6 +201,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       if (user.isPremium != null && user.isPremium!) {
         ref.read(InAppPurchaseService.$userIsSubscribed.notifier).state = true;
       }
+      _checkUserSubsription();
     } else {
       FirebaseCrashlytics.instance.setUserIdentifier('');
       BasicUtils.afterBuild(() => ref.read(userProvider.notifier).state = null);
@@ -275,6 +283,27 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
           value.substring(startIndex, value.length).split(' ')[0];
       _appRouter.navigate(
           MealCreateScreenRoute(id: Uri.encodeComponent(extractedLink)));
+    }
+  }
+
+  void _checkUserSubsription() async {
+    final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
+    if (isSubscribed) {
+      return;
+    }
+
+    bool shouldRestartApp = false;
+
+    if (SettingsService.primaryColor.value != defaultPrimaryColor.value) {
+      await SettingsService.setPrimaryColor(defaultPrimaryColor);
+      shouldRestartApp = true;
+    }
+    if (SettingsService.shoppingListSort != defaultShoppingListSort) {
+      await SettingsService.setShoppingListSort(defaultShoppingListSort);
+    }
+
+    if (shouldRestartApp && mounted) {
+      Phoenix.rebirth(context);
     }
   }
 }

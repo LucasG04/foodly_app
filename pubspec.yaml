@@ -49,7 +49,7 @@ dependencies:
   envied: ^0.2.4
   purchases_flutter: ^4.4.1
   permission_handler: ^10.2.0
-  restart_app: ^1.1.1
+  flutter_phoenix: ^1.1.0
 
   # Firebase
   firebase_core: ^1.21.1
