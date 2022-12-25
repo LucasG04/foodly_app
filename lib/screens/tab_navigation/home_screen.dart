@@ -199,6 +199,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
     return showDialog<void>(
       context: context,
       builder: (context) => HomeScreenDialogs.updateDialogCupertino(
+        context,
         onUpdate: () {
           Navigator.of(context).pop();
           _openAppStore();
@@ -253,6 +254,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
       context: context,
       builder: (context) => Platform.isIOS || Platform.isMacOS
           ? HomeScreenDialogs.lockPlanCupertino(
+              context,
               onLock: onLock,
               onDismiss: onDismiss,
             )

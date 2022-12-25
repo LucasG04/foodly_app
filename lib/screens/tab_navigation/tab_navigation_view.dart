@@ -53,6 +53,7 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView> {
       ),
       floatingActionButton: _showActionButton()
           ? FloatingActionButton(
+              backgroundColor: Theme.of(context).primaryColor,
               child: const Icon(EvaIcons.plus),
               onPressed: () {
                 switch (_currentIndex) {
@@ -70,6 +71,8 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView> {
           : null,
       bottomNavigationBar: SnakeNavigationBar.color(
         currentIndex: _currentIndex,
+        snakeViewColor: Theme.of(context).primaryColor,
+        unselectedItemColor: Theme.of(context).primaryColor,
         onTap: (value) async {
           setState(() {
             _currentIndex = value;

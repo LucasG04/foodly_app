@@ -139,6 +139,7 @@ class _MealListTitleState extends State<MealListTitle> {
       controller: _textEditingController,
       autofocus: true,
       onChanged: widget.onSearch,
+      cursorColor: Theme.of(context).primaryColor,
       style: const TextStyle(
         fontSize: 32.0,
         fontWeight: FontWeight.w700,
@@ -146,6 +147,12 @@ class _MealListTitleState extends State<MealListTitle> {
       ),
       decoration: InputDecoration(
         hintText: '${'meal_list_search'.tr()}...',
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Theme.of(context).primaryColor),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Theme.of(context).primaryColor),
+        ),
       ),
     );
   }
