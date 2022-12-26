@@ -97,10 +97,6 @@ jobs:
         run: bash ./.github/scripts/update_version.sh '${{ github.event.head_commit.message }}' '${{ github.run_number }}'
       - name: Build the AAB
         run: flutter build appbundle
-      - name: Remove Gemfile.lock
-        run: rm -f android/Gemfile.lock
-      - name: Run bundle install
-        run: cd android && bundle install
       - name: Run Fastlane
         uses: maierj/fastlane-action@v3.0.0
         with:
