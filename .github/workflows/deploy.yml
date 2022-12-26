@@ -102,11 +102,11 @@ jobs:
       - name: Run bundle install
         run: cd android && bundle install
       - name: Run Fastlane
-        uses: maierj/fastlane-action@v1.4.0
+        uses: maierj/fastlane-action@v3.0.0
         with:
           lane: internal
           subdirectory: android
-          # working-directory: android
+          working-directory: android
       - name: Notify on failure
         if: ${{ failure() }}
         uses: appleboy/telegram-action@master
