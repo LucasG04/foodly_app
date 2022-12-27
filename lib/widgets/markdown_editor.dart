@@ -105,6 +105,7 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
                         hintText:
                             '# Title\n## Subtitle\n- The quick brown fox jumps over the lazy dog\n- Lorem ipsum dolor sit amet, ...',
                       ),
+                      cursorColor: Theme.of(context).primaryColor,
                       minLines: 6,
                     ),
                   ),
