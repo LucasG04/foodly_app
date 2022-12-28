@@ -32,12 +32,12 @@ class ShoppingListService {
     return list;
   }
 
-  static Future<ShoppingList> getShoppingListByPlanId(String planId) async {
+  static Future<ShoppingList?> getShoppingListByPlanId(String planId) async {
     _log.finer('Call getShoppingListByPlanId with $planId');
     final snaps =
         await _firestore.where('planId', isEqualTo: planId).limit(1).get();
 
-    return snaps.docs.first.data();
+    return snaps.docs.isEmpty ? null : snaps.docs.first.data();
   }
 
   static Stream<List<Grocery>> streamShoppingList(String listId) {

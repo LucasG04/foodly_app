@@ -113,11 +113,7 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView> {
   }
 
   void _newGrocery() async {
-    if (_activeListId == null) {
-      final planId = ref.read(planProvider)!.id!;
-      final list = await ShoppingListService.getShoppingListByPlanId(planId);
-      _activeListId = list.id;
-    }
+    _activeListId ??= ref.read(shoppingListIdProvider);
 
     await WidgetUtils.showFoodlyBottomSheet<Ingredient?>(
       context: context,
