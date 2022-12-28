@@ -230,9 +230,7 @@ class _AddToShoppingListModalState
 
   Future<void> _addToShoppingList() async {
     ref.read(_$buttonState.notifier).state = ButtonState.inProgress;
-    final planId = ref.read(planProvider)!.id!;
-    final shoppingList =
-        await ShoppingListService.getShoppingListByPlanId(planId);
+    final shoppingListId = ref.read(shoppingListIdProvider);
     final ingredientsToAdd = _ingredientStates!
         .where((state) => ref.read(state.$isChecked))
         .map((state) => state.ingredient)
@@ -261,7 +259,7 @@ class _AddToShoppingListModalState
     }
 
     await ShoppingListService.addGroceries(
-      shoppingList.id!,
+      shoppingListId!,
       groceries,
       BasicUtils.getActiveLanguage(context),
     );

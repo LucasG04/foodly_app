@@ -95,6 +95,9 @@ class _EditListContentModalState extends ConsumerState<EditListContentModal> {
                   ),
                   TextButton(
                     onPressed: _closeModal,
+                    style: TextButton.styleFrom(
+                      foregroundColor: Theme.of(context).primaryColor,
+                    ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -165,13 +168,9 @@ class _EditListContentModalState extends ConsumerState<EditListContentModal> {
     final isSelected = _isSelected(text);
     return ListTile(
       title: Text(text),
-      trailing: isSelected
-          ? Icon(
-              EvaIcons.checkmark,
-              color: Theme.of(ctx).primaryColor,
-            )
-          : const SizedBox(),
+      trailing: isSelected ? const Icon(EvaIcons.checkmark) : const SizedBox(),
       selected: isSelected,
+      selectedColor: Theme.of(ctx).primaryColor,
       onTap: () => _selectValue(text),
       shape: _listTileShape,
       dense: true,
