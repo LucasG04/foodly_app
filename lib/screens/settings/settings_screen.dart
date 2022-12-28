@@ -388,7 +388,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   TextSpan(text: 'settings_sign_in_as'.tr()),
                                   TextSpan(
                                     text:
-                                        '\n${firebaseUser!.email!}${isSubscribed ? ' ⭐️' : ''}',
+                                        '\n${firebaseUser?.email ?? '...'}${isSubscribed ? ' ⭐️' : ''}',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
