@@ -64,6 +64,8 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
                 'https://www.chefkoch.de/rezepte/2280941363879458/Brokkoli-Spaetzle-Pfanne.html',
             errorText: _linkErrorText,
             onSubmit: _importMeal,
+            pasteFromClipboard: true,
+            pasteValidator: (text) => BasicUtils.isValidUri(text),
           ),
           if (_linkError)
             Container(
@@ -92,7 +94,10 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
           SizedBox(
             height: MediaQuery.of(context).viewInsets.bottom == 0
                 ? kPadding * 2
-                : MediaQuery.of(context).viewInsets.bottom,
+                : MediaQuery.of(context).viewInsets.bottom >
+                        60 // 60 for MainButton
+                    ? MediaQuery.of(context).viewInsets.bottom - 60
+                    : MediaQuery.of(context).viewInsets.bottom,
           ),
           Center(
             child: MainButton(
@@ -112,7 +117,7 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
     final String? link =
         BasicUtils.getUrlFromString(_linkController.text.trim());
 
-    if (link == null || link.isEmpty) {
+    if (link == null || link.isEmpty || BasicUtils.isValidUri(link)) {
       setState(() {
         _buttonState = ButtonState.error;
         _linkErrorText = 'import_modal_error_no_link'.tr();
@@ -127,6 +132,10 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
 
     try {
       final meal = await LunixApiService.getMealFromChefkochUrl(link);
+      if (meal == null) {
+        _handleDownloadError();
+        return;
+      }
       _buttonState = ButtonState.normal;
       if (!mounted) {
         return;
@@ -134,10 +143,14 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
       FocusScope.of(context).unfocus();
       Navigator.pop(context, meal);
     } catch (e) {
-      setState(() {
-        _buttonState = ButtonState.error;
-        _linkError = true;
-      });
+      _handleDownloadError();
     }
+  }
+
+  void _handleDownloadError() {
+    setState(() {
+      _buttonState = ButtonState.error;
+      _linkError = true;
+    });
   }
 }
