@@ -66,6 +66,7 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
             onSubmit: _importMeal,
             pasteFromClipboard: true,
             pasteValidator: (text) => BasicUtils.isValidUri(text),
+            submitOnPaste: true,
           ),
           if (_linkError)
             Container(
@@ -117,7 +118,7 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
     final String? link =
         BasicUtils.getUrlFromString(_linkController.text.trim());
 
-    if (link == null || link.isEmpty || BasicUtils.isValidUri(link)) {
+    if (link == null || link.isEmpty || !BasicUtils.isValidUri(link)) {
       setState(() {
         _buttonState = ButtonState.error;
         _linkErrorText = 'import_modal_error_no_link'.tr();
@@ -131,7 +132,8 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
     });
 
     try {
-      final meal = await LunixApiService.getMealFromChefkochUrl(link);
+      final langCode = context.locale.languageCode;
+      final meal = await LunixApiService.getMealFromUrl(link, langCode);
       if (meal == null) {
         _handleDownloadError();
         return;

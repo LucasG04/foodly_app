@@ -200,8 +200,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
                                   return WrappedImagePicker(
                                     key: ValueKey(imageUrl),
                                     imageUrl: imageUrl,
-                                    onPick: (value) =>
-                                        _updatedImage = value, // TODO: check
+                                    onPick: (value) => _updatedImage = value,
                                   );
                                 }),
                                 const Divider(),
@@ -305,8 +304,11 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
     } else if (widget.id.startsWith('https') &&
         Uri.decodeComponent(widget.id).startsWith(kChefkochShareEndpoint)) {
       _isCreatingMeal = true;
-      final meal = await LunixApiService.getMealFromChefkochUrl(
-          Uri.decodeComponent(widget.id));
+      final langCode = context.locale.languageCode;
+      final meal = await LunixApiService.getMealFromUrl(
+        Uri.decodeComponent(widget.id),
+        langCode,
+      );
       if (meal != null) {
         meal.imageUrl = meal.imageUrl!.replaceFirst('http:', 'https:');
         _titleController.text = meal.name;

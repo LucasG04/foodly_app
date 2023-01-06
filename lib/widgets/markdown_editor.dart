@@ -97,6 +97,7 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
                     thickness: 2.5,
                     child: TextFormField(
                       controller: widget.textEditingController,
+                      scrollController: ScrollController(),
                       maxLines: null,
                       onChanged: (data) =>
                           ref.read(_$currentText.notifier).state = data,
@@ -118,6 +119,7 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
                   child: Scrollbar(
                     thickness: 2.5,
                     child: SingleChildScrollView(
+                      controller: ScrollController(),
                       child: Consumer(builder: (context, ref, child) {
                         final text = ref.watch(_$currentText);
                         return MarkdownBody(

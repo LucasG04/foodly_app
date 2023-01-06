@@ -28,6 +28,7 @@ class MainTextField extends ConsumerStatefulWidget {
   final TextCapitalization? textCapitalization;
   final bool pasteFromClipboard;
   final bool Function(String)? pasteValidator;
+  final bool submitOnPaste;
 
   const MainTextField({
     required this.controller,
@@ -52,6 +53,7 @@ class MainTextField extends ConsumerStatefulWidget {
     this.textCapitalization,
     this.pasteFromClipboard = false,
     this.pasteValidator,
+    this.submitOnPaste = false,
     Key? key,
   })  : assert(
             (obscureText && !pasteFromClipboard) ||
@@ -154,13 +156,17 @@ class _MainTextFieldState extends ConsumerState<MainTextField> {
                   ? IconButton(
                       onPressed: () async {
                         final text = (await FlutterClipboard.paste()).trim();
-                        if (text.isNotEmpty) {
-                          if (widget.pasteValidator != null &&
-                              widget.pasteValidator!(text)) {
-                            widget.controller!.text = text;
-                          } else {
-                            widget.controller!.text = text;
-                          }
+
+                        if (text.isEmpty) {
+                          return;
+                        }
+                        if (widget.pasteValidator == null ||
+                            !widget.pasteValidator!(text)) {
+                          return;
+                        }
+                        widget.controller!.text = text;
+                        if (widget.submitOnPaste) {
+                          widget.onSubmit!();
                         }
                       },
                       icon: const Icon(EvaIcons.clipboardOutline),
