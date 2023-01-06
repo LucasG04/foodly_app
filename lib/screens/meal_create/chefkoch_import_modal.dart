@@ -1,25 +1,28 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../constants.dart';
+import '../../providers/data_provider.dart';
 import '../../services/lunix_api_service.dart';
 import '../../utils/basic_utils.dart';
+import '../../utils/main_snackbar.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
 
-class ChefkochImportModal extends StatefulWidget {
+class ChefkochImportModal extends ConsumerStatefulWidget {
   const ChefkochImportModal({Key? key}) : super(key: key);
 
   @override
-  State<ChefkochImportModal> createState() => _ChefkochImportModalState();
+  ConsumerState<ChefkochImportModal> createState() =>
+      _ChefkochImportModalState();
 }
 
-class _ChefkochImportModalState extends State<ChefkochImportModal> {
+class _ChefkochImportModalState extends ConsumerState<ChefkochImportModal> {
   TextEditingController _linkController = TextEditingController();
   String? _linkErrorText;
-  late bool _linkError;
 
   ButtonState? _buttonState;
 
@@ -27,7 +30,6 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
   void initState() {
     _linkController = TextEditingController();
     _linkErrorText = null;
-    _linkError = false;
     _buttonState = ButtonState.normal;
     super.initState();
   }
@@ -46,15 +48,26 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: kPadding),
-              child: Text(
-                'import_modal_title'.tr().toUpperCase(),
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ).tr(),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: kPadding),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'import_modal_title'.tr().toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                IconButton(
+                  onPressed: _showInfo,
+                  icon: const Icon(EvaIcons.infoOutline),
+                  color: Theme.of(context).primaryColor,
+                ),
+              ],
             ),
           ),
           MainTextField(
@@ -68,30 +81,6 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
             pasteValidator: (text) => BasicUtils.isValidUri(text),
             submitOnPaste: true,
           ),
-          if (_linkError)
-            Container(
-              margin: const EdgeInsets.only(top: kPadding),
-              padding: const EdgeInsets.symmetric(
-                  horizontal: kPadding, vertical: kPadding / 2),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(kRadius),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    EvaIcons.alertCircleOutline,
-                    color: Theme.of(context).errorColor,
-                  ),
-                  const SizedBox(width: kPadding),
-                  Expanded(
-                    child: const Text('import_modal_error_not_found').tr(),
-                  )
-                ],
-              ),
-            )
-          else
-            const SizedBox(),
           SizedBox(
             height: MediaQuery.of(context).viewInsets.bottom == 0
                 ? kPadding * 2
@@ -127,7 +116,7 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
     }
 
     setState(() {
-      _linkError = false;
+      _linkErrorText = null;
       _buttonState = ButtonState.inProgress;
     });
 
@@ -149,10 +138,30 @@ class _ChefkochImportModalState extends State<ChefkochImportModal> {
     }
   }
 
+  void _showInfo() {
+    final providerSites = ref.read(dataSupportedImportSitesProvider);
+    final backupSites = ['chefkoch.de', 'kitchenstories.com'];
+    var supportedSites = providerSites.isEmpty ? backupSites : providerSites;
+    supportedSites = supportedSites.map((e) => '- $e').toList();
+    var supportedSitesString = supportedSites.join('\n');
+    supportedSitesString = '\n$supportedSitesString';
+
+    MainSnackbar(
+      message: 'import_modal_info'.tr(args: [supportedSitesString]),
+      isDismissible: true,
+      duration: 10,
+    ).show(context);
+  }
+
   void _handleDownloadError() {
+    MainSnackbar(
+      isError: true,
+      title: 'import_modal_error_not_found_title'.tr(),
+      message: 'import_modal_error_not_found'.tr(),
+      isDismissible: true,
+    ).show(context);
     setState(() {
       _buttonState = ButtonState.error;
-      _linkError = true;
     });
   }
 }

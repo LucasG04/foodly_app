@@ -382,4 +382,25 @@ class LunixApiService {
       return null;
     }
   }
+
+  static Future<List<String>> getSupportedImportSites() async {
+    _log.finer('Call getSupportedImportSites()');
+
+    try {
+      final response = await _dio.get<dynamic>(
+        '$_lunixApiEndpoint/import/supported-sites',
+      );
+      if (response.statusCode != 200) {
+        return [];
+      }
+
+      final sites = List<String>.from(
+        (response.data as List<dynamic>?) ?? <String>[],
+      );
+      return sites;
+    } catch (e) {
+      _log.severe('ERR in getSupportedImportSites. API Request failed', e);
+      return [];
+    }
+  }
 }
