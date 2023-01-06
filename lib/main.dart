@@ -136,8 +136,8 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
             snapshot.connectionState == ConnectionState.done) {
           _loadActivePlan().then((_) {
             _loadActiveShoppingList();
-            _loadGroceryGroups();
           });
+          _loadBaseData();
           _loadActiveUser();
           return Consumer(
             builder: (context, ref, _) {
@@ -229,10 +229,20 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     ref.read(shoppingListIdProvider.notifier).state = shoppingList.id;
   }
 
+  void _loadBaseData() {
+    _loadGroceryGroups();
+    _loadSupportedImportSites();
+  }
+
   Future<void> _loadGroceryGroups() async {
     final langCode = context.locale.languageCode;
     final groups = await LunixApiService.getGroceryGroups(langCode);
     ref.read(dataGroceryGroupsProvider.notifier).state = groups;
+  }
+
+  Future<void> _loadSupportedImportSites() async {
+    final sites = await LunixApiService.getSupportedImportSites();
+    ref.read(dataSupportedImportSitesProvider.notifier).state = sites;
   }
 
   void _initializeLogger() {

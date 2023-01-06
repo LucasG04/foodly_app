@@ -31,7 +31,7 @@ class LinkMetadataService {
     try {
       data = await MetadataFetch.extract(link);
     } catch (e) {
-      log.severe('Error while fetching metadata for $link', e);
+      log.warning('Error while fetching metadata for $link', e);
       return null;
     }
 

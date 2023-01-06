@@ -1,9 +1,11 @@
+import 'package:clipboard/clipboard.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../constants.dart';
 
-class MainTextField extends StatefulWidget {
+class MainTextField extends ConsumerStatefulWidget {
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final String? title;
@@ -24,6 +26,9 @@ class MainTextField extends StatefulWidget {
   final bool required;
   final List<String>? autofillHints;
   final TextCapitalization? textCapitalization;
+  final bool pasteFromClipboard;
+  final bool Function(String)? pasteValidator;
+  final bool submitOnPaste;
 
   const MainTextField({
     required this.controller,
@@ -46,16 +51,24 @@ class MainTextField extends StatefulWidget {
     this.required = false,
     this.autofillHints,
     this.textCapitalization,
+    this.pasteFromClipboard = false,
+    this.pasteValidator,
+    this.submitOnPaste = false,
     Key? key,
-  }) : super(key: key);
+  })  : assert(
+            (obscureText && !pasteFromClipboard) ||
+                (!obscureText && pasteFromClipboard) ||
+                (!obscureText && !pasteFromClipboard),
+            'You cannot use both obscureText and pastFromClipboard'),
+        super(key: key);
 
   @override
-  State<MainTextField> createState() => _MainTextFieldState();
+  ConsumerState<MainTextField> createState() => _MainTextFieldState();
 }
 
-class _MainTextFieldState extends State<MainTextField> {
+class _MainTextFieldState extends ConsumerState<MainTextField> {
+  final _$hasFocus = AutoDisposeStateProvider<bool>((_) => false);
   late bool _obscureText;
-  bool _hasFocus = false;
   FocusNode? _focusNode;
 
   @override
@@ -97,6 +110,9 @@ class _MainTextFieldState extends State<MainTextField> {
 
   Widget _buildInput() {
     return Focus(
+      onFocusChange: (value) {
+        ref.read(_$hasFocus.notifier).state = value;
+      },
       child: TextFormField(
         controller: widget.controller,
         autofocus: widget.autofocus,
@@ -116,7 +132,7 @@ class _MainTextFieldState extends State<MainTextField> {
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Theme.of(context).primaryColor),
           ),
-          fillColor: _hasFocus
+          fillColor: ref.read(_$hasFocus)
               ? Theme.of(context).scaffoldBackgroundColor
               : Colors.grey[300],
           filled: false,
@@ -136,7 +152,27 @@ class _MainTextFieldState extends State<MainTextField> {
                             size: kIconHeight),
                   ),
                 )
-              : null,
+              : widget.pasteFromClipboard
+                  ? IconButton(
+                      onPressed: () async {
+                        final text = (await FlutterClipboard.paste()).trim();
+
+                        if (text.isEmpty) {
+                          return;
+                        }
+                        if (widget.pasteValidator == null ||
+                            !widget.pasteValidator!(text)) {
+                          return;
+                        }
+                        widget.controller!.text = text;
+                        if (widget.submitOnPaste) {
+                          widget.onSubmit!();
+                        }
+                      },
+                      icon: const Icon(EvaIcons.clipboardOutline),
+                      splashRadius: kIconHeight,
+                    )
+                  : null,
           errorText: widget.errorText,
           errorMaxLines: widget.errorMaxLines,
         ),
@@ -160,11 +196,6 @@ class _MainTextFieldState extends State<MainTextField> {
         onChanged: widget.onChange,
         validator: widget.validator,
       ),
-      onFocusChange: (value) {
-        setState(() {
-          _hasFocus = value;
-        });
-      },
     );
   }
 }
