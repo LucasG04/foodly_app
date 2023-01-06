@@ -49,6 +49,9 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
         });
       } else {
         _imageIsAvailable(widget.imageUrl).then((available) {
+          if (!mounted) {
+            return;
+          }
           if (available) {
             ref.read(_$isLoading.notifier).state = false;
           } else {
