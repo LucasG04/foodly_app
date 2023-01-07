@@ -44,6 +44,9 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
       final isStorageImage = BasicUtils.isStorageMealImage(widget.imageUrl);
       if (isStorageImage) {
         StorageService.getMealImageUrl(widget.imageUrl).then((url) {
+          if (!mounted) {
+            return;
+          }
           _storageUrl = url;
           ref.read(_$isLoading.notifier).state = false;
         });
@@ -62,6 +65,9 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
     } catch (e) {
       _log.finer('Init of FoodlyNetworkImage failed.', e);
       BasicUtils.afterBuild(() {
+        if (!mounted) {
+          return;
+        }
         ref.read(_$hasError.notifier).state = true;
         ref.read(_$isLoading.notifier).state = false;
       });
@@ -78,7 +84,6 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
         } else if (ref.watch(_$hasError)) {
           return _buildFallbackImage();
         }
-
         return _buildCachedNetworkImage(
           BasicUtils.isStorageMealImage(widget.imageUrl)
               ? _storageUrl
