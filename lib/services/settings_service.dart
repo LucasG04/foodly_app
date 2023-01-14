@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
 import '../constants.dart';
+import '../models/plan_meal.dart';
 import '../models/shopping_list_sort.dart';
 import '../primary_colors.dart';
 import 'in_app_purchase_service.dart';
@@ -47,9 +48,6 @@ class SettingsService {
   static bool get removeBoughtImmediately =>
       _settingsBox.get('removeBoughtImmediately', defaultValue: false) as bool;
 
-  static bool get planWithBreakfast =>
-      _settingsBox.get('planWithBreakfast', defaultValue: false) as bool;
-
   static Color get primaryColor {
     final value = _settingsBox.get('primaryColor') as int?;
     return value != null ? Color(value) : defaultPrimaryColor;
@@ -82,6 +80,14 @@ class SettingsService {
     return value.cast<String>();
   }
 
+  static List<MealType> get activeMealTypes {
+    final value = _settingsBox.get('activeMealTypes') as List<int>?;
+    if (value == null) {
+      return [MealType.LUNCH, MealType.DINNER];
+    }
+    return value.map((e) => MealType.values[e]).toList();
+  }
+
   static Future<void> setMultipleMealsPerTime(bool value) async {
     await _settingsBox.put('multipleMealsPerTime', value);
   }
@@ -94,10 +100,6 @@ class SettingsService {
     await _settingsBox.put('removeBoughtImmediately', value);
   }
 
-  static Future<void> setPlanWithBreakfast(bool value) async {
-    await _settingsBox.put('planWithBreakfast', value);
-  }
-
   static Future<void> setPrimaryColor(Color value) async {
     await _settingsBox.put('primaryColor', value.value);
   }
@@ -108,6 +110,13 @@ class SettingsService {
 
   static Future<void> setProductGroupOrder(List<String> value) async {
     await _settingsBox.put('productGroupOrder', value);
+  }
+
+  static Future<void> setActiveMealTypes(List<MealType> value) async {
+    await _settingsBox.put(
+      'activeMealTypes',
+      value.map((e) => e.index).toList(),
+    );
   }
 
   static Stream<BoxEvent> streamShoppingListSort() {

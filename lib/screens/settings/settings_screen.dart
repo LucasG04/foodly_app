@@ -32,6 +32,7 @@ import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import '../onboarding/onboarding_screen.dart';
+import 'change_meal_types_modal.dart';
 import 'change_plan_name_modal.dart';
 import 'help_slides/help_slide_share_import.dart';
 import 'import_meals_modal.dart';
@@ -184,19 +185,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             }),
                           ),
                           SettingsTile(
+                            onTap: _openChangeMealTypesModal,
                             leadingIcon: Icons.emoji_food_beverage_rounded,
-                            text:
-                                'settings_section_customization_breakfast'.tr(),
-                            trailing: Consumer(builder: (context, ref, _) {
-                              return Switch.adaptive(
-                                value: SettingsService.planWithBreakfast,
-                                onChanged: (value) {
-                                  setState(() {
-                                    SettingsService.setPlanWithBreakfast(value);
-                                  });
-                                },
-                              );
-                            }),
+                            text: 'settings_section_customization_meal_types'
+                                .tr(),
+                            trailing: const Icon(
+                              EvaIcons.arrowIosForwardOutline,
+                            ),
                           ),
                           WidgetUtils.userIsSubscribed(
                             ref: ref,
@@ -632,6 +627,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) => const GetPremiumModal(),
+    );
+  }
+
+  void _openChangeMealTypesModal() {
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => const ChangeMealTypesModal(),
     );
   }
 
