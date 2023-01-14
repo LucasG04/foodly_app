@@ -64,79 +64,73 @@ class PlanDayCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: kPadding),
-              StreamBuilder<bool>(
-                initialData: SettingsService.planWithBreakfast,
-                stream: SettingsService.streamPlanWithBreakfast(),
-                builder: (context, snapshot) {
-                  if (_showBreakfast(snapshot.data, breakfastList.isEmpty)) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildSubtitle('plan_day_breakfast'.tr()),
-                        ...breakfastList
-                            .map(
-                              (e) => PlanDayMealTile(
-                                e,
-                                readonly: readonly,
-                                enableVoting:
-                                    breakfastList.length > 1 && !readonly,
-                              ),
-                            )
-                            .toList(),
-                        _buildAddButton(
-                          context,
-                          mealType: MealType.BREAKFAST,
-                          mealsAtTime: breakfastList.length,
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Divider(),
-                        ),
-                      ],
-                    );
-                  }
-                  return const SizedBox();
-                },
+              _buildMealView(
+                title: 'plan_day_breakfast'.tr(),
+                mealType: MealType.BREAKFAST,
+                list: breakfastList,
+                context: context,
               ),
-              _buildSubtitle('plan_day_lunch'.tr()),
-              ...lunchList
-                  .map(
-                    (e) => PlanDayMealTile(
-                      e,
-                      readonly: readonly,
-                      enableVoting: lunchList.length > 1 && !readonly,
-                    ),
-                  )
-                  .toList(),
-              _buildAddButton(
-                context,
+              _buildMealView(
+                title: 'plan_day_lunch'.tr(),
                 mealType: MealType.LUNCH,
-                mealsAtTime: lunchList.length,
+                list: lunchList,
+                context: context,
               ),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Divider(),
-              ),
-              _buildSubtitle('plan_day_dinner'.tr()),
-              ...dinnerList
-                  .map(
-                    (e) => PlanDayMealTile(
-                      e,
-                      readonly: readonly,
-                      enableVoting: dinnerList.length > 1 && !readonly,
-                    ),
-                  )
-                  .toList(),
-              _buildAddButton(
-                context,
+              _buildMealView(
+                title: 'plan_day_dinner'.tr(),
                 mealType: MealType.DINNER,
-                mealsAtTime: dinnerList.length,
+                list: dinnerList,
+                context: context,
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildMealView({
+    required String title,
+    required MealType mealType,
+    required Iterable<PlanMeal> list,
+    required BuildContext context,
+  }) {
+    return StreamBuilder<List<MealType>>(
+      initialData: SettingsService.activeMealTypes,
+      stream: SettingsService.streamActiveMealTypes(),
+      builder: (context, snapshot) {
+        final isActive = snapshot.data?.contains(mealType) ?? false;
+        if (!_showMealView(isActive, list.isEmpty)) {
+          return const SizedBox();
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildSubtitle(title),
+            ...list
+                .map(
+                  (e) => PlanDayMealTile(
+                    e,
+                    readonly: readonly,
+                    enableVoting: list.length > 1 && !readonly,
+                  ),
+                )
+                .toList(),
+            _buildAddButton(
+              context,
+              mealType: mealType,
+              mealsAtTime: list.length,
+            ),
+            // TODO: Add divider only if there is a meal below
+            if (true)
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Divider(),
+              ),
+          ],
+        );
+      },
     );
   }
 
@@ -149,7 +143,10 @@ class PlanDayCard extends StatelessWidget {
       return mealsAtTime > 0
           ? const SizedBox()
           : const Center(
-              child: Text('-', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: Text(
+                '-',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             );
     }
     return StreamBuilder<dynamic>(
@@ -210,8 +207,8 @@ class PlanDayCard extends StatelessWidget {
     return mealsAtTime < 1 || SettingsService.multipleMealsPerTime;
   }
 
-  bool _showBreakfast(bool? settingEnabled, bool breakfastListEmpty) {
-    return (readonly && !breakfastListEmpty) ||
+  bool _showMealView(bool? settingEnabled, bool listIsEmpty) {
+    return (readonly && !listIsEmpty) ||
         (!readonly && settingEnabled != null && settingEnabled);
   }
 }

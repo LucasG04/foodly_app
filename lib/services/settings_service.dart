@@ -81,11 +81,7 @@ class SettingsService {
   }
 
   static List<MealType> get activeMealTypes {
-    final value = _settingsBox.get('activeMealTypes') as List<int>?;
-    if (value == null) {
-      return [MealType.LUNCH, MealType.DINNER];
-    }
-    return value.map((e) => MealType.values[e]).toList();
+    return _convertToMealTypes(_settingsBox.get('activeMealTypes'));
   }
 
   static Future<void> setMultipleMealsPerTime(bool value) async {
@@ -127,15 +123,28 @@ class SettingsService {
     return _settingsBox.watch(key: 'multipleMealsPerTime');
   }
 
-  static Stream<bool> streamPlanWithBreakfast() {
+  static Stream<List<MealType>> streamActiveMealTypes() {
     return _settingsBox
-        .watch(key: 'planWithBreakfast')
-        .map((event) => event.value == true);
+        .watch(key: 'activeMealTypes')
+        .map((event) => _convertToMealTypes(event.value));
   }
 
   static Stream<List<String>> streamProductGroupOrder() {
     return _settingsBox
         .watch(key: 'productGroupOrder')
         .map((event) => event.value as List<String>);
+  }
+
+  static List<MealType> _convertToMealTypes(dynamic value) {
+    final defaultValues = [MealType.LUNCH, MealType.DINNER];
+    try {
+      value as List<int>?;
+      if (value == null) {
+        return defaultValues;
+      }
+      return value.map((e) => MealType.values[e]).toList();
+    } catch (e) {
+      return defaultValues;
+    }
   }
 }

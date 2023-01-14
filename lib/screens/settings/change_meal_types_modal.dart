@@ -92,7 +92,7 @@ class _ChangeMealTypeModalState extends ConsumerState<ChangeMealTypesModal> {
   ) {
     return Consumer(builder: (context, ref, _) {
       return CheckboxListTile(
-        value: ref.read(provider),
+        value: ref.watch(provider),
         onChanged: (value) {
           ref.read(provider.notifier).state = value!;
         },

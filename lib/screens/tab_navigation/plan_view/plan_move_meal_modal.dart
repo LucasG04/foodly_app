@@ -95,25 +95,27 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal> {
             isExpanded: true,
           ),
           const SizedBox(height: kPadding / 2),
-          if (SettingsService.planWithBreakfast)
+          if (_showMealTile(MealType.BREAKFAST))
             RadioListTile(
               title: const Text('plan_move_breakfast').tr(),
               value: MealType.BREAKFAST,
               groupValue: _selectedMealType,
               onChanged: _changeMealType,
             ),
-          RadioListTile(
-            title: const Text('plan_move_lunch').tr(),
-            value: MealType.LUNCH,
-            groupValue: _selectedMealType,
-            onChanged: _changeMealType,
-          ),
-          RadioListTile(
-            title: const Text('plan_move_dinner').tr(),
-            value: MealType.DINNER,
-            groupValue: _selectedMealType,
-            onChanged: _changeMealType,
-          ),
+          if (_showMealTile(MealType.LUNCH))
+            RadioListTile(
+              title: const Text('plan_move_lunch').tr(),
+              value: MealType.LUNCH,
+              groupValue: _selectedMealType,
+              onChanged: _changeMealType,
+            ),
+          if (_showMealTile(MealType.DINNER))
+            RadioListTile(
+              title: const Text('plan_move_dinner').tr(),
+              value: MealType.DINNER,
+              groupValue: _selectedMealType,
+              onChanged: _changeMealType,
+            ),
           const SizedBox(height: kPadding),
           Center(
             child: MainButton(
@@ -193,5 +195,9 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal> {
       return;
     }
     Navigator.pop(context, true);
+  }
+
+  bool _showMealTile(MealType type) {
+    return SettingsService.activeMealTypes.contains(type);
   }
 }

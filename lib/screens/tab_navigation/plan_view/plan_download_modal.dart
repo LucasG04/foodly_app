@@ -155,7 +155,8 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
   }
 
   bool _getIinitialIncludeBreakfast() {
-    final settingActive = SettingsService.planWithBreakfast;
+    final settingActive =
+        SettingsService.activeMealTypes.contains(MealType.BREAKFAST);
     final breakfastInPlan =
         widget.plan.meals?.any((e) => e.type == MealType.BREAKFAST) ?? false;
 
