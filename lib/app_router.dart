@@ -26,7 +26,7 @@ import 'screens/upcoming_features/upcoming_features_screen.dart';
     CupertinoRoute<dynamic>(page: UpcomingFeaturesScreen),
     CupertinoRoute<dynamic>(page: ReorderProductGroupsScreen),
     CupertinoRoute<dynamic>(path: '/meal-create/:id', page: MealCreateScreen),
-    CupertinoRoute<dynamic>(path: '/meal/:id', page: MealScreen),
+    CupertinoRoute<dynamic>(path: '/meal', page: MealScreen),
     CupertinoRoute<dynamic>(path: '*', page: UnknownRouteScreen),
   ],
 )
