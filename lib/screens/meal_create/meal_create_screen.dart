@@ -377,9 +377,18 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
         : meal.createdBy;
     meal.planId = ref.read(planProvider)!.id;
 
-    meal.imageUrl = _updatedImage ??
-        (await LinkMetadataService.get(meal.source!))?.image ??
-        meal.imageUrl;
+    final useLinkImage =
+        !_imageIsValid(meal.imageUrl) && !_imageIsValid(_updatedImage);
+
+    if (useLinkImage) {
+      final imageOfSource =
+          (await LinkMetadataService.get(meal.source!))?.image;
+      if (_imageIsValid(imageOfSource)) {
+        meal.imageUrl = imageOfSource;
+      }
+    } else if (_imageIsValid(_updatedImage)) {
+      meal.imageUrl = _updatedImage;
+    }
 
     if (_formIsValid()) {
       try {
@@ -424,6 +433,10 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
 
   bool _formIsValid() {
     return _titleController.text.isNotEmpty;
+  }
+
+  bool _imageIsValid(String? image) {
+    return image != null && image.isNotEmpty;
   }
 
   bool _formHasChanges() {
