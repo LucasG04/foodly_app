@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
 import '../constants.dart';
+import '../models/plan_meal.dart';
 import '../models/shopping_list_sort.dart';
 import '../primary_colors.dart';
 import 'in_app_purchase_service.dart';
@@ -47,9 +48,6 @@ class SettingsService {
   static bool get removeBoughtImmediately =>
       _settingsBox.get('removeBoughtImmediately', defaultValue: false) as bool;
 
-  static bool get planWithBreakfast =>
-      _settingsBox.get('planWithBreakfast', defaultValue: false) as bool;
-
   static Color get primaryColor {
     final value = _settingsBox.get('primaryColor') as int?;
     return value != null ? Color(value) : defaultPrimaryColor;
@@ -82,6 +80,10 @@ class SettingsService {
     return value.cast<String>();
   }
 
+  static List<MealType> get activeMealTypes {
+    return _convertToMealTypes(_settingsBox.get('activeMealTypes'));
+  }
+
   static Future<void> setMultipleMealsPerTime(bool value) async {
     await _settingsBox.put('multipleMealsPerTime', value);
   }
@@ -92,10 +94,6 @@ class SettingsService {
 
   static Future<void> setRemoveBoughtImmediately(bool value) async {
     await _settingsBox.put('removeBoughtImmediately', value);
-  }
-
-  static Future<void> setPlanWithBreakfast(bool value) async {
-    await _settingsBox.put('planWithBreakfast', value);
   }
 
   static Future<void> setPrimaryColor(Color value) async {
@@ -110,6 +108,13 @@ class SettingsService {
     await _settingsBox.put('productGroupOrder', value);
   }
 
+  static Future<void> setActiveMealTypes(List<MealType> value) async {
+    await _settingsBox.put(
+      'activeMealTypes',
+      value.map((e) => e.index).toList(),
+    );
+  }
+
   static Stream<BoxEvent> streamShoppingListSort() {
     return _settingsBox.watch(key: 'shoppingListSort');
   }
@@ -118,15 +123,28 @@ class SettingsService {
     return _settingsBox.watch(key: 'multipleMealsPerTime');
   }
 
-  static Stream<bool> streamPlanWithBreakfast() {
+  static Stream<List<MealType>> streamActiveMealTypes() {
     return _settingsBox
-        .watch(key: 'planWithBreakfast')
-        .map((event) => event.value == true);
+        .watch(key: 'activeMealTypes')
+        .map((event) => _convertToMealTypes(event.value));
   }
 
   static Stream<List<String>> streamProductGroupOrder() {
     return _settingsBox
         .watch(key: 'productGroupOrder')
         .map((event) => event.value as List<String>);
+  }
+
+  static List<MealType> _convertToMealTypes(dynamic value) {
+    final defaultValues = [MealType.LUNCH, MealType.DINNER];
+    try {
+      value as List<int>?;
+      if (value == null) {
+        return defaultValues;
+      }
+      return value.map((e) => MealType.values[e]).toList();
+    } catch (e) {
+      return defaultValues;
+    }
   }
 }

@@ -35,7 +35,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
 
   @override
   void initState() {
-    _includeBreakfast = _getIinitialIncludeBreakfast();
+    _includeBreakfast = _initialIncludeBreakfast();
     super.initState();
   }
 
@@ -154,8 +154,9 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
     Navigator.maybePop(context);
   }
 
-  bool _getIinitialIncludeBreakfast() {
-    final settingActive = SettingsService.planWithBreakfast;
+  bool _initialIncludeBreakfast() {
+    final settingActive =
+        SettingsService.activeMealTypes.contains(MealType.BREAKFAST);
     final breakfastInPlan =
         widget.plan.meals?.any((e) => e.type == MealType.BREAKFAST) ?? false;
 
