@@ -19,7 +19,7 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal> {
   static const double kEmptySpace = kPadding / 2;
 
   final ScrollController _scrollController = ScrollController();
-  bool _isScrollToTop = true;
+  final _$isScrollToTop = AutoDisposeStateProvider((_) => true);
 
   @override
   void initState() {
@@ -105,44 +105,46 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal> {
     );
   }
 
-  Card _buildModalHeader(BuildContext context, double width) {
-    return Card(
-      margin: EdgeInsets.zero,
-      color: Theme.of(context).scaffoldBackgroundColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(10.0),
-          topRight: Radius.circular(10.0),
+  Widget _buildModalHeader(BuildContext context, double width) {
+    return Consumer(builder: (context, ref, _) {
+      return Card(
+        margin: EdgeInsets.zero,
+        color: Theme.of(context).scaffoldBackgroundColor,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10.0),
+            topRight: Radius.circular(10.0),
+          ),
         ),
-      ),
-      elevation: _isScrollToTop ? 0 : 4.0,
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: (MediaQuery.of(context).size.width - width) / 2,
-          vertical: kPadding / 2,
+        elevation: ref.watch(_$isScrollToTop) ? 0 : 2.0,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: (MediaQuery.of(context).size.width - width) / 2,
+            vertical: kPadding / 2,
+          ),
+          child: Row(
+            children: [
+              const Text(
+                'FILTER',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(EvaIcons.trash2Outline),
+                onPressed: () =>
+                    ref.read(mealTagFilterProvider.notifier).state = [],
+              ),
+              const SizedBox(width: kPadding / 2),
+              IconButton(
+                icon: const Icon(EvaIcons.arrowIosDownwardOutline),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
         ),
-        child: Row(
-          children: [
-            const Text(
-              'FILTER',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(EvaIcons.trash2Outline),
-              onPressed: () =>
-                  ref.read(mealTagFilterProvider.notifier).state = [],
-            ),
-            const SizedBox(width: kPadding / 2),
-            IconButton(
-              icon: const Icon(EvaIcons.arrowIosDownwardOutline),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ],
-        ),
-      ),
-    );
+      );
+    });
   }
 
   FilterChip _buildFilterChip(
@@ -175,16 +177,12 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal> {
   void _scrollListener() {
     if (_scrollController.offset <=
         _scrollController.position.minScrollExtent) {
-      if (!_isScrollToTop) {
-        setState(() {
-          _isScrollToTop = true;
-        });
+      if (!ref.read(_$isScrollToTop)) {
+        ref.read(_$isScrollToTop.notifier).state = true;
       }
     } else {
-      if (_scrollController.offset > kEmptySpace && _isScrollToTop) {
-        setState(() {
-          _isScrollToTop = false;
-        });
+      if (_scrollController.offset > kEmptySpace && ref.read(_$isScrollToTop)) {
+        ref.read(_$isScrollToTop.notifier).state = false;
       }
     }
   }

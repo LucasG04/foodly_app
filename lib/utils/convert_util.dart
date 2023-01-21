@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 
 class ConvertUtil {
@@ -66,5 +67,11 @@ class ConvertUtil {
     }
     final actualAmount = amount * requestedServings / mealServings;
     return num.tryParse(actualAmount.toStringAsFixed(2)) ?? actualAmount;
+  }
+
+  static String errorDescriptionToString(Object? error) {
+    return error != null && error is ErrorDescription
+        ? error.toStringDeep()
+        : error.toString();
   }
 }
