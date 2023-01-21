@@ -186,6 +186,7 @@ class _AddToShoppingListModalState
                   subtitle: amountString.isEmpty
                       ? null
                       : _buildAmountSubtitle(ingredient),
+                  activeColor: Theme.of(context).primaryColor,
                 );
               },
             );

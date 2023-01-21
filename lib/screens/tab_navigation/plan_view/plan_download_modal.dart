@@ -80,6 +80,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
             trailing: Checkbox(
               value: _excludeToday,
               onChanged: _excludeTodayChange,
+              activeColor: Theme.of(context).primaryColor,
             ),
             onTap: () => _excludeTodayChange(!_excludeToday),
           ),
@@ -88,6 +89,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
             trailing: Checkbox(
               value: _portraitFormat,
               onChanged: _portraitFormatChange,
+              activeColor: Theme.of(context).primaryColor,
             ),
             onTap: () => _portraitFormatChange(!_portraitFormat),
           ),
@@ -97,6 +99,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
               trailing: Checkbox(
                 value: _includeBreakfast,
                 onChanged: _includeBreakfastChange,
+                activeColor: Theme.of(context).primaryColor,
               ),
               onTap: () => _includeBreakfastChange(!_includeBreakfast),
             ),
