@@ -35,8 +35,13 @@ import 'tag_tile.dart';
 
 class MealScreen extends ConsumerStatefulWidget {
   final String id;
+  final bool showOptions;
 
-  const MealScreen({required this.id, Key? key}) : super(key: key);
+  const MealScreen({
+    required this.id,
+    this.showOptions = true,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _MealScreenState createState() => _MealScreenState();
@@ -127,7 +132,8 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                                     ),
                                   ),
                                 ),
-                                if (meal.planId == currentPlanId)
+                                if (meal.planId == currentPlanId &&
+                                    widget.showOptions)
                                   BorderIcon(
                                     height: 50,
                                     width: 50,

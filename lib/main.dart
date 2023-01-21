@@ -37,6 +37,7 @@ import 'services/settings_service.dart';
 import 'services/shopping_list_service.dart';
 import 'services/version_service.dart';
 import 'utils/basic_utils.dart';
+import 'utils/convert_util.dart';
 import 'widgets/disposable_widget.dart';
 
 Future<void> _configureFirebase() async {
@@ -78,7 +79,7 @@ Future<void> main() async {
       );
     },
     (error, stack) => FirebaseCrashlytics.instance.recordError(
-      error,
+      ConvertUtil.errorDescriptionToString(error),
       stack,
       fatal: true,
     ),
@@ -253,7 +254,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
         print('${record.level.name}: ${record.loggerName}: ${record.message}');
         if (record.error != null) {
           // ignore: avoid_print
-          print(record.error);
+          print(ConvertUtil.errorDescriptionToString(record.error));
         }
       }).canceledBy(this);
     } else {
@@ -266,7 +267,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
         FirebaseCrashlytics.instance.recordError(
           message,
           record.stackTrace,
-          reason: record.error,
+          reason: ConvertUtil.errorDescriptionToString(record.error),
         );
       }).canceledBy(this);
     }

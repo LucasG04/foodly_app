@@ -77,7 +77,8 @@ class AppRouter extends _i12.RootStackRouter {
       final args = routeData.argsAs<MealScreenRouteArgs>();
       return _i12.CupertinoPageX<dynamic>(
           routeData: routeData,
-          child: _i10.MealScreen(id: args.id, key: args.key));
+          child: _i10.MealScreen(
+              id: args.id, showOptions: args.showOptions, key: args.key));
     },
     UnknownRouteScreenRoute.name: (routeData) {
       return _i12.CupertinoPageX<dynamic>(
@@ -101,7 +102,7 @@ class AppRouter extends _i12.RootStackRouter {
         _i12.RouteConfig(ReorderProductGroupsScreenRoute.name,
             path: '/reorder-product-groups-screen'),
         _i12.RouteConfig(MealCreateScreenRoute.name, path: '/meal-create/:id'),
-        _i12.RouteConfig(MealScreenRoute.name, path: '/meal/:id'),
+        _i12.RouteConfig(MealScreenRoute.name, path: '/meal'),
         _i12.RouteConfig(UnknownRouteScreenRoute.name, path: '*')
       ];
 }
@@ -228,23 +229,28 @@ class MealCreateScreenRouteArgs {
 /// generated route for
 /// [_i10.MealScreen]
 class MealScreenRoute extends _i12.PageRouteInfo<MealScreenRouteArgs> {
-  MealScreenRoute({required String id, _i13.Key? key})
+  MealScreenRoute({required String id, bool showOptions = true, _i13.Key? key})
       : super(MealScreenRoute.name,
-            path: '/meal/:id', args: MealScreenRouteArgs(id: id, key: key));
+            path: '/meal',
+            args: MealScreenRouteArgs(
+                id: id, showOptions: showOptions, key: key));
 
   static const String name = 'MealScreenRoute';
 }
 
 class MealScreenRouteArgs {
-  const MealScreenRouteArgs({required this.id, this.key});
+  const MealScreenRouteArgs(
+      {required this.id, this.showOptions = true, this.key});
 
   final String id;
+
+  final bool showOptions;
 
   final _i13.Key? key;
 
   @override
   String toString() {
-    return 'MealScreenRouteArgs{id: $id, key: $key}';
+    return 'MealScreenRouteArgs{id: $id, showOptions: $showOptions, key: $key}';
   }
 }
 
