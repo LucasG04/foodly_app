@@ -102,13 +102,19 @@ class _ChangeMealTypeModalState extends ConsumerState<ChangeMealTypesModal> {
   }
 
   Future<void> _save() async {
-    // TODO: check if at least one is selected
+    var updatedTypes = [
+      if (ref.read(_$breakfast)) MealType.BREAKFAST,
+      if (ref.read(_$lunch)) MealType.LUNCH,
+      if (ref.read(_$dinner)) MealType.DINNER,
+    ];
+    if (updatedTypes.isEmpty) {
+      updatedTypes = [
+        MealType.LUNCH,
+        MealType.DINNER,
+      ];
+    }
     try {
-      SettingsService.setActiveMealTypes([
-        if (ref.read(_$breakfast)) MealType.BREAKFAST,
-        if (ref.read(_$lunch)) MealType.LUNCH,
-        if (ref.read(_$dinner)) MealType.DINNER,
-      ]);
+      SettingsService.setActiveMealTypes(updatedTypes);
     } catch (e) {
       _log.severe('Failed to save meal types', e);
     }
