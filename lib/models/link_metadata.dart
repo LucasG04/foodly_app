@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+
 part 'link_metadata.g.dart';
 
 @HiveType(typeId: 1)
@@ -25,4 +26,9 @@ class LinkMetadata {
     this.description,
     this.cachedAt,
   });
+
+  @override
+  String toString() {
+    return 'LinkMetadata(url: $url, image: $image, title: $title, description: $description, cachedAt: $cachedAt)';
+  }
 }

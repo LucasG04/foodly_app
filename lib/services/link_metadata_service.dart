@@ -37,6 +37,8 @@ class LinkMetadataService {
 
     if (data == null) {
       return null;
+    } else if (data.url == null || data.url!.isEmpty) {
+      data.url = link;
     }
 
     final linkMetadata = _parseMetadata(data);
