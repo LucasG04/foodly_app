@@ -122,8 +122,7 @@ class PlanDayCard extends StatelessWidget {
               mealType: mealType,
               mealsAtTime: list.length,
             ),
-            // TODO: Add divider only if there is a meal below
-            if (true)
+            if (_shouldAddDivider(mealType))
               const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Divider(),
@@ -210,5 +209,15 @@ class PlanDayCard extends StatelessWidget {
   bool _showMealView(bool? settingEnabled, bool listIsEmpty) {
     return (readonly && !listIsEmpty) ||
         (!readonly && settingEnabled != null && settingEnabled);
+  }
+
+  bool _shouldAddDivider(MealType mealType) {
+    final currentTypes = SettingsService.activeMealTypes;
+    final forBreakfast = mealType == MealType.BREAKFAST &&
+        (currentTypes.contains(MealType.LUNCH) ||
+            currentTypes.contains(MealType.DINNER));
+    final forLunch =
+        mealType == MealType.LUNCH && currentTypes.contains(MealType.DINNER);
+    return forBreakfast || forLunch;
   }
 }
