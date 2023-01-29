@@ -1,5 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -67,10 +67,10 @@ class _MealListTitleState extends State<MealListTitle> {
                   builder: (context, ref, child) {
                     final tagFilterLength =
                         ref.watch(mealTagFilterProvider).length;
-                    return Badge(
+                    return badges.Badge(
                       animationDuration: const Duration(milliseconds: 250),
-                      position: BadgePosition.topEnd(top: 0, end: 3),
-                      animationType: BadgeAnimationType.scale,
+                      position: badges.BadgePosition.topEnd(top: 0, end: 3),
+                      animationType: badges.BadgeAnimationType.scale,
                       badgeColor: Theme.of(context).primaryColor,
                       badgeContent: Text(
                         tagFilterLength.toString(),
