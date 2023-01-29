@@ -17,7 +17,10 @@ class BasicUtils {
   }
 
   /// Returns if the given image url/string is a image from Firebase Storage
-  static bool isStorageMealImage(String image) {
+  static bool isStorageMealImage(String? image) {
+    if (image == null || image.isEmpty) {
+      return false;
+    }
     try {
       final date = DateTime.fromMicrosecondsSinceEpoch(
           int.parse(image.split('.').first));

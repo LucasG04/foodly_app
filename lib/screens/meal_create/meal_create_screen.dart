@@ -111,7 +111,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
               IconButton(
                 icon: Icon(
                   EvaIcons.downloadOutline,
-                  color: Theme.of(context).textTheme.bodyText1!.color,
+                  color: Theme.of(context).textTheme.bodyLarge!.color,
                 ),
                 onPressed: () => _openChefkochImport(),
               ),
@@ -163,7 +163,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
                                         'meal_create_servings_title',
                                         style: Theme.of(context)
                                             .textTheme
-                                            .bodyText1,
+                                            .bodyLarge,
                                         overflow: TextOverflow.ellipsis,
                                       ).tr(),
                                     ),
@@ -186,7 +186,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
                                   child: Text(
                                     'meal_create_instruction_title',
                                     style:
-                                        Theme.of(context).textTheme.bodyText1,
+                                        Theme.of(context).textTheme.bodyLarge,
                                   ).tr(),
                                 ),
                                 MarkdownEditor(
@@ -200,7 +200,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
                                   return WrappedImagePicker(
                                     key: ValueKey(imageUrl),
                                     imageUrl: imageUrl,
-                                    onPick: (value) => _updatedImage = value,
+                                    onPick: _pickNewImage,
                                   );
                                 }),
                                 const Divider(),
@@ -364,6 +364,15 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
     }
   }
 
+  void _pickNewImage(String imageUrl) {
+    final meal = ref.read(_$meal.notifier).state;
+    if (meal.imageUrl != _updatedImage &&
+        BasicUtils.isStorageMealImage(_updatedImage)) {
+      StorageService.removeFile(_updatedImage);
+    }
+    _updatedImage = imageUrl;
+  }
+
   Future<bool> _saveMeal() async {
     ref.read(_$buttonState.notifier).state = ButtonState.inProgress;
 
@@ -377,6 +386,15 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
         : meal.createdBy;
     meal.planId = ref.read(planProvider)!.id;
 
+    if (!_formIsValid()) {
+      MainSnackbar(
+        message: 'meal_create_error_missing_input'.tr(),
+        isError: true,
+      ).show(context);
+      ref.read(_$buttonState.notifier).state = ButtonState.error;
+      return false;
+    }
+
     final useLinkImage =
         !_imageIsValid(meal.imageUrl) && !_imageIsValid(_updatedImage);
 
@@ -386,44 +404,36 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
       if (_imageIsValid(imageOfSource)) {
         meal.imageUrl = imageOfSource;
       }
-    } else if (_imageIsValid(_updatedImage)) {
+    } else {
+      if (meal.imageUrl != _updatedImage &&
+          BasicUtils.isStorageMealImage(meal.imageUrl)) {
+        StorageService.removeFile(meal.imageUrl);
+      }
       meal.imageUrl = _updatedImage;
     }
 
-    if (_formIsValid()) {
-      try {
-        final newMeal = _isCreatingMeal
-            ? await MealService.createMeal(meal)
-            : await MealService.updateMeal(meal);
-        ref.read(_$buttonState.notifier).state = ButtonState.normal;
-        _mealSaved = true;
-        if (!mounted) {
-          return false;
-        }
-        LunixApiService.setGroupsForIngredients(
-          newMeal?.id ?? '',
-          BasicUtils.getActiveLanguage(context),
-        );
-        BasicUtils.emitMealsChanged(ref, newMeal?.id ?? '');
-        AutoRouter.of(context).pop();
-        return true;
-      } catch (e) {
-        if (!mounted) {
-          return false;
-        }
-        MainSnackbar(
-          message: 'meal_create_error_unknown'.tr(),
-          isError: true,
-        ).show(context);
-        ref.read(_$buttonState.notifier).state = ButtonState.error;
+    try {
+      final newMeal = _isCreatingMeal
+          ? await MealService.createMeal(meal)
+          : await MealService.updateMeal(meal);
+      ref.read(_$buttonState.notifier).state = ButtonState.normal;
+      _mealSaved = true;
+      if (!mounted) {
         return false;
       }
-    } else {
+      LunixApiService.setGroupsForIngredients(
+        newMeal?.id ?? '',
+        BasicUtils.getActiveLanguage(context),
+      );
+      BasicUtils.emitMealsChanged(ref, newMeal?.id ?? '');
+      AutoRouter.of(context).pop();
+      return true;
+    } catch (e) {
       if (!mounted) {
         return false;
       }
       MainSnackbar(
-        message: 'meal_create_error_missing_input'.tr(),
+        message: 'meal_create_error_unknown'.tr(),
         isError: true,
       ).show(context);
       ref.read(_$buttonState.notifier).state = ButtonState.error;
@@ -478,6 +488,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
       ..._existingMealTags ?? <String>[],
       ..._getMissingTagsInExisting()
     ];
+    if (!mounted) {
+      return;
+    }
     final result = await WidgetUtils.showFoodlyBottomSheet<List<String>>(
       context: context,
       builder: (_) => EditListContentModal(
@@ -545,7 +558,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
   void _removeUnsavedStorageImage() {
     if (_updatedImage != null &&
         !_mealSaved &&
-        BasicUtils.isStorageMealImage(_updatedImage!)) {
+        BasicUtils.isStorageMealImage(_updatedImage)) {
       StorageService.removeFile(_updatedImage);
     }
   }
