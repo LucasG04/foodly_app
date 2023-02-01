@@ -44,7 +44,7 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
       final isStorageImage = BasicUtils.isStorageMealImage(widget.imageUrl);
       if (isStorageImage) {
         StorageService.getMealImageUrl(widget.imageUrl).then((url) {
-          if (!mounted) {
+          if (!mounted || url == null) {
             return;
           }
           _storageUrl = url;

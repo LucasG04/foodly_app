@@ -38,10 +38,10 @@ class StorageService {
     return Future.value(uploadTask);
   }
 
-  static Future<String> getMealImageUrl(String? fileName) async {
+  static Future<String?> getMealImageUrl(String? fileName) async {
     _log.finer('Call getMealImageUrl with $fileName');
     if (fileName == null || fileName.isEmpty) {
-      return '';
+      return null;
     }
 
     // Create a Reference to the file
@@ -50,7 +50,12 @@ class StorageService {
         .child(_storageMealImageFolder)
         .child(fileName);
 
-    return ref.getDownloadURL();
+    try {
+      return ref.getDownloadURL();
+    } catch (e) {
+      _log.severe('Could not get download url for $fileName', e);
+      return null;
+    }
   }
 
   static Future<void> removeFile(String? fileName) async {
