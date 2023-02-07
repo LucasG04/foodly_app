@@ -113,10 +113,12 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
     if (result != null) {
       if (BasicUtils.isStorageMealImage(result)) {
         final storageUrl = await StorageService.getMealImageUrl(result);
+        if (storageUrl == null) {
+          return;
+        }
         setState(() {
           _imageUrl = storageUrl;
         });
-        print('3kil4 storage up $_imageUrl');
         widget.onPick(result);
       } else if (Uri.tryParse(result)!.isAbsolute) {
         setState(() {

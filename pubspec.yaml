@@ -33,7 +33,6 @@ dependencies:
   logging: ^1.0.0
   receive_sharing_intent: ^1.4.5
   image_picker: ^0.7.3
-  in_app_update: ^3.0.0
   path_provider: ^2.0.1
   sign_in_with_apple: ^3.2.0
   crypto: ^3.0.1
@@ -44,10 +43,11 @@ dependencies:
   keyboard_service: ^2.0.1
   flutter_native_image: ^0.0.6+1
   version: ^2.0.0
-  package_info_plus: ^1.4.2
-  update_available: ^2.1.0
+  package_info_plus: ^3.0.2
+  in_app_update: ^4.0.1 # Android Updates
+  update_available: ^2.2.0 # iOS Updates
   envied: ^0.2.4
-  purchases_flutter: ^4.4.1
+  purchases_flutter: ^4.9.0
   permission_handler: ^10.2.0
   flutter_phoenix: ^1.1.0
   clipboard: ^0.1.3
