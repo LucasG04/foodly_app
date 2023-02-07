@@ -404,9 +404,10 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
       if (_imageIsValid(imageOfSource)) {
         meal.imageUrl = imageOfSource;
       }
-    } else {
-      if (meal.imageUrl != _updatedImage &&
-          BasicUtils.isStorageMealImage(meal.imageUrl)) {
+    } else if (_imageIsValid(_updatedImage)) {
+      final shouldRemoveCurrent = meal.imageUrl != _updatedImage &&
+          BasicUtils.isStorageMealImage(meal.imageUrl);
+      if (shouldRemoveCurrent) {
         StorageService.removeFile(meal.imageUrl);
       }
       meal.imageUrl = _updatedImage;
