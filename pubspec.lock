@@ -895,10 +895,10 @@ packages:
     dependency: "direct main"
     description:
       name: in_app_update
-      sha256: cc7e96b4f09b6f968598b804157c279e34d3ab661d1e3bea333751826496eb5f
+      sha256: "0be3b79405409d77999b57075322ae4703af7871d83529b5b52c246ada9861fe"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0"
+    version: "4.0.1"
   integration_test:
     dependency: "direct dev"
     description: flutter
@@ -1061,50 +1061,18 @@ packages:
     dependency: "direct main"
     description:
       name: package_info_plus
-      sha256: f62d7253edc197fe3c88d7c2ddab82d68f555e778d55390ccc3537eca8e8d637
+      sha256: f619162573096d428ccde2e33f92e05b5a179cd6f0e3120c1005f181bee8ed16
       url: "https://pub.dev"
     source: hosted
-    version: "1.4.3+1"
-  package_info_plus_linux:
-    dependency: transitive
-    description:
-      name: package_info_plus_linux
-      sha256: "04b575f44233d30edbb80a94e57cad9107aada334fc02aabb42b6becd13c43fc"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.5"
-  package_info_plus_macos:
-    dependency: transitive
-    description:
-      name: package_info_plus_macos
-      sha256: a2ad8b4acf4cd479d4a0afa5a74ea3f5b1c7563b77e52cc32b3ee6956d5482a6
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.0"
+    version: "3.0.2"
   package_info_plus_platform_interface:
     dependency: transitive
     description:
       name: package_info_plus_platform_interface
-      sha256: f7a0c8f1e7e981bc65f8b64137a53fd3c195b18d429fba960babc59a5a1c7ae8
+      sha256: "9bc8ba46813a4cc42c66ab781470711781940780fd8beddd0c3da62506d3a6c6"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.2"
-  package_info_plus_web:
-    dependency: transitive
-    description:
-      name: package_info_plus_web
-      sha256: f0829327eb534789e0a16ccac8936a80beed4e2401c4d3a74f3f39094a822d3b
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.6"
-  package_info_plus_windows:
-    dependency: transitive
-    description:
-      name: package_info_plus_windows
-      sha256: "79524f11c42dd9078b96d797b3cf79c0a2883a50c4920dc43da8562c115089bc"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
+    version: "2.0.1"
   path:
     dependency: transitive
     description:
@@ -1285,10 +1253,10 @@ packages:
     dependency: "direct main"
     description:
       name: purchases_flutter
-      sha256: "66221ba93adccc3ddd256e8ec7825870431e417d6e10c3b5c42c15de664cad1f"
+      sha256: ab91d3e09f832ebcee063b377d6f5e4e736c541bbfa0348a9ac05cca92cb0b2a
       url: "https://pub.dev"
     source: hosted
-    version: "4.8.0"
+    version: "4.9.0"
   receive_sharing_intent:
     dependency: "direct main"
     description:
@@ -1626,34 +1594,34 @@ packages:
     dependency: "direct main"
     description:
       name: update_available
-      sha256: ca5493e86805adc679bedcf9326a9b80dad15637f52b0b14e6d412515a049d20
+      sha256: "5569efa2d589e46d83c2af89114fae59e8df776af75105ac2c30f763bd3dd81b"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.0"
+    version: "2.2.0"
   update_available_android:
     dependency: transitive
     description:
       name: update_available_android
-      sha256: "0f383fce03bfdab408e3500faad37729fbd2e71c78ba0141d337bf5eab5784fc"
+      sha256: "89400b24d59309631b8e55fe7b990228d43c7643ac43ac26aeb24b1b36974826"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.0"
+    version: "2.2.0"
   update_available_ios:
     dependency: transitive
     description:
       name: update_available_ios
-      sha256: "5d9fd24d961e91074b42868fc24dc775b5a2a3db30797fa8627da39ba0eb812e"
+      sha256: "0daf8a94f7b654743b12285ac7f9cf34a4976d75ebe6a13ba8bdab1d2ff687cb"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.0"
+    version: "2.2.0"
   update_available_platform_interface:
     dependency: transitive
     description:
       name: update_available_platform_interface
-      sha256: a307dbd985154313485714494bb0ce32d6300df81c33db38728c9bc6631f1ee0
+      sha256: ac3eba71886ce27b7db211e4d790af9947ace5adf5535bac6dc40069646ec2ce
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.0"
+    version: "3.0.0"
   url_launcher:
     dependency: "direct main"
     description:
@@ -1807,5 +1775,5 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=2.18.0 <4.0.0"
+  dart: ">=2.18.0 <3.0.0"
   flutter: ">=3.3.0"
