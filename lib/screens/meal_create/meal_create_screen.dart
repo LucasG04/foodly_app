@@ -89,6 +89,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
   @override
   void dispose() {
     _removeUnsavedStorageImage();
+    ref.read(initSearchWebImagePickerProvider.notifier).state = '';
     super.dispose();
   }
 
@@ -137,10 +138,6 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
                                   controller: _titleController,
                                   title: 'meal_create_title_title'.tr(),
                                   required: true,
-                                  onChange: (newText) => ref
-                                      .read(initSearchWebImagePickerProvider
-                                          .notifier)
-                                      .state = newText,
                                 ),
                                 const Divider(),
                                 Consumer(builder: (context, ref, _) {
@@ -201,6 +198,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
                                     key: ValueKey(imageUrl),
                                     imageUrl: imageUrl,
                                     onPick: _pickNewImage,
+                                    onOpen: _onOpenImagePicker,
                                   );
                                 }),
                                 const Divider(),
@@ -569,5 +567,10 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
     final copy = Meal.fromMap(meal.id, meal.toMap());
     changeProperty(copy);
     ref.read(_$meal.notifier).state = copy;
+  }
+
+  void _onOpenImagePicker() {
+    ref.read(initSearchWebImagePickerProvider.notifier).state =
+        _titleController.text;
   }
 }

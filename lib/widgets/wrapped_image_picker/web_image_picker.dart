@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -43,23 +42,15 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
   bool _isLoading = false;
   bool _isLoadingMore = false;
   bool _noResults = false;
-  bool _firstBuild = true;
 
   @override
   void initState() {
     super.initState();
+    BasicUtils.afterBuild(() => _initialSearch());
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_firstBuild) {
-      final initialSearch = ref.read(initSearchWebImagePickerProvider);
-      if (initialSearch.isNotEmpty) {
-        _inputController.text = initialSearch;
-        _search();
-      }
-      _firstBuild = false;
-    }
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -108,7 +99,7 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
                     children: [
                       Icon(
                         EvaIcons.alertCircleOutline,
-                        color: Theme.of(context).errorColor,
+                        color: Theme.of(context).colorScheme.error,
                       ),
                       const SizedBox(height: kPadding / 2),
                       Expanded(
@@ -263,6 +254,16 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
       ),
       child: child,
     );
+  }
+
+  void _initialSearch() {
+    final initialSearch = ref.read(initSearchWebImagePickerProvider);
+    if (initialSearch.isEmpty) {
+      return;
+    }
+
+    _inputController.text = initialSearch;
+    _search();
   }
 
   void _clearResults() {

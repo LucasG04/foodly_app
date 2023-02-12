@@ -13,6 +13,7 @@ import 'select_picker_dialog.dart';
 class WrappedImagePicker extends StatefulWidget {
   final Function(String) onPick;
   final Function()? onRemove;
+  final Function()? onOpen;
   final double edgeLength;
 
   /// Used to display a already selected image
@@ -22,6 +23,7 @@ class WrappedImagePicker extends StatefulWidget {
     Key? key,
     required this.onPick,
     this.onRemove,
+    this.onOpen,
     this.edgeLength = 200.0,
     this.imageUrl,
   }) : super(key: key);
@@ -105,6 +107,9 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
   }
 
   void _selectImage() async {
+    if (widget.onOpen != null) {
+      widget.onOpen!();
+    }
     final String? result = await WidgetUtils.showFoodlyBottomSheet<String?>(
       context: context,
       builder: (_) => const SelectPickerDialog(),
