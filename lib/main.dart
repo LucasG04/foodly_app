@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
@@ -116,6 +117,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   void initState() {
     _initializeLogger();
     _listenForShareIntent();
+    _listenForConnectivity();
     super.initState();
     InAppPurchaseService.setRef(ref);
     SettingsService.setRef(ref);
@@ -322,6 +324,18 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     if (shouldRestartApp && mounted) {
       Phoenix.rebirth(context);
     }
+  }
+
+  void _listenForConnectivity() async {
+    final connectivity = Connectivity();
+
+    connectivity.checkConnectivity().then((result) {
+      ref.read(connectivityProvider.notifier).state = result;
+    });
+
+    connectivity.onConnectivityChanged.listen((ConnectivityResult result) {
+      ref.read(connectivityProvider.notifier).state = result;
+    }).canceledBy(this);
   }
 }
 

@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/foodly_user.dart';
@@ -30,3 +31,7 @@ final initSearchWebImagePickerProvider = StateProvider<String>((_) => '');
 /// Provides the last time the page index of the pagehistory/home page
 /// controller has been changed
 final planHistoryPageChanged = StateProvider<int>((_) => 0);
+
+/// controller has been changed
+final connectivityProvider =
+    StateProvider<ConnectivityResult>((_) => ConnectivityResult.none);
