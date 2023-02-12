@@ -5,7 +5,6 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
@@ -175,6 +174,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       final String? planId = await PlanService.getCurrentPlanId();
 
       if (planId != null && planId.isNotEmpty) {
+        FirebaseCrashlytics.instance.setCustomKey('planId', planId);
         final Plan? newPlan = await PlanService.getPlanById(planId);
         if (!mounted) {
           return;
@@ -192,6 +192,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     final firebaseUser = AuthenticationService.currentUser;
     if (firebaseUser != null) {
       FirebaseCrashlytics.instance.setUserIdentifier(firebaseUser.uid);
+      FirebaseCrashlytics.instance.setCustomKey('userId', firebaseUser.uid);
       final FoodlyUser? user =
           await FoodlyUserService.getUserById(firebaseUser.uid);
       if (!mounted || user == null) {
