@@ -184,7 +184,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
                       onPressed: _showRecommendationsInfo,
                       icon: Icon(
                         EvaIcons.infoOutline,
-                        color: Theme.of(context).textTheme.bodyText1?.color ??
+                        color: Theme.of(context).textTheme.bodyLarge?.color ??
                             Theme.of(context).primaryColor,
                       ),
                       splashRadius: 25.0,
@@ -373,7 +373,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
     FirebaseAnalytics.instance.logEvent(
       name: 'add_meal_to_plan',
       parameters: {
-        'isPlaceholder': isPlaceholder,
+        'isPlaceholder': isPlaceholder.toString(),
       },
     );
   }

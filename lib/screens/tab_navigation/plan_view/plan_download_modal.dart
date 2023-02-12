@@ -246,9 +246,9 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
     FirebaseAnalytics.instance.logEvent(
       name: 'plan_download',
       parameters: {
-        'excludeToday': _excludeToday,
-        'vertical': _portraitFormat,
-        'includeBreakfast': _includeBreakfast,
+        'excludeToday': _excludeToday.toString(),
+        'vertical': _portraitFormat.toString(),
+        'includeBreakfast': _includeBreakfast.toString(),
         'type': _getValueForDocType(_docType),
       },
     );
