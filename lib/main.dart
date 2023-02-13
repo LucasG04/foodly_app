@@ -1,17 +1,18 @@
 import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -117,6 +118,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   void initState() {
     _initializeLogger();
     _listenForShareIntent();
+    _listenForConnectivity();
     super.initState();
     InAppPurchaseService.setRef(ref);
     SettingsService.setRef(ref);
@@ -175,6 +177,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       final String? planId = await PlanService.getCurrentPlanId();
 
       if (planId != null && planId.isNotEmpty) {
+        FirebaseCrashlytics.instance.setCustomKey('planId', planId);
         final Plan? newPlan = await PlanService.getPlanById(planId);
         if (!mounted) {
           return;
@@ -192,6 +195,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     final firebaseUser = AuthenticationService.currentUser;
     if (firebaseUser != null) {
       FirebaseCrashlytics.instance.setUserIdentifier(firebaseUser.uid);
+      FirebaseCrashlytics.instance.setCustomKey('userId', firebaseUser.uid);
       final FoodlyUser? user =
           await FoodlyUserService.getUserById(firebaseUser.uid);
       if (!mounted || user == null) {
@@ -321,6 +325,20 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     if (shouldRestartApp && mounted) {
       Phoenix.rebirth(context);
     }
+  }
+
+  void _listenForConnectivity() async {
+    InternetConnectionChecker().hasConnection.then((result) {
+      ref.read(hasConnectionProvider.notifier).state = result;
+    });
+
+    Connectivity().onConnectivityChanged.listen((_) async {
+      final isDeviceConnected = await InternetConnectionChecker().hasConnection;
+      if (!mounted) {
+        return;
+      }
+      ref.read(hasConnectionProvider.notifier).state = isDeviceConnected;
+    }).canceledBy(this);
   }
 }
 

@@ -30,3 +30,6 @@ final initSearchWebImagePickerProvider = StateProvider<String>((_) => '');
 /// Provides the last time the page index of the pagehistory/home page
 /// controller has been changed
 final planHistoryPageChanged = StateProvider<int>((_) => 0);
+
+/// controller has been changed
+final hasConnectionProvider = StateProvider<bool>((_) => true);

@@ -607,6 +607,9 @@ PODS:
     - firebase_core
     - Flutter
     - nanopb (< 2.30910.0, >= 2.30908.0)
+  - connectivity_plus (0.0.1):
+    - Flutter
+    - ReachabilitySwift
   - Firebase/AnalyticsWithoutAdIdSupport (10.3.0):
     - Firebase/CoreOnly
     - FirebaseAnalytics/WithoutAdIdSupport (~> 10.3.0)
@@ -827,6 +830,7 @@ PODS:
     - PurchasesHybridCommon (= 4.12.0)
   - PurchasesHybridCommon (4.12.0):
     - RevenueCat (= 4.17.3)
+  - ReachabilitySwift (5.0.0)
   - receive_sharing_intent (0.0.1):
     - Flutter
   - RevenueCat (4.17.3)
@@ -845,6 +849,7 @@ PODS:
 
 DEPENDENCIES:
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
+  - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
   - firebase_app_check (from `.symlinks/plugins/firebase_app_check/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
@@ -897,11 +902,14 @@ SPEC REPOS:
     - nanopb
     - PromisesObjC
     - PurchasesHybridCommon
+    - ReachabilitySwift
     - RevenueCat
 
 EXTERNAL SOURCES:
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
+  connectivity_plus:
+    :path: ".symlinks/plugins/connectivity_plus/ios"
   firebase_analytics:
     :path: ".symlinks/plugins/firebase_analytics/ios"
   firebase_app_check:
@@ -951,6 +959,7 @@ SPEC CHECKSUMS:
   abseil: ebe5b5529fb05d93a8bdb7951607be08b7fa71bc
   BoringSSL-GRPC: 3175b25143e648463a56daeaaa499c6cb86dad33
   cloud_firestore: 5e5bb98722f66e820bf1aa7b3c98ffc9b2450ffb
+  connectivity_plus: 413a8857dd5d9f1c399a39130850d02fe0feaf7e
   Firebase: f92fc551ead69c94168d36c2b26188263860acd9
   firebase_analytics: f28e472a67eb553b7fc24a1cf17daf5247713c38
   firebase_app_check: 44e4b4a2e69608f9093ed729f1d101bccdb8badd
@@ -992,6 +1001,7 @@ SPEC CHECKSUMS:
   PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
   purchases_flutter: 7e2197717b04adfc9e220cec10dcb7808b99bcba
   PurchasesHybridCommon: f3c0a774af895108cc13ace9e524187969b8763b
+  ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
   receive_sharing_intent: c0d87310754e74c0f9542947e7cbdf3a0335a3b1
   RevenueCat: 925dce1d8b8a54e1b9729f0163eb5d439ba314bc
   share_plus: 056a1e8ac890df3e33cb503afffaf1e9b4fbae68
