@@ -112,6 +112,10 @@ class _MainTextFieldState extends ConsumerState<MainTextField> {
     return Focus(
       onFocusChange: (value) {
         ref.read(_$hasFocus.notifier).state = value;
+        if (!value) {
+          // prevent unwanted focus after closing modal
+          FocusScope.of(context).requestFocus(FocusNode());
+        }
       },
       child: TextFormField(
         controller: widget.controller,
