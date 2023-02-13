@@ -113,7 +113,7 @@ class _MainTextFieldState extends ConsumerState<MainTextField> {
       onFocusChange: (value) {
         ref.read(_$hasFocus.notifier).state = value;
         if (!value) {
-          // prevent unwanted focus after closing modal
+          // prevent repeated unwanted focus after unfocus by modal
           FocusScope.of(context).requestFocus(FocusNode());
         }
       },
