@@ -1,6 +1,5 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -68,7 +67,7 @@ class PageTitle extends StatelessWidget {
   Widget _buildConnectivityIndicator(BuildContext context) {
     return Consumer(
       builder: (context, ref, indicator) {
-        return ref.watch(connectivityProvider) == ConnectivityResult.none
+        return !ref.watch(hasConnectionProvider)
             ? indicator!
             : const SizedBox();
       },

@@ -1,4 +1,3 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/foodly_user.dart';
@@ -33,5 +32,4 @@ final initSearchWebImagePickerProvider = StateProvider<String>((_) => '');
 final planHistoryPageChanged = StateProvider<int>((_) => 0);
 
 /// controller has been changed
-final connectivityProvider =
-    StateProvider<ConnectivityResult>((_) => ConnectivityResult.none);
+final hasConnectionProvider = StateProvider<bool>((_) => true);

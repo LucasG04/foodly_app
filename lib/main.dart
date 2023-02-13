@@ -12,6 +12,7 @@ import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -327,14 +328,16 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   }
 
   void _listenForConnectivity() async {
-    final connectivity = Connectivity();
-
-    connectivity.checkConnectivity().then((result) {
-      ref.read(connectivityProvider.notifier).state = result;
+    InternetConnectionChecker().hasConnection.then((result) {
+      ref.read(hasConnectionProvider.notifier).state = result;
     });
 
-    connectivity.onConnectivityChanged.listen((ConnectivityResult result) {
-      ref.read(connectivityProvider.notifier).state = result;
+    Connectivity().onConnectivityChanged.listen((_) async {
+      final isDeviceConnected = await InternetConnectionChecker().hasConnection;
+      if (!mounted) {
+        return;
+      }
+      ref.read(hasConnectionProvider.notifier).state = isDeviceConnected;
     }).canceledBy(this);
   }
 }
