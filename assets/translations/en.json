@@ -294,5 +294,7 @@
   "upcoming_features_title": "Upcoming Features",
   "shopping_list_sort_name": "Name",
   "shopping_list_sort_group": "Product group",
-  "reorder_product_groups_title": "Product Groups"
+  "reorder_product_groups_title": "Product Groups",
+  "page_title_connectivity_error_title": "No internet connection",
+  "page_title_connectivity_error_message": "It seems that you are not connected to the Internet at the moment. This may cause problems when using {}.\nPlease check your connection."
 }

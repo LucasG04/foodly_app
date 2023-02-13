@@ -49,6 +49,7 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
                     padding: const EdgeInsets.only(left: 5.0),
                     child: PageTitle(
                       text: 'plan_title'.tr(),
+                      checkConnectivity: true,
                       actions: [
                         IconButton(
                           onPressed: () => AutoRouter.of(context).push(

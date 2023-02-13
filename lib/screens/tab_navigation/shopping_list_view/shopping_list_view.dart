@@ -161,16 +161,16 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                           ShoppingListService.deleteAllBoughtGrocery(listId),
                       style: ButtonStyle(
                         shadowColor: MaterialStateProperty.all<Color>(
-                          Theme.of(context).errorColor,
+                          Theme.of(context).colorScheme.error,
                         ),
                         overlayColor: MaterialStateProperty.all<Color>(
-                          Theme.of(context).errorColor.withOpacity(0.1),
+                          Theme.of(context).colorScheme.error.withOpacity(0.1),
                         ),
                       ),
                       child: Text(
                         'shopping_list_remove_all',
                         style: TextStyle(
-                          color: Theme.of(context).errorColor,
+                          color: Theme.of(context).colorScheme.error,
                         ),
                       ).tr(),
                     ),
@@ -188,6 +188,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
       padding: const EdgeInsets.only(left: 5.0),
       child: PageTitle(
         text: 'shopping_list_title'.tr(),
+        checkConnectivity: true,
         actions: [
           IconButton(
             onPressed: () => _shareList(todoItems),
