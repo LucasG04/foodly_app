@@ -6,6 +6,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -200,7 +201,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                                         fontWeight: FontWeight.bold,
                                         color: Theme.of(context)
                                             .textTheme
-                                            .bodyText1!
+                                            .bodyLarge!
                                             .color!
                                             .withOpacity(0.5),
                                       ),
@@ -259,8 +260,8 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                               styleSheet: MarkdownStyleSheet.fromTheme(
                                 ThemeData(
                                   textTheme: const TextTheme(
-                                    bodyText1: TextStyle(fontSize: 16),
-                                    bodyText2: TextStyle(fontSize: 16),
+                                    bodyLarge: TextStyle(fontSize: 16),
+                                    bodyMedium: TextStyle(fontSize: 16),
                                   ),
                                 ),
                               ),
@@ -429,7 +430,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
           ElevatedButton(
             onPressed: _openGetPremium,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).textTheme.bodyText1!.color,
+              backgroundColor: Theme.of(context).textTheme.bodyLarge!.color,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -443,7 +444,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                 ),
                 Icon(
                   EvaIcons.arrowIosForwardOutline,
-                  size: Theme.of(context).textTheme.bodyText1!.fontSize! + 5,
+                  size: Theme.of(context).textTheme.bodyLarge!.fontSize! + 5,
                   color: Theme.of(context).scaffoldBackgroundColor,
                 ),
               ],
@@ -545,6 +546,11 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
       context: context,
       builder: (_) => OptionsSheet(options: [
         OptionsSheetOptions(
+          title: 'meal_details_share_meal'.tr(),
+          icon: EvaIcons.shareOutline,
+          onTap: () => _shareMeal(meal),
+        ),
+        OptionsSheetOptions(
           title: 'meal_details_add_to_plan'.tr(),
           icon: EvaIcons.fileAddOutline,
           onTap: () => _openAddToPlan(meal),
@@ -559,7 +565,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
         OptionsSheetOptions(
           title: 'meal_details_delete'.tr(),
           icon: EvaIcons.minusCircleOutline,
-          textColor: Theme.of(context).errorColor,
+          textColor: Theme.of(context).colorScheme.error,
           onTap: () => _openConfirmDelete(meal),
         ),
       ]),
@@ -570,6 +576,13 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) => const GetPremiumModal(),
+    );
+  }
+
+  void _shareMeal(Meal meal) {
+    Share.share(
+      '${meal.name} - $kAppWebBaseUrl/meal/${meal.id}',
+      subject: meal.name,
     );
   }
 

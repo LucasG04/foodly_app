@@ -154,6 +154,7 @@
   "import_modal_info": "You can import dishes directly from popular websites. To do this, paste the link to the dish and click \"Import\". Supported sites are: {}",
   "import_modal_import": "import",
   "import_modal_error_no_link": "Please insert a link.",
+  "meal_details_share_meal": "Share dish",
   "meal_details_edit": "Edit",
   "meal_details_delete": "Delete",
   "meal_details_add_to_plan": "Add to plan",

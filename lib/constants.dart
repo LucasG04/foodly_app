@@ -15,6 +15,7 @@ final kAppPrivacyUrl = Platform.isIOS || Platform.isMacOS
 final kAppTermsOfUseUrl = Platform.isIOS || Platform.isMacOS
     ? 'https://golenia.dev/eula/foodster.html'
     : 'https://golenia.dev/eula/foodly.html';
+const kAppWebBaseUrl = 'https://foodly.golenia.dev';
 
 /// Styling
 const kPadding = 20.0;
