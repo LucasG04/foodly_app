@@ -154,6 +154,7 @@
   "import_modal_info": "Du kannst Gerichte direkt von beliebten Webseiten importieren. Füge dazu den Link zum Gericht ein und klicke auf \"Importieren\". Unterstützte Seiten sind: {}",
   "import_modal_import": "Importieren",
   "import_modal_error_no_link": "Bitte füg einen Link ein.",
+  "meal_details_share_meal": "Gericht teilen",
   "meal_details_edit": "Bearbeiten",
   "meal_details_delete": "Löschen",
   "meal_details_add_to_plan": "Zum Plan hinzufügen",

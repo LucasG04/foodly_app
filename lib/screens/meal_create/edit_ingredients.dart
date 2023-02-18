@@ -26,7 +26,7 @@ class EditIngredients extends StatelessWidget {
           width: double.infinity,
           child: Text(
             title,
-            style: Theme.of(context).textTheme.bodyText1,
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
         ),
         ListView.builder(

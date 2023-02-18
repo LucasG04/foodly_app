@@ -89,7 +89,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
   @override
   void dispose() {
     _removeUnsavedStorageImage();
-    ref.read(initSearchWebImagePickerProvider.notifier).state = '';
+    // TODO: Error "Looking up a deactivated widget's ancestor is unsafe."
+    // ref.read(initSearchWebImagePickerProvider.notifier).state = '';
     super.dispose();
   }
 
