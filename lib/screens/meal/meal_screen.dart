@@ -20,6 +20,7 @@ import '../../services/meal_stat_service.dart';
 import '../../services/plan_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/convert_util.dart';
+import '../../utils/main_snackbar.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/foodly_network_image.dart';
@@ -53,6 +54,8 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
   final _$meal = AutoDisposeStateProvider<Meal?>((_) => null);
   final _$mealStat = AutoDisposeStateProvider<MealStat?>((_) => null);
   late final AutoDisposeStateProvider<int> _$servings;
+
+  bool? _isInPlan;
 
   @override
   void initState() {
@@ -133,8 +136,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                                     ),
                                   ),
                                 ),
-                                if (meal.planId == currentPlanId &&
-                                    widget.showOptions)
+                                if (widget.showOptions)
                                   BorderIcon(
                                     height: 50,
                                     width: 50,
@@ -519,6 +521,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     await Future.wait<void>([_fetchMeal()]);
     ref.read(_$isLoading.notifier).state = false;
     _fetchStats(); // call after is loading, to avoid riverpod issues
+    _checkOwnerOfMeal();
   }
 
   Future<void> _fetchMeal() async {
@@ -532,6 +535,17 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     ref.read(_$mealStat.notifier).state = result;
   }
 
+  void _checkOwnerOfMeal() {
+    final planId = ref.read(planProvider)?.id;
+    final meal = ref.read(_$meal);
+
+    if (meal == null || planId == null) {
+      return;
+    }
+
+    _isInPlan = meal.planId == planId;
+  }
+
   String _formatSourceString(String source) {
     return BasicUtils.isValidUri(source)
         ? Uri.parse(source).host.replaceAll('www.', '')
@@ -539,6 +553,20 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
   }
 
   void _showOptionsSheet(Meal meal, String? planId) {
+    if (_isInPlan == false) {
+      WidgetUtils.showFoodlyBottomSheet<void>(
+        context: context,
+        builder: (_) => OptionsSheet(options: [
+          OptionsSheetOptions(
+            title: 'meal_details_import'.tr(),
+            icon: EvaIcons.downloadOutline,
+            onTap: () => _importMeal(meal),
+          ),
+        ]),
+      );
+      return;
+    }
+
     if (meal.planId != planId) {
       return;
     }
@@ -577,6 +605,19 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
       context: context,
       builder: (_) => const GetPremiumModal(),
     );
+  }
+
+  void _importMeal(Meal meal) {
+    meal.id = null;
+    final planId = ref.read(planProvider)?.id;
+    meal.planId = planId;
+    MealService.createMeal(meal).then((_) {
+      _checkOwnerOfMeal();
+      MainSnackbar(
+        message: 'meal_details_import_success',
+        isSuccess: true,
+      ).show(context);
+    });
   }
 
   void _shareMeal(Meal meal) {

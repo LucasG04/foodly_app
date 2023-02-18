@@ -17,6 +17,7 @@ import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:uni_links/uni_links.dart';
 
 import 'app_router.gr.dart';
 import 'constants.dart';
@@ -33,6 +34,7 @@ import 'services/image_cache_service.dart';
 import 'services/in_app_purchase_service.dart';
 import 'services/link_metadata_service.dart';
 import 'services/lunix_api_service.dart';
+import 'services/meal_service.dart';
 import 'services/plan_service.dart';
 import 'services/settings_service.dart';
 import 'services/shopping_list_service.dart';
@@ -122,6 +124,8 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     super.initState();
     InAppPurchaseService.setRef(ref);
     SettingsService.setRef(ref);
+
+    _initUniLinks();
   }
 
   @override
@@ -339,6 +343,46 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       }
       ref.read(hasConnectionProvider.notifier).state = isDeviceConnected;
     }).canceledBy(this);
+  }
+
+  Future<void> _initUniLinks() async {
+    try {
+      final initialLink = await getInitialLink();
+      _checkForMealLinkAndNavigate(initialLink);
+    } catch (e) {
+      _log.finer('Failed to get initial link', e);
+    }
+
+    linkStream
+        .listen(
+          _checkForMealLinkAndNavigate,
+          onError: (dynamic e) => _log.finer('ERR in getLinksStream()', e),
+        )
+        .canceledBy(this);
+  }
+
+  Future<void> _checkForMealLinkAndNavigate(String? link) async {
+    if (link == null) {
+      return;
+    }
+
+    const pattern = '/meal/';
+    final indexStart = link.indexOf(pattern) + pattern.length;
+    var indexEnd = link.indexOf('?');
+    if (indexStart == -1) {
+      return;
+    }
+    if (indexEnd == -1) {
+      indexEnd = link.length;
+    }
+
+    final mealId = link.substring(indexStart, indexEnd);
+    final meal = await MealService.getMealById(mealId);
+    if (meal == null || !mounted) {
+      return;
+    }
+
+    _appRouter.push(MealScreenRoute(id: mealId));
   }
 }
 
