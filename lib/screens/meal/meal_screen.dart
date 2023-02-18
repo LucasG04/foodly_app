@@ -580,8 +580,9 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
   }
 
   void _shareMeal(Meal meal) {
+    final langCode = context.locale.languageCode;
     Share.share(
-      '${meal.name} - $kAppWebBaseUrl/meal/${meal.id}',
+      '${meal.name} - $kAppWebBaseUrl/meal/${meal.id}?lang=$langCode',
       subject: meal.name,
     );
   }
