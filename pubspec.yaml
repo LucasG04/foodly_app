@@ -110,7 +110,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   lints: ^2.0.0
-  # build runner via: `flutter packages pub run build_runner build`
+  # build runner via: `flutter packages pub run build_runner build --delete-conflicting-outputs`
   build_runner:
   auto_route_generator: ^4.0.0
   hive_generator: ^1.1.1
