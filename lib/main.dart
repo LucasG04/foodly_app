@@ -367,11 +367,13 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     }
 
     const pattern = '/meal/';
-    final indexStart = link.indexOf(pattern) + pattern.length;
-    var indexEnd = link.indexOf('?');
-    if (indexStart == -1) {
+    final indexPattern = link.indexOf(pattern);
+    if (indexPattern == -1) {
       return;
     }
+
+    final indexStart = indexPattern + pattern.length;
+    var indexEnd = link.indexOf('?');
     if (indexEnd == -1) {
       indexEnd = link.length;
     }
