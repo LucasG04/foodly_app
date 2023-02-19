@@ -38,7 +38,11 @@ dependencies:
   crypto: ^3.0.1
   easy_localization: ^3.0.0
   flutter_localized_locales: ^2.0.3
-  metadata_fetch: ^0.4.1
+  # metadata_fetch: ^0.4.1
+  metadata_fetch:
+    git:
+      url: https://github.com/LucasG04/metadata_fetch.git
+      ref: master
   flutter_file_dialog: ^2.3.0
   keyboard_service: ^2.0.1
   flutter_native_image: ^0.0.6+1
