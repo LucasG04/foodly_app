@@ -62,7 +62,10 @@ class _CodeInputViewState extends State<CodeInputView> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   key: AuthenticationKeys.buttonForgotCode,
-                  child: const Text('login_code_forgot').tr(),
+                  child: Text(
+                    'login_code_forgot',
+                    style: TextStyle(color: Theme.of(context).primaryColor),
+                  ).tr(),
                   onPressed: () => widget.onPageChange(CodeInputResult.FORGOT),
                 ),
               ),

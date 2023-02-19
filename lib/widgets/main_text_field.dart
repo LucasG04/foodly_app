@@ -151,9 +151,16 @@ class _MainTextFieldState extends ConsumerState<MainTextField> {
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 125),
                     child: _obscureText
-                        ? const Icon(EvaIcons.eyeOutline, size: kIconHeight)
-                        : const Icon(EvaIcons.eyeOff2Outline,
-                            size: kIconHeight),
+                        ? Icon(
+                            EvaIcons.eyeOutline,
+                            size: kIconHeight,
+                            color: Theme.of(context).primaryColor,
+                          )
+                        : Icon(
+                            EvaIcons.eyeOff2Outline,
+                            size: kIconHeight,
+                            color: Theme.of(context).primaryColor,
+                          ),
                   ),
                 )
               : widget.pasteFromClipboard
