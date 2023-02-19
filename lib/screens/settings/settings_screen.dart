@@ -359,7 +359,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             colorText: Colors.red,
                           ),
                           SettingsTile(
-                            onTap: () => AuthenticationService.signOut(),
+                            onTap: _signOut,
                             leadingIcon: EvaIcons.logOutOutline,
                             text: 'settings_section_account_logout'.tr(),
                             trailing: const Icon(
@@ -604,6 +604,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         await _reauthenticateUserAndDelete();
       }
     }
+    BasicUtils.clearAllProvider(ref);
     FirebaseAnalytics.instance.logEvent(name: 'delete_account');
   }
 
@@ -622,6 +623,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     } catch (e) {
       _log.severe('ERR! Account deletion failed after reauthentication!', e);
     }
+  }
+
+  Future<void> _signOut() async {
+    await AuthenticationService.signOut();
+    BasicUtils.clearAllProvider(ref);
   }
 
   void _openGetPremium() {
