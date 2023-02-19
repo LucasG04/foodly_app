@@ -189,7 +189,11 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: _showPasswordReset,
-                        child: const Text('login_forgot_password').tr(),
+                        child: Text(
+                          'login_forgot_password',
+                          style:
+                              TextStyle(color: Theme.of(context).primaryColor),
+                        ).tr(),
                       ),
                     ),
                   )
