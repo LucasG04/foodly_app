@@ -1051,10 +1051,11 @@ packages:
   metadata_fetch:
     dependency: "direct main"
     description:
-      name: metadata_fetch
-      sha256: "2c79e69e71cbb051041da6a8a9dd3df0617db84482ab3f36b4952ff779b7580e"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: master
+      resolved-ref: b4eb8043708d76245e5c99274a78ff53bd456f68
+      url: "https://github.com/LucasG04/metadata_fetch.git"
+    source: git
     version: "0.4.1"
   mime:
     dependency: transitive
