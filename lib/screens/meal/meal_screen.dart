@@ -401,7 +401,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
       builder: (context, ref, _) {
         final mealStat = ref.watch(_$mealStat);
         return mealStat == null
-            ? const SizedBox(child: Text('no stats'))
+            ? const SizedBox()
             : _buildSection(
                 'meal_details_stats'.tr(),
                 Consumer(
@@ -614,7 +614,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     MealService.createMeal(meal).then((_) {
       _checkOwnerOfMeal();
       MainSnackbar(
-        message: 'meal_details_import_success',
+        message: 'meal_details_import_success'.tr(),
         isSuccess: true,
       ).show(context);
     });
