@@ -20,7 +20,6 @@ import '../../services/meal_stat_service.dart';
 import '../../services/plan_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/convert_util.dart';
-import '../../utils/main_snackbar.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/foodly_network_image.dart';
@@ -611,12 +610,10 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     meal.id = null;
     final planId = ref.read(planProvider)?.id;
     meal.planId = planId;
-    MealService.createMeal(meal).then((_) {
-      _checkOwnerOfMeal();
-      MainSnackbar(
-        message: 'meal_details_import_success'.tr(),
-        isSuccess: true,
-      ).show(context);
+    MealService.createMeal(meal).then((value) {
+      if (value != null && value.id != null) {
+        AutoRouter.of(context).popAndPush(MealScreenRoute(id: value.id!));
+      }
     });
   }
 
