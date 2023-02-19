@@ -299,5 +299,7 @@
   "shopping_list_sort_group": "Product group",
   "reorder_product_groups_title": "Product Groups",
   "page_title_connectivity_error_title": "No internet connection",
-  "page_title_connectivity_error_message": "It seems that you are not connected to the Internet at the moment. This may cause problems when using {}.\nPlease check your connection."
+  "page_title_connectivity_error_message": "It seems that you are not connected to the Internet at the moment. This may cause problems when using {}.\nPlease check your connection.",
+  "premium_gifted_msg_title": "Premium for free!",
+  "premium_gifted_msg_message": "Thanks to your feedback, {} has been improved. As a thank you, you get Premium for 1 year for free."
 }

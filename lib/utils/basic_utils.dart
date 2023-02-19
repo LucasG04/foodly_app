@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/foodly_user.dart';
 import '../models/grocery_group.dart';
 import '../providers/state_providers.dart';
 
@@ -89,5 +90,13 @@ class BasicUtils {
     final List<GroceryGroup> unSorted =
         groups.where((element) => !sort.contains(element.id)).toList();
     return [...sorted, ...unSorted];
+  }
+
+  static bool premiumGiftedActive(FoodlyUser user) {
+    final giftedDateIsValid = user.premiumGiftedAt != null &&
+        user.premiumGiftedAt!.isAfter(
+          DateTime.now().subtract(const Duration(days: 365)),
+        );
+    return user.isPremiumGifted == true && giftedDateIsValid;
   }
 }

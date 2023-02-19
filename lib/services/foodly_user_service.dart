@@ -47,4 +47,24 @@ class FoodlyUserService {
     log.finer('Call deleteUserById with $userId');
     return _firestore.doc(userId).delete();
   }
+
+  static Future<void> setPremiumGiftedMessageShown(String userId) async {
+    log.finer('Call setPremiumGiftedMessageShown');
+    final user = await getUserById(userId);
+    if (user != null) {
+      user.premiumGiftedMessageShown = true;
+      await _firestore.doc(user.id).update(user.toMap());
+    }
+  }
+
+  static Future<void> resetPremiumGifted(String userId) async {
+    log.finer('Call resetPremiumGifted');
+    final user = await getUserById(userId);
+    if (user != null) {
+      user.isPremiumGifted = false;
+      user.premiumGiftedAt = null;
+      user.premiumGiftedMessageShown = false;
+      await _firestore.doc(user.id).update(user.toMap());
+    }
+  }
 }

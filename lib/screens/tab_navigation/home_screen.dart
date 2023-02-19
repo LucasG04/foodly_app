@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,9 +15,13 @@ import 'package:version/version.dart';
 import '../../app_router.gr.dart';
 import '../../constants.dart';
 import '../../providers/state_providers.dart';
+import '../../services/foodly_user_service.dart';
+import '../../services/in_app_purchase_service.dart';
 import '../../services/plan_service.dart';
 import '../../services/settings_service.dart';
 import '../../services/version_service.dart';
+import '../../utils/basic_utils.dart';
+import '../../utils/main_snackbar.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/new_version_modal.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
@@ -44,6 +49,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
         .stream
         .listen((_) => _changePage())
         .canceledBy(this);
+    _checkPremiumGiftedStatusAndMessage();
   }
 
   @override
@@ -277,5 +283,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
     }
 
     _checkLockPlan();
+  }
+
+  Future<void> _checkPremiumGiftedStatusAndMessage() async {
+    final user = ref.read(userProvider);
+    if (user == null) {
+      return;
+    }
+
+    final userHasBoughtPremium =
+        await InAppPurchaseService.getUserIsSubscribed();
+    if (userHasBoughtPremium && user.id != null) {
+      FoodlyUserService.resetPremiumGifted(user.id!);
+      return;
+    }
+
+    final showMessage =
+        user.isPremiumGifted == true && user.premiumGiftedMessageShown != true;
+    if (showMessage) {
+      BasicUtils.afterBuild(
+        () => MainSnackbar(
+          isSuccess: true,
+          duration: 10,
+          title: 'premium_gifted_msg_title'.tr(),
+          message: 'premium_gifted_msg_message'.tr(args: [kAppName]),
+        ).show(context),
+      );
+      if (user.id != null) {
+        FoodlyUserService.setPremiumGiftedMessageShown(user.id!);
+      }
+    }
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
@@ -22,7 +23,9 @@ class InAppPurchaseService {
   static StateProvider<bool> get $userIsSubscribed => _userIsSubscribedProvider;
 
   static Future<void> initialize() async {
-    await Purchases.setDebugLogsEnabled(true);
+    await Purchases.setLogLevel(
+      foundation.kDebugMode ? LogLevel.debug : LogLevel.error,
+    );
 
     PurchasesConfiguration? configuration;
     if (Platform.isAndroid) {
@@ -67,7 +70,7 @@ class InAppPurchaseService {
     try {
       final customerInfo = await Purchases.purchaseProduct(productIdentifier);
       await fetchUserSubscription();
-      return _customerisSubscribed(customerInfo);
+      return _customerIsSubscribed(customerInfo);
     } on PlatformException catch (e) {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);
       if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
@@ -81,7 +84,7 @@ class InAppPurchaseService {
     try {
       final restoredInfo = await Purchases.restorePurchases();
       await fetchUserSubscription();
-      return _customerisSubscribed(restoredInfo);
+      return _customerIsSubscribed(restoredInfo);
     } catch (e) {
       _log.severe(e);
     }
@@ -92,13 +95,23 @@ class InAppPurchaseService {
     try {
       final customerInfo = await Purchases.getCustomerInfo();
       _ref?.read($userIsSubscribed.notifier).state =
-          _customerisSubscribed(customerInfo);
+          _customerIsSubscribed(customerInfo);
     } catch (e) {
       _log.severe(e);
     }
   }
 
-  static bool _customerisSubscribed(CustomerInfo customerInfo) {
+  static Future<bool> getUserIsSubscribed() async {
+    try {
+      final customerInfo = await Purchases.getCustomerInfo();
+      return _customerIsSubscribed(customerInfo);
+    } catch (e) {
+      _log.severe(e);
+      return false;
+    }
+  }
+
+  static bool _customerIsSubscribed(CustomerInfo customerInfo) {
     final entitlementInfo =
         customerInfo.entitlements.all[_premiumEntitlementId];
     return entitlementInfo != null && entitlementInfo.isActive;
