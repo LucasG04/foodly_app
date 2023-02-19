@@ -6,7 +6,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
@@ -375,15 +374,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           builder: (context, ref, _) {
                             final isSubscribed = ref
                                 .watch(InAppPurchaseService.$userIsSubscribed);
+                            final isGifted =
+                                BasicUtils.premiumGiftedActive(foodlyUser);
                             return RichText(
                               textAlign: TextAlign.center,
                               text: TextSpan(
-                                style: Theme.of(context).textTheme.bodyText1,
+                                style: Theme.of(context).textTheme.bodyLarge,
                                 children: <TextSpan>[
                                   TextSpan(text: 'settings_sign_in_as'.tr()),
                                   TextSpan(
                                     text:
-                                        '\n${firebaseUser?.email ?? '...'}${isSubscribed ? ' ⭐️' : ''}',
+                                        '\n${firebaseUser?.email ?? '...'}${isSubscribed ? isGifted ? ' 🎁' : ' ⭐️' : ''}',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -404,7 +405,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   child: Text(
                                     'settings_privacy'.tr(),
                                     style:
-                                        Theme.of(context).textTheme.bodyText1,
+                                        Theme.of(context).textTheme.bodyLarge,
                                   ),
                                 ),
                                 TextButton(
@@ -413,7 +414,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   child: Text(
                                     'settings_terms_of_use'.tr(),
                                     style:
-                                        Theme.of(context).textTheme.bodyText1,
+                                        Theme.of(context).textTheme.bodyLarge,
                                   ),
                                 ),
                               ],

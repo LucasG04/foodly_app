@@ -207,9 +207,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       }
       ref.read(userProvider.notifier).state = user;
       await InAppPurchaseService.setUserId(user.id!);
-      if (user.isPremium != null && user.isPremium!) {
-        ref.read(InAppPurchaseService.$userIsSubscribed.notifier).state = true;
-      }
+      _checkPremiumStatus();
       _checkUserSubsription();
     } else {
       FirebaseCrashlytics.instance.setUserIdentifier('');
@@ -219,6 +217,20 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     BasicUtils.afterBuild(
       () => ref.read(initialUserLoadingProvider.notifier).state = false,
     );
+  }
+
+  void _checkPremiumStatus() {
+    final user = ref.read(userProvider);
+    if (user == null) {
+      return;
+    }
+    if (user.isPremium == true) {
+      ref.read(InAppPurchaseService.$userIsSubscribed.notifier).state = true;
+      return;
+    }
+    if (BasicUtils.premiumGiftedActive(user)) {
+      ref.read(InAppPurchaseService.$userIsSubscribed.notifier).state = true;
+    }
   }
 
   Future<void> _loadActiveShoppingList() async {
