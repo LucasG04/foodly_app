@@ -612,6 +612,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     meal.planId = planId;
     MealService.createMeal(meal).then((value) {
       if (value != null && value.id != null) {
+        BasicUtils.emitMealsChanged(ref, value.id!);
         AutoRouter.of(context).popAndPush(MealScreenRoute(id: value.id!));
       }
     });
