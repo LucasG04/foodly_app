@@ -1,6 +1,6 @@
 class FoodlyUser {
   String? id;
-  List<String?>? oldPlans;
+  List<String?>? plans;
   bool? isPremium;
   bool? isPremiumGifted;
   DateTime? premiumGiftedAt;
@@ -8,7 +8,7 @@ class FoodlyUser {
 
   FoodlyUser({
     this.id,
-    this.oldPlans,
+    this.plans,
     this.isPremium,
     this.isPremiumGifted,
     this.premiumGiftedAt,
@@ -17,7 +17,7 @@ class FoodlyUser {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'oldPlans': oldPlans,
+      'oldPlans': plans,
       'isPremium': isPremium,
       'isPremiumGifted': isPremiumGifted,
       'premiumGiftedAt': premiumGiftedAt?.millisecondsSinceEpoch,
@@ -28,7 +28,7 @@ class FoodlyUser {
   factory FoodlyUser.fromMap(String id, Map<String, dynamic> map) {
     return FoodlyUser(
       id: id,
-      oldPlans: List<String>.from(map['oldPlans'] as List<dynamic>),
+      plans: List<String>.from(map['oldPlans'] as List<dynamic>),
       isPremium: map['isPremium'] as bool?,
       isPremiumGifted: map['isPremiumGifted'] as bool?,
       premiumGiftedAt: map['premiumGiftedAt'] != null

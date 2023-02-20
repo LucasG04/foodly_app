@@ -80,7 +80,7 @@ class SelectPlanModal extends StatelessWidget {
 
   Widget _buildPlanList(FoodlyUser user, double emptySpaceHeight) {
     return FutureBuilder<List<Plan>>(
-      future: PlanService.getPlansByIds(user.oldPlans!),
+      future: PlanService.getPlansByIds(user.plans!),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return SizedBox(

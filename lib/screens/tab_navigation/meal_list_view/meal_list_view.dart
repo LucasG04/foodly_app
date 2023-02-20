@@ -208,8 +208,14 @@ class _MealListViewState extends ConsumerState<MealListView>
               builder: (_) => HelpSlideShareImport(),
             ),
           ),
-          icon: const Icon(EvaIcons.questionMarkCircleOutline),
-          label: const Text('meal_list_help_import').tr(),
+          icon: Icon(
+            EvaIcons.questionMarkCircleOutline,
+            color: Theme.of(context).primaryColor,
+          ),
+          label: Text(
+            'meal_list_help_import',
+            style: TextStyle(color: Theme.of(context).primaryColor),
+          ).tr(),
         ),
       ],
     );

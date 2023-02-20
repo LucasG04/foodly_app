@@ -26,6 +26,7 @@ import '../../../utils/widget_utils.dart';
 import '../../../widgets/loading_logout.dart';
 import '../../models/plan.dart';
 import '../../models/shopping_list_sort.dart';
+import '../../services/foodly_user_service.dart';
 import '../../services/in_app_purchase_service.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
@@ -260,7 +261,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             }),
                           ),
                           SettingsTile(
-                            onTap: () => _leavePlan(plan.id, context),
+                            onTap: () => _leavePlan(plan.id!, context),
                             leadingIcon: EvaIcons.closeCircleOutline,
                             text: 'settings_section_plan_leave'.tr(),
                             trailing: const Icon(
@@ -271,15 +272,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             colorText: Colors.red,
                           ),
                         ], context),
-                        if (foodlyUser.oldPlans!.length > 1)
+                        if (foodlyUser.plans!.length > 1)
                           _buildSectionTitle('settings_section_meals'.tr())
                         else
                           const SizedBox(),
-                        if (foodlyUser.oldPlans!.length > 1)
+                        if (foodlyUser.plans!.length > 1)
                           _buildSection([
                             SettingsTile(
                               onTap: () => _importMeals(
-                                foodlyUser.oldPlans!
+                                foodlyUser.plans!
                                     .where((id) => id != plan.id)
                                     .toList(),
                                 context,
@@ -553,7 +554,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     ref.read(planProvider.notifier).state = plan;
   }
 
-  void _leavePlan(String? planId, BuildContext context) async {
+  void _leavePlan(String planId, BuildContext context) async {
     final leavePlan = await showLeaveConfirmDialog(context);
 
     if (!leavePlan) {
@@ -561,7 +562,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
 
     final String userId = AuthenticationService.currentUser!.uid;
-    PlanService.leavePlan(planId, userId).then((_) {
+    Future.wait([
+      PlanService.leavePlan(planId, userId),
+      FoodlyUserService.removePlanFromUser(userId, planId)
+    ]).then((_) {
       AuthenticationService.signOut();
       BasicUtils.clearAllProvider(ref);
     });

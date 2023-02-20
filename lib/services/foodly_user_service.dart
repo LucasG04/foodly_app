@@ -16,7 +16,7 @@ class FoodlyUserService {
 
   static Future<FoodlyUser> createUserWithId(String userId) async {
     log.finer('Call createUserWithId with $userId');
-    final user = FoodlyUser(id: userId, oldPlans: []);
+    final user = FoodlyUser(id: userId, plans: []);
     await _firestore.doc(userId).set(user);
     return user;
   }
@@ -27,20 +27,32 @@ class FoodlyUserService {
     return doc.exists ? doc.data() : null;
   }
 
-  static Future<void> addOldPlanIdToUser(String userId, String? planId) async {
+  static Future<void> addPlanIdToUser(String userId, String? planId) async {
     log.finer('Call addOldPlanIdToUser with UserId: $userId | PlanId: $planId');
     final user = await getUserById(userId);
 
-    if (user != null &&
-        user.oldPlans != null &&
-        !user.oldPlans!.contains(planId)) {
-      user.oldPlans!.add(planId);
+    if (user != null && user.plans != null && !user.plans!.contains(planId)) {
+      user.plans!.add(planId);
       return _firestore
           .doc(userId)
-          .update(<String, List<String?>>{'oldPlans': user.oldPlans ?? []});
+          .update(<String, List<String?>>{'oldPlans': user.plans ?? []});
     }
     log.finest(
-        'Call addOldPlanIdToUser with UserId: $userId | PlanId: $planId | ${user.toString()} | oldPlans dont contain planId');
+        'Call addOldPlanIdToUser with UserId: $userId | PlanId: $planId | $user');
+  }
+
+  static Future<void> removePlanFromUser(String userId, String planId) async {
+    log.finer('Call removePlanFromUser with UserId: $userId | PlanId: $planId');
+    final user = await getUserById(userId);
+
+    if (user != null && user.plans != null && user.plans!.contains(planId)) {
+      user.plans!.remove(planId);
+      return _firestore
+          .doc(userId)
+          .update(<String, List<String?>>{'oldPlans': user.plans ?? []});
+    }
+    log.finest(
+        'Call removePlanFromUser with UserId: $userId | PlanId: $planId | $user');
   }
 
   static Future<void> deleteUserById(String userId) {

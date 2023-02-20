@@ -274,7 +274,7 @@ class PlanService {
 
     if (plan.users!.contains(userId)) {
       plan.users!.remove(userId);
-      _firestore.doc(planId).update(<String, Object>{
+      await _firestore.doc(planId).update(<String, Object>{
         'users': plan.users ?? <dynamic>[],
         'locked': plan.locked ?? false
       });

@@ -367,8 +367,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
       foodlyUser = (await FoodlyUserService.getUserById(userId))!;
     }
 
-    foodlyUser.oldPlans!.add(plan!.id);
-    await FoodlyUserService.addOldPlanIdToUser(userId, plan.id);
+    foodlyUser.plans!.add(plan!.id);
+    await FoodlyUserService.addPlanIdToUser(userId, plan.id);
 
     setState(() {
       _buttonState = ButtonState.normal;
