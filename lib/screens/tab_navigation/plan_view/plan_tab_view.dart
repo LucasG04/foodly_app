@@ -34,12 +34,19 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
   @override
   bool get wantKeepAlive => true;
 
+  final AutoDisposeStreamProvider<List<PlanMeal>> planMealsStreamProvider =
+      StreamProvider.autoDispose<List<PlanMeal>>((ref) {
+    final activePlan = ref.watch(planProvider);
+    return PlanService.streamPlanMealsByPlanId(activePlan!.id);
+  });
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final activePlan = ref.watch(planProvider);
+    final livePlanMeals = ref.watch(planMealsStreamProvider);
+    final plan = ref.read(planProvider);
 
-    return activePlan != null
+    return plan != null
         ? SingleChildScrollView(
             child: AnimationLimiter(
               child: Column(
@@ -58,7 +65,7 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
                           icon: const Icon(EvaIcons.settings2Outline),
                         ),
                         IconButton(
-                          onPressed: () => _showOptionsSheet(activePlan),
+                          onPressed: () => _showOptionsSheet(plan),
                           icon: const Icon(EvaIcons.moreHorizontalOutline),
                         )
                       ],
@@ -66,30 +73,23 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
                   ),
                   SizedBox(
                     width: BasicUtils.contentWidth(context),
-                    child: StreamBuilder<List<PlanMeal>>(
-                      stream: PlanService.streamPlanMealsByPlanId(
-                        activePlan.id,
+                    child: livePlanMeals.when(
+                      data: (planMeals) => ListView(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: _getDaysByMeals(planMeals)
+                            .map(
+                              (e) => PlanDayCard(
+                                date: e.date,
+                                meals: e.meals,
+                              ),
+                            )
+                            .toList(),
                       ),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return ListView(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            children: _getDaysByMeals(snapshot.data!)
-                                .map(
-                                  (e) => PlanDayCard(
-                                    date: e.date,
-                                    meals: e.meals,
-                                  ),
-                                )
-                                .toList(),
-                          );
-                        } else {
-                          return const Center(
-                            child: SmallCircularProgressIndicator(),
-                          );
-                        }
-                      },
+                      error: (_, __) => const LoadingLogout(),
+                      loading: () => const Center(
+                        child: SmallCircularProgressIndicator(),
+                      ),
                     ),
                   ),
                 ],
