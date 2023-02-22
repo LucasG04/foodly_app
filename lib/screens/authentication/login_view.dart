@@ -21,6 +21,7 @@ import '../../services/foodly_user_service.dart';
 import '../../services/plan_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/firebase_auth_providers.dart';
+import '../../utils/widget_utils.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
@@ -414,15 +415,9 @@ class _LoginViewState extends ConsumerState<LoginView> {
   }
 
   void _showPasswordReset() {
-    showModalBottomSheet<void>(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(10.0),
-        ),
-      ),
+    WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
-      isScrollControlled: true,
-      builder: (context) => ResetPasswordModal(_emailController.text),
+      builder: (_) => ResetPasswordModal(_emailController.text),
     );
   }
 
