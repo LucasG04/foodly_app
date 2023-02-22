@@ -112,8 +112,7 @@ class FoodlyApp extends ConsumerStatefulWidget {
 }
 
 class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
-  final Logger _log = Logger('FoodlyApp');
-
+  final _log = Logger('FoodlyApp');
   final _appRouter = AppRouter();
 
   @override
@@ -141,15 +140,20 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active ||
             snapshot.connectionState == ConnectionState.done) {
-          _loadActivePlan().then((_) {
-            _loadActiveShoppingList();
-          });
           _loadBaseData();
+          _loadActivePlan();
           _loadActiveUser();
+
           return Consumer(
             builder: (context, ref, _) {
               final plan = ref.watch(planProvider);
               _log.finer('PlanProvider Update: ${plan?.id}');
+
+              if (plan != null) {
+                _loadActiveShoppingList();
+              } else {
+                ref.read(shoppingListIdProvider.notifier).state = null;
+              }
 
               return MaterialApp.router(
                 routerDelegate: _appRouter.delegate(),
@@ -235,7 +239,8 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
 
   Future<void> _loadActiveShoppingList() async {
     final planId = ref.read(planProvider)?.id;
-    final userId = ref.read(userProvider.notifier).state?.id;
+    final userId = ref.read(userProvider)?.id;
+
     if (planId == null || userId == null) {
       return;
     }

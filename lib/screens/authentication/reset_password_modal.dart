@@ -55,13 +55,17 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  AutoSizeText(
-                    'modal_password_reset_title'.tr().toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  Flexible(
+                    child: AutoSizeText(
+                      'modal_password_reset_title'.tr().toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                      minFontSize: 16,
+                      maxLines: 1,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                   GestureDetector(
                     child: const Icon(EvaIcons.close),
@@ -77,6 +81,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
             placeholder: 'tony@gmail.com',
             errorText: _errorText,
             onSubmit: _resetPassword,
+            keyboardType: TextInputType.emailAddress,
             autofillHints: const [AutofillHints.email],
           ),
           const SizedBox(height: kPadding),
@@ -100,7 +105,12 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
           else
             const SizedBox(),
           SizedBox(
-            height: kPadding * 2 + MediaQuery.of(context).viewInsets.bottom,
+            height: MediaQuery.of(context).viewInsets.bottom == 0
+                ? kPadding * 2
+                : MediaQuery.of(context).viewInsets.bottom >
+                        60 // 60 for MainButton
+                    ? MediaQuery.of(context).viewInsets.bottom - 60
+                    : MediaQuery.of(context).viewInsets.bottom,
           ),
           Center(
             child: MainButton(
