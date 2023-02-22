@@ -112,8 +112,7 @@ class FoodlyApp extends ConsumerStatefulWidget {
 }
 
 class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
-  final Logger _log = Logger('FoodlyApp');
-
+  final _log = Logger('FoodlyApp');
   final _appRouter = AppRouter();
 
   @override
