@@ -153,10 +153,11 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
                   });
   }
 
-  Widget _buildSizeWrapper({required Widget child}) {
+  Widget _buildSizeWrapper({required Widget child, EdgeInsets? padding}) {
     return Align(
-      child: SizedBox(
+      child: Container(
         width: _containerWidth,
+        padding: padding,
         child: child,
       ),
     );
@@ -180,6 +181,9 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
           itemBuilder: (context, index) {
             if (index == 0) {
               return _buildSizeWrapper(
+                padding: const EdgeInsets.symmetric(
+                  vertical: kPadding / 4,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -240,14 +244,12 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
 
   Widget _buildGetPremiumInfo() {
     return _buildSizeWrapper(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: kPadding / 2,
-        ),
-        child: GetPremiumInfo(
-          title: 'get_premium_modal_2_title'.tr(),
-          description: 'get_premium_modal_2_description_ad'.tr(),
-        ),
+      padding: const EdgeInsets.symmetric(
+        vertical: kPadding / 2,
+      ),
+      child: GetPremiumInfo(
+        title: 'get_premium_modal_2_title'.tr(),
+        description: 'get_premium_modal_2_description_ad'.tr(),
       ),
     );
   }
