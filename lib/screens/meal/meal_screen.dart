@@ -25,8 +25,10 @@ import '../../widgets/disposable_widget.dart';
 import '../../widgets/foodly_network_image.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/link_preview.dart';
+import '../../widgets/main_button.dart';
 import '../../widgets/options_modal/options_modal.dart';
 import '../../widgets/options_modal/options_modal_option.dart';
+import '../../widgets/progress_button.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import '../../widgets/small_number_input.dart';
 import '../tab_navigation/plan_view/plan_move_meal_modal.dart';
@@ -52,6 +54,9 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
   final _$isLoading = AutoDisposeStateProvider<bool>((_) => true);
   final _$meal = AutoDisposeStateProvider<Meal?>((_) => null);
   final _$mealStat = AutoDisposeStateProvider<MealStat?>((_) => null);
+  final _$importButtonState = AutoDisposeStateProvider<ButtonState>(
+    (_) => ButtonState.normal,
+  );
   late final AutoDisposeStateProvider<int> _$servings;
 
   bool? _isInPlan;
@@ -250,6 +255,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                             ],
                           ),
                         ),
+                        _buildImportButton(meal),
                         _buildIngredientSection(meal),
                         if (meal.instructions != null &&
                             meal.instructions!.isNotEmpty) ...[
@@ -289,6 +295,34 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
               ],
             ),
     );
+  }
+
+  Widget _buildImportButton(Meal? meal) {
+    if (_isInPlan == null || meal == null) {
+      return const SizedBox();
+    }
+    return _isInPlan!
+        ? const SizedBox()
+        : Padding(
+            padding: const EdgeInsets.only(
+              top: kPadding,
+              left: kPadding,
+              right: kPadding,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Consumer(builder: (_, ref, __) {
+                  return MainButton(
+                    onTap: () => _importMeal(meal),
+                    text: 'meal_details_import'.tr(),
+                    isProgress: true,
+                    buttonState: ref.watch(_$importButtonState),
+                  );
+                }),
+              ],
+            ),
+          );
   }
 
   Widget _buildIngredientSection(Meal meal) {
@@ -610,11 +644,15 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     meal.id = null;
     final planId = ref.read(planProvider)?.id;
     meal.planId = planId;
+    ref.read(_$importButtonState.notifier).state = ButtonState.inProgress;
     MealService.createMeal(meal).then((value) {
+      ref.read(_$importButtonState.notifier).state = ButtonState.normal;
       if (value != null && value.id != null) {
         BasicUtils.emitMealsChanged(ref, value.id!);
         AutoRouter.of(context).popAndPush(MealScreenRoute(id: value.id!));
       }
+    }).catchError((dynamic e) {
+      ref.read(_$importButtonState.notifier).state = ButtonState.normal;
     });
   }
 
