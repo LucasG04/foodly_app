@@ -128,7 +128,7 @@ class ShoppingListService {
         .get();
 
     _log.finest(
-        'deleteAllBoughtGrocery: Query results: ${snaps.docs.toString()}');
+        'deleteAllBoughtGrocery: Query results: ${snaps.docs.map((e) => e.id)}');
 
     await Future.wait(
       snaps.docs.map((e) => deleteGrocery(listId, e.id)).toList(),

@@ -19,12 +19,14 @@ import '../../../services/shopping_list_service.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/convert_util.dart';
 import '../../../utils/main_snackbar.dart';
+import '../../../utils/permission_utils.dart';
 import '../../../utils/widget_utils.dart';
 import '../../../widgets/ingredient_edit_modal.dart';
 import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import '../../../widgets/user_information.dart';
 import 'animated_shopping_list.dart';
+import 'edit_grocery_suggestion_sheet.dart';
 import 'grouped_shopping_list.dart';
 
 class ShoppingListView extends ConsumerStatefulWidget {
@@ -114,6 +116,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                               todoItems,
                               boughtItems,
                             ),
+                            onLongPress: _editGrocerySuggestion,
                           );
                         }
                         return AnimatedShoppingList(
@@ -125,6 +128,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                             todoItems,
                             boughtItems,
                           ),
+                          onLongPress: _editGrocerySuggestion,
                         );
                       });
                 }),
@@ -154,6 +158,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                         item,
                       );
                     },
+                    onLongPress: _editGrocerySuggestion,
                   ),
                   Center(
                     child: TextButton(
@@ -453,6 +458,19 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
           },
         ),
       ],
+    );
+  }
+
+  void _editGrocerySuggestion(Grocery grocery) {
+    final user = ref.read(userProvider);
+    if (!PermissionUtils.allowedToModerate(user)) {
+      return;
+    }
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) {
+        return EditGrocerySuggestionSheet(grocery: grocery);
+      },
     );
   }
 }

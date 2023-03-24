@@ -8,12 +8,14 @@ class GroupedShoppingList extends StatefulWidget {
   final List<ShoppingListGroup> groups;
   final void Function(Grocery) onTap;
   final void Function(Grocery) onEdit;
+  final void Function(Grocery) onLongPress;
   final ScrollController? pageScrollController;
 
   const GroupedShoppingList({
     required this.groups,
     required this.onTap,
     required this.onEdit,
+    required this.onLongPress,
     this.pageScrollController,
     Key? key,
   }) : super(key: key);
@@ -59,6 +61,7 @@ class _GroupedShoppingListState extends State<GroupedShoppingList> {
                   groceries: group.groceries,
                   onTap: widget.onTap,
                   onEdit: widget.onEdit,
+                  onLongPress: widget.onLongPress,
                 ),
               );
       },

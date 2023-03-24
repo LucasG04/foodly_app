@@ -9,6 +9,7 @@ class AnimatedShoppingList extends StatelessWidget {
   final List<Grocery> groceries;
   final void Function(Grocery) onTap;
   final void Function(Grocery) onEdit;
+  final void Function(Grocery) onLongPress;
 
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
 
@@ -16,6 +17,7 @@ class AnimatedShoppingList extends StatelessWidget {
     required this.groceries,
     required this.onTap,
     required this.onEdit,
+    required this.onLongPress,
     Key? key,
   }) : super(key: key);
 
@@ -43,6 +45,7 @@ class AnimatedShoppingList extends StatelessWidget {
       ).animate(animation),
       child: InkWell(
         onTap: () => _tapItem(index),
+        onLongPress: () => onLongPress(grocery),
         child: Slidable(
           actionPane: const SlidableDrawerActionPane(),
           child: ListTile(

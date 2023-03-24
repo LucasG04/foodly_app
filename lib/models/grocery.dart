@@ -84,4 +84,24 @@ class Grocery {
   @override
   String toString() =>
       'Grocery(id: $id, name: $name, amount: $amount, unit: $unit, bought: $bought, group: $group, lastEdited: ${lastBoughtEdited.toIso8601String()})';
+
+  Grocery copyWith({
+    String? id,
+    String? name,
+    double? amount,
+    String? unit,
+    String? group,
+    bool? bought,
+    DateTime? lastBoughtEdited,
+  }) {
+    return Grocery(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      amount: amount ?? this.amount,
+      unit: unit ?? this.unit,
+      group: group ?? this.group,
+      bought: bought ?? this.bought,
+      lastBoughtEdited: lastBoughtEdited ?? this.lastBoughtEdited,
+    );
+  }
 }
