@@ -55,7 +55,7 @@ class _SettingsReauthenticateModalState
           ),
           RichText(
             text: TextSpan(
-              style: Theme.of(context).textTheme.bodyText1,
+              style: Theme.of(context).textTheme.bodyLarge,
               children: <TextSpan>[
                 TextSpan(
                     text: '${'settings_reauthenticate_description_1'.tr()} '),

@@ -68,7 +68,7 @@ class EditIngredients extends StatelessWidget {
     final result = await WidgetUtils.showFoodlyBottomSheet<Ingredient?>(
       context: context,
       builder: (_) => IngredientEditModal(
-        ingredient: isCreating ? Ingredient() : ingredient!,
+        ingredient: isCreating ? Ingredient() : ingredient,
       ),
     );
 
@@ -79,7 +79,7 @@ class EditIngredients extends StatelessWidget {
     if (isCreating) {
       content.add(result);
     } else {
-      content[index!] = result;
+      content[index] = result;
     }
     onChanged!(content);
   }

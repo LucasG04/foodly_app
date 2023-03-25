@@ -164,7 +164,7 @@ class _LinkPreviewState extends State<LinkPreview> {
         children: [
           SkeletonContainer(
             width: size.width,
-            height: Theme.of(context).textTheme.bodyText1!.fontSize,
+            height: Theme.of(context).textTheme.bodyLarge!.fontSize,
           ),
           Padding(
             padding: const EdgeInsets.all(kPadding / 2),
@@ -177,7 +177,7 @@ class _LinkPreviewState extends State<LinkPreview> {
                 const SizedBox(height: kPadding / 4),
                 SkeletonContainer(
                   width: size.width,
-                  height: Theme.of(context).textTheme.bodyText1!.fontSize! * 2,
+                  height: Theme.of(context).textTheme.bodyLarge!.fontSize! * 2,
                 ),
               ],
             ),
@@ -213,12 +213,12 @@ class _LinkPreviewState extends State<LinkPreview> {
                 children: [
                   SkeletonContainer(
                     width: size.width * 0.4,
-                    height: Theme.of(context).textTheme.bodyText1!.fontSize,
+                    height: Theme.of(context).textTheme.bodyLarge!.fontSize,
                   ),
                   SkeletonContainer(
                     width: size.width * 0.6,
                     height:
-                        Theme.of(context).textTheme.bodyText1!.fontSize! * 2,
+                        Theme.of(context).textTheme.bodyLarge!.fontSize! * 2,
                   ),
                 ],
               ),

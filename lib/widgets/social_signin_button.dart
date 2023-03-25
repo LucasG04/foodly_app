@@ -47,7 +47,7 @@ class _SocialButton extends StatelessWidget {
               text,
               style: Theme.of(context)
                   .textTheme
-                  .button!
+                  .labelLarge!
                   .copyWith(color: Colors.white),
             ),
           ],

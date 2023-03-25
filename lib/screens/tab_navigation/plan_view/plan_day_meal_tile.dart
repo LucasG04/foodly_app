@@ -104,7 +104,7 @@ class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
     final voteColor = (widget.planMeal.upvotes ?? [])
             .contains(AuthenticationService.currentUser?.uid)
         ? Theme.of(context).primaryColor
-        : Theme.of(context).textTheme.bodyText1!.color;
+        : Theme.of(context).textTheme.bodyLarge!.color;
 
     return Row(
       children: [

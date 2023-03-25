@@ -34,7 +34,7 @@ class _ReorderProductGroupsScreenState
             icon: Icon(
               EvaIcons.refreshOutline,
               color:
-                  Theme.of(context).textTheme.bodyText1?.color ?? Colors.black,
+                  Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
             ),
             splashRadius: kPadding,
             tooltip: 'reset'.tr(),

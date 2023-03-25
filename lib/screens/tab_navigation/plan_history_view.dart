@@ -39,7 +39,7 @@ class _PlanHistoryViewState extends ConsumerState<PlanHistoryView> {
               onPressed: navigateBack,
               icon: Icon(
                 EvaIcons.close,
-                color: Theme.of(context).textTheme.bodyText1!.color,
+                color: Theme.of(context).textTheme.bodyLarge!.color,
               ),
             ),
           ),

@@ -55,7 +55,7 @@ class CardListTile extends StatelessWidget {
                 foregroundColor: Theme.of(context).primaryColor,
                 padding: EdgeInsets.zero,
               ),
-              child: trailing!,
+              child: trailing,
             ),
           ),
         ],

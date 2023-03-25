@@ -282,7 +282,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
     await WidgetUtils.showFoodlyBottomSheet<Ingredient?>(
       context: context,
       builder: (_) => IngredientEditModal(
-        ingredient: isCreating ? Ingredient() : grocery!.toIngredient(),
+        ingredient: isCreating ? Ingredient() : grocery.toIngredient(),
         onSaved: (result) async {
           final updatedGrocery = Grocery.fromIngredient(result);
           if (isCreating) {
@@ -292,7 +292,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
               BasicUtils.getActiveLanguage(context),
             );
           } else {
-            updatedGrocery.id = grocery!.id;
+            updatedGrocery.id = grocery.id;
             await ShoppingListService.updateGrocery(
               listId,
               updatedGrocery,

@@ -113,8 +113,7 @@ class MealService {
   }
 
   static Future<void> addMeals(String planId, List<Meal> meals) async {
-    _log.finer(
-        'Call addMeals with PlanId: $planId | Meals: ${meals.toString()}');
+    _log.finer('Call addMeals with PlanId: $planId | Meals: $meals');
     try {
       for (final meal in meals) {
         meal.planId = planId;
@@ -125,8 +124,7 @@ class MealService {
         }),
       );
     } catch (e) {
-      _log.severe(
-          'ERR: addMeals with PlanId: $planId | Meals: ${meals.toString()}', e);
+      _log.severe('ERR: addMeals with PlanId: $planId | Meals: $meals', e);
     }
   }
 

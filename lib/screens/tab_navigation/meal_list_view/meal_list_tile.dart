@@ -126,7 +126,7 @@ class MealListTile extends StatelessWidget {
   Widget _buildLoadingTitle() {
     return LayoutBuilder(builder: (context, constraints) {
       return SkeletonContainer(
-        height: Theme.of(context).textTheme.bodyText1?.fontSize ?? 16,
+        height: Theme.of(context).textTheme.bodyLarge?.fontSize ?? 16,
         width: constraints.maxWidth * 0.7,
       );
     });

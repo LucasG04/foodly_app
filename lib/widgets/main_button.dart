@@ -56,9 +56,9 @@ class MainButton extends StatelessWidget {
                         style: !isSecondary
                             ? Theme.of(context)
                                 .textTheme
-                                .button!
+                                .labelLarge!
                                 .copyWith(color: Colors.white)
-                            : Theme.of(context).textTheme.bodyText1!.copyWith(
+                            : Theme.of(context).textTheme.bodyLarge!.copyWith(
                                   color: kTextHeadlineColor,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -95,9 +95,9 @@ class MainButton extends StatelessWidget {
                 style: !isSecondary
                     ? Theme.of(context)
                         .textTheme
-                        .button!
+                        .labelLarge!
                         .copyWith(color: Colors.white)
-                    : Theme.of(context).textTheme.bodyText1!.copyWith(
+                    : Theme.of(context).textTheme.bodyLarge!.copyWith(
                           color: kTextHeadlineColor,
                           fontWeight: FontWeight.bold,
                         ),

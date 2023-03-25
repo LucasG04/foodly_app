@@ -37,7 +37,7 @@ class ConfirmDeleteModal extends StatelessWidget {
           ),
           RichText(
             text: TextSpan(
-              style: Theme.of(context).textTheme.bodyText1!.copyWith(
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                     fontSize: 16.0,
                   ),
               children: <TextSpan>[
@@ -57,7 +57,7 @@ class ConfirmDeleteModal extends StatelessWidget {
             child: MainButton(
               text: 'modal_delete_delete'.tr(),
               onTap: () => Navigator.pop(context, true),
-              color: Theme.of(context).errorColor,
+              color: Theme.of(context).colorScheme.error,
             ),
           ),
           const SizedBox(height: kPadding * 2),

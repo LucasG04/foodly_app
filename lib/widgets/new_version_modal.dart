@@ -31,9 +31,14 @@ class NewVersionModal extends ConsumerStatefulWidget {
     final Version lastCheckedVersion =
         Version.parse(VersionService.lastCheckedVersion);
     final publishedVersions = await _getPublishedVersions();
+    // ignore: use_build_context_synchronously
+    if (!context.mounted) {
+      return;
+    }
+
     final versionStrings = publishedVersions.map<String>((e) => e.toString());
     _log.fine(
-      'open() with lastCheckedVersion: ${lastCheckedVersion.toString()} and publishedVersions: $versionStrings',
+      'open() with lastCheckedVersion: $lastCheckedVersion and publishedVersions: $versionStrings',
     );
 
     final newVersions = publishedVersions.where((v) => v > lastCheckedVersion);
@@ -63,6 +68,7 @@ class NewVersionModal extends ConsumerStatefulWidget {
       'open() with versionNotes: ${versionNotes.map((e) => '${e.title}(${e.language})')}',
     );
 
+    // ignore: use_build_context_synchronously
     return WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) => NewVersionModal(

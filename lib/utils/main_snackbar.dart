@@ -50,7 +50,7 @@ class MainSnackbar {
                   ? Icon(
                       EvaIcons.alertCircleOutline,
                       size: 28.0,
-                      color: Theme.of(context).errorColor,
+                      color: Theme.of(context).colorScheme.error,
                     )
                   : Icon(
                       EvaIcons.infoOutline,

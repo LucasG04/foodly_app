@@ -54,7 +54,7 @@ class GetPremiumInfo extends StatelessWidget {
                         const SizedBox(height: kPadding / 6),
                         Text(
                           description,
-                          style: Theme.of(context).textTheme.bodyText1,
+                          style: Theme.of(context).textTheme.bodyLarge,
                         ),
                       ],
                     ),

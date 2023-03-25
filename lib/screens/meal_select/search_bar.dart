@@ -102,7 +102,7 @@ class _SearchBarState extends State<SearchBar> {
       controller: _closeIconController,
       startIcon: null,
       endIcon: EvaIcons.close,
-      color: Theme.of(context).textTheme.bodyText1!.color,
+      color: Theme.of(context).textTheme.bodyLarge!.color,
     );
   }
 }

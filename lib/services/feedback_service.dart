@@ -13,12 +13,12 @@ class FeedbackService {
   FeedbackService._();
 
   static Future<void> create(FoodlyFeedback feedback) async {
-    _log.finer('Call create with ${feedback.toString()}');
+    _log.finer('Call create with $feedback');
     final mappedFeedback = feedback.toMap();
     try {
       await _firestore.add(mappedFeedback);
     } catch (e) {
-      _log.severe('ERR: create with ${feedback.toString()}', e);
+      _log.severe('ERR: create with $feedback', e);
     }
   }
 }
