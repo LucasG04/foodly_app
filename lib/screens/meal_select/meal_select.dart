@@ -46,7 +46,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
   List<Meal> searchedMeals = [];
 
   double get _containerWidth {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.of(context).size.width * 0.9;
     return width > 599 ? 600 : width;
   }
 
@@ -69,9 +69,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
         controller: _scrollController,
         child: Column(
           children: [
-            SearchBar(
-              onSearch: _onSearchEvent,
-            ),
+            SearchBar(onSearch: _onSearchEvent),
             Consumer(builder: (context, ref, _) {
               final isSearching = ref.watch(_$isSearching);
 
@@ -329,8 +327,6 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
         parameters: {'query': query},
       );
     } else {
-      // TODO: check if
-      if (ref.read(_$isSearching)) {}
       searchedMeals = [];
       ref.read(_$isSearching.notifier).state = false;
       setState(() {});
