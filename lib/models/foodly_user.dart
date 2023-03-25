@@ -1,3 +1,5 @@
+import 'foodly_user_role.dart';
+
 class FoodlyUser {
   String? id;
   List<String?>? plans;
@@ -5,6 +7,7 @@ class FoodlyUser {
   bool? isPremiumGifted;
   DateTime? premiumGiftedAt;
   bool? premiumGiftedMessageShown;
+  FoodlyUserRole role;
 
   FoodlyUser({
     this.id,
@@ -13,6 +16,7 @@ class FoodlyUser {
     this.isPremiumGifted,
     this.premiumGiftedAt,
     this.premiumGiftedMessageShown,
+    this.role = FoodlyUserRole.user,
   });
 
   Map<String, dynamic> toMap() {
@@ -22,6 +26,7 @@ class FoodlyUser {
       'isPremiumGifted': isPremiumGifted,
       'premiumGiftedAt': premiumGiftedAt?.millisecondsSinceEpoch,
       'premiumGiftedMessageShown': premiumGiftedMessageShown,
+      'role': role.toString(),
     };
   }
 
@@ -35,6 +40,10 @@ class FoodlyUser {
           ? DateTime.fromMillisecondsSinceEpoch(map['premiumGiftedAt'] as int)
           : null,
       premiumGiftedMessageShown: map['premiumGiftedMessageShown'] as bool?,
+      role: FoodlyUserRole.values.firstWhere(
+        (e) => e.toString() == map['role'],
+        orElse: () => FoodlyUserRole.user,
+      ),
     );
   }
 }

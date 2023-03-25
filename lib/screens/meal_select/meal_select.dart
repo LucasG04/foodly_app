@@ -45,6 +45,11 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
 
   List<Meal> searchedMeals = [];
 
+  double get _containerWidth {
+    final width = MediaQuery.of(context).size.width * 0.9;
+    return width > 599 ? 600 : width;
+  }
+
   @override
   void initState() {
     _$isSearching = StateProvider.autoDispose<bool>((_) => false);
@@ -64,9 +69,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
         controller: _scrollController,
         child: Column(
           children: [
-            SearchBar(
-              onSearch: _onSearchEvent,
-            ),
+            SearchBar(onSearch: _onSearchEvent),
             Consumer(builder: (context, ref, _) {
               final isSearching = ref.watch(_$isSearching);
 
@@ -148,6 +151,16 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
                   });
   }
 
+  Widget _buildSizeWrapper({required Widget child, EdgeInsets? padding}) {
+    return Align(
+      child: Container(
+        width: _containerWidth,
+        padding: padding,
+        child: child,
+      ),
+    );
+  }
+
   Widget _buildPreviewMeals() {
     final planId = ref.read(planProvider)!.id!;
     return FutureBuilder<List<Meal>>(
@@ -165,9 +178,8 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
                   1, // +1 to make space for title and 0 to not show title
           itemBuilder: (context, index) {
             if (index == 0) {
-              return Padding(
+              return _buildSizeWrapper(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: kPadding,
                   vertical: kPadding / 4,
                 ),
                 child: Row(
@@ -229,9 +241,8 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
   }
 
   Widget _buildGetPremiumInfo() {
-    return Padding(
+    return _buildSizeWrapper(
       padding: const EdgeInsets.symmetric(
-        horizontal: kPadding,
         vertical: kPadding / 2,
       ),
       child: GetPremiumInfo(
@@ -243,12 +254,11 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
 
   Widget _buildContainer(IconData iconData, String text, Function action) {
     const double height = 75.0;
-    final double width = MediaQuery.of(context).size.width * 0.9;
     return Align(
       // ignore: avoid_redundant_argument_values
       alignment: Alignment.center,
       child: Container(
-        width: width > 599 ? 600 : width,
+        width: _containerWidth,
         height: height,
         margin: const EdgeInsets.symmetric(vertical: kPadding / 2),
         decoration: BoxDecoration(
@@ -317,8 +327,6 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
         parameters: {'query': query},
       );
     } else {
-      // TODO: check if
-      if (ref.read(_$isSearching)) {}
       searchedMeals = [];
       ref.read(_$isSearching.notifier).state = false;
       setState(() {});

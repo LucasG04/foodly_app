@@ -60,7 +60,7 @@ class ImportMealsModal extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize:
-                            Theme.of(context).textTheme.bodyText1!.fontSize! +
+                            Theme.of(context).textTheme.bodyLarge!.fontSize! +
                                 2,
                       ),
                     ).tr(),

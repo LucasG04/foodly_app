@@ -59,9 +59,13 @@ class _SearchBarState extends State<SearchBar> {
                 focusNode: _focusNode,
                 controller: _textEditingController,
                 style: const TextStyle(fontSize: 20.0),
+                cursorColor: Theme.of(context).primaryColor,
                 decoration: InputDecoration(
                   suffixIcon: _buildClearIcon(),
-                  icon: const Icon(EvaIcons.searchOutline),
+                  icon: Icon(
+                    EvaIcons.searchOutline,
+                    color: Theme.of(context).primaryColor,
+                  ),
                   border: InputBorder.none,
                   focusedBorder: InputBorder.none,
                   enabledBorder: InputBorder.none,
@@ -102,7 +106,7 @@ class _SearchBarState extends State<SearchBar> {
       controller: _closeIconController,
       startIcon: null,
       endIcon: EvaIcons.close,
-      color: Theme.of(context).textTheme.bodyText1!.color,
+      color: Theme.of(context).textTheme.bodyLarge!.color,
     );
   }
 }

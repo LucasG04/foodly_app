@@ -402,4 +402,37 @@ class LunixApiService {
       return [];
     }
   }
+
+  static Future<void> editGrocerySuggestion({
+    required Grocery oldGrocery,
+    required Grocery grocery,
+    required String langCode,
+    required String userId,
+  }) async {
+    _log.finer('Call editGrocerySuggestion()');
+
+    try {
+      final dynamic data = <String, dynamic>{
+        'current': <String, dynamic>{
+          'language': langCode,
+          'groupId': oldGrocery.group,
+          'name': oldGrocery.name,
+        },
+        'next': <String, dynamic>{
+          'language': langCode,
+          'groupId': grocery.group,
+          'name': grocery.name
+        },
+      };
+      await _dio.put<void>(
+        '$_lunixApiEndpoint/grocery/update-grocery-suggestion',
+        queryParameters: <String, dynamic>{
+          'uid': userId,
+        },
+        data: data,
+      );
+    } catch (e) {
+      _log.severe('ERR in editGrocerySuggestion. API Request failed', e);
+    }
+  }
 }

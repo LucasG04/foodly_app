@@ -12,7 +12,7 @@ class MealTag extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 2.5, horizontal: 4.0),
       decoration: BoxDecoration(
         color:
-            Theme.of(context).textTheme.bodyText1?.color?.withOpacity(0.12) ??
+            Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.12) ??
                 Colors.black12,
         borderRadius: BorderRadius.circular(15.0),
       ),

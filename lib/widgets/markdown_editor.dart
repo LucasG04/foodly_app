@@ -42,7 +42,7 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
 
   @override
   Widget build(BuildContext context) {
-    final textColor = Theme.of(context).textTheme.bodyText1!.color;
+    final textColor = Theme.of(context).textTheme.bodyLarge!.color;
     return SizedBox(
       width: MediaQuery.of(context).size.width > 599
           ? 600.0

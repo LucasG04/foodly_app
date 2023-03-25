@@ -301,5 +301,6 @@
   "page_title_connectivity_error_title": "Keine Internetverbindung",
   "page_title_connectivity_error_message": "Es scheint, als ob du momentan nicht mit dem Internet verbunden bist. Dies kann zu Problemen bei der Verwendung von {} führen.\nÜberprüfe bitte deine Verbindung.",
   "premium_gifted_msg_title": "Premium geschenkt!",
-  "premium_gifted_msg_message": "Durch dein Feedback konnte {} verbessert werden. Als Dankeschön bekommst du Premium für 1 Jahr geschenkt."
+  "premium_gifted_msg_message": "Durch dein Feedback konnte {} verbessert werden. Als Dankeschön bekommst du Premium für 1 Jahr geschenkt.",
+  "edit_grocery_suggestion_group": "Produktgruppe"
 }

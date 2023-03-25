@@ -101,6 +101,7 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal> {
               value: MealType.BREAKFAST,
               groupValue: _selectedMealType,
               onChanged: _changeMealType,
+              activeColor: Theme.of(context).primaryColor,
             ),
           if (_showMealTile(MealType.LUNCH))
             RadioListTile(
@@ -108,6 +109,7 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal> {
               value: MealType.LUNCH,
               groupValue: _selectedMealType,
               onChanged: _changeMealType,
+              activeColor: Theme.of(context).primaryColor,
             ),
           if (_showMealTile(MealType.DINNER))
             RadioListTile(
@@ -115,6 +117,7 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal> {
               value: MealType.DINNER,
               groupValue: _selectedMealType,
               onChanged: _changeMealType,
+              activeColor: Theme.of(context).primaryColor,
             ),
           const SizedBox(height: kPadding),
           Center(

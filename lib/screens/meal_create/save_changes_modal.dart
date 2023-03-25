@@ -47,7 +47,7 @@ class SaveChangesModal extends StatelessWidget {
             child: MainButton(
               text: 'save_changes_discard'.tr(),
               onTap: () => Navigator.pop(context, SaveChangesResult.discard),
-              color: Theme.of(context).errorColor,
+              color: Theme.of(context).colorScheme.error,
             ),
           ),
           const SizedBox(height: kPadding),

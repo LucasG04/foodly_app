@@ -51,15 +51,11 @@ class CardListTile extends StatelessWidget {
             margin: const EdgeInsets.only(right: 20.0),
             child: OutlinedButton(
               onPressed: trailingAction,
-              style: ButtonStyle(
-                padding: MaterialStateProperty.resolveWith(
-                  (states) => EdgeInsets.zero,
-                ),
-                foregroundColor: MaterialStateProperty.resolveWith(
-                  (states) => Colors.black,
-                ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Theme.of(context).primaryColor,
+                padding: EdgeInsets.zero,
               ),
-              child: trailing!,
+              child: trailing,
             ),
           ),
         ],

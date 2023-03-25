@@ -64,7 +64,7 @@ AlertDialog _buildLeaveDialog(BuildContext context) {
         },
         child: Text(
           'settings_plan_leave_dialog_action_leave'.tr(),
-          style: TextStyle(color: Theme.of(context).errorColor),
+          style: TextStyle(color: Theme.of(context).colorScheme.error),
         ),
       ),
       TextButton(
@@ -138,7 +138,7 @@ AlertDialog _buildDeleteConfirmDialog(BuildContext context) {
         },
         child: Text(
           'settings_plan_delete_dialog_action_delete'.tr(),
-          style: TextStyle(color: Theme.of(context).errorColor),
+          style: TextStyle(color: Theme.of(context).colorScheme.error),
         ),
       ),
       TextButton(

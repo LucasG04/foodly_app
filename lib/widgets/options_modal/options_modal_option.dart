@@ -27,7 +27,7 @@ class OptionsSheetOptions extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(kRadius),
           color:
-              Theme.of(context).textTheme.bodyText1?.color?.withOpacity(0.06) ??
+              Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.06) ??
                   Colors.black.withOpacity(0.06),
         ),
         padding: const EdgeInsets.all(kPadding),
@@ -35,7 +35,7 @@ class OptionsSheetOptions extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: textColor ?? Theme.of(context).textTheme.bodyText1?.color,
+              color: textColor ?? Theme.of(context).textTheme.bodyLarge?.color,
             ),
             const SizedBox(width: kPadding),
             Flexible(

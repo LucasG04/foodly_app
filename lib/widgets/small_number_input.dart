@@ -44,7 +44,7 @@ class SmallNumberInput extends StatelessWidget {
       '$value',
       textAlign: TextAlign.center,
       style: TextStyle(
-        fontSize: Theme.of(context).textTheme.bodyText1!.fontSize! + 2,
+        fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize! + 2,
         fontWeight: FontWeight.bold,
       ),
     );

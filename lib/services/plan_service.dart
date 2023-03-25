@@ -59,7 +59,7 @@ class PlanService {
   }
 
   static Future<List<Plan>> getPlansByIds(List<String?> ids) async {
-    _log.finer('Call getPlansByIds with ${ids.toString()}');
+    _log.finer('Call getPlansByIds with $ids');
     if (ids.isEmpty) {
       return [];
     }
@@ -129,15 +129,14 @@ class PlanService {
     if (snaps.docs.isEmpty) {
       return null;
     }
-    _log.finest('getPlanByCode: Query result: ${snaps.docs.toString()}');
+    _log.finest('getPlanByCode: Query result: ${snaps.docs}');
 
     final plan = snaps.docs.first.data();
 
     if (!withMeals) {
       final snapMeals = await _firestore.doc(plan.id).collection('meals').get();
 
-      _log.finest(
-          'getPlanByCode: Query meals result: ${snapMeals.docs.toString()}');
+      _log.finest('getPlanByCode: Query meals result: ${snapMeals.docs}');
 
       plan.meals = snapMeals.docs
           .map((doc) => PlanMeal.fromMap(doc.id, doc.data()))

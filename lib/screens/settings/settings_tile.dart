@@ -24,7 +24,7 @@ class SettingsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color? textColor =
-        colorText ?? Theme.of(context).textTheme.bodyText1!.color;
+        colorText ?? Theme.of(context).textTheme.bodyLarge!.color;
     return InkWell(
       onTap: onTap,
       child: Container(

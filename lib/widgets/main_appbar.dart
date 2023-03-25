@@ -50,7 +50,7 @@ class _MainAppBarState extends State<MainAppBar> {
         style: TextStyle(
           fontWeight: FontWeight.w600,
           fontFamily: 'Poppins',
-          color: Theme.of(context).textTheme.bodyText1!.color,
+          color: Theme.of(context).textTheme.bodyLarge!.color,
         ),
         overflow: TextOverflow.fade,
       ),
@@ -61,7 +61,7 @@ class _MainAppBarState extends State<MainAppBar> {
           ? IconButton(
               icon: Icon(
                 _getIconData(Theme.of(context).platform),
-                color: Theme.of(context).textTheme.bodyText1!.color,
+                color: Theme.of(context).textTheme.bodyLarge!.color,
               ),
               tooltip: MaterialLocalizations.of(context).backButtonTooltip,
               onPressed: () {
