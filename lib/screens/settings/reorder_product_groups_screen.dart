@@ -44,66 +44,68 @@ class _ReorderProductGroupsScreenState
           ),
         ],
       ),
-      body: SizedBox(
-        width: BasicUtils.contentWidth(context, smallMultiplier: 1),
-        child: Consumer(builder: (context, ref, _) {
-          final productGroups = ref.watch(dataGroceryGroupsProvider);
-          return productGroups == null
-              ? const SingleChildScrollView(
-                  child: SizedBox(
-                    height: 200,
-                    child: SmallCircularProgressIndicator(),
-                  ),
-                )
-              : SingleChildScrollView(
-                  controller: _scrollController,
-                  child: Column(
-                    children: [
-                      StreamBuilder(
-                        stream: SettingsService.streamProductGroupOrder(),
-                        builder: (context, _) {
-                          final sortedGroups = BasicUtils.sortGroceryGroups(
-                            productGroups,
-                            SettingsService.productGroupOrder,
-                          );
-                          return ReorderableListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: sortedGroups.length,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                key: ValueKey(sortedGroups[index].id),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: kPadding / 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Theme.of(context).dividerColor,
-                                      width: 0.5,
+      body: Center(
+        child: SizedBox(
+          width: BasicUtils.contentWidth(context, smallMultiplier: 1),
+          child: Consumer(builder: (context, ref, _) {
+            final productGroups = ref.watch(dataGroceryGroupsProvider);
+            return productGroups == null
+                ? const SingleChildScrollView(
+                    child: SizedBox(
+                      height: 200,
+                      child: SmallCircularProgressIndicator(),
+                    ),
+                  )
+                : SingleChildScrollView(
+                    controller: _scrollController,
+                    child: Column(
+                      children: [
+                        StreamBuilder(
+                          stream: SettingsService.streamProductGroupOrder(),
+                          builder: (context, _) {
+                            final sortedGroups = BasicUtils.sortGroceryGroups(
+                              productGroups,
+                              SettingsService.productGroupOrder,
+                            );
+                            return ReorderableListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: sortedGroups.length,
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  key: ValueKey(sortedGroups[index].id),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: kPadding / 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Theme.of(context).dividerColor,
+                                        width: 0.5,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                child: ListTile(
-                                  title: Text(sortedGroups[index].name),
-                                  trailing: const Icon(EvaIcons.menu),
-                                ),
-                              );
-                            },
-                            onReorder: (oldIndex, newIndex) =>
-                                _updateProductGroupsOrder(
-                              oldIndex,
-                              newIndex,
-                              productGroups,
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: kPadding * 2)
-                    ],
-                  ),
-                );
-        }),
+                                  child: ListTile(
+                                    title: Text(sortedGroups[index].name),
+                                    trailing: const Icon(EvaIcons.menu),
+                                  ),
+                                );
+                              },
+                              onReorder: (oldIndex, newIndex) =>
+                                  _updateProductGroupsOrder(
+                                oldIndex,
+                                newIndex,
+                                productGroups,
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: kPadding * 2)
+                      ],
+                    ),
+                  );
+          }),
+        ),
       ),
     );
   }
