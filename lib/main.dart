@@ -115,6 +115,14 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   final _log = Logger('FoodlyApp');
   final _appRouter = AppRouter();
 
+  /// Handle the initial uni link only when user is in a plan
+  bool _handleInitUniLink = true;
+
+  /// Subscription that handles uni links when the app is in the foreground.
+  /// Will be canceled by [cancelSubscriptions] when the app is closed
+  // ignore: cancel_subscriptions
+  StreamSubscription<String?>? _uniLinkSub;
+
   @override
   void initState() {
     _initializeLogger();
@@ -123,8 +131,6 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     super.initState();
     InAppPurchaseService.setRef(ref);
     SettingsService.setRef(ref);
-
-    _initUniLinks();
   }
 
   @override
@@ -140,9 +146,11 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active ||
             snapshot.connectionState == ConnectionState.done) {
-          _loadBaseData();
-          _loadActivePlan();
-          _loadActiveUser();
+          Future.wait([
+            _loadBaseData(),
+            _loadActivePlan(),
+            _loadActiveUser(),
+          ]).whenComplete(() => afterUserAndPlanLoaded());
 
           return Consumer(
             builder: (context, ref, _) {
@@ -216,6 +224,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     } else {
       FirebaseCrashlytics.instance.setUserIdentifier('');
       BasicUtils.afterBuild(() => ref.read(userProvider.notifier).state = null);
+      _handleInitUniLink = false;
     }
 
     BasicUtils.afterBuild(
@@ -255,9 +264,11 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     ref.read(shoppingListIdProvider.notifier).state = shoppingList.id;
   }
 
-  void _loadBaseData() {
-    _loadGroceryGroups();
-    _loadSupportedImportSites();
+  Future<void> _loadBaseData() {
+    return Future.wait([
+      _loadGroceryGroups(),
+      _loadSupportedImportSites(),
+    ]);
   }
 
   Future<void> _loadGroceryGroups() async {
@@ -362,27 +373,47 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     }).canceledBy(this);
   }
 
-  Future<void> _initUniLinks() async {
-    try {
-      final initialLink = await getInitialLink();
-      _checkForMealLinkAndNavigate(initialLink);
-    } catch (e) {
-      _log.finer('Failed to get initial link', e);
-    }
-
-    linkStream
-        .listen(
-          _checkForMealLinkAndNavigate,
-          onError: (dynamic e) => _log.finer('ERR in getLinksStream()', e),
-        )
-        .canceledBy(this);
+  Future<void> afterUserAndPlanLoaded() async {
+    _initUniLinks();
   }
 
-  Future<void> _checkForMealLinkAndNavigate(String? link) async {
-    if (link == null) {
+  Future<void> _initUniLinks() async {
+    if (_handleInitUniLink) {
+      try {
+        final initialLink = await getInitialLink();
+        _processLink(initialLink);
+      } catch (e) {
+        _log.finer('Failed to get initial link', e);
+      }
+    }
+
+    if (_uniLinkSub == null) {
+      _uniLinkSub = linkStream.listen(
+        _processLink,
+        onError: (dynamic e) => _log.finer('ERR in getLinksStream()', e),
+      );
+      _uniLinkSub!.canceledBy(this);
+    }
+  }
+
+  Future<void> _processLink(String? link) async {
+    if (link == null || link.isEmpty) {
+      _log.fine('_processLink: link is null or empty');
       return;
     }
 
+    final userId = ref.read(userProvider)?.id;
+    final planId = ref.read(planProvider)?.id;
+
+    if (userId == null || planId == null) {
+      _log.fine('_processLink: user or plan not loaded yet');
+      return;
+    }
+
+    _checkForMealLinkAndNavigate(link);
+  }
+
+  Future<void> _checkForMealLinkAndNavigate(String link) async {
     const pattern = '/meal/';
     final indexPattern = link.indexOf(pattern);
     if (indexPattern == -1) {
