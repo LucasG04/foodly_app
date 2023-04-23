@@ -51,17 +51,18 @@ class _AddToShoppingListModalState
     if (_isMealValid()) {
       _ingredientStates = _getIngredientStates(widget.meal!);
     } else {
-      BasicUtils.afterBuild(
-          () => ref.read(_$loadingData.notifier).state = true);
-      MealService.getMealById(widget.mealId!).then((value) {
-        if (value != null) {
-          _ingredientStates = _getIngredientStates(value);
-          _mealServings = value.servings;
-          BasicUtils.afterBuild(
-            () => ref.read(_$servings.notifier).state = _mealServings!,
-          );
-          ref.read(_$loadingData.notifier).state = false;
-        }
+      BasicUtils.afterBuild(() {
+        ref.read(_$loadingData.notifier).state = true;
+        MealService.getMealById(widget.mealId!).then((value) {
+          if (value != null) {
+            _ingredientStates = _getIngredientStates(value);
+            _mealServings = value.servings;
+            BasicUtils.afterBuild(
+              () => ref.read(_$servings.notifier).state = _mealServings!,
+            );
+            ref.read(_$loadingData.notifier).state = false;
+          }
+        });
       });
     }
   }
