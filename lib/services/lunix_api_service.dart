@@ -17,26 +17,29 @@ import '../models/upcoming_feature.dart';
 import '../utils/basic_utils.dart';
 import '../utils/env.dart';
 import 'meal_service.dart';
+import 'settings_service.dart';
 
 class LunixApiService {
   LunixApiService._();
 
   static final _log = Logger('LunixApiService');
-  static const String _lunixApiEndpoint =
-      'https://lunix-api.herokuapp.com/foodly';
   static final Dio _dio = Dio(
     BaseOptions(
-      headers: <String, dynamic>{'x-api-key': Env.lunixApiKey},
+      headers: <String, dynamic>{'x-api-key': _lunixApiKey},
     ),
   );
 
   static Dio get dio => _dio;
-  static String get apiEndpoint => _lunixApiEndpoint;
+  static String get _lunixApiKey =>
+      SettingsService.useDevApi ? Env.lunixApiKeyDev : Env.lunixApiKey;
+  static String get apiEndpoint => SettingsService.useDevApi
+      ? 'https://lunix-api-dev.herokuapp.com/foodly'
+      : 'https://lunix-api.herokuapp.com/foodly';
 
   static Future<bool> lunixApiAvailable() async {
     Response? response;
     try {
-      response = await _dio.get<Map>(_lunixApiEndpoint);
+      response = await _dio.get<Map>(apiEndpoint);
     } catch (e) {
       _log.severe('ERR in lunixApiAvailable. Response is null', e);
     }
@@ -71,7 +74,7 @@ class LunixApiService {
       final todayString = DateTime.now().toIso8601String().split('T')[0];
       final planSavePath = '${dir.path}/plan-$todayString.docx';
       final Response response = await _dio.post<List<int>>(
-        '$_lunixApiEndpoint/generate-plan-pdf',
+        '$apiEndpoint/generate-plan-pdf',
         data: docxData.toJson(),
         options: Options(responseType: ResponseType.bytes),
       );
@@ -154,7 +157,7 @@ class LunixApiService {
     Response? response;
     try {
       response = await _dio.get<Map<String, dynamic>>(
-        '$_lunixApiEndpoint/search-image',
+        '$apiEndpoint/search-image',
         queryParameters: <String, dynamic>{
           'q': text,
           'page': page,
@@ -177,7 +180,7 @@ class LunixApiService {
     Response? response;
     try {
       response = await _dio.get<List<dynamic>>(
-        '$_lunixApiEndpoint/published-versions',
+        '$apiEndpoint/published-versions',
       );
     } catch (e) {
       _log.severe('ERR in getAllPublishedVersions. Response is null', e);
@@ -200,7 +203,7 @@ class LunixApiService {
 
     try {
       response = await _dio.get<List<dynamic>>(
-        '$_lunixApiEndpoint/search-meals',
+        '$apiEndpoint/search-meals',
         queryParameters: <String, String>{
           'planId': planId,
           'query': query,
@@ -230,7 +233,7 @@ class LunixApiService {
     Response? response;
     try {
       response = await _dio.get<List<dynamic>>(
-        '$_lunixApiEndpoint/tags-in-plan',
+        '$apiEndpoint/tags-in-plan',
         queryParameters: <String, String>{'planId': planId},
       );
     } catch (e) {
@@ -256,7 +259,7 @@ class LunixApiService {
     Response? response;
     try {
       response = await _dio.post<List<dynamic>>(
-        '$_lunixApiEndpoint/search-meal-by-tags',
+        '$apiEndpoint/search-meal-by-tags',
         data: <String, dynamic>{
           'planId': planId,
           'tags': tags,
@@ -283,7 +286,7 @@ class LunixApiService {
     Response? response;
     try {
       response = await _dio.get<List<dynamic>>(
-        '$_lunixApiEndpoint/grocery/groups',
+        '$apiEndpoint/grocery/groups',
         queryParameters: <String, dynamic>{'language': langCode},
       );
     } catch (e) {
@@ -304,7 +307,7 @@ class LunixApiService {
     Response? response;
     try {
       response = await _dio.get<List<dynamic>>(
-        '$_lunixApiEndpoint/grocery/suggestion',
+        '$apiEndpoint/grocery/suggestion',
         queryParameters: <String, dynamic>{
           'language': langCode,
           'query': query,
@@ -329,7 +332,7 @@ class LunixApiService {
     Response? response;
     try {
       response = await _dio.get<List<dynamic>>(
-        '$_lunixApiEndpoint/open-issues',
+        '$apiEndpoint/open-issues',
       );
     } catch (e) {
       _log.severe('ERR in getUpcomingFeatures. API Request failed', e);
@@ -348,7 +351,7 @@ class LunixApiService {
     _log.finer('Call setGroupsForIngredients() with $mealId');
     try {
       await _dio.get<void>(
-        '$_lunixApiEndpoint/set-groups-for-ingredients',
+        '$apiEndpoint/set-groups-for-ingredients',
         queryParameters: <String, dynamic>{
           'mealId': mealId,
           'langCode': langCode,
@@ -365,7 +368,7 @@ class LunixApiService {
 
     try {
       final response = await _dio.get<dynamic>(
-        '$_lunixApiEndpoint/import',
+        '$apiEndpoint/import',
         queryParameters: <String, dynamic>{
           'url': url,
           'language': langCode,
@@ -387,7 +390,7 @@ class LunixApiService {
 
     try {
       final response = await _dio.get<dynamic>(
-        '$_lunixApiEndpoint/import/supported-sites',
+        '$apiEndpoint/import/supported-sites',
       );
       if (response.statusCode != 200) {
         return [];
@@ -425,7 +428,7 @@ class LunixApiService {
         },
       };
       await _dio.put<void>(
-        '$_lunixApiEndpoint/grocery/update-grocery-suggestion',
+        '$apiEndpoint/grocery/update-grocery-suggestion',
         queryParameters: <String, dynamic>{
           'uid': userId,
         },

@@ -31,6 +31,7 @@
   "settings_section_general_language": "Language",
   "settings_section_general_premium": "Get Premium {}",
   "settings_section_general_upcoming": "Upcoming features",
+  "settings_section_general_use_dev_api": "Use dev API",
   "settings_section_customization": "Customization",
   "settings_section_customization_change_color": "Change the primary color",
   "settings_section_customization_multiple_meals": "Multiple dishes per meal",

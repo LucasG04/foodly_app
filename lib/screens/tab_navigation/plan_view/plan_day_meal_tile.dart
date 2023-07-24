@@ -82,8 +82,8 @@ class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
   }
 
   Widget _buildSkeletonLoading() {
-    return Row(
-      children: const [
+    return const Row(
+      children: [
         SkeletonContainer(
           width: 50.0,
           height: 50.0,

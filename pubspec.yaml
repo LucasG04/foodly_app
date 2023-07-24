@@ -16,9 +16,9 @@ dependencies:
 
   # Util
   flutter_riverpod: ^2.1.1
-  auto_route: ^4.0.1
-  intl: ^0.17.0
-  hive: ^2.0.4
+  auto_route: ^5.0.4
+  intl: ^0.18.0
+  hive: ^2.2.3
   # flutter_cache_manager_hive:
   #   git:
   #     url: https://github.com/X-Wei/flutter_cache_manager_hive.git
@@ -47,10 +47,10 @@ dependencies:
   keyboard_service: ^2.0.1
   flutter_native_image: ^0.0.6+1
   version: ^2.0.0
-  package_info_plus: ^3.0.2
+  package_info_plus: ^3.1.2
   in_app_update: ^4.0.1 # Android Updates
   update_available: ^2.2.0 # iOS Updates
-  envied: ^0.2.4
+  envied: ^0.3.0+3
   purchases_flutter: ^4.9.0
   permission_handler: ^10.2.0
   flutter_phoenix: ^1.1.0
@@ -63,13 +63,13 @@ dependencies:
   cloud_firestore: ^4.3.1
   firebase_analytics: ^10.1.0
   firebase_app_check: ^0.1.1+8
-  firebase_auth: ^4.2.5
+  firebase_auth: ^4.2.10
   firebase_core: ^2.4.1
   firebase_crashlytics: ^3.0.11
   firebase_storage: ^11.0.10
 
   # Widgets
-  flutter_snake_navigationbar: ^0.5.0
+  flutter_snake_navigationbar: ^0.6.1
   eva_icons_flutter: ^3.0.2
   # cached_network_image: ^3.2.2
   cached_network_image:
@@ -78,7 +78,7 @@ dependencies:
       ref: feature/errorListener
       path: cached_network_image
   group_list_view: ^1.1.1
-  adaptive_dialog: ^1.2.0
+  adaptive_dialog: ^1.9.0
   flutter_markdown:
   auto_size_text:
   flutter_slidable: ^0.6.0-nullsafety.0
@@ -111,11 +111,11 @@ dev_dependencies:
     sdk: flutter
   lints: ^2.0.0
   # build runner via: `flutter packages pub run build_runner build --delete-conflicting-outputs`
-  build_runner:
-  auto_route_generator: ^4.0.0
-  hive_generator: ^1.1.1
+  build_runner: ^2.4.6
+  auto_route_generator: ^5.0.3
+  hive_generator: ^2.0.0
   flutter_launcher_icons: ^0.9.0
-  envied_generator: ^0.2.3
+  envied_generator: ^0.3.0+3
 
 # dependency_overrides:
 #   platform: ^3.1.0
