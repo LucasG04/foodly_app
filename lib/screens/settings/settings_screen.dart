@@ -28,6 +28,7 @@ import '../../models/plan.dart';
 import '../../models/shopping_list_sort.dart';
 import '../../services/foodly_user_service.dart';
 import '../../services/in_app_purchase_service.dart';
+import '../../utils/permission_utils.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
@@ -127,6 +128,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               colorIcon: kPremiumColor,
                             ),
                           ),
+                          if (PermissionUtils.allowedToModerate(foodlyUser))
+                            SettingsTile(
+                              leadingIcon: EvaIcons.code,
+                              text: 'settings_section_general_use_dev_api'.tr(),
+                              trailing: StreamBuilder<bool>(
+                                initialData: SettingsService.useDevApi,
+                                stream: SettingsService.streamUseDevApi(),
+                                builder: (context, snapshot) {
+                                  return Switch.adaptive(
+                                    value: snapshot.data!,
+                                    onChanged: (value) {
+                                      SettingsService.setUseDevApi(value);
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
                         ], context),
                         _buildSectionTitle(
                           'settings_section_customization'.tr(),

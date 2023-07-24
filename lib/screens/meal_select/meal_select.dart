@@ -24,7 +24,7 @@ import '../../widgets/main_appbar.dart';
 import '../../widgets/meal_pagination.dart';
 import '../../widgets/user_information.dart';
 import '../tab_navigation/meal_list_view/meal_list_tile.dart';
-import 'search_bar.dart';
+import 'search_bar.dart' as foodly_search_bar;
 import 'select_meal_tile.dart';
 
 class MealSelectScreen extends ConsumerStatefulWidget {
@@ -69,7 +69,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
         controller: _scrollController,
         child: Column(
           children: [
-            SearchBar(onSearch: _onSearchEvent),
+            foodly_search_bar.SearchBar(onSearch: _onSearchEvent),
             Consumer(builder: (context, ref, _) {
               final isSearching = ref.watch(_$isSearching);
 

@@ -31,6 +31,7 @@
   "settings_section_general_language": "Sprache",
   "settings_section_general_premium": "Hol dir Premium {}",
   "settings_section_general_upcoming": "Zukünftige Funktionen",
+  "settings_section_general_use_dev_api": "Entwickler API verwenden",
   "settings_section_customization": "Anpassung",
   "settings_section_customization_change_color": "Hauptfarbe ändern",
   "settings_section_customization_multiple_meals": "Mehrere Gerichte pro Mahlzeit",

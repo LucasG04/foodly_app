@@ -84,6 +84,9 @@ class SettingsService {
     return _convertToMealTypes(_settingsBox.get('activeMealTypes'));
   }
 
+  static bool get useDevApi =>
+      _settingsBox.get('useDevApi', defaultValue: false) as bool;
+
   static Future<void> setMultipleMealsPerTime(bool value) async {
     await _settingsBox.put('multipleMealsPerTime', value);
   }
@@ -115,6 +118,10 @@ class SettingsService {
     );
   }
 
+  static Future<void> setUseDevApi(bool value) async {
+    await _settingsBox.put('useDevApi', value);
+  }
+
   static Stream<BoxEvent> streamShoppingListSort() {
     return _settingsBox.watch(key: 'shoppingListSort');
   }
@@ -133,6 +140,12 @@ class SettingsService {
     return _settingsBox
         .watch(key: 'productGroupOrder')
         .map((event) => event.value as List<String>);
+  }
+
+  static Stream<bool> streamUseDevApi() {
+    return _settingsBox
+        .watch(key: 'useDevApi')
+        .map((event) => event.value as bool);
   }
 
   static List<MealType> _convertToMealTypes(dynamic value) {
