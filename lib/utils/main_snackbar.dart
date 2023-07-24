@@ -108,6 +108,6 @@ class MainSnackbar {
   }
 
   String _getCountdownText(double value) {
-    return ((duration - (value / 1000)).toInt()).toString();
+    return (duration - (value / 1000)).toInt().toString();
   }
 }
