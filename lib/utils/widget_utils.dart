@@ -15,7 +15,11 @@ class WidgetUtils {
     required BuildContext context,
     required Widget Function(BuildContext) builder,
     bool scrollable = false,
+    bool unfocus = true,
   }) {
+    if (unfocus) {
+      FocusScope.of(context).unfocus();
+    }
     return showBarModalBottomSheet<T>(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
