@@ -424,7 +424,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                 ),
         ),
         const SizedBox(height: kPadding),
-        Padding(padding: sidePadding, child: content),
+        Container(width: double.infinity, padding: sidePadding, child: content),
       ],
     );
   }
