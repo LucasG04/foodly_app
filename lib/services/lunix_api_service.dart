@@ -165,7 +165,7 @@ class LunixApiService {
         },
       );
     } catch (e) {
-      _log.severe('ERR in getAllPublishedVersions. Response is null', e);
+      _log.severe('ERR in searchImages. Response is null', e);
     }
 
     if (response == null || response.data == null) {

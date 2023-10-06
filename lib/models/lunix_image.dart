@@ -37,8 +37,8 @@ class LunixImage {
   factory LunixImage.fromMap(Map<String, dynamic> map) {
     return LunixImage(
       url: map['url'] as String? ?? '',
-      width: int.tryParse(map['width'] as String? ?? '') ?? 0,
-      height: int.tryParse(map['height'] as String? ?? '') ?? 0,
+      width: map['width'] as int? ?? 0,
+      height: map['height'] as int? ?? 0,
     );
   }
 }
