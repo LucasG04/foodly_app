@@ -315,7 +315,7 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
         _noResults = _images.isEmpty;
       });
     } catch (e) {
-      _log.severe('ERR: searchImages with $search');
+      _log.severe('ERR: searchImages with $search', e);
       if (!mounted) {
         return;
       }
