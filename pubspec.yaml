@@ -42,14 +42,14 @@ dependencies:
   metadata_fetch:
     git:
       url: https://github.com/LucasG04/metadata_fetch.git
-      ref: master
+      ref: v0.4.3
   flutter_file_dialog: ^2.3.0
   keyboard_service: ^2.0.1
   flutter_native_image: ^0.0.6+1
   version: ^2.0.0
-  package_info_plus: ^3.1.2
+  package_info_plus: ^4.1.0
   in_app_update: ^4.0.1 # Android Updates
-  update_available: ^2.2.0 # iOS Updates
+  update_available: ^3.0.0 # iOS Updates
   envied: ^0.3.0+3
   purchases_flutter: ^4.9.0
   permission_handler: ^10.2.0
@@ -71,12 +71,7 @@ dependencies:
   # Widgets
   flutter_snake_navigationbar: ^0.6.1
   eva_icons_flutter: ^3.0.2
-  # cached_network_image: ^3.2.2
-  cached_network_image:
-    git:
-      url: https://github.com/SuaMusica/flutter_cached_network_image.git
-      ref: feature/errorListener
-      path: cached_network_image
+  extended_image: ^8.1.1
   group_list_view: ^1.1.1
   adaptive_dialog: ^1.9.0
   flutter_markdown:
