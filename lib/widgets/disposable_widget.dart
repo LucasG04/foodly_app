@@ -1,6 +1,6 @@
 import 'dart:async';
 
-class DisposableWidget {
+mixin DisposableWidget {
   final List<StreamSubscription> _subscriptions = [];
 
   void cancelSubscriptions() {

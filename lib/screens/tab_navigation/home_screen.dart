@@ -180,10 +180,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
 
     try {
       final availability = await getUpdateAvailability();
-      available = availability.foldElse(
-        available: () => true,
-        orElse: () => false,
-      );
+      available = switch (availability) {
+        UpdateAvailable() => true,
+        NoUpdateAvailable() => false,
+        UnknownAvailability() => false,
+      };
     } catch (e) {
       _log.severe(
         'ERR in _checkForUpdateIOS() for getUpdateAvailability() or foldElse()',
