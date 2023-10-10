@@ -302,8 +302,10 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
         final isActive = ref.watch(_$keepScreenOnActive);
         return FloatingActionButton.small(
           onPressed: () => _keepScreenOn(!isActive),
-          foregroundColor: isActive ? Colors.white : Colors.grey[850],
-          backgroundColor: isActive ? Colors.grey[850] : Colors.white,
+          // the white background for `isActive` indicates that the screen is kept on
+          // the `flashOffOutline` icon is used to indicate what will happen when the button is pressed
+          foregroundColor: isActive ? Colors.grey[850] : Colors.white,
+          backgroundColor: isActive ? Colors.white : Colors.grey[850],
           tooltip: 'meal_details_keep_screen_on'.tr(),
           child: Icon(
             isActive ? EvaIcons.flashOffOutline : EvaIcons.flashOutline,
