@@ -6,6 +6,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:keep_screen_on/keep_screen_on.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../app_router.gr.dart';
@@ -20,6 +21,7 @@ import '../../services/meal_stat_service.dart';
 import '../../services/plan_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/convert_util.dart';
+import '../../utils/main_snackbar.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/foodly_network_image.dart';
@@ -57,6 +59,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
   final _$importButtonState = AutoDisposeStateProvider<ButtonState>(
     (_) => ButtonState.normal,
   );
+  final _$keepScreenOnActive = AutoDisposeStateProvider<bool>((_) => false);
   late final AutoDisposeStateProvider<int> _$servings;
 
   bool? _isInPlan;
@@ -78,6 +81,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
 
   @override
   void dispose() {
+    KeepScreenOn.turnOff();
     cancelSubscriptions();
     super.dispose();
   }
@@ -294,6 +298,20 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                 ),
               ],
             ),
+      floatingActionButton: Consumer(builder: (context, ref, _) {
+        final isActive = ref.watch(_$keepScreenOnActive);
+        return FloatingActionButton.small(
+          onPressed: () => _keepScreenOn(!isActive),
+          // the white background for `isActive` indicates that the screen is kept on
+          // the `flashOffOutline` icon is used to indicate what will happen when the button is pressed
+          foregroundColor: isActive ? Colors.grey[850] : Colors.white,
+          backgroundColor: isActive ? Colors.white : Colors.grey[850],
+          tooltip: 'meal_details_keep_screen_on'.tr(),
+          child: Icon(
+            isActive ? EvaIcons.flashOffOutline : EvaIcons.flashOutline,
+          ),
+        );
+      }),
     );
   }
 
@@ -710,5 +728,24 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
       }
     }
     ref.read(_$isLoading.notifier).state = true;
+  }
+
+  void _keepScreenOn(bool active) {
+    ref.read(_$keepScreenOnActive.notifier).state = active;
+
+    if (!active) {
+      KeepScreenOn.turnOff();
+      return;
+    }
+
+    KeepScreenOn.turnOn();
+    if (mounted && ref.read(showKeepOnScreenNotification)) {
+      MainSnackbar(
+        title: 'meal_details_keep_screen_on'.tr(),
+        message: 'meal_details_keep_screen_on_description'.tr(),
+        isDismissible: true,
+      ).show(context);
+      ref.read(showKeepOnScreenNotification.notifier).state = false;
+    }
   }
 }

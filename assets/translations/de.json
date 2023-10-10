@@ -169,6 +169,8 @@
   "meal_details_stats": "Statistiken",
   "meal_details_stats_locked": "Statistiken sind nur für Premium-Nutzer verfügbar",
   "meal_details_stats_unlock": "Hol dir Premium",
+  "meal_details_keep_screen_on": "Bildschirm bleibt an 💡",
+  "meal_details_keep_screen_on_description": "Der Bildschirm bleibt an, solange du dir das Gericht anschaust oder du wieder auf den Button drückst.",
   "modal_delete_sure_leading": "Bist du dir sicher, dass du das Gericht",
   "modal_delete_sure_trailing": "für immer löschen möchtest. Es kann nicht wiederhergestellt noch von jemanden aufgerufen werden.",
   "modal_delete_delete": "Permanent löschen",

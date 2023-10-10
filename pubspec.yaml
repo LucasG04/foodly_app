@@ -58,6 +58,7 @@ dependencies:
   connectivity_plus: ^3.0.3
   internet_connection_checker: ^1.0.0+1
   uni_links: ^0.5.1
+  keep_screen_on: ^2.1.0
 
   # Firebase
   cloud_firestore: ^4.3.1
