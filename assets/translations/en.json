@@ -169,6 +169,8 @@
   "meal_details_stats": "Stats",
   "meal_details_stats_locked": "Statistics are only available for premium users",
   "meal_details_stats_unlock": "Get Premium",
+  "meal_details_keep_screen_on": "Keep screen on 💡",
+  "meal_details_keep_screen_on_description": "The screen will not turn off while you are cooking or until you press this button again.",
   "modal_delete_sure_leading": "Are you sure you want the dish",
   "modal_delete_sure_trailing": "to be deleted forever? It cannot be restored nor accessed by anyone.",
   "modal_delete_trailing": "Delete permanently",

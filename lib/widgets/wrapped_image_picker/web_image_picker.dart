@@ -1,6 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -215,22 +215,24 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
   Widget _buildImage(String url) {
     url = url.replaceFirst('http://', 'https://');
     return _buildImageContainer(
-      child: CachedNetworkImage(
-        imageUrl: url,
-        imageBuilder: (context, image) => InkWell(
-          onTap: () => _selectImage(url),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(kRadius)),
-              image: DecorationImage(image: image, fit: BoxFit.cover),
-            ),
+      child: InkWell(
+        onTap: () => _selectImage(url),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(kRadius),
+          child: ExtendedImage.network(
+            url,
+            fit: BoxFit.cover,
+            loadStateChanged: (state) =>
+                state.extendedImageLoadState == LoadState.failed
+                    ? _buildErrorWidget()
+                    : state.extendedImageLoadState == LoadState.loading
+                        ? const SkeletonContainer(
+                            width: double.infinity,
+                            height: double.infinity,
+                          )
+                        : state.completedWidget,
           ),
         ),
-        placeholder: (_, __) => const SkeletonContainer(
-          width: double.infinity,
-          height: double.infinity,
-        ),
-        errorWidget: (_, __, dynamic ___) => _buildErrorWidget(),
       ),
     );
   }

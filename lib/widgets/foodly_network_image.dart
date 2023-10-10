@@ -1,8 +1,6 @@
-import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
@@ -58,6 +56,7 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
           if (available) {
             ref.read(_$isLoading.notifier).state = false;
           } else {
+            ref.read(_$isLoading.notifier).state = false;
             ref.read(_$hasError.notifier).state = true;
           }
         });
@@ -78,9 +77,9 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
   @override
   Widget build(BuildContext context) {
     return Consumer(
-      builder: (context, ref, loader) {
+      builder: (context, ref, child) {
         if (ref.watch(_$isLoading)) {
-          return loader!;
+          return child!;
         } else if (ref.watch(_$hasError)) {
           return _buildFallbackImage();
         }
@@ -94,24 +93,17 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
     );
   }
 
-  CachedNetworkImage _buildCachedNetworkImage(String url) {
+  ExtendedImage _buildCachedNetworkImage(String url) {
     url = url.replaceFirst('http://', 'https://');
-    return CachedNetworkImage(
-      imageUrl: url,
+    return ExtendedImage.network(
+      url,
       fit: widget.boxFit,
-      placeholder: (_, __) => _buildLoader(),
-      errorWidget: (_, __, dynamic ___) => _buildFallbackImage(),
-      errorListener: (dynamic e) {
-        if (e is SocketException) {
-          _log.finer(
-            'Error with image "$url". Address: "${e.address}". Message: "${e.message}".',
-          );
-        } else {
-          _log.severe(
-            'Error with image "$url". Exception: "${e.runtimeType}".',
-          );
-        }
-      },
+      loadStateChanged: (state) =>
+          state.extendedImageLoadState == LoadState.failed
+              ? _buildFallbackImage()
+              : state.extendedImageLoadState == LoadState.loading
+                  ? _buildLoader()
+                  : state.completedWidget,
     );
   }
 

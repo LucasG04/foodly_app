@@ -33,3 +33,7 @@ final planHistoryPageChanged = StateProvider<int>((_) => 0);
 
 /// controller has been changed
 final hasConnectionProvider = StateProvider<bool>((_) => true);
+
+/// Whether the "keep on screen" notification should be shown.
+/// It shows once per app start, after the first "keep on screen" action
+final showKeepOnScreenNotification = StateProvider<bool>((_) => true);

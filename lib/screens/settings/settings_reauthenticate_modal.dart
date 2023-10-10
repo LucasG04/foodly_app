@@ -142,6 +142,8 @@ class _SettingsReauthenticateModalState
 
     ref.read(_$buttonState.notifier).state = ButtonState.normal;
     ref.read(_$errorText.notifier).state = null;
+    // mounted is check above
+    // ignore: use_build_context_synchronously
     Navigator.of(context).pop(true);
   }
 
