@@ -855,6 +855,8 @@ PODS:
     - Flutter
   - integration_test (0.0.1):
     - Flutter
+  - keep_screen_on (1.0.0):
+    - Flutter
   - leveldb-library (1.22.2)
   - nanopb (2.30909.0):
     - nanopb/decode (= 2.30909.0)
@@ -908,6 +910,7 @@ DEPENDENCIES:
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
   - in_app_review (from `.symlinks/plugins/in_app_review/ios`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - keep_screen_on (from `.symlinks/plugins/keep_screen_on/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
@@ -981,6 +984,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/in_app_review/ios"
   integration_test:
     :path: ".symlinks/plugins/integration_test/ios"
+  keep_screen_on:
+    :path: ".symlinks/plugins/keep_screen_on/ios"
   package_info_plus:
     :path: ".symlinks/plugins/package_info_plus/ios"
   path_provider_foundation:
@@ -1039,6 +1044,7 @@ SPEC CHECKSUMS:
   image_picker: 50e7c7ff960e5f58faa4d1f4af84a771c671bc4a
   in_app_review: 318597b3a06c22bb46dc454d56828c85f444f99d
   integration_test: 13825b8a9334a850581300559b8839134b124670
+  keep_screen_on: e9070104e4f365251dbdcf2596684f40abf6e46e
   leveldb-library: f03246171cce0484482ec291f88b6d563699ee06
   nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
   package_info_plus: fd030dabf36271f146f1f3beacd48f564b0f17f7
