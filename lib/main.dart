@@ -49,7 +49,9 @@ Future<void> _configureFirebase() async {
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
   } else {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-    await FirebaseAppCheck.instance.activate();
+    await FirebaseAppCheck.instance.activate(
+      appleProvider: AppleProvider.appAttestWithDeviceCheckFallback,
+    );
     final packageInfo = await PackageInfo.fromPlatform();
     await Future.wait([
       FirebaseAnalytics.instance
