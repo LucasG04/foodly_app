@@ -663,7 +663,7 @@ PODS:
     - Firebase/AnalyticsWithoutAdIdSupport (= 10.15.0)
     - firebase_core
     - Flutter
-  - firebase_app_check (0.2.0):
+  - firebase_app_check (0.2.0-1):
     - Firebase/CoreOnly (~> 10.15.0)
     - firebase_core
     - FirebaseAppCheck (~> 10.15.0-beta)
@@ -672,7 +672,7 @@ PODS:
     - Firebase/Auth (= 10.15.0)
     - firebase_core
     - Flutter
-  - firebase_core (2.16.0):
+  - firebase_core (2.17.0):
     - Firebase/CoreOnly (= 10.15.0)
     - Flutter
   - firebase_crashlytics (3.3.6):
@@ -1014,9 +1014,9 @@ SPEC CHECKSUMS:
   connectivity_plus: 413a8857dd5d9f1c399a39130850d02fe0feaf7e
   Firebase: 66043bd4579e5b73811f96829c694c7af8d67435
   firebase_analytics: ce9396167b403608fce42b6e676b72e488b24c86
-  firebase_app_check: e9ea282ac1792e9cb3e770a83ed37887c6f17947
+  firebase_app_check: d6e8557b8540393638729de97a54de59f65ccac0
   firebase_auth: ca31bca59224dc727ea0df7f066f30158a8acc3b
-  firebase_core: 77172d0a9d8d19d07606e24406e4c2fc14d3265b
+  firebase_core: 28e84c2a4fcf6a50ef83f47b145ded8c1fa331e4
   firebase_crashlytics: 4365238d33a7a43164f1049f892365de4aee999f
   firebase_storage: 0b51a488243202d5bed0d66415fea3425f2d3901
   FirebaseAnalytics: 47cef43728f81a839cf1306576bdd77ffa2eac7e
