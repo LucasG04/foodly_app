@@ -3,7 +3,6 @@ import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logging/logging.dart';
 
 import '../services/image_cache_service.dart';
 import '../services/storage_service.dart';
@@ -25,7 +24,6 @@ class FoodlyNetworkImage extends ConsumerStatefulWidget {
 }
 
 class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
-  static final _log = Logger('FoodlyNetworkImage');
   final _dio = Dio()
     ..interceptors.add(
       DioCacheInterceptor(
@@ -38,40 +36,17 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
 
   @override
   void initState() {
-    try {
+    super.initState();
+
+    BasicUtils.afterBuild(() async {
       final isStorageImage = BasicUtils.isStorageMealImage(widget.imageUrl);
       if (isStorageImage) {
-        StorageService.getMealImageUrl(widget.imageUrl).then((url) {
-          if (!mounted || url == null) {
-            return;
-          }
-          _storageUrl = url;
-          ref.read(_$isLoading.notifier).state = false;
-        });
-      } else {
-        _imageIsAvailable(widget.imageUrl).then((available) {
-          if (!mounted) {
-            return;
-          }
-          if (available) {
-            ref.read(_$isLoading.notifier).state = false;
-          } else {
-            ref.read(_$isLoading.notifier).state = false;
-            ref.read(_$hasError.notifier).state = true;
-          }
-        });
+        await _loadAndSetStorageUrl();
       }
-    } catch (e) {
-      _log.finer('Init of FoodlyNetworkImage failed.', e);
-      BasicUtils.afterBuild(() {
-        if (!mounted) {
-          return;
-        }
-        ref.read(_$hasError.notifier).state = true;
+      if (mounted) {
         ref.read(_$isLoading.notifier).state = false;
-      });
-    }
-    super.initState();
+      }
+    });
   }
 
   @override
@@ -93,17 +68,31 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
     );
   }
 
-  ExtendedImage _buildCachedNetworkImage(String url) {
+  Widget _buildCachedNetworkImage(String url) {
     url = url.replaceFirst('http://', 'https://');
-    return ExtendedImage.network(
-      url,
-      fit: widget.boxFit,
-      loadStateChanged: (state) =>
-          state.extendedImageLoadState == LoadState.failed
-              ? _buildFallbackImage()
-              : state.extendedImageLoadState == LoadState.loading
-                  ? _buildLoader()
-                  : state.completedWidget,
+
+    return FutureBuilder(
+      future: _imageIsAvailable(url),
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return _buildLoader();
+        } else if (snap.hasError) {
+          return _buildFallbackImage();
+        } else if (snap.data == null || !snap.data!) {
+          return _buildFallbackImage();
+        }
+
+        return ExtendedImage.network(
+          url,
+          fit: widget.boxFit,
+          loadStateChanged: (state) =>
+              state.extendedImageLoadState == LoadState.failed
+                  ? _buildFallbackImage()
+                  : state.extendedImageLoadState == LoadState.loading
+                      ? _buildLoader()
+                      : state.completedWidget,
+        );
+      },
     );
   }
 
@@ -121,9 +110,22 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
     );
   }
 
+  Future<void> _loadAndSetStorageUrl() async {
+    final storageUrl = await StorageService.getMealImageUrl(
+      widget.imageUrl,
+    );
+    if (storageUrl != null && storageUrl.isNotEmpty) {
+      _storageUrl = storageUrl;
+    }
+  }
+
   Future<bool> _imageIsAvailable(String url) async {
     try {
       final response = await _dio.head<dynamic>(url);
+      // check if content-type contains image
+      if (response.headers.value('content-type')?.contains('image') != true) {
+        return false;
+      }
       return [200, 201, 202, 203].contains(response.statusCode);
     } catch (error) {
       return false;
