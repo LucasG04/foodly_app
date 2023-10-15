@@ -63,13 +63,13 @@ Future<void> _configureFirebase() async {
   }
 }
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await EasyLocalization.ensureInitialized();
-  await _configureFirebase();
-  await initializeHive();
+void main() {
   runZonedGuarded<void>(
-    () {
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      await EasyLocalization.ensureInitialized();
+      await _configureFirebase();
+      await initializeHive();
       runApp(
         Phoenix(
           child: ProviderScope(
