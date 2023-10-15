@@ -58,7 +58,7 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
         } else if (ref.watch(_$hasError)) {
           return _buildFallbackImage();
         }
-        return _buildCachedNetworkImage(
+        return _buildCacheOrNetworkImage(
           BasicUtils.isStorageMealImage(widget.imageUrl)
               ? _storageUrl
               : widget.imageUrl,
@@ -68,9 +68,29 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
     );
   }
 
-  Widget _buildCachedNetworkImage(String url) {
+  Widget _buildCacheOrNetworkImage(String url) {
     url = url.replaceFirst('http://', 'https://');
 
+    return FutureBuilder(
+      future: getCachedImageFile(url),
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return _buildLoader();
+        } else if (snap.hasError) {
+          return _buildFallbackImage();
+        } else if (snap.data == null) {
+          return _buildNetworkImage(url);
+        }
+
+        return ExtendedImage.file(
+          snap.data!,
+          fit: widget.boxFit,
+        );
+      },
+    );
+  }
+
+  Widget _buildNetworkImage(String url) {
     return FutureBuilder(
       future: _imageIsAvailable(url),
       builder: (context, snap) {
