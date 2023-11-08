@@ -106,7 +106,7 @@ class BasicUtils {
     if (languageCode == 'de') {
       return TextCapitalization.sentences;
     } else {
-      return TextCapitalization.words;
+      return TextCapitalization.none;
     }
   }
 }
