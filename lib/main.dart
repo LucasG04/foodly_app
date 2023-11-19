@@ -176,7 +176,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
                 ],
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
-                theme: Theme.of(context).copyWith(
+                theme: ThemeData(
                   primaryColor: SettingsService.primaryColor,
                 ),
               );

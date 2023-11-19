@@ -54,7 +54,10 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView> {
       floatingActionButton: _showActionButton()
           ? FloatingActionButton(
               backgroundColor: Theme.of(context).primaryColor,
-              child: const Icon(EvaIcons.plus),
+              child: const Icon(
+                EvaIcons.plus,
+                color: Colors.white,
+              ),
               onPressed: () {
                 switch (_currentIndex) {
                   case 0:

@@ -14,7 +14,7 @@ class MealListTile extends StatelessWidget {
 
   const MealListTile(this.meal, {Key? key}) : super(key: key);
 
-  double get height => 75.0;
+  double get height => 80.0;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +42,7 @@ class MealListTile extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                     maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
             subtitle: meal != null && meal!.tags!.isNotEmpty
                 ? SizedBox(
@@ -51,7 +52,7 @@ class MealListTile extends StatelessWidget {
                       children: meal!.tags!.map((e) => MealTag(e)).toList(),
                     ),
                   )
-                : const SizedBox(),
+                : null,
           ),
         ],
       ),
@@ -60,7 +61,7 @@ class MealListTile extends StatelessWidget {
 
   Expanded _buildTileContent({
     required Widget title,
-    required Widget subtitle,
+    Widget? subtitle,
   }) {
     return Expanded(
       child: Padding(
@@ -73,7 +74,7 @@ class MealListTile extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 5.0),
               child: title,
             ),
-            subtitle,
+            if (subtitle != null) subtitle
           ],
         ),
       ),
