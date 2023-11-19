@@ -177,7 +177,16 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
                 theme: ThemeData(
-                  primaryColor: SettingsService.primaryColor,
+                  colorSchemeSeed: SettingsService.primaryColor,
+                  outlinedButtonTheme: OutlinedButtonThemeData(
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(kRadius),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               );
             },

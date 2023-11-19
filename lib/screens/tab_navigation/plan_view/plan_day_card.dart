@@ -31,6 +31,7 @@ class PlanDayCard extends StatelessWidget {
       width: width > 599 ? 600 : width * 0.9,
       padding: const EdgeInsets.symmetric(vertical: 15.0),
       child: Card(
+        surfaceTintColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(kRadius),
         ),
