@@ -43,7 +43,6 @@ class _GroupedShoppingListState extends State<GroupedShoppingList> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Divider(),
                       ListTile(
                         dense: true,
                         title: Text(
