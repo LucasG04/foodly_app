@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 
 const kPrimaryColorsHex = [
   '595457',
@@ -12,7 +11,7 @@ const kPrimaryColorsHex = [
 
 MaterialColor get defaultPrimaryColor => primaryBlueColor;
 
-MaterialColor primaryDarkColor = const MaterialColor(0xFF595457, _darkColorMap);
+MaterialColor primaryGreyColor = const MaterialColor(0xFF3A3A3A, _darkGrayMap);
 MaterialColor primaryDarkBlueColor =
     const MaterialColor(0xFF072AC8, _darkBlueMap);
 MaterialColor primaryBlueColor = const MaterialColor(0xFF2196F3, _blueMap);
@@ -23,17 +22,17 @@ MaterialColor primaryPinkColor = const MaterialColor(0xFFDE0D92, _pinkMap);
 MaterialColor primaryRedColor = const MaterialColor(0xFFCE2D4F, _redMap);
 MaterialColor primaryOrangeColor = const MaterialColor(0xFFF86624, _orangeMap);
 
-const Map<int, Color> _darkColorMap = {
-  50: Color.fromRGBO(89, 84, 87, .1),
-  100: Color.fromRGBO(89, 84, 87, .2),
-  200: Color.fromRGBO(89, 84, 87, .3),
-  300: Color.fromRGBO(89, 84, 87, .4),
-  400: Color.fromRGBO(89, 84, 87, .5),
-  500: Color.fromRGBO(89, 84, 87, .6),
-  600: Color.fromRGBO(89, 84, 87, .7),
-  700: Color.fromRGBO(89, 84, 87, .8),
-  800: Color.fromRGBO(89, 84, 87, .9),
-  900: Color.fromRGBO(89, 84, 87, 1),
+const Map<int, Color> _darkGrayMap = {
+  50: Color.fromRGBO(58, 58, 58, .1),
+  100: Color.fromRGBO(58, 58, 58, .2),
+  200: Color.fromRGBO(58, 58, 58, .3),
+  300: Color.fromRGBO(58, 58, 58, .4),
+  400: Color.fromRGBO(58, 58, 58, .5),
+  500: Color.fromRGBO(58, 58, 58, .6),
+  600: Color.fromRGBO(58, 58, 58, .7),
+  700: Color.fromRGBO(58, 58, 58, .8),
+  800: Color.fromRGBO(58, 58, 58, .9),
+  900: Color.fromRGBO(58, 58, 58, 1),
 };
 
 const Map<int, Color> _darkBlueMap = {
