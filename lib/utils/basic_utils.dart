@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/foodly_user.dart';
@@ -98,5 +98,15 @@ class BasicUtils {
           DateTime.now().subtract(const Duration(days: 365)),
         );
     return user.isPremiumGifted == true && giftedDateIsValid;
+  }
+
+  static TextCapitalization getTextCapitalizationByLanguage(
+      BuildContext context) {
+    final languageCode = context.locale.languageCode;
+    if (languageCode == 'de') {
+      return TextCapitalization.sentences;
+    } else {
+      return TextCapitalization.none;
+    }
   }
 }

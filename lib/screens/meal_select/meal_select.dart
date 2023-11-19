@@ -304,8 +304,10 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
                   padding: MaterialStateProperty.resolveWith(
                       (states) => EdgeInsets.zero),
                 ),
-                child: const Icon(EvaIcons.arrowIosForwardOutline,
-                    color: Colors.black),
+                child: const Icon(
+                  EvaIcons.arrowIosForwardOutline,
+                  color: Colors.black,
+                ),
               ),
             ),
           ],

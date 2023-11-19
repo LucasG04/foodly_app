@@ -137,6 +137,8 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal> {
                 onSubmit: () => _amountFocusNode.requestFocus(),
                 onChange: (text) =>
                     _nameDebouncer.run(() => _loadSuggestions(text)),
+                textCapitalization:
+                    BasicUtils.getTextCapitalizationByLanguage(context),
               );
             }),
             Row(

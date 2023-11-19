@@ -71,7 +71,7 @@ class _SettingsChangePrimaryColorModalState
             spacing: kPadding / 2,
             alignment: WrapAlignment.spaceEvenly,
             children: [
-              primaryDarkColor,
+              primaryGreyColor,
               primaryDarkGreenColor,
               primaryDarkBlueColor,
               primaryBlueColor,

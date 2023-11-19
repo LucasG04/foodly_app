@@ -3,6 +3,7 @@ import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
 
 import '../services/image_cache_service.dart';
 import '../services/storage_service.dart';
@@ -24,6 +25,7 @@ class FoodlyNetworkImage extends ConsumerStatefulWidget {
 }
 
 class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
+  static final _log = Logger('FoodlyNetworkImage');
   final _dio = Dio()
     ..interceptors.add(
       DioCacheInterceptor(
@@ -36,17 +38,40 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
 
   @override
   void initState() {
-    super.initState();
-
-    BasicUtils.afterBuild(() async {
+    try {
       final isStorageImage = BasicUtils.isStorageMealImage(widget.imageUrl);
       if (isStorageImage) {
-        await _loadAndSetStorageUrl();
+        StorageService.getMealImageUrl(widget.imageUrl).then((url) {
+          if (!mounted || url == null) {
+            return;
+          }
+          _storageUrl = url;
+          ref.read(_$isLoading.notifier).state = false;
+        });
+      } else {
+        _imageIsAvailable(widget.imageUrl).then((available) {
+          if (!mounted) {
+            return;
+          }
+          if (available) {
+            ref.read(_$isLoading.notifier).state = false;
+          } else {
+            ref.read(_$isLoading.notifier).state = false;
+            ref.read(_$hasError.notifier).state = true;
+          }
+        });
       }
-      if (mounted) {
+    } catch (e) {
+      _log.finer('Init of FoodlyNetworkImage failed.', e);
+      BasicUtils.afterBuild(() {
+        if (!mounted) {
+          return;
+        }
+        ref.read(_$hasError.notifier).state = true;
         ref.read(_$isLoading.notifier).state = false;
-      }
-    });
+      });
+    }
+    super.initState();
   }
 
   @override
@@ -58,7 +83,7 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
         } else if (ref.watch(_$hasError)) {
           return _buildFallbackImage();
         }
-        return _buildCacheOrNetworkImage(
+        return _buildCachedNetworkImage(
           BasicUtils.isStorageMealImage(widget.imageUrl)
               ? _storageUrl
               : widget.imageUrl,
@@ -68,51 +93,17 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
     );
   }
 
-  Widget _buildCacheOrNetworkImage(String url) {
+  ExtendedImage _buildCachedNetworkImage(String url) {
     url = url.replaceFirst('http://', 'https://');
-
-    return FutureBuilder(
-      future: getCachedImageFile(url),
-      builder: (context, snap) {
-        if (snap.connectionState != ConnectionState.done) {
-          return _buildLoader();
-        } else if (snap.hasError) {
-          return _buildFallbackImage();
-        } else if (snap.data == null) {
-          return _buildNetworkImage(url);
-        }
-
-        return ExtendedImage.file(
-          snap.data!,
-          fit: widget.boxFit,
-        );
-      },
-    );
-  }
-
-  Widget _buildNetworkImage(String url) {
-    return FutureBuilder(
-      future: _imageIsAvailable(url),
-      builder: (context, snap) {
-        if (snap.connectionState != ConnectionState.done) {
-          return _buildLoader();
-        } else if (snap.hasError) {
-          return _buildFallbackImage();
-        } else if (snap.data == null || !snap.data!) {
-          return _buildFallbackImage();
-        }
-
-        return ExtendedImage.network(
-          url,
-          fit: widget.boxFit,
-          loadStateChanged: (state) =>
-              state.extendedImageLoadState == LoadState.failed
-                  ? _buildFallbackImage()
-                  : state.extendedImageLoadState == LoadState.loading
-                      ? _buildLoader()
-                      : state.completedWidget,
-        );
-      },
+    return ExtendedImage.network(
+      url,
+      fit: widget.boxFit,
+      loadStateChanged: (state) =>
+          state.extendedImageLoadState == LoadState.failed
+              ? _buildFallbackImage()
+              : state.extendedImageLoadState == LoadState.loading
+                  ? _buildLoader()
+                  : state.completedWidget,
     );
   }
 
@@ -128,15 +119,6 @@ class _FoodlyNetworkImageState extends ConsumerState<FoodlyNetworkImage> {
       width: double.infinity,
       height: double.infinity,
     );
-  }
-
-  Future<void> _loadAndSetStorageUrl() async {
-    final storageUrl = await StorageService.getMealImageUrl(
-      widget.imageUrl,
-    );
-    if (storageUrl != null && storageUrl.isNotEmpty) {
-      _storageUrl = storageUrl;
-    }
   }
 
   Future<bool> _imageIsAvailable(String url) async {
