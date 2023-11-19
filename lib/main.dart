@@ -178,6 +178,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
                 locale: context.locale,
                 theme: ThemeData(
                   colorSchemeSeed: SettingsService.primaryColor,
+                  dividerColor: Colors.grey.shade300,
                   outlinedButtonTheme: OutlinedButtonThemeData(
                     style: ButtonStyle(
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
