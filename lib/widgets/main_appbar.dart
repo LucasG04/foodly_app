@@ -57,6 +57,8 @@ class _MainAppBarState extends State<MainAppBar> {
       centerTitle: true,
       elevation: _isScrollToTop ? 0 : 2,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      surfaceTintColor: Theme.of(context).scaffoldBackgroundColor,
+      shadowColor: Theme.of(context).primaryColor,
       leading: widget.showBack
           ? IconButton(
               icon: Icon(
