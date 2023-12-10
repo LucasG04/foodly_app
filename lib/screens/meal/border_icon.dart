@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
@@ -23,22 +21,24 @@ class BorderIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(kRadius * 2),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-        child: Container(
-          width: width,
-          height: height,
-          padding: padding ?? const EdgeInsets.all(8.0),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade200.withOpacity(0.5),
-            borderRadius: BorderRadius.circular(kRadius * 2),
-            border: Border.all(
-              color: Colors.black.withAlpha(40),
-              width: withBorder ? 2.0 : 0.0,
-            ),
+      // Known issue: https://github.com/flutter/flutter/issues/132735
+      // child: BackdropFilter(
+      //   filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+      //   child:
+      // ),
+      child: Container(
+        width: width,
+        height: height,
+        padding: padding ?? const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(kRadius * 2),
+          border: Border.all(
+            color: Colors.black.withAlpha(40),
+            width: withBorder ? 2.0 : 0.0,
           ),
-          child: Center(child: child),
         ),
+        child: Center(child: child),
       ),
     );
   }
