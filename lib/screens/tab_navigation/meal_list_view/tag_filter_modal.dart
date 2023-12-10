@@ -46,7 +46,8 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal> {
         children: <Widget>[
           _buildModalHeader(context, width),
           Expanded(
-            child: Padding(
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
               padding: EdgeInsets.symmetric(
                 horizontal: (MediaQuery.of(context).size.width - width) / 2,
               ),
