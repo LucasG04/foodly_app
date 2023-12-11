@@ -47,6 +47,7 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal> {
           _buildModalHeader(context, width),
           Expanded(
             child: Container(
+              width: double.infinity,
               color: Theme.of(context).scaffoldBackgroundColor,
               padding: EdgeInsets.symmetric(
                 horizontal: (MediaQuery.of(context).size.width - width) / 2,
@@ -117,7 +118,9 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal> {
             topRight: Radius.circular(10.0),
           ),
         ),
-        elevation: ref.watch(_$isScrollToTop) ? 0 : 2.0,
+        elevation: ref.watch(_$isScrollToTop) ? 0 : 2,
+        surfaceTintColor: Theme.of(context).scaffoldBackgroundColor,
+        shadowColor: Theme.of(context).primaryColor,
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: (MediaQuery.of(context).size.width - width) / 2,
