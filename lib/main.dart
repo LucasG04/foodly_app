@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -103,6 +104,7 @@ Future<void> initializeHive() async {
     AppReviewService.initialize(),
     PlanService.initialize(),
     InAppPurchaseService.initialize(),
+    FastCachedImageConfig.init(clearCacheAfter: const Duration(days: 14)),
   ]);
 }
 
