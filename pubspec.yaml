@@ -23,9 +23,9 @@ dependencies:
   #   git:
   #     url: https://github.com/X-Wei/flutter_cache_manager_hive.git
   #     ref: master
-  dio: ^5.0.3
-  dio_cache_interceptor: ^3.4.0
-  dio_cache_interceptor_hive_store: ^3.2.1
+  dio: ^5.4.0
+  dio_cache_interceptor: ^3.5.0
+  dio_cache_interceptor_hive_store: ^3.2.2
   url_launcher: ^6.1.4
   another_flushbar: ^1.12.30
   share_plus: ^4.0.8
@@ -94,6 +94,7 @@ dependencies:
   like_button: ^2.0.5
   blur: ^3.1.0
   sticky_headers: ^0.3.0+2
+  fast_cached_network_image: ^1.2.0
 
   # Icons/Styles/Animations
   cupertino_icons: ^1.0.4
