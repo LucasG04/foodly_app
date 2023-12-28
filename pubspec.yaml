@@ -94,7 +94,10 @@ dependencies:
   like_button: ^2.0.5
   blur: ^3.1.0
   sticky_headers: ^0.3.0+2
-  fast_cached_network_image: ^1.2.0
+  # fast_cached_network_image: ^1.2.0
+  fast_cached_network_image:
+    git:
+      url: https://github.com/LucasG04/fast_cached_network_image.git
 
   # Icons/Styles/Animations
   cupertino_icons: ^1.0.4
