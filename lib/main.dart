@@ -31,7 +31,6 @@ import 'providers/state_providers.dart';
 import 'services/app_review_service.dart';
 import 'services/authentication_service.dart';
 import 'services/foodly_user_service.dart';
-import 'services/image_cache_service.dart';
 import 'services/in_app_purchase_service.dart';
 import 'services/link_metadata_service.dart';
 import 'services/lunix_api_service.dart';
@@ -100,7 +99,6 @@ Future<void> initializeHive() async {
     SettingsService.initialize(),
     LinkMetadataService.initialize(),
     VersionService.initialize(),
-    ImageCacheService.initialize(),
     AppReviewService.initialize(),
     PlanService.initialize(),
     InAppPurchaseService.initialize(),

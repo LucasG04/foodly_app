@@ -453,10 +453,11 @@ packages:
   fast_cached_network_image:
     dependency: "direct main"
     description:
-      name: fast_cached_network_image
-      sha256: "78a2da7314008540fce494906d017adc7654edbd259dca24c0a9b5fd78cdcd5c"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "542701529007705570231f1745f7e53a68bbb3dd"
+      url: "https://github.com/LucasG04/fast_cached_network_image.git"
+    source: git
     version: "1.2.0"
   ffi:
     dependency: transitive
