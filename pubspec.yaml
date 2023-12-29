@@ -51,7 +51,7 @@ dependencies:
   in_app_update: ^4.0.1 # Android Updates
   update_available: ^3.0.0 # iOS Updates
   envied: ^0.3.0+3
-  purchases_flutter: ^4.9.0
+  purchases_flutter: ^5.8.0
   permission_handler: ^10.2.0
   flutter_phoenix: ^1.1.0
   clipboard: ^0.1.3
