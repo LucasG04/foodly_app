@@ -253,7 +253,7 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Text(e.price ?? ''),
+                                Text(e.price ?? '-'),
                               ],
                             ),
                           ),
@@ -314,9 +314,10 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
     final index = ref.read(_$selectedPremiumDuration);
     final products = InAppPurchaseService.products;
     if (products.isNotEmpty) {
-      final success =
-          await InAppPurchaseService.buy(products[index].identifier);
+      final success = await InAppPurchaseService.buy(products[index]);
       await _handlePurchase(success);
+    } else {
+      ref.read(_$purchaseState.notifier).state = _PurchaseState.none;
     }
   }
 

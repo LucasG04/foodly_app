@@ -66,9 +66,9 @@ class InAppPurchaseService {
     }
   }
 
-  static Future<bool> buy(String productIdentifier) async {
+  static Future<bool> buy(StoreProduct product) async {
     try {
-      final customerInfo = await Purchases.purchaseProduct(productIdentifier);
+      final customerInfo = await Purchases.purchaseStoreProduct(product);
       await fetchUserSubscription();
       return _customerIsSubscribed(customerInfo);
     } on PlatformException catch (e) {
