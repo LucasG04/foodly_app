@@ -59,7 +59,6 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
 
   @override
   Widget build(BuildContext context) {
-    print(Theme.of(context).scaffoldBackgroundColor);
     return Column(
       children: [
         Consumer(
