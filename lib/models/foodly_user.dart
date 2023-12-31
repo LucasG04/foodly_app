@@ -6,6 +6,7 @@ class FoodlyUser {
   bool? isPremium;
   bool? isPremiumGifted;
   DateTime? premiumGiftedAt;
+  int? premiumGiftedMonths;
   bool? premiumGiftedMessageShown;
   FoodlyUserRole role;
 
@@ -15,6 +16,7 @@ class FoodlyUser {
     this.isPremium,
     this.isPremiumGifted,
     this.premiumGiftedAt,
+    this.premiumGiftedMonths,
     this.premiumGiftedMessageShown,
     this.role = FoodlyUserRole.user,
   });
@@ -25,6 +27,7 @@ class FoodlyUser {
       'isPremium': isPremium,
       'isPremiumGifted': isPremiumGifted,
       'premiumGiftedAt': premiumGiftedAt?.millisecondsSinceEpoch,
+      'premiumGiftedMonths': premiumGiftedMonths,
       'premiumGiftedMessageShown': premiumGiftedMessageShown,
       'role': role.toString(),
     };
@@ -40,6 +43,7 @@ class FoodlyUser {
           ? DateTime.fromMillisecondsSinceEpoch(map['premiumGiftedAt'] as int)
           : null,
       premiumGiftedMessageShown: map['premiumGiftedMessageShown'] as bool?,
+      premiumGiftedMonths: map['premiumGiftedMonths'] as int?,
       role: FoodlyUserRole.values.firstWhere(
         (e) => e.toString() == map['role'],
         orElse: () => FoodlyUserRole.user,

@@ -93,10 +93,15 @@ class BasicUtils {
   }
 
   static bool premiumGiftedActive(FoodlyUser user) {
-    final giftedDateIsValid = user.premiumGiftedAt != null &&
-        user.premiumGiftedAt!.isAfter(
-          DateTime.now().subtract(const Duration(days: 365)),
-        );
+    if (user.premiumGiftedAt == null ||
+        user.premiumGiftedMonths == null ||
+        user.premiumGiftedMonths == 0) {
+      return false;
+    }
+
+    final giftedDateIsValid = user.premiumGiftedAt!.isAfter(
+      DateTime.now().subtract(Duration(days: user.premiumGiftedMonths! * 30)),
+    );
     return user.isPremiumGifted == true && giftedDateIsValid;
   }
 
