@@ -296,6 +296,8 @@
   "get_premium_modal_5_description": "Your shopping list will be sorted by product groups to make shopping easier for you. You can also adjust the sorting to your store at any time.",
   "get_premium_modal_6_title": "Change the primary color",
   "get_premium_modal_6_description": "Are you tired of the current color of {}? With Premium you can change it!",
+  "get_premium_modal_7_title": "iCloud family sharing",
+  "get_premium_modal_7_description": "{} Premium is shared with all members of your iCloud family group. So everyone in your family can benefit from the advantages.",
   "get_premium_modal_thanks": "Thanks {}",
   "upcoming_features_title": "Upcoming Features",
   "shopping_list_sort_name": "Name",
