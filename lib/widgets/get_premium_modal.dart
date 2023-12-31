@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -69,10 +70,11 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                 color: Theme.of(context).scaffoldBackgroundColor,
                 boxShadow: showShadow
                     ? [
-                        const BoxShadow(
-                          offset: Offset(0, 1),
+                        BoxShadow(
+                          offset: const Offset(0, 1),
                           blurRadius: 1,
-                          color: Color.fromRGBO(0, 0, 0, .16),
+                          color:
+                              Theme.of(context).primaryColor.withOpacity(0.16),
                         )
                       ]
                     : [],
@@ -140,6 +142,13 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                         description: 'get_premium_modal_6_description'
                             .tr(args: [kAppName]),
                       ),
+                      if (Platform.isIOS || Platform.isMacOS)
+                        ListTileCard(
+                          iconData: Icons.diversity_3_rounded,
+                          title: 'get_premium_modal_7_title'.tr(),
+                          description: 'get_premium_modal_7_description'
+                              .tr(args: [kAppName]),
+                        ),
                       ListTileCard(
                         iconData: _getSupportAppIcon(),
                         iconColor: Colors.red,

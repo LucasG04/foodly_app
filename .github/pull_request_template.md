@@ -1,15 +1,11 @@
 ### Features
-
 - ...
 
 ### Fixed bugs
-
 - ...
 
 ### Further improvements
-
 - ...
 
 ### Checklist
-
-- [ ] Flutter version upgraded
+- [ ] Flutter version upgraded/checked

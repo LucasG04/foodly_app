@@ -296,6 +296,8 @@
   "get_premium_modal_5_description": "Deine Einkaufsliste wird nach Produktgruppen sortiert, um dir so das Einkaufen zu erleichtern. Du kannst außerdem die Sortierung jederzeit an deinen Laden anpassen.",
   "get_premium_modal_6_title": "Ändern der Hauptfarbe",
   "get_premium_modal_6_description": "Hast du keine Lust mehr auf die aktuelle Farbe von {}? Mit Premium kannst du sie änderen!",
+  "get_premium_modal_7_title": "iCloud Familienfreigabe",
+  "get_premium_modal_7_description": "{} Premium wird mit allen Mitgliedern deiner Familiengruppe geteilt. So können alle in deiner Familie von den Vorteilen profitieren.",
   "get_premium_modal_thanks": "Danke {}",
   "upcoming_features_title": "Zukünftige Funktionen",
   "shopping_list_sort_name": "Name",
@@ -304,6 +306,6 @@
   "page_title_connectivity_error_title": "Keine Internetverbindung",
   "page_title_connectivity_error_message": "Es scheint, als ob du momentan nicht mit dem Internet verbunden bist. Dies kann zu Problemen bei der Verwendung von {} führen.\nÜberprüfe bitte deine Verbindung.",
   "premium_gifted_msg_title": "Premium geschenkt!",
-  "premium_gifted_msg_message": "Durch dein Feedback konnte {} verbessert werden. Als Dankeschön bekommst du Premium für 1 Jahr geschenkt.",
+  "premium_gifted_msg_message": "Durch dein Feedback konnte {} verbessert werden. Als Dankeschön bekommst du Premium für {} Montate geschenkt.",
   "edit_grocery_suggestion_group": "Produktgruppe"
 }

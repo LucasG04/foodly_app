@@ -307,7 +307,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
           isSuccess: true,
           duration: 10,
           title: 'premium_gifted_msg_title'.tr(),
-          message: 'premium_gifted_msg_message'.tr(args: [kAppName]),
+          message: 'premium_gifted_msg_message'
+              .tr(args: [kAppName, user.premiumGiftedMonths.toString()]),
         ).show(context),
       );
       if (user.id != null) {
