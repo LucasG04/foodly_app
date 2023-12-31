@@ -8,4 +8,4 @@
 - ...
 
 ### Checklist
-- [ ] Flutter version upgraded
+- [ ] Flutter version upgraded/checked
