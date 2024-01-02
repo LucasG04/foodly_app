@@ -545,6 +545,10 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
   }
 
   void _onSourceTextChange(String newText) {
+    if (!mounted) {
+      return;
+    }
+
     if (newText.isEmpty) {
       ref.read(_$sourceLinkMetadata.notifier).state = null;
       return;

@@ -47,6 +47,6 @@ class FoodlyFeedback {
 
   @override
   String toString() {
-    return 'FoodlyDeedback(userId: $userId, planId: $planId, title: $title, email: $email, description: $description, date: $date, version: $version, isSubscribedToPremium: $isSubscribedToPremium)';
+    return 'FoodlyFeedback(userId: $userId, planId: $planId, title: $title, email: $email, description: $description, date: $date, version: $version, isSubscribedToPremium: $isSubscribedToPremium)';
   }
 }
