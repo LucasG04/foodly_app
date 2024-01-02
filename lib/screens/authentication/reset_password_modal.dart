@@ -139,6 +139,10 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
         return;
       }
 
+      if (!mounted) {
+        return;
+      }
+
       setState(() {
         _buttonState = ButtonState.normal;
         _errorText = null;
@@ -146,6 +150,10 @@ class _ResetPasswordModalState extends State<ResetPasswordModal> {
       });
 
       await Future<void>.delayed(const Duration(seconds: 30));
+
+      if (!mounted) {
+        return;
+      }
 
       setState(() {
         _showSuccess = false;
