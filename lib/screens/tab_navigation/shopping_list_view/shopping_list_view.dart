@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -38,6 +39,8 @@ class ShoppingListView extends ConsumerStatefulWidget {
 class _ShoppingListViewState extends ConsumerState<ShoppingListView>
     with AutomaticKeepAliveClientMixin {
   final _scrollController = ScrollController();
+  bool _blockRemoveFromList = false;
+  Timer? _blockRemoveFromListTimer;
 
   @override
   bool get wantKeepAlive => true;
@@ -57,6 +60,8 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                       snapshot.connectionState == ConnectionState.none) {
                     return _buildLoader();
                   }
+                  _blockRemove();
+
                   final data = snapshot.data ?? [];
                   final List<Grocery> todoItems =
                       data.where((e) => !e.bought).toList();
@@ -110,6 +115,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                             groups: groceriesWithGroups,
                             pageScrollController: _scrollController,
                             onEdit: (e) => _editGrocery(listId, e),
+                            allowTap: () => !_blockRemoveFromList,
                             onTap: (item) => _removeBoughtGrocery(
                               listId,
                               item,
@@ -122,6 +128,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                         return AnimatedShoppingList(
                           groceries: todoItems,
                           onEdit: (e) => _editGrocery(listId, e),
+                          allowTap: () => !_blockRemoveFromList,
                           onTap: (item) => _removeBoughtGrocery(
                             listId,
                             item,
@@ -152,6 +159,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                   AnimatedShoppingList(
                     groceries: boughtItems,
                     onEdit: (e) => _editGrocery(listId, e),
+                    allowTap: () => true, // don't block undo
                     onTap: (item) {
                       ShoppingListService.groceryToggleBought(
                         listId,
@@ -215,6 +223,20 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
       assetPath: 'assets/images/undraw_empty_cart.png',
       message: 'shopping_list_empty_subtitle'.tr(),
     );
+  }
+
+  /// Block remove from list for 500ms
+  void _blockRemove() {
+    if (_blockRemoveFromList || _blockRemoveFromListTimer != null) {
+      return;
+    }
+
+    _blockRemoveFromList = true;
+    _blockRemoveFromListTimer = Timer(const Duration(milliseconds: 500), () {
+      _blockRemoveFromList = false;
+      _blockRemoveFromListTimer?.cancel();
+      _blockRemoveFromListTimer = null;
+    });
   }
 
   List<ShoppingListGroup> _groceriesToGroups(List<Grocery> groceries) {

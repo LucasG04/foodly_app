@@ -6,6 +6,7 @@ import 'animated_shopping_list.dart';
 
 class GroupedShoppingList extends StatefulWidget {
   final List<ShoppingListGroup> groups;
+  final bool Function() allowTap;
   final void Function(Grocery) onTap;
   final void Function(Grocery) onEdit;
   final void Function(Grocery) onLongPress;
@@ -13,6 +14,7 @@ class GroupedShoppingList extends StatefulWidget {
 
   const GroupedShoppingList({
     required this.groups,
+    required this.allowTap,
     required this.onTap,
     required this.onEdit,
     required this.onLongPress,
@@ -58,6 +60,7 @@ class _GroupedShoppingListState extends State<GroupedShoppingList> {
                 ),
                 content: AnimatedShoppingList(
                   groceries: group.groceries,
+                  allowTap: widget.allowTap,
                   onTap: widget.onTap,
                   onEdit: widget.onEdit,
                   onLongPress: widget.onLongPress,

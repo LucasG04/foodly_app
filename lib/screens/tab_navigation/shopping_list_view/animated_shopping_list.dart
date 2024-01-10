@@ -7,6 +7,7 @@ import '../../../utils/convert_util.dart';
 
 class AnimatedShoppingList extends StatelessWidget {
   final List<Grocery> groceries;
+  final bool Function() allowTap;
   final void Function(Grocery) onTap;
   final void Function(Grocery) onEdit;
   final void Function(Grocery) onLongPress;
@@ -15,6 +16,7 @@ class AnimatedShoppingList extends StatelessWidget {
 
   AnimatedShoppingList({
     required this.groceries,
+    required this.allowTap,
     required this.onTap,
     required this.onEdit,
     required this.onLongPress,
@@ -65,6 +67,10 @@ class AnimatedShoppingList extends StatelessWidget {
   }
 
   void _tapItem(int index) {
+    if (!allowTap()) {
+      return;
+    }
+
     try {
       listKey.currentState!.removeItem(
         index,
@@ -76,6 +82,12 @@ class AnimatedShoppingList extends StatelessWidget {
 
     Future<void>.delayed(
       const Duration(milliseconds: 250),
-    ).then((_) => onTap(groceries.removeAt(index)));
+    ).then((_) {
+      try {
+        onTap(groceries.removeAt(index));
+      } catch (e) {
+        return;
+      }
+    });
   }
 }
