@@ -14,11 +14,13 @@ import '../../widgets/small_circular_progress_indicator.dart';
 class SelectMealTile extends StatefulWidget {
   final Meal? meal;
   final Function()? onAddMeal;
+  final Function()? secondaryAction;
   final bool isLoading;
 
   const SelectMealTile({
     this.meal,
     this.onAddMeal,
+    this.secondaryAction,
     this.isLoading = false,
     Key? key,
   })  : assert(isLoading || (!isLoading && meal != null && onAddMeal != null)),
@@ -82,20 +84,29 @@ class _SelectMealTileState extends State<SelectMealTile> {
               ),
             ],
           ),
-          trailing: widget.isLoading
-              ? null
-              : AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 375),
-                  child: _buttonState == _ButtonState.DEFAULT
-                      ? const Icon(EvaIcons.plus)
-                      : _buttonState == _ButtonState.LOADING
-                          ? const SmallCircularProgressIndicator()
-                          : const Icon(
-                              EvaIcons.checkmark,
-                              color: Colors.green,
-                            ),
-                ),
-          trailingAction: widget.isLoading ? null : () => _selectMeal(),
+          actions: [
+            if (widget.secondaryAction != null)
+              CardListTileAction(
+                widget: const Icon(EvaIcons.syncOutline),
+                onTap: widget.secondaryAction,
+              ),
+            CardListTileAction(
+              widget: widget.isLoading
+                  ? const SizedBox()
+                  : AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 375),
+                      child: _buttonState == _ButtonState.DEFAULT
+                          ? const Icon(EvaIcons.plus)
+                          : _buttonState == _ButtonState.LOADING
+                              ? const SmallCircularProgressIndicator()
+                              : const Icon(
+                                  EvaIcons.checkmark,
+                                  color: Colors.green,
+                                ),
+                    ),
+              onTap: widget.isLoading ? null : () => _selectMeal(),
+            )
+          ],
         ),
       ),
     );

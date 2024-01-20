@@ -39,7 +39,9 @@ class MealSelectScreen extends ConsumerStatefulWidget {
 }
 
 class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
-  late AutoDisposeStateProvider<bool> _$isSearching;
+  final _$isSearching = StateProvider.autoDispose<bool>((_) => false);
+  final _$randomMeal = FutureProvider.autoDispose<Meal?>(
+      (ref) => LunixApiService.getRandomMeal(ref.read(planProvider)!.id!));
 
   final ScrollController _scrollController = ScrollController();
 
@@ -48,12 +50,6 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
   double get _containerWidth {
     final width = MediaQuery.of(context).size.width * 0.9;
     return width > 599 ? 600 : width;
-  }
-
-  @override
-  void initState() {
-    _$isSearching = StateProvider.autoDispose<bool>((_) => false);
-    super.initState();
   }
 
   @override
@@ -82,7 +78,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
                 padding: const EdgeInsets.symmetric(vertical: kPadding),
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: searchedMeals.isEmpty
-                    ? 3 // there could be a max amount of 3 items if none is found
+                    ? 4 // there could be a max amount of 4 items if none is found
                     : searchedMeals.length,
                 itemBuilder: (context, index) {
                   return AnimationConfiguration.staggeredList(
@@ -122,33 +118,58 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
   }
 
   Widget _buildNoResultsForIndex(int index, String planId) {
-    return (index == 0)
-        ? _buildContainer(
-            EvaIcons.code,
-            'meal_select_placeholder'.tr(),
-            () => _showPlaceholderDialog(ref),
+    if (index == 0) {
+      return _buildContainer(
+        EvaIcons.code,
+        'meal_select_placeholder'.tr(),
+        () => _showPlaceholderDialog(ref),
+      );
+    } else if (index == 1) {
+      return _buildContainer(
+        EvaIcons.plus,
+        'meal_select_new'.tr(),
+        () => _createNewMeal(ref),
+      );
+    } else if (index == 2) {
+      return Consumer(builder: (context, ref, _) {
+        final AsyncValue<Meal?> randomMeal = ref.watch(_$randomMeal);
+
+        if (randomMeal.isLoading) {
+          // handle loading before `when`, because it skips the load state
+          // if it has been too fast
+          return const SelectMealTile(
+            isLoading: true,
+          );
+        }
+
+        return randomMeal.when(
+          data: (value) => SelectMealTile(
+            meal: value,
+            onAddMeal: () => _addMealToPlan(value!.id!, planId),
+            secondaryAction: () => ref.invalidate(_$randomMeal),
+          ),
+          error: (_, __) => const SizedBox(),
+          loading: () => const SelectMealTile(
+            isLoading: true,
+          ),
+        );
+      });
+    }
+    return ref.read(_$isSearching)
+        ? UserInformation(
+            assetPath: 'assets/images/undraw_empty.png',
+            title: 'meal_select_no_results'.tr(),
+            message: 'meal_select_no_results_msg'.tr(),
           )
-        : (index == 1)
-            ? _buildContainer(
-                EvaIcons.plus,
-                'meal_select_new'.tr(),
-                () => _createNewMeal(ref),
-              )
-            : ref.read(_$isSearching)
-                ? UserInformation(
-                    assetPath: 'assets/images/undraw_empty.png',
-                    title: 'meal_select_no_results'.tr(),
-                    message: 'meal_select_no_results_msg'.tr(),
-                  )
-                : Consumer(builder: (context, ref, _) {
-                    final userIsSubscribed =
-                        ref.watch(InAppPurchaseService.$userIsSubscribed);
-                    return !userIsSubscribed
-                        ? _buildGetPremiumInfo()
-                        : SettingsService.showSuggestions
-                            ? _buildPreviewMeals()
-                            : _buildPaginatedMealList();
-                  });
+        : Consumer(builder: (context, ref, _) {
+            final userIsSubscribed =
+                ref.watch(InAppPurchaseService.$userIsSubscribed);
+            return !userIsSubscribed
+                ? _buildGetPremiumInfo()
+                : SettingsService.showSuggestions
+                    ? _buildPreviewMeals()
+                    : _buildPaginatedMealList();
+          });
   }
 
   Widget _buildSizeWrapper({required Widget child, EdgeInsets? padding}) {

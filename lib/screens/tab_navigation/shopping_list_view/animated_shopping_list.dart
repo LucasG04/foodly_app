@@ -76,6 +76,12 @@ class AnimatedShoppingList extends StatelessWidget {
 
     Future<void>.delayed(
       const Duration(milliseconds: 250),
-    ).then((_) => onTap(groceries.removeAt(index)));
+    ).then((_) {
+      try {
+        onTap(groceries.removeAt(index));
+      } catch (e) {
+        return;
+      }
+    });
   }
 }
