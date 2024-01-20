@@ -7,8 +7,7 @@ class CardListTile extends StatelessWidget {
   final double? width;
   final Widget? leading;
   final Widget? content;
-  final Widget? trailing;
-  final void Function()? trailingAction;
+  final List<CardListTileAction> actions;
 
   const CardListTile({
     Key? key,
@@ -16,8 +15,7 @@ class CardListTile extends StatelessWidget {
     this.width,
     this.leading,
     this.content,
-    this.trailing,
-    this.trailingAction,
+    this.actions = const [],
   }) : super(key: key);
 
   @override
@@ -45,21 +43,38 @@ class CardListTile extends StatelessWidget {
               child: content,
             ),
           ),
-          Container(
-            height: height / 2,
-            width: height / 2,
-            margin: const EdgeInsets.only(right: 20.0),
-            child: OutlinedButton(
-              onPressed: trailingAction,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Theme.of(context).primaryColor,
-                padding: EdgeInsets.zero,
-              ),
-              child: trailing,
-            ),
-          ),
+          ...actions.map((e) => _buildActionContainer(e, context)).toList(),
         ],
       ),
     );
   }
+
+  Widget _buildActionContainer(
+    CardListTileAction action,
+    BuildContext context,
+  ) {
+    return Container(
+      height: height / 2,
+      width: height / 2,
+      margin: const EdgeInsets.only(right: 20.0),
+      child: OutlinedButton(
+        onPressed: action.onTap,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Theme.of(context).primaryColor,
+          padding: EdgeInsets.zero,
+        ),
+        child: action.widget,
+      ),
+    );
+  }
+}
+
+class CardListTileAction {
+  Widget widget;
+  Function()? onTap;
+
+  CardListTileAction({
+    required this.widget,
+    this.onTap,
+  });
 }

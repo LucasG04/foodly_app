@@ -438,4 +438,28 @@ class LunixApiService {
       _log.severe('ERR in editGrocerySuggestion. API Request failed', e);
     }
   }
+
+  static Future<Meal?> getRandomMeal(String planId) async {
+    _log.finer('Call getRandomMeal with $planId');
+
+    try {
+      final response = await _dio.get<dynamic>(
+        '$apiEndpoint/random-meal',
+        queryParameters: <String, dynamic>{
+          'planId': planId,
+        },
+      );
+      if (response.statusCode != 200) {
+        return null;
+      }
+
+      return Meal.fromMap(
+          // ignore: avoid_dynamic_calls
+          response.data['id'],
+          response.data as Map<String, dynamic>);
+    } catch (e) {
+      _log.severe('ERR in getRandomMeal with $planId. API Request failed', e);
+      return null;
+    }
+  }
 }
