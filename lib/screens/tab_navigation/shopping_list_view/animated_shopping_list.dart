@@ -1,6 +1,5 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '../../../models/grocery.dart';
 import '../../../utils/convert_util.dart';
@@ -46,19 +45,16 @@ class AnimatedShoppingList extends StatelessWidget {
       child: InkWell(
         onTap: () => _tapItem(index),
         onLongPress: () => onLongPress(grocery),
-        child: Slidable(
-          actionPane: const SlidableDrawerActionPane(),
-          child: ListTile(
-            title: Text(grocery.name!, style: const TextStyle(fontSize: 18.0)),
-            subtitle: grocery.amount != null && grocery.amount != 0
-                ? Text(ConvertUtil.amountToString(grocery.amount, grocery.unit))
-                : null,
-            trailing: IconButton(
-              icon: const Icon(EvaIcons.moreHorizontalOutline),
-              onPressed: () => onEdit(grocery),
-            ),
-            dense: true,
+        child: ListTile(
+          title: Text(grocery.name!, style: const TextStyle(fontSize: 18.0)),
+          subtitle: grocery.amount != null && grocery.amount != 0
+              ? Text(ConvertUtil.amountToString(grocery.amount, grocery.unit))
+              : null,
+          trailing: IconButton(
+            icon: const Icon(EvaIcons.moreHorizontalOutline),
+            onPressed: () => onEdit(grocery),
           ),
+          dense: true,
         ),
       ),
     );

@@ -17,7 +17,7 @@ dependencies:
   # Util
   flutter_riverpod: ^2.1.1
   auto_route: ^5.0.4
-  intl: ^0.18.0
+  intl: ^0.19.0
   hive: ^2.2.3
   # flutter_cache_manager_hive:
   #   git:
@@ -28,7 +28,7 @@ dependencies:
   dio_cache_interceptor_hive_store: ^3.2.2
   url_launcher: ^6.1.4
   another_flushbar: ^1.12.30
-  share_plus: ^4.0.8
+  share_plus: ^7.2.2
   email_validator: ^2.0.1
   logging: ^1.0.0
   receive_sharing_intent: ^1.4.5
@@ -77,7 +77,6 @@ dependencies:
   adaptive_dialog: ^1.9.0
   flutter_markdown:
   auto_size_text:
-  flutter_slidable: ^0.6.0-nullsafety.0
   # flutter_toggle_tab: ^0.0.5+4
   badges: ^2.0.0-nullsafety.1
   # TODO: change when merged https://github.com/jamesblasco/modal_bottom_sheet/issues/325
