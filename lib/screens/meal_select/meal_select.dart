@@ -322,7 +322,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
               child: OutlinedButton(
                 onPressed: action as void Function()?,
                 style: ButtonStyle(
-                  padding: MaterialStateProperty.resolveWith(
+                  padding: WidgetStateProperty.resolveWith(
                       (states) => EdgeInsets.zero),
                 ),
                 child: const Icon(

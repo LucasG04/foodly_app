@@ -161,16 +161,16 @@ class PlanDayCard extends StatelessWidget {
                       MealSelectScreenRoute(date: date, mealType: mealType),
                     ),
                     style: ButtonStyle(
-                      padding: MaterialStateProperty.resolveWith(
+                      padding: WidgetStateProperty.resolveWith(
                         (_) => const EdgeInsets.all(15.0),
                       ),
-                      side: MaterialStateProperty.resolveWith(
+                      side: WidgetStateProperty.resolveWith(
                         (_) => const BorderSide(width: 0.0),
                       ),
-                      foregroundColor: MaterialStateProperty.resolveWith(
+                      foregroundColor: WidgetStateProperty.resolveWith(
                         (_) => Theme.of(context).primaryColor,
                       ),
-                      shape: MaterialStateProperty.resolveWith(
+                      shape: WidgetStateProperty.resolveWith(
                         (_) => RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(kRadius / 2),
                         ),

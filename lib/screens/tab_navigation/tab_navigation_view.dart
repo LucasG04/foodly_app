@@ -76,6 +76,8 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView> {
         currentIndex: _currentIndex,
         snakeViewColor: Theme.of(context).primaryColor,
         unselectedItemColor: Theme.of(context).primaryColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        elevation: 1,
         onTap: (value) async {
           setState(() {
             _currentIndex = value;

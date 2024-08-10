@@ -186,7 +186,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
                   ),
                   outlinedButtonTheme: OutlinedButtonThemeData(
                     style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(kRadius),
                         ),

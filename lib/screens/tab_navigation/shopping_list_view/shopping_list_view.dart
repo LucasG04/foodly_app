@@ -165,10 +165,10 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                       onPressed: () =>
                           ShoppingListService.deleteAllBoughtGrocery(listId),
                       style: ButtonStyle(
-                        shadowColor: MaterialStateProperty.all<Color>(
+                        shadowColor: WidgetStateProperty.all<Color>(
                           Theme.of(context).colorScheme.error,
                         ),
-                        overlayColor: MaterialStateProperty.all<Color>(
+                        overlayColor: WidgetStateProperty.all<Color>(
                           Theme.of(context).colorScheme.error.withOpacity(0.1),
                         ),
                       ),
