@@ -57,11 +57,14 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
       AutoDisposeStateProvider<ButtonState>((_) => ButtonState.normal);
   final _$isLoading = AutoDisposeStateProvider<bool>((_) => true);
   final _$sourceLinkMetadata = AutoDisposeStateProvider<String?>((_) => null);
+  final _$updatedImage = AutoDisposeStateProvider<String?>((_) => null);
   late final AutoDisposeStateProvider<Meal> _$meal;
 
   Meal _originalMeal = Meal(name: '');
-  String? _updatedImage;
   List<String>? _existingMealTags;
+
+  /// Holds the value of _$updatedImage, so it can be used in dispose
+  String _updatedImageUrl = '';
 
   @override
   void initState() {
@@ -88,7 +91,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
 
   @override
   void dispose() {
-    _removeUnsavedStorageImage();
+    _removeUnsavedStorageImage(_updatedImageUrl);
     // TODO: Error "Looking up a deactivated widget's ancestor is unsafe."
     // ref.read(initSearchWebImagePickerProvider.notifier).state = '';
     super.dispose();
@@ -193,11 +196,14 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
                                 ),
                                 const Divider(),
                                 Consumer(builder: (context, ref, _) {
-                                  final imageUrl = ref
+                                  final mealImageUrl = ref
                                       .watch(_$meal.select((m) => m.imageUrl));
+                                  final updatedImageUrl =
+                                      ref.watch(_$updatedImage);
                                   return WrappedImagePicker(
-                                    key: ValueKey(imageUrl),
-                                    imageUrl: imageUrl,
+                                    key: ValueKey(
+                                        updatedImageUrl ?? mealImageUrl),
+                                    imageUrl: updatedImageUrl ?? mealImageUrl,
                                     onPick: _pickNewImage,
                                     onOpen: _onOpenImagePicker,
                                   );
@@ -365,16 +371,20 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
 
   void _pickNewImage(String imageUrl) {
     final meal = ref.read(_$meal.notifier).state;
-    if (meal.imageUrl != _updatedImage &&
-        BasicUtils.isStorageMealImage(_updatedImage)) {
-      StorageService.removeFile(_updatedImage);
+    final updatedImage = ref.read(_$updatedImage.notifier).state;
+    if (meal.imageUrl != updatedImage &&
+        BasicUtils.isStorageMealImage(updatedImage)) {
+      StorageService.removeFile(updatedImage);
     }
-    _updatedImage = imageUrl;
+
+    ref.read(_$updatedImage.notifier).state = imageUrl;
+    _updatedImageUrl = imageUrl;
   }
 
   Future<bool> _saveMeal() async {
     ref.read(_$buttonState.notifier).state = ButtonState.inProgress;
 
+    final updatedImage = ref.read(_$updatedImage.notifier).state;
     final meal = ref.read(_$meal.notifier).state;
     meal.name = _titleController.text;
     meal.source = _sourceController.text;
@@ -395,7 +405,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
     }
 
     final useLinkImage =
-        !_imageIsValid(meal.imageUrl) && !_imageIsValid(_updatedImage);
+        !_imageIsValid(meal.imageUrl) && !_imageIsValid(updatedImage);
 
     if (useLinkImage) {
       final imageOfSource =
@@ -403,13 +413,13 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
       if (_imageIsValid(imageOfSource)) {
         meal.imageUrl = imageOfSource;
       }
-    } else if (_imageIsValid(_updatedImage)) {
-      final shouldRemoveCurrent = meal.imageUrl != _updatedImage &&
+    } else if (_imageIsValid(updatedImage)) {
+      final shouldRemoveCurrent = meal.imageUrl != updatedImage &&
           BasicUtils.isStorageMealImage(meal.imageUrl);
       if (shouldRemoveCurrent) {
         StorageService.removeFile(meal.imageUrl);
       }
-      meal.imageUrl = _updatedImage;
+      meal.imageUrl = updatedImage;
     }
 
     try {
@@ -455,7 +465,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
         _sourceController.text != (_originalMeal.source ?? '') ||
         _durationController.text != (_originalMeal.duration ?? '').toString() ||
         _instructionsController.text != (_originalMeal.instructions ?? '') ||
-        _updatedImage != null ||
+        ref.read(_$updatedImage.notifier).state != null ||
         !_ingredientsEquals(
             meal.ingredients ?? [], _originalMeal.ingredients ?? []) ||
         !listEquals<String>(meal.tags ?? [], _originalMeal.tags ?? []);
@@ -559,11 +569,11 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
     }
   }
 
-  void _removeUnsavedStorageImage() {
-    if (_updatedImage != null &&
+  void _removeUnsavedStorageImage(String currentUpdatedImage) {
+    if (currentUpdatedImage.isNotEmpty &&
         !_mealSaved &&
-        BasicUtils.isStorageMealImage(_updatedImage)) {
-      StorageService.removeFile(_updatedImage);
+        BasicUtils.isStorageMealImage(currentUpdatedImage)) {
+      StorageService.removeFile(currentUpdatedImage);
     }
   }
 

@@ -1,6 +1,6 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_native_image/flutter_native_image.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logging/logging.dart';
 
@@ -11,7 +11,7 @@ class StorageService {
 
   static const String _storageMealImageFolder = 'meal-images/';
 
-  static Future<UploadTask?> uploadFile(PickedFile? file) async {
+  static Future<Reference?> uploadFile(PickedFile? file) async {
     _log.finer('Call uploadFile');
     if (file == null) {
       return null;
@@ -23,19 +23,25 @@ class StorageService {
     final Reference ref = FirebaseStorage.instance
         .ref()
         .child(_storageMealImageFolder)
-        .child('$fileName.jpg');
+        .child('$fileName.webp');
 
     if (kIsWeb) {
       uploadTask = ref.putData(await file.readAsBytes());
     } else {
-      final compressed = await FlutterNativeImage.compressImage(
+      final compressed = await FlutterImageCompress.compressWithFile(
         file.path,
-        quality: 25,
+        quality: 85,
+        format: CompressFormat.webp,
       );
-      uploadTask = ref.putFile(compressed);
+      if (compressed == null) {
+        return null;
+      }
+      uploadTask = ref.putData(compressed);
     }
 
-    return Future.value(uploadTask);
+    final uploadResult = await uploadTask;
+
+    return uploadResult.ref;
   }
 
   static Future<String?> getMealImageUrl(String? fileName) async {

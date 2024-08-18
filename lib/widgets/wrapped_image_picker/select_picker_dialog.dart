@@ -111,20 +111,19 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
     }
 
     try {
-      final upload = await StorageService.uploadFile(image);
       setState(() {
         _isLoading = true;
       });
-      if (upload == null) {
+      final storedRef = await StorageService.uploadFile(image);
+      if (storedRef == null) {
         throw Exception('upload task is null');
       }
-      final result = await upload;
       _isLoading = false;
 
       if (!mounted) {
         return;
       }
-      Navigator.pop(context, result.ref.name);
+      Navigator.pop(context, storedRef.name);
     } catch (e) {
       _log.severe('ERR: StorageService.uploadFile', e);
       if (!mounted) {
