@@ -1316,10 +1316,10 @@ packages:
     dependency: "direct main"
     description:
       name: receive_sharing_intent
-      sha256: "912bebb551bce75a14098891fd750305b30d53eba0d61cc70cd9973be9866e8d"
+      sha256: fcf167ad5aed85937c42d985dc31c7e50dbb3cf97dc5063a2bcfd26147023b34
       url: "https://pub.dev"
     source: hosted
-    version: "1.4.5"
+    version: "1.6.8"
   riverpod:
     dependency: transitive
     description:
@@ -1420,10 +1420,10 @@ packages:
     dependency: "direct main"
     description:
       name: sign_in_with_apple
-      sha256: "54791280a9b4c233c3a85027c936690f77e2406fd0ffd6e1e0ac92338448d6b5"
+      sha256: ac3b113767dfdd765078c507dad9d4d9fe96b669cc7bd88fc36fc15376fb3400
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.0"
+    version: "4.3.0"
   sign_in_with_apple_platform_interface:
     dependency: transitive
     description:

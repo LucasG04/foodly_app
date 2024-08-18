@@ -31,10 +31,10 @@ dependencies:
   share_plus: ^7.2.2
   email_validator: ^2.0.1
   logging: ^1.0.0
-  receive_sharing_intent: ^1.4.5
+  receive_sharing_intent: ^1.5.4
   image_picker: ^0.7.3
   path_provider: ^2.0.1
-  sign_in_with_apple: ^3.2.0
+  sign_in_with_apple: ^4.3.0
   crypto: ^3.0.1
   easy_localization: ^3.0.0
   flutter_localized_locales: ^2.0.3

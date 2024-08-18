@@ -328,28 +328,36 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
 
   void _listenForShareIntent() {
     // For sharing or opening urls/text coming from outside the app while the app is in the memory
-    ReceiveSharingIntent.getTextStream()
+    ReceiveSharingIntent.getMediaStream()
         .listen(_handleReceivedMealShare,
-            onError: (dynamic err) =>
-                _log.severe('ERR in ReceiveSharingIntent.getTextStream()', err))
+            onError: (dynamic err) => _log.severe(
+                'ERR in ReceiveSharingIntent.getMediaStream()', err))
         .canceledBy(this);
 
     // For sharing or opening urls/text coming from outside the app while the app is closed
-    ReceiveSharingIntent.getInitialText().then(_handleReceivedMealShare);
+    ReceiveSharingIntent.getInitialMedia().then(_handleReceivedMealShare);
   }
 
-  void _handleReceivedMealShare(String? value) {
-    if (AuthenticationService.currentUser == null || value == null) {
+  void _handleReceivedMealShare(List<SharedMediaFile>? value) {
+    if (AuthenticationService.currentUser == null ||
+        value == null ||
+        value.isEmpty) {
+      return;
+    }
+    final isCorrectType =
+        [SharedMediaType.text, SharedMediaType.url].contains(value.first.type);
+    final sharedText = value.first.message;
+    if (!isCorrectType || sharedText == null) {
       return;
     }
 
-    if (value.startsWith(kChefkochShareEndpoint)) {
+    if (sharedText.startsWith(kChefkochShareEndpoint)) {
       _appRouter
-          .navigate(MealCreateScreenRoute(id: Uri.encodeComponent(value)));
-    } else if (value.contains(kChefkochShareEndpoint)) {
-      final startIndex = value.indexOf(kChefkochShareEndpoint);
+          .navigate(MealCreateScreenRoute(id: Uri.encodeComponent(sharedText)));
+    } else if (sharedText.contains(kChefkochShareEndpoint)) {
+      final startIndex = sharedText.indexOf(kChefkochShareEndpoint);
       final extractedLink =
-          value.substring(startIndex, value.length).split(' ')[0];
+          sharedText.substring(startIndex, sharedText.length).split(' ')[0];
       _appRouter.navigate(
           MealCreateScreenRoute(id: Uri.encodeComponent(extractedLink)));
     }

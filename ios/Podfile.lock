@@ -1242,7 +1242,7 @@ PODS:
     - RevenueCat (= 4.26.1)
   - ReachabilitySwift (5.2.3)
   - RecaptchaInterop (100.0.0)
-  - receive_sharing_intent (0.0.1):
+  - receive_sharing_intent (1.6.8):
     - Flutter
   - RevenueCat (4.26.1)
   - share_plus (0.0.1):
@@ -1426,7 +1426,7 @@ SPEC CHECKSUMS:
   PurchasesHybridCommon: 5ee5e13fe009876850a03f52bb0349b6fa91d976
   ReachabilitySwift: 7f151ff156cea1481a8411701195ac6a984f4979
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
-  receive_sharing_intent: c0d87310754e74c0f9542947e7cbdf3a0335a3b1
+  receive_sharing_intent: 6837b01768e567fe8562182397bf43d63d8c6437
   RevenueCat: 4e8899a69fd57180ef166237d1eb670023be05de
   share_plus: c3fef564749587fc939ef86ffb283ceac0baf9f5
   shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
