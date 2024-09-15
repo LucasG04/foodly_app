@@ -74,8 +74,8 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
-          java-version: 12.x
-      - name: Setup Rubya
+          java-version: 17.x
+      - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.1.3"
