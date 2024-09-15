@@ -962,7 +962,7 @@ PODS:
     - Flutter
   - connectivity_plus (0.0.1):
     - Flutter
-    - ReachabilitySwift
+    - FlutterMacOS
   - Firebase/AnalyticsWithoutAdIdSupport (10.29.0):
     - Firebase/CoreOnly
     - FirebaseAnalytics/WithoutAdIdSupport (~> 10.29.0)
@@ -1258,7 +1258,6 @@ PODS:
     - PurchasesHybridCommon (= 13.2.0)
   - PurchasesHybridCommon (13.2.0):
     - RevenueCat (= 5.3.1)
-  - ReachabilitySwift (5.2.3)
   - RecaptchaInterop (100.0.0)
   - receive_sharing_intent (1.6.8):
     - Flutter
@@ -1283,7 +1282,7 @@ PODS:
 
 DEPENDENCIES:
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
-  - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
+  - connectivity_plus (from `.symlinks/plugins/connectivity_plus/darwin`)
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
   - firebase_app_check (from `.symlinks/plugins/firebase_app_check/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
@@ -1343,7 +1342,6 @@ SPEC REPOS:
     - PromisesObjC
     - PromisesSwift
     - PurchasesHybridCommon
-    - ReachabilitySwift
     - RecaptchaInterop
     - RevenueCat
     - SDWebImage
@@ -1353,7 +1351,7 @@ EXTERNAL SOURCES:
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
   connectivity_plus:
-    :path: ".symlinks/plugins/connectivity_plus/ios"
+    :path: ".symlinks/plugins/connectivity_plus/darwin"
   firebase_analytics:
     :path: ".symlinks/plugins/firebase_analytics/ios"
   firebase_app_check:
@@ -1406,7 +1404,7 @@ SPEC CHECKSUMS:
   AppCheckCore: 9feb4300caa596a36416cde10674dc5bec1e022e
   BoringSSL-GRPC: 1e2348957acdbcad360b80a264a90799984b2ba6
   cloud_firestore: 8a2ff2bb050f87d0ca996866625cefbe2395a83b
-  connectivity_plus: 413a8857dd5d9f1c399a39130850d02fe0feaf7e
+  connectivity_plus: ddd7f30999e1faaef5967c23d5b6d503d10434db
   Firebase: cec914dab6fd7b1bd8ab56ea07ce4e03dd251c2d
   firebase_analytics: 5c4746904f4a4782d6a6ec738368bd510734168e
   firebase_app_check: bf48979c0d6d350452f3615eb1d557bacd3ff256
@@ -1454,7 +1452,6 @@ SPEC CHECKSUMS:
   PromisesSwift: 9d77319bbe72ebf6d872900551f7eeba9bce2851
   purchases_flutter: 71bf40d5f70c4653df8a53ef3819b6bfe08d86d3
   PurchasesHybridCommon: 20acf98303a9593f5d56b449459dcf16ea581a99
-  ReachabilitySwift: 7f151ff156cea1481a8411701195ac6a984f4979
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
   receive_sharing_intent: 6837b01768e567fe8562182397bf43d63d8c6437
   RevenueCat: b2d2555cbb1f4116d341af4c5f82269c8e4e499a

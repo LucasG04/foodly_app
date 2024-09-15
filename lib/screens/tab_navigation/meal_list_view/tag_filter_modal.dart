@@ -160,6 +160,9 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal> {
           color: isSelected ? Colors.white : Colors.black,
         ),
       ),
+      backgroundColor: isSelected
+          ? Theme.of(context).primaryColor
+          : Theme.of(context).scaffoldBackgroundColor,
       selected: isSelected,
       selectedColor: Theme.of(context).primaryColor,
       selectedShadowColor: Theme.of(context).primaryColor.withOpacity(0.3),

@@ -68,10 +68,13 @@ class _MealListTitleState extends State<MealListTitle> {
                     final tagFilterLength =
                         ref.watch(mealTagFilterProvider).length;
                     return badges.Badge(
-                      animationDuration: const Duration(milliseconds: 250),
+                      badgeStyle: badges.BadgeStyle(
+                        badgeColor: Theme.of(context).primaryColor,
+                      ),
                       position: badges.BadgePosition.topEnd(top: 0, end: 3),
-                      animationType: badges.BadgeAnimationType.scale,
-                      badgeColor: Theme.of(context).primaryColor,
+                      badgeAnimation: const badges.BadgeAnimation.scale(
+                        animationDuration: Duration(milliseconds: 250),
+                      ),
                       badgeContent: Text(
                         tagFilterLength.toString(),
                         style: const TextStyle(color: Colors.white),
