@@ -216,6 +216,9 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
           return;
         }
         ref.read(planProvider.notifier).state = newPlan;
+        FirebaseCrashlytics.instance.setCustomKey('planId', newPlan?.id ?? '-');
+        FirebaseCrashlytics.instance
+            .setCustomKey('planCode', newPlan?.code ?? '-');
       }
     }
 

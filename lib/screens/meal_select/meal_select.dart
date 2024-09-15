@@ -143,11 +143,13 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
         }
 
         return randomMeal.when(
-          data: (value) => SelectMealTile(
-            meal: value,
-            onAddMeal: () => _addMealToPlan(value!.id!, planId),
-            secondaryAction: () => ref.invalidate(_$randomMeal),
-          ),
+          data: (value) => value != null
+              ? SelectMealTile(
+                  meal: value,
+                  onAddMeal: () => _addMealToPlan(value.id!, planId),
+                  secondaryAction: () => ref.invalidate(_$randomMeal),
+                )
+              : const SizedBox(),
           error: (_, __) => const SizedBox(),
           loading: () => const SelectMealTile(
             isLoading: true,
