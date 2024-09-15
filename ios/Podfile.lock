@@ -1253,19 +1253,19 @@ PODS:
   - PromisesObjC (2.4.0)
   - PromisesSwift (2.4.0):
     - PromisesObjC (= 2.4.0)
-  - purchases_flutter (5.8.0):
+  - purchases_flutter (8.1.1):
     - Flutter
-    - PurchasesHybridCommon (= 6.3.0)
-  - PurchasesHybridCommon (6.3.0):
-    - RevenueCat (= 4.26.1)
+    - PurchasesHybridCommon (= 13.2.0)
+  - PurchasesHybridCommon (13.2.0):
+    - RevenueCat (= 5.3.1)
   - ReachabilitySwift (5.2.3)
   - RecaptchaInterop (100.0.0)
   - receive_sharing_intent (1.6.8):
     - Flutter
-  - RevenueCat (4.26.1)
-  - SDWebImage (5.19.6):
-    - SDWebImage/Core (= 5.19.6)
-  - SDWebImage/Core (5.19.6)
+  - RevenueCat (5.3.1)
+  - SDWebImage (5.19.7):
+    - SDWebImage/Core (= 5.19.7)
+  - SDWebImage/Core (5.19.7)
   - SDWebImageWebPCoder (0.14.6):
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.17)
@@ -1452,13 +1452,13 @@ SPEC CHECKSUMS:
   permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   PromisesSwift: 9d77319bbe72ebf6d872900551f7eeba9bce2851
-  purchases_flutter: a23f77000427872e31f770101cd0cd6f4fc60cb3
-  PurchasesHybridCommon: 5ee5e13fe009876850a03f52bb0349b6fa91d976
+  purchases_flutter: 71bf40d5f70c4653df8a53ef3819b6bfe08d86d3
+  PurchasesHybridCommon: 20acf98303a9593f5d56b449459dcf16ea581a99
   ReachabilitySwift: 7f151ff156cea1481a8411701195ac6a984f4979
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
   receive_sharing_intent: 6837b01768e567fe8562182397bf43d63d8c6437
-  RevenueCat: 4e8899a69fd57180ef166237d1eb670023be05de
-  SDWebImage: a79252b60f4678812d94316c91da69ec83089c9f
+  RevenueCat: b2d2555cbb1f4116d341af4c5f82269c8e4e499a
+  SDWebImage: 8a6b7b160b4d710e2a22b6900e25301075c34cb3
   SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
   share_plus: c3fef564749587fc939ef86ffb283ceac0baf9f5
   shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
@@ -1466,6 +1466,6 @@ SPEC CHECKSUMS:
   uni_links: d97da20c7701486ba192624d99bffaaffcfc298a
   url_launcher_ios: 08a3dfac5fb39e8759aeb0abbd5d9480f30fc8b4
 
-PODFILE CHECKSUM: 2138b4fe80c23402c85249f4c947e634f19e0722
+PODFILE CHECKSUM: 27f24238132e0e851dc2760cd51e82746e3af6d0
 
 COCOAPODS: 1.13.0

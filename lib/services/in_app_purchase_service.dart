@@ -76,6 +76,8 @@ class InAppPurchaseService {
       if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
         _log.severe(e);
       }
+    } catch (e) {
+      _log.severe(e);
     }
     return false;
   }
