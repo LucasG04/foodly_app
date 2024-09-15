@@ -72,9 +72,9 @@ class _ButtonsTabState extends State<ButtonsTab> {
         child: TextButton(
           onPressed: widget.onPressed as void Function()?,
           style: ButtonStyle(
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+              shape: WidgetStateProperty.all(RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(widget.radius!))),
-              padding: MaterialStateProperty.all(EdgeInsets.zero)),
+              padding: WidgetStateProperty.all(EdgeInsets.zero)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

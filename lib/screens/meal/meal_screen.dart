@@ -540,7 +540,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
       width: 150,
       padding: const EdgeInsets.all(kPadding / 2),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(kRadius),
         boxShadow: const [kSmallShadow],
       ),

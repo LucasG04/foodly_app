@@ -1,5 +1,3 @@
-import 'dart:io' show Platform;
-
 import 'package:auto_route/auto_route.dart';
 import 'package:concentric_transition/page_route.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -413,34 +411,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             );
                           },
                         ),
-                        if (Platform.isIOS || Platform.isMacOS)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: kPadding),
-                            child: Wrap(
-                              alignment: WrapAlignment.spaceEvenly,
-                              children: [
-                                TextButton(
-                                  onPressed: () => _launchUrl(kAppPrivacyUrl),
-                                  child: Text(
-                                    'settings_privacy'.tr(),
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
-                                  ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: kPadding),
+                          child: Wrap(
+                            alignment: WrapAlignment.spaceEvenly,
+                            children: [
+                              TextButton(
+                                onPressed: () => _launchUrl(kAppPrivacyUrl),
+                                child: Text(
+                                  'settings_privacy'.tr(),
+                                  style: Theme.of(context).textTheme.bodyLarge,
                                 ),
-                                TextButton(
-                                  onPressed: () =>
-                                      _launchUrl(kAppTermsOfUseUrl),
-                                  child: Text(
-                                    'settings_terms_of_use'.tr(),
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
-                                  ),
+                              ),
+                              TextButton(
+                                onPressed: () => _launchUrl(kAppTermsOfUseUrl),
+                                child: Text(
+                                  'settings_terms_of_use'.tr(),
+                                  style: Theme.of(context).textTheme.bodyLarge,
                                 ),
-                              ],
-                            ),
-                          )
-                        else
-                          const SizedBox(height: kPadding),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),

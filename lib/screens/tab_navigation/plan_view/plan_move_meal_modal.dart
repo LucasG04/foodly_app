@@ -191,12 +191,12 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal> {
         newPlanMeal!,
       );
     }
-    setState(() {
-      _buttonState = ButtonState.normal;
-    });
     if (!mounted) {
       return;
     }
+    setState(() {
+      _buttonState = ButtonState.normal;
+    });
     Navigator.pop(context, true);
   }
 
