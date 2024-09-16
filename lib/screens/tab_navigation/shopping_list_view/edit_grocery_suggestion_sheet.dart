@@ -66,6 +66,7 @@ class _EditGrocerySuggestionSheetState
                     final selectedGroup = ref.watch(_$selectedGroup);
                     return DropdownButton<GroceryGroup>(
                       value: selectedGroup,
+                      dropdownColor: Theme.of(context).scaffoldBackgroundColor,
                       items: productGroups
                           .map((group) => DropdownMenuItem<GroceryGroup>(
                                 value: group,

@@ -94,6 +94,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             text: 'settings_section_general_language'.tr(),
                             trailing: DropdownButton<Locale>(
                               value: context.locale,
+                              dropdownColor:
+                                  Theme.of(context).scaffoldBackgroundColor,
                               items: context.supportedLocales
                                   .map((locale) => DropdownMenuItem<Locale>(
                                         value: locale,
@@ -458,6 +460,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               );
               return DropdownButton<_ShoppingListSortValue>(
                 value: sortObject,
+                dropdownColor: Theme.of(context).scaffoldBackgroundColor,
                 items: shoppingListSorts
                     .map((sort) => DropdownMenuItem<_ShoppingListSortValue>(
                           value: sort,

@@ -1,7 +1,6 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:logging/logging.dart';
 
 class StorageService {
@@ -11,7 +10,7 @@ class StorageService {
 
   static const String _storageMealImageFolder = 'meal-images/';
 
-  static Future<Reference?> uploadFile(PickedFile? file) async {
+  static Future<Reference?> uploadFile(XFile? file) async {
     _log.finer('Call uploadFile');
     if (file == null) {
       return null;
