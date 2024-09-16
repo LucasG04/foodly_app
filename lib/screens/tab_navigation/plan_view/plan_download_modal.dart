@@ -107,6 +107,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
             text: 'plan_download_modal_type'.tr(),
             trailing: DropdownButton<_PlanDocType>(
               value: _docType,
+              dropdownColor: Theme.of(context).scaffoldBackgroundColor,
               items: _PlanDocType.values
                   .map((type) => DropdownMenuItem<_PlanDocType>(
                         value: type,

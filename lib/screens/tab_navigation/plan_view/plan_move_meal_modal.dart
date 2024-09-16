@@ -83,6 +83,7 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal> {
           const SizedBox(height: kPadding),
           DropdownButton(
             value: _selectedDate,
+            dropdownColor: Theme.of(context).scaffoldBackgroundColor,
             items: _dropdownValues
                 .map(
                   (date) => DropdownMenuItem(
