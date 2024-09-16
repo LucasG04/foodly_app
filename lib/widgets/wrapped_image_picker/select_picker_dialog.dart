@@ -90,9 +90,9 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
   }
 
   void _uploadLocalImage(ImageSource source) async {
-    PickedFile? image;
+    XFile? image;
     try {
-      image = await _imagePicker.getImage(source: source);
+      image = await _imagePicker.pickImage(source: source);
       // if none is picked, `getImage` will `return` automatically
       // so show error if `image` is null
       if (image == null) {
