@@ -41,6 +41,13 @@ class PlanDayMealTile extends ConsumerStatefulWidget {
 
 class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
   final _$voteIsLoading = AutoDisposeStateProvider<bool>((_) => false);
+  late Future<Meal?> _mealFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _mealFuture = MealService.getMealById(widget.planMeal.meal);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +63,7 @@ class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
               ),
             )
           : FutureBuilder<Meal?>(
-              future: MealService.getMealById(widget.planMeal.meal),
+              future: _mealFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (snapshot.hasData) {
