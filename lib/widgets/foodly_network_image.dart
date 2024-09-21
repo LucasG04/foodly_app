@@ -20,24 +20,26 @@ class FoodlyNetworkImage extends StatefulWidget {
 }
 
 class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
+  String? _cachedImageUrl;
+
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     if (BasicUtils.isStorageMealImage(widget.imageUrl)) {
-      return FutureBuilder(
-        future: StorageService.getMealImageUrl(widget.imageUrl),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return _buildLoader();
-          } else if (snapshot.hasData) {
-            return _buildCachedImage(snapshot.data!);
-          } else {
-            return _buildFallbackImage();
-          }
-        },
-      );
+      StorageService.getMealImageUrl(widget.imageUrl).then((url) {
+        if (mounted) {
+          setState(() => _cachedImageUrl = url);
+        }
+      });
+    } else {
+      _cachedImageUrl = widget.imageUrl;
     }
-    return _buildCachedImage(widget.imageUrl);
   }
+
+  @override
+  Widget build(BuildContext context) => _cachedImageUrl == null
+      ? _buildLoader()
+      : _buildCachedImage(_cachedImageUrl!);
 
   FastCachedImage _buildCachedImage(String imageUrl) {
     return FastCachedImage(

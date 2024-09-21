@@ -40,7 +40,14 @@ class PlanDayMealTile extends ConsumerStatefulWidget {
 }
 
 class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
-  bool _voteIsLoading = false;
+  final _$voteIsLoading = AutoDisposeStateProvider<bool>((_) => false);
+  late Future<Meal?> _mealFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _mealFuture = MealService.getMealById(widget.planMeal.meal);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +63,7 @@ class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
               ),
             )
           : FutureBuilder<Meal?>(
-              future: MealService.getMealById(widget.planMeal.meal),
+              future: _mealFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (snapshot.hasData) {
@@ -176,19 +183,20 @@ class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
               IconButton(
                 icon: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 250),
-                  child: _voteIsLoading
-                      ? const SmallCircularProgressIndicator()
-                      : Icon(
-                          EvaIcons.arrowIosUpwardOutline,
-                          color: voteColor,
-                        ),
+                  child: Consumer(
+                    builder: (context, ref, child) => ref.watch(_$voteIsLoading)
+                        ? const SmallCircularProgressIndicator()
+                        : child!,
+                    child: Icon(
+                      EvaIcons.arrowIosUpwardOutline,
+                      color: voteColor,
+                    ),
+                  ),
                 ),
-                onPressed: _voteIsLoading
-                    ? null
-                    : () => _voteMeal(
-                          ref.read(planProvider)!.id,
-                          AuthenticationService.currentUser!.uid,
-                        ),
+                onPressed: () => _voteMeal(
+                  ref.read(planProvider)!.id,
+                  AuthenticationService.currentUser!.uid,
+                ),
                 splashRadius: 15.0,
               ),
               Text(
@@ -211,13 +219,13 @@ class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
   }
 
   void _voteMeal(String? planId, String userId) async {
-    setState(() {
-      _voteIsLoading = true;
-    });
+    if (ref.read(_$voteIsLoading.notifier).state) {
+      return;
+    }
+
+    ref.read(_$voteIsLoading.notifier).state = true;
     await PlanService.voteForPlanMeal(planId, widget.planMeal, userId);
-    setState(() {
-      _voteIsLoading = false;
-    });
+    ref.read(_$voteIsLoading.notifier).state = false;
   }
 
   void _showOptionsModal(String planId) {
