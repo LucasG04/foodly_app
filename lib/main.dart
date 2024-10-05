@@ -331,14 +331,19 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
 
   void _listenForShareIntent() {
     // For sharing or opening urls/text coming from outside the app while the app is in the memory
-    ReceiveSharingIntent.getMediaStream()
-        .listen(_handleReceivedMealShare,
-            onError: (dynamic err) => _log.severe(
-                'ERR in ReceiveSharingIntent.getMediaStream()', err))
+    ReceiveSharingIntent.instance
+        .getMediaStream()
+        .listen(
+          _handleReceivedMealShare,
+          onError: (dynamic err) =>
+              _log.severe('ERR in ReceiveSharingIntent.getMediaStream()', err),
+        )
         .canceledBy(this);
 
     // For sharing or opening urls/text coming from outside the app while the app is closed
-    ReceiveSharingIntent.getInitialMedia().then(_handleReceivedMealShare);
+    ReceiveSharingIntent.instance
+        .getInitialMedia()
+        .then(_handleReceivedMealShare);
   }
 
   void _handleReceivedMealShare(List<SharedMediaFile>? value) {
