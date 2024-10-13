@@ -75,6 +75,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
     _$meal = AutoDisposeStateProvider<Meal>(
       (_) => Meal(name: '', planId: plan?.id),
     );
+    _fetchAllTagsIfNotExist();
+
     _initialParseId().then((meal) {
       if (meal != null) {
         BasicUtils.afterBuild(() {
@@ -83,10 +85,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
         });
       }
       ref.read(_$isLoading.notifier).state = false;
-    });
-    _fetchAllTagsIfNotExist();
+    }).whenComplete(() => super.initState());
 
-    super.initState();
+    // TODO: fix init for share meal to create
   }
 
   @override
