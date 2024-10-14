@@ -31,7 +31,11 @@ dependencies:
   share_plus: ^10.0.2
   email_validator: ^2.0.1
   logging: ^1.0.0
-  receive_sharing_intent: ^1.8.0
+  # receive_sharing_intent: ^1.8.0
+  receive_sharing_intent:
+    git:
+      url: https://github.com/KasemJaffer/receive_sharing_intent.git
+      ref: da6fb81de86a7cb0f7bf88deb0517690ea4f9255 # Fix iOS18 open URL
   image_picker: ^1.1.2
   path_provider: ^2.1.4
   sign_in_with_apple: ^4.3.0

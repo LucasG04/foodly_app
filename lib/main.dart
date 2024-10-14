@@ -128,9 +128,9 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   @override
   void initState() {
     _initializeLogger();
-    _listenForShareIntent();
     _listenForConnectivity();
     super.initState();
+    _listenForShareIntent();
     InAppPurchaseService.setRef(ref);
     SettingsService.setRef(ref);
   }
@@ -341,9 +341,12 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
         .canceledBy(this);
 
     // For sharing or opening urls/text coming from outside the app while the app is closed
-    ReceiveSharingIntent.instance
-        .getInitialMedia()
-        .then(_handleReceivedMealShare);
+    ReceiveSharingIntent.instance.getInitialMedia().then((data) {
+      _handleReceivedMealShare(data);
+      ReceiveSharingIntent.instance.reset();
+    }).catchError((dynamic err) {
+      _log.severe('ERR in ReceiveSharingIntent.getInitialMedia()', err);
+    });
   }
 
   void _handleReceivedMealShare(List<SharedMediaFile>? value) {
@@ -354,7 +357,9 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     }
     final isCorrectType =
         [SharedMediaType.text, SharedMediaType.url].contains(value.first.type);
-    final sharedText = value.first.message;
+    final sharedText = value.first.type == SharedMediaType.url
+        ? value.first.path
+        : value.first.message;
     if (!isCorrectType || sharedText == null) {
       return;
     }
