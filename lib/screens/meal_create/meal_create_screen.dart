@@ -66,17 +66,24 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
   /// Holds the value of _$updatedImage, so it can be used in dispose
   String _updatedImageUrl = '';
 
+  /// Init listeners, providers and fetch data
   @override
   void initState() {
-    // TODO: clean up
-    _sourceController
-        .addListener(() => _onSourceTextChange(_sourceController.text));
+    super.initState();
+    _sourceController.addListener(
+      () => _onSourceTextChange(_sourceController.text),
+    );
     final plan = ref.read(planProvider);
     _$meal = AutoDisposeStateProvider<Meal>(
       (_) => Meal(name: '', planId: plan?.id),
     );
     _fetchAllTagsIfNotExist();
+  }
 
+  /// Parse passed id and set initial values
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _initialParseId().then((meal) {
       if (meal != null) {
         BasicUtils.afterBuild(() {
@@ -85,9 +92,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
         });
       }
       ref.read(_$isLoading.notifier).state = false;
-    }).whenComplete(() => super.initState());
-
-    // TODO: fix init for share meal to create
+    });
   }
 
   @override
