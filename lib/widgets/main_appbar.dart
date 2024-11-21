@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 class MainAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String text;
   final bool showBack;
+  final VoidCallback? onPopRejected;
   final List<Widget>? actions;
   final ScrollController scrollController;
 
   const MainAppBar({
     required this.text,
     this.showBack = true,
+    this.onPopRejected,
     this.actions,
     required this.scrollController,
     Key? key,
@@ -66,8 +68,11 @@ class _MainAppBarState extends State<MainAppBar> {
                 color: Theme.of(context).textTheme.bodyLarge!.color,
               ),
               tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-              onPressed: () {
-                Navigator.maybePop(context);
+              onPressed: () async {
+                final success = await Navigator.maybePop(context);
+                if (!success && widget.onPopRejected != null) {
+                  widget.onPopRejected!();
+                }
               },
             )
           : null,
