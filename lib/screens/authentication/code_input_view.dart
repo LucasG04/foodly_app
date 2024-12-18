@@ -142,6 +142,9 @@ class _CodeInputViewState extends State<CodeInputView> {
       ),
       decoration: InputDecoration(
         hintText: '8Lu261gO',
+        hintStyle: const TextStyle(
+          color: Colors.grey,
+        ),
         suffix: _loadingCode
             ? const Padding(
                 padding: EdgeInsets.only(right: 10.0),

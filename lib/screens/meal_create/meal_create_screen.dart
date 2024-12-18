@@ -110,18 +110,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
         ? 700.0
         : MediaQuery.of(context).size.width * 0.8;
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) {
-          return;
-        }
-        final shouldPop = await _pageWillPop();
-        if (shouldPop && mounted) {
-          // ignore: use_build_context_synchronously, mounted is checked above
-          AutoRouter.of(context).pop(result);
-        }
-      },
+    // ignore: deprecated_member_use, see https://github.com/flutter/flutter/issues/138614
+    return WillPopScope(
+      onWillPop: _pageWillPop,
       child: KeyboardAutoDismiss(
         scaffold: Scaffold(
           appBar: MainAppBar(
