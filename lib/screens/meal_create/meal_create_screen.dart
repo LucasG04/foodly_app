@@ -45,6 +45,7 @@ class MealCreateScreen extends ConsumerStatefulWidget {
 
 class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
   bool _mealSaved = false;
+  bool _isFirstCall = true;
   final ScrollController _scrollController = ScrollController();
 
   late bool _isCreatingMeal;
@@ -85,15 +86,19 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _initialParseId().then((meal) {
-      if (meal != null) {
-        BasicUtils.afterBuild(() {
-          ref.read(_$meal.notifier).state = meal;
-          _onSourceTextChange(_sourceController.text);
-        });
-      }
-      ref.read(_$isLoading.notifier).state = false;
-    });
+
+    if (_isFirstCall) {
+      _isFirstCall = false;
+      _initialParseId().then((meal) {
+        if (meal != null) {
+          BasicUtils.afterBuild(() {
+            ref.read(_$meal.notifier).state = meal;
+            _onSourceTextChange(_sourceController.text);
+          });
+        }
+        ref.read(_$isLoading.notifier).state = false;
+      });
+    }
   }
 
   @override
