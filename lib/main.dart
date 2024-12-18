@@ -361,20 +361,21 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
         [SharedMediaType.text, SharedMediaType.url].contains(value.first.type);
     final sharedText = value.first.type == SharedMediaType.url
         ? value.first.path
-        : value.first.message;
-    if (!isCorrectType || sharedText == null) {
+        : value.first.message ?? value.first.path;
+    if (!isCorrectType || sharedText.isEmpty) {
       return;
     }
 
-    if (sharedText.startsWith(kChefkochShareEndpoint)) {
-      _appRouter
-          .navigate(MealCreateScreenRoute(id: Uri.encodeComponent(sharedText)));
-    } else if (sharedText.contains(kChefkochShareEndpoint)) {
-      final startIndex = sharedText.indexOf(kChefkochShareEndpoint);
-      final extractedLink =
-          sharedText.substring(startIndex, sharedText.length).split(' ')[0];
+    if (sharedText.contains(kChefkochShareEndpoint)) {
+      final extractedLink = sharedText.contains(' ')
+          ? sharedText
+              .substring(sharedText.indexOf(kChefkochShareEndpoint))
+              .split(' ')[0]
+          : sharedText;
+
       _appRouter.navigate(
-          MealCreateScreenRoute(id: Uri.encodeComponent(extractedLink)));
+        MealCreateScreenRoute(id: Uri.encodeComponent(extractedLink)),
+      );
     }
   }
 
