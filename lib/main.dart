@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -128,7 +127,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   @override
   void initState() {
     _initializeLogger();
-    _listenForConnectivity();
+    _listenForInternetConnection();
     _listenForShareIntent();
     super.initState();
     InAppPurchaseService.setRef(ref);
@@ -397,13 +396,14 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     }
   }
 
-  void _listenForConnectivity() async {
-    InternetConnectionChecker().hasConnection.then((result) {
+  void _listenForInternetConnection() async {
+    InternetConnectionChecker.instance.hasConnection.then((result) {
       ref.read(hasConnectionProvider.notifier).state = result;
     });
 
-    Connectivity().onConnectivityChanged.listen((_) async {
-      final isDeviceConnected = await InternetConnectionChecker().hasConnection;
+    InternetConnectionChecker.instance.onStatusChange.listen((_) async {
+      final isDeviceConnected =
+          await InternetConnectionChecker.instance.hasConnection;
       if (!mounted) {
         return;
       }
