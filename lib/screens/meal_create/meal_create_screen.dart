@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:keyboard_service/keyboard_service.dart';
 
+import '../../app_router.gr.dart';
 import '../../constants.dart';
 import '../../models/ingredient.dart';
 import '../../models/meal.dart';
@@ -66,15 +67,24 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
   /// Holds the value of _$updatedImage, so it can be used in dispose
   String _updatedImageUrl = '';
 
+  /// Init listeners, providers and fetch data
   @override
   void initState() {
-    // TODO: clean up
-    _sourceController
-        .addListener(() => _onSourceTextChange(_sourceController.text));
+    super.initState();
+    _sourceController.addListener(
+      () => _onSourceTextChange(_sourceController.text),
+    );
     final plan = ref.read(planProvider);
     _$meal = AutoDisposeStateProvider<Meal>(
       (_) => Meal(name: '', planId: plan?.id),
     );
+    _fetchAllTagsIfNotExist();
+  }
+
+  /// Parse passed id and set initial values
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _initialParseId().then((meal) {
       if (meal != null) {
         BasicUtils.afterBuild(() {
@@ -84,9 +94,6 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
       }
       ref.read(_$isLoading.notifier).state = false;
     });
-    _fetchAllTagsIfNotExist();
-
-    super.initState();
   }
 
   @override
@@ -103,6 +110,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
         ? 700.0
         : MediaQuery.of(context).size.width * 0.8;
 
+    // ignore: deprecated_member_use, see https://github.com/flutter/flutter/issues/138614
     return WillPopScope(
       onWillPop: _pageWillPop,
       child: KeyboardAutoDismiss(
@@ -121,6 +129,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
                 onPressed: () => _openChefkochImport(),
               ),
             ],
+            onPopRejected: () {
+              AutoRouter.of(context).push(const HomeScreenRoute());
+            },
           ),
           body: Consumer(
             builder: (context, ref, _) {

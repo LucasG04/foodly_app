@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -128,8 +127,8 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   @override
   void initState() {
     _initializeLogger();
+    _listenForInternetConnection();
     _listenForShareIntent();
-    _listenForConnectivity();
     super.initState();
     InAppPurchaseService.setRef(ref);
     SettingsService.setRef(ref);
@@ -178,6 +177,9 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
                 locale: context.locale,
                 theme: ThemeData(
                   primaryColor: SettingsService.primaryColor,
+                  colorScheme: ColorScheme.fromSeed(
+                    seedColor: SettingsService.primaryColor,
+                  ),
                   dividerColor: Colors.grey.shade300,
                   scaffoldBackgroundColor: const Color(0xFFFFFFFF),
                   dialogBackgroundColor: const Color(0xFFFFFFFF),
@@ -331,14 +333,22 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
 
   void _listenForShareIntent() {
     // For sharing or opening urls/text coming from outside the app while the app is in the memory
-    ReceiveSharingIntent.getMediaStream()
-        .listen(_handleReceivedMealShare,
-            onError: (dynamic err) => _log.severe(
-                'ERR in ReceiveSharingIntent.getMediaStream()', err))
+    ReceiveSharingIntent.instance
+        .getMediaStream()
+        .listen(
+          _handleReceivedMealShare,
+          onError: (dynamic err) =>
+              _log.severe('ERR in ReceiveSharingIntent.getMediaStream()', err),
+        )
         .canceledBy(this);
 
     // For sharing or opening urls/text coming from outside the app while the app is closed
-    ReceiveSharingIntent.getInitialMedia().then(_handleReceivedMealShare);
+    ReceiveSharingIntent.instance.getInitialMedia().then((data) {
+      _handleReceivedMealShare(data);
+      ReceiveSharingIntent.instance.reset();
+    }).catchError((dynamic err) {
+      _log.severe('ERR in ReceiveSharingIntent.getInitialMedia()', err);
+    });
   }
 
   void _handleReceivedMealShare(List<SharedMediaFile>? value) {
@@ -349,7 +359,9 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     }
     final isCorrectType =
         [SharedMediaType.text, SharedMediaType.url].contains(value.first.type);
-    final sharedText = value.first.message;
+    final sharedText = value.first.type == SharedMediaType.url
+        ? value.first.path
+        : value.first.message;
     if (!isCorrectType || sharedText == null) {
       return;
     }
@@ -387,13 +399,14 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     }
   }
 
-  void _listenForConnectivity() async {
-    InternetConnectionChecker().hasConnection.then((result) {
+  void _listenForInternetConnection() async {
+    InternetConnectionChecker.instance.hasConnection.then((result) {
       ref.read(hasConnectionProvider.notifier).state = result;
     });
 
-    Connectivity().onConnectivityChanged.listen((_) async {
-      final isDeviceConnected = await InternetConnectionChecker().hasConnection;
+    InternetConnectionChecker.instance.onStatusChange.listen((_) async {
+      final isDeviceConnected =
+          await InternetConnectionChecker.instance.hasConnection;
       if (!mounted) {
         return;
       }

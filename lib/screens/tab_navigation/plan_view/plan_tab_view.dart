@@ -40,6 +40,8 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
     return PlanService.streamPlanMealsByPlanId(activePlan!.id);
   });
 
+  // TODO: initState to listen on plan meal changes; create providers for all days or one that can be used with select for individual days
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
