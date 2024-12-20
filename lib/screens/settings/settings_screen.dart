@@ -123,9 +123,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   .tr(args: ['✨']),
                               trailing: const Icon(
                                 EvaIcons.arrowIosForwardOutline,
-                                color: kPremiumColor,
                               ),
                               colorIcon: kPremiumColor,
+                              gradientBorder: true,
                             ),
                           ),
                           if (PermissionUtils.allowedToModerate(foodlyUser))
@@ -489,10 +489,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         color: Theme.of(context).dialogBackgroundColor,
         borderRadius: BorderRadius.circular(kRadius),
       ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(kPadding, 8, kPadding, 0),
-        child: Wrap(children: widgets),
-      ),
+      child: Wrap(children: widgets),
     );
   }
 

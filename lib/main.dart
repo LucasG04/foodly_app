@@ -181,7 +181,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
                     seedColor: SettingsService.primaryColor,
                   ),
                   dividerColor: Colors.grey.shade300,
-                  scaffoldBackgroundColor: const Color(0xFFFFFFFF),
+                  scaffoldBackgroundColor: const Color(0xFFFAFAFA),
                   dialogBackgroundColor: const Color(0xFFFFFFFF),
                   cardTheme: const CardTheme(
                     color: Color(0xFFFFFFFF),
