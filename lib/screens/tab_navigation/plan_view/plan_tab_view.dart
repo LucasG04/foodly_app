@@ -75,14 +75,21 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
                       ],
                     ),
                   ),
-                  if (true || AppReviewService.shouldRequestReview())
-                    SizedBox(
-                      width: BasicUtils.contentWidth(context),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 5.0),
-                        child: ReviewRequestContainer(),
-                      ),
-                    ),
+                  StreamBuilder<bool>(
+                    stream: AppReviewService.shouldRequestReview(),
+                    builder: (context, snapshot) {
+                      if (snapshot.data == null || !snapshot.data!) {
+                        return const SizedBox();
+                      }
+                      return SizedBox(
+                        width: BasicUtils.contentWidth(context),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5.0),
+                          child: ReviewRequestContainer(),
+                        ),
+                      );
+                    },
+                  ),
                   SizedBox(
                     width: BasicUtils.contentWidth(context),
                     child: livePlanMeals.when(
