@@ -88,34 +88,58 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
             child: TabBarView(
               controller: _tabController,
               children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 5.0,
-                    horizontal: 20.0,
-                  ),
-                  child: Scrollbar(
-                    thickness: 2.5,
-                    child: TextFormField(
-                      controller: widget.textEditingController,
-                      scrollController: ScrollController(),
-                      maxLines: null,
-                      onChanged: (data) =>
-                          ref.read(_$currentText.notifier).state = data,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText:
-                            '# Title\n## Subtitle\n- The quick brown fox jumps over the lazy dog\n- Lorem ipsum dolor sit amet, ...',
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: Colors.black12),
+                        ),
                       ),
-                      cursorColor: Theme.of(context).primaryColor,
-                      minLines: 6,
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () => _insertMarkdown('**', '**'),
+                            child: const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Icon(Icons.format_bold),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _insertMarkdown('_', '_'),
+                            child: const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Icon(Icons.format_italic),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Scrollbar(
+                        thickness: 2.5,
+                        child: TextFormField(
+                          controller: widget.textEditingController,
+                          scrollController: ScrollController(),
+                          maxLines: null,
+                          onChanged: (data) =>
+                              ref.read(_$currentText.notifier).state = data,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText:
+                                '# Title\n## Subtitle\n- The quick brown fox jumps over the lazy dog\n- Lorem ipsum dolor sit amet, ...',
+                          ),
+                          cursorColor: Theme.of(context).primaryColor,
+                          minLines: 6,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 5.0,
-                    horizontal: 20.0,
-                  ),
+                  padding: const EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 0),
                   child: Scrollbar(
                     thickness: 2.5,
                     child: SingleChildScrollView(
@@ -161,6 +185,28 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
           ),
         ],
       ),
+    );
+  }
+
+  void _insertMarkdown(String startTag, [String? endTag]) {
+    final text = widget.textEditingController.text;
+    final selection = widget.textEditingController.selection;
+
+    final start = selection.start < 0 ? 0 : selection.start;
+    final end = selection.end < 0 ? 0 : selection.end;
+
+    final selectedText = text.substring(start, end);
+
+    final newText = text.replaceRange(
+      start,
+      end,
+      '$startTag$selectedText${endTag ?? ''}',
+    );
+
+    widget.textEditingController.text = newText;
+    widget.textEditingController.selection = TextSelection(
+      baseOffset: start + startTag.length,
+      extentOffset: start + startTag.length + selectedText.length,
     );
   }
 
