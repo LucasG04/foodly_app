@@ -12,6 +12,7 @@ import '../../../constants.dart';
 import '../../../models/plan.dart';
 import '../../../models/plan_meal.dart';
 import '../../../providers/state_providers.dart';
+import '../../../services/app_review_service.dart';
 import '../../../services/plan_service.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/widget_utils.dart';
@@ -22,6 +23,7 @@ import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import 'plan_day_card.dart';
 import 'plan_download_modal.dart';
+import 'review_request_container.dart';
 
 class PlanTabView extends ConsumerStatefulWidget {
   const PlanTabView({Key? key}) : super(key: key);
@@ -73,6 +75,14 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
                       ],
                     ),
                   ),
+                  if (true || AppReviewService.shouldRequestReview())
+                    SizedBox(
+                      width: BasicUtils.contentWidth(context),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 5.0),
+                        child: ReviewRequestContainer(),
+                      ),
+                    ),
                   SizedBox(
                     width: BasicUtils.contentWidth(context),
                     child: livePlanMeals.when(
