@@ -94,7 +94,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
           BasicUtils.afterBuild(() {
             ref.read(_$meal.notifier).state = meal;
             _onSourceTextChange(_sourceController.text);
-          });
+          }, mounted);
         }
         ref.read(_$isLoading.notifier).state = false;
       });

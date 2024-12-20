@@ -226,6 +226,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
 
     BasicUtils.afterBuild(
       () => ref.read(initialPlanLoadingProvider.notifier).state = false,
+      mounted,
     );
   }
 
@@ -245,12 +246,16 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       _checkUserSubsription();
     } else {
       FirebaseCrashlytics.instance.setUserIdentifier('');
-      BasicUtils.afterBuild(() => ref.read(userProvider.notifier).state = null);
+      BasicUtils.afterBuild(
+        () => ref.read(userProvider.notifier).state = null,
+        mounted,
+      );
       _handleInitUniLink = false;
     }
 
     BasicUtils.afterBuild(
       () => ref.read(initialUserLoadingProvider.notifier).state = false,
+      mounted,
     );
   }
 

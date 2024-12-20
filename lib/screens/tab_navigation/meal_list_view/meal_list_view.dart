@@ -360,6 +360,7 @@ class _MealListViewState extends ConsumerState<MealListView>
           .where((mealId) => mealId != null)
           .listen((_) => _refreshMeals())
           .canceledBy(this),
+      mounted,
     );
   }
 }

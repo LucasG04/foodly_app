@@ -143,7 +143,9 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
       return;
     }
     BasicUtils.afterBuild(
-        () => ref.read(_$isLoadingPagination.notifier).state = true);
+      () => ref.read(_$isLoadingPagination.notifier).state = true,
+      mounted,
+    );
     const pageSize = 30;
     final currentMeals = ref.read(_$loadedMeals);
 
