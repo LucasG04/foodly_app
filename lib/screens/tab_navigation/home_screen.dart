@@ -310,6 +310,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
           message: 'premium_gifted_msg_message'
               .tr(args: [kAppName, user.premiumGiftedMonths.toString()]),
         ).show(context),
+        mounted,
       );
       if (user.id != null) {
         FoodlyUserService.setPremiumGiftedMessageShown(user.id!);

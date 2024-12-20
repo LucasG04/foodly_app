@@ -46,7 +46,10 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
   @override
   void initState() {
     super.initState();
-    BasicUtils.afterBuild(() => _initialSearch());
+    BasicUtils.afterBuild(
+      () => _initialSearch(),
+      mounted,
+    );
   }
 
   @override
