@@ -290,6 +290,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
   }
 
   Future<void> _checkPremiumGiftedStatusAndMessage() async {
+    if (!mounted) {
+      return;
+    }
+
     final user = ref.read(userProvider);
     if (user == null) {
       return;
