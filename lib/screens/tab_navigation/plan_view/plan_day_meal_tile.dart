@@ -41,16 +41,15 @@ class PlanDayMealTile extends ConsumerStatefulWidget {
 
 class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
   final _$voteIsLoading = AutoDisposeStateProvider<bool>((_) => false);
-  late Future<Meal?> _mealFuture;
 
-  @override
-  void initState() {
-    super.initState();
-    _mealFuture = MealService.getMealById(widget.planMeal.meal);
-  }
+  /// Keeping track of the meal future and id in state to avoid unnecessary rebuilds
+  /// They will be set in the build method and it will be checked if the meal is the same or not
+  String? _mealFutureId;
+  Future<Meal?>? _mealFuture;
 
   @override
   Widget build(BuildContext context) {
+    _setMealFuture();
     return Container(
       margin: const EdgeInsets.symmetric(vertical: kPadding / 2),
       child: widget.planMeal.meal.startsWith(kPlaceholderSymbol)
@@ -216,6 +215,14 @@ class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
           ),
       ],
     );
+  }
+
+  void _setMealFuture() {
+    if (_mealFutureId == widget.planMeal.meal) {
+      return;
+    }
+    _mealFutureId = widget.planMeal.meal;
+    _mealFuture = MealService.getMealById(widget.planMeal.meal);
   }
 
   void _voteMeal(String? planId, String userId) async {
