@@ -71,7 +71,7 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
                         IconButton(
                           onPressed: () => _showOptionsSheet(plan),
                           icon: const Icon(EvaIcons.moreHorizontalOutline),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -173,14 +173,26 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
       });
     }
 
-    // apply updates to firebase collection
-    if (planMeals != updatedMeals) {
+    // apply updates to firebase collection if lists are not equal
+    if (!_arePlanMealListsEqual(planMeals, updatedMeals)) {
       Future.wait(
         updatedMeals.map((e) => PlanService.updatePlanMealFromPlan(plan.id, e)),
       );
     }
 
     return days;
+  }
+
+  bool _arePlanMealListsEqual(List<PlanMeal> a, List<PlanMeal> b) {
+    if (a.length != b.length) {
+      return false;
+    }
+    for (var i = 0; i < a.length; i++) {
+      if (a[i].id != b[i].id) {
+        return false;
+      }
+    }
+    return true;
   }
 
   void _openDownloadModal(Plan plan) {

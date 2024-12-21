@@ -49,7 +49,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
         .stream
         .listen((_) => _changePage())
         .canceledBy(this);
-    _checkPremiumGiftedStatusAndMessage();
+
+    Future.delayed(const Duration(seconds: 1), () {
+      _checkPremiumGiftedStatusAndMessage();
+    });
   }
 
   @override
