@@ -33,7 +33,7 @@ class AppReviewService {
       yield planMealCount >= 20 &&
           groceryCount >= 50 &&
           mealCreatedCount >= 5 &&
-          _timeSinceLastReviewRequest.inDays >= 30;
+          _timeSinceLastReviewRequest.inDays >= 60;
     }
   }
 
