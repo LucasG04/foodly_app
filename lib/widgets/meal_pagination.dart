@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants.dart';
 import '../models/meal.dart';
 import '../screens/tab_navigation/meal_list_view/meal_list_tile.dart';
+import '../utils/debouncer.dart';
 import 'small_circular_progress_indicator.dart';
 import 'user_information.dart';
 
@@ -37,8 +38,8 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
   late StateProvider<bool> _$isLoadingPagination;
   late StateProvider<List<Meal>> _$loadedMeals;
 
+  final Debouncer _scrollDepouncer = Debouncer(milliseconds: 50);
   bool _paginationAtEnd = false;
-  Timer? _debounce;
 
   @override
   void initState() {
@@ -47,14 +48,14 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
     _$loadedMeals = StateProvider<List<Meal>>((_) => []);
 
     _loadNextMeals().then((_) => ref.read(_$isLoading.notifier).state = false);
-    widget.scrollController.addListener(_scrollListener);
+    widget.scrollController
+        .addListener(() => _scrollDepouncer.run(_scrollListener));
     super.initState();
   }
 
   @override
   void dispose() {
     widget.scrollController.dispose();
-    _debounce?.cancel();
     super.dispose();
   }
 
@@ -133,16 +134,11 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
       return;
     }
 
-    if (_debounce?.isActive ?? false) {
-      _debounce?.cancel();
+    final loadNew = widget.scrollController.offset >=
+        widget.scrollController.position.maxScrollExtent * 0.7;
+    if (loadNew) {
+      _loadNextMeals();
     }
-    _debounce = Timer(const Duration(milliseconds: 50), () {
-      final loadNew = widget.scrollController.offset >=
-          widget.scrollController.position.maxScrollExtent * 0.7;
-      if (loadNew) {
-        _loadNextMeals();
-      }
-    });
   }
 
   Future<void> _loadNextMeals() async {
