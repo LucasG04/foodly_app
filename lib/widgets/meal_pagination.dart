@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants.dart';
 import '../models/meal.dart';
 import '../screens/tab_navigation/meal_list_view/meal_list_tile.dart';
-import '../utils/basic_utils.dart';
 import 'small_circular_progress_indicator.dart';
 import 'user_information.dart';
 
@@ -37,6 +38,7 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
   late StateProvider<List<Meal>> _$loadedMeals;
 
   bool _paginationAtEnd = false;
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -52,6 +54,7 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
   @override
   void dispose() {
     widget.scrollController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -129,28 +132,34 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
     if (_paginationAtEnd) {
       return;
     }
-    final loadNew = widget.scrollController.offset >=
-        widget.scrollController.position.maxScrollExtent * 0.7;
 
-    if (!loadNew) {
-      return;
+    if (_debounce?.isActive ?? false) {
+      _debounce?.cancel();
     }
-    _loadNextMeals();
+    _debounce = Timer(const Duration(milliseconds: 50), () {
+      final loadNew = widget.scrollController.offset >=
+          widget.scrollController.position.maxScrollExtent * 0.7;
+      if (loadNew) {
+        _loadNextMeals();
+      }
+    });
   }
 
   Future<void> _loadNextMeals() async {
+    final isLoading = ref.read(_$isLoading);
+    final refIsLoadingPagination = ref.read(_$isLoadingPagination.notifier);
+    final refLoadedMeals = ref.read(_$loadedMeals.notifier);
     if (!mounted) {
       return;
     }
-    BasicUtils.afterBuild(
-      () => ref.read(_$isLoadingPagination.notifier).state = true,
-      mounted,
-    );
+    if (!isLoading) {
+      // don't show page loading indicator if full is loading
+      refIsLoadingPagination.state = true;
+    }
     const pageSize = 30;
-    final currentMeals = ref.read(_$loadedMeals);
 
     final nextMeals = await widget.loadNextMeals(
-      currentMeals.isEmpty ? null : currentMeals.last.id,
+      refLoadedMeals.state.isEmpty ? null : refLoadedMeals.state.last.id,
     );
 
     _paginationAtEnd = nextMeals.length < pageSize;
@@ -159,7 +168,9 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
       return;
     }
 
-    ref.read(_$loadedMeals.notifier).state = [...currentMeals, ...nextMeals];
-    ref.read(_$isLoadingPagination.notifier).state = false;
+    refLoadedMeals.state = [...refLoadedMeals.state, ...nextMeals];
+    if (!isLoading) {
+      refIsLoadingPagination.state = false;
+    }
   }
 }
