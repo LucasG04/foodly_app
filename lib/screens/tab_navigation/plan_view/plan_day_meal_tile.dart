@@ -244,7 +244,6 @@ class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
             title: 'plan_ingredients_to_list'.tr(),
             icon: EvaIcons.fileAddOutline,
             onTap: () async {
-              // Navigator.of(context).pop();
               WidgetUtils.showFoodlyBottomSheet<void>(
                 scrollable: true,
                 context: context,

@@ -37,6 +37,7 @@ class _MealListViewState extends ConsumerState<MealListView>
 
   final ScrollController _scrollController = ScrollController();
   final Debouncer _searchDebouncer = Debouncer(milliseconds: 500);
+  final Debouncer _scrollDepouncer = Debouncer(milliseconds: 50);
   bool _paginationAtEnd = false;
 
   @override
@@ -52,7 +53,7 @@ class _MealListViewState extends ConsumerState<MealListView>
 
     _loadNextMeals(ref)
         .then((_) => ref.read(_$isLoading.notifier).state = false);
-    _scrollController.addListener(_scrollListener);
+    _scrollController.addListener(() => _scrollDepouncer.run(_scrollListener));
     _listenForMealsChange(ref);
     super.initState();
   }
@@ -311,13 +312,14 @@ class _MealListViewState extends ConsumerState<MealListView>
   }
 
   Future<void> _loadNextMeals(WidgetRef ref) async {
-    ref.read(_$isLoadingPagination.notifier).state = true;
+    final refIsLoadingPagination = ref.read(_$isLoadingPagination.notifier);
+    refIsLoadingPagination.state = true;
     const pageSize = 30;
-    final currentMeals = ref.read(_$loadedMeals);
+    final refMeals = ref.read(_$loadedMeals.notifier);
 
     final nextMeals = await MealService.getMealsPaginated(
       ref.read(planProvider)!.id!,
-      lastMealId: currentMeals.isEmpty ? null : currentMeals.last.id,
+      lastMealId: refMeals.state.isEmpty ? null : refMeals.state.last.id,
       amount: pageSize, // ignore: avoid_redundant_argument_values
     );
 
@@ -327,8 +329,8 @@ class _MealListViewState extends ConsumerState<MealListView>
       return;
     }
 
-    ref.read(_$loadedMeals.notifier).state = [...currentMeals, ...nextMeals];
-    ref.read(_$isLoadingPagination.notifier).state = false;
+    refMeals.state = [...refMeals.state, ...nextMeals];
+    refIsLoadingPagination.state = false;
   }
 
   bool _paginationActive() {
@@ -339,7 +341,8 @@ class _MealListViewState extends ConsumerState<MealListView>
   }
 
   void _refreshMeals() async {
-    ref.read(_$isLoading.notifier).state = true;
+    final refIsLoading = ref.read(_$isLoading.notifier);
+    refIsLoading.state = true;
     ref.read(_$loadedMeals.notifier).state = [];
     ref.read(_$filteredMeals.notifier).state = [];
     ref.read(_$isLoadingPagination.notifier).state = false;
@@ -349,18 +352,16 @@ class _MealListViewState extends ConsumerState<MealListView>
     if (!mounted) {
       return;
     }
-    ref.read(_$isLoading.notifier).state = false;
+    refIsLoading.state = false;
   }
 
   void _listenForMealsChange(WidgetRef ref) {
+    final stream = ref.read(lastChangedMealProvider.notifier).stream;
     BasicUtils.afterBuild(
-      () => ref
-          .read(lastChangedMealProvider.notifier)
-          .stream
+      () => stream
           .where((mealId) => mealId != null)
           .listen((_) => _refreshMeals())
           .canceledBy(this),
-      mounted,
     );
   }
 }

@@ -20,14 +20,11 @@ import 'small_number_input.dart';
 
 class AddToShoppingListModal extends ConsumerStatefulWidget {
   final String? mealId;
-  final Meal? meal;
 
   const AddToShoppingListModal({
     this.mealId,
-    this.meal,
     Key? key,
-  })  : assert(mealId != null || meal != null),
-        super(key: key);
+  }) : super(key: key);
 
   @override
   _AddToShoppingListModalState createState() => _AddToShoppingListModalState();
@@ -48,27 +45,21 @@ class _AddToShoppingListModalState
   @override
   void initState() {
     super.initState();
-    if (_isMealValid()) {
-      _ingredientStates = _getIngredientStates(widget.meal!);
-    } else {
-      BasicUtils.afterBuild(
-        () {
-          ref.read(_$loadingData.notifier).state = true;
-          MealService.getMealById(widget.mealId!).then((value) {
-            if (value != null) {
-              _ingredientStates = _getIngredientStates(value);
-              _mealServings = value.servings;
-              BasicUtils.afterBuild(
-                () => ref.read(_$servings.notifier).state = _mealServings!,
-                mounted,
-              );
-              ref.read(_$loadingData.notifier).state = false;
-            }
-          });
-        },
-        mounted,
-      );
-    }
+    BasicUtils.afterBuild(
+      () {
+        ref.read(_$loadingData.notifier).state = true;
+        MealService.getMealById(widget.mealId!).then((value) {
+          if (value != null) {
+            _ingredientStates = _getIngredientStates(value);
+            _mealServings = value.servings;
+            BasicUtils.afterBuild(
+              () => ref.read(_$servings.notifier).state = _mealServings!,
+            );
+            ref.read(_$loadingData.notifier).state = false;
+          }
+        });
+      },
+    );
   }
 
   @override
@@ -102,25 +93,22 @@ class _AddToShoppingListModalState
             ],
           ),
           const SizedBox(height: kPadding / 2),
-          if (_isMealValid())
-            _buildIngredientCheckList()
-          else
-            Consumer(builder: (context, ref, _) {
-              final loadState = ref.watch(_$loadingData);
-              if (loadState) {
-                return _buildSingleChildWrapper(
-                  context: context,
-                  child: const SmallCircularProgressIndicator(),
-                );
-              } else if (_ingredientStates != null &&
-                  _ingredientStates!.isNotEmpty) {
-                return _buildIngredientCheckList();
-              }
+          Consumer(builder: (context, ref, _) {
+            final loadState = ref.watch(_$loadingData);
+            if (loadState) {
               return _buildSingleChildWrapper(
                 context: context,
-                child: Text('try_again_later'.tr()),
+                child: const SmallCircularProgressIndicator(),
               );
-            }),
+            } else if (_ingredientStates != null &&
+                _ingredientStates!.isNotEmpty) {
+              return _buildIngredientCheckList();
+            }
+            return _buildSingleChildWrapper(
+              context: context,
+              child: Text('try_again_later'.tr()),
+            );
+          }),
           Consumer(
             builder: (context, ref, _) => MainButton(
               height: 40.0,
@@ -217,12 +205,6 @@ class _AddToShoppingListModalState
 
   void _close() {
     Navigator.pop(context);
-  }
-
-  bool _isMealValid() {
-    return widget.meal != null &&
-        widget.meal!.ingredients != null &&
-        widget.meal!.ingredients!.isNotEmpty;
   }
 
   List<IngredientState> _getIngredientStates(Meal meal) {

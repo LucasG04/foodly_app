@@ -207,17 +207,17 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   }
 
   Future<void> _loadActivePlan() async {
-    final currentPlan = ref.read(planProvider);
-    if (currentPlan == null) {
+    final refPlanProvider = ref.read(planProvider.notifier);
+    final refInitLoading = ref.read(initialPlanLoadingProvider.notifier);
+    if (refPlanProvider.state == null) {
       final String? planId = await PlanService.getCurrentPlanId();
-
       if (planId != null && planId.isNotEmpty) {
         FirebaseCrashlytics.instance.setCustomKey('planId', planId);
         final Plan? newPlan = await PlanService.getPlanById(planId);
         if (!mounted) {
           return;
         }
-        ref.read(planProvider.notifier).state = newPlan;
+        refPlanProvider.state = newPlan;
         FirebaseCrashlytics.instance.setCustomKey('planId', newPlan?.id ?? '-');
         FirebaseCrashlytics.instance
             .setCustomKey('planCode', newPlan?.code ?? '-');
@@ -225,37 +225,36 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     }
 
     BasicUtils.afterBuild(
-      () => ref.read(initialPlanLoadingProvider.notifier).state = false,
-      mounted,
+      () => refInitLoading.state = false,
     );
   }
 
   Future<void> _loadActiveUser() async {
+    final refInitLoading = ref.read(initialUserLoadingProvider.notifier);
+    final refUserProvider = ref.read(userProvider.notifier);
     final firebaseUser = AuthenticationService.currentUser;
     if (firebaseUser != null) {
       FirebaseCrashlytics.instance.setUserIdentifier(firebaseUser.uid);
       FirebaseCrashlytics.instance.setCustomKey('userId', firebaseUser.uid);
       final FoodlyUser? user =
           await FoodlyUserService.getUserById(firebaseUser.uid);
-      if (!mounted || user == null) {
+      if (user == null) {
         return;
       }
-      ref.read(userProvider.notifier).state = user;
+      refUserProvider.state = user;
       await InAppPurchaseService.setUserId(user.id!);
       _checkPremiumStatus();
       _checkUserSubsription();
     } else {
       FirebaseCrashlytics.instance.setUserIdentifier('');
       BasicUtils.afterBuild(
-        () => ref.read(userProvider.notifier).state = null,
-        mounted,
+        () => refUserProvider.state = null,
       );
       _handleInitUniLink = false;
     }
 
     BasicUtils.afterBuild(
-      () => ref.read(initialUserLoadingProvider.notifier).state = false,
-      mounted,
+      () => refInitLoading.state = false,
     );
   }
 

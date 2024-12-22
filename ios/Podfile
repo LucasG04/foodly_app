@@ -1,5 +1,6 @@
 # Uncomment this line to define a global platform for your project
 platform :ios, '14.0'
+$FirebaseSDKVersion = '11.4.0' # See Podfile.lock at Firebase/Firestore for the current version
 
 # Analytics
 $FirebaseAnalyticsWithoutAdIdSupport = true
@@ -39,6 +40,10 @@ target 'Runner' do
   target 'ReceiveShare' do
     inherit! :search_paths
   end
+
+  Pod::UI.puts "Using user specified Firebase SDK version for FirebaseFirestore framework: '#{$FirebaseSDKVersion}'"
+  firebase_sdk_version = $FirebaseSDKVersion
+  pod 'FirebaseFirestore', :git => 'https://github.com/invertase/firestore-ios-sdk-frameworks.git', :tag => "#{firebase_sdk_version}"
 end
 
 post_install do |installer|

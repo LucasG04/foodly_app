@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants.dart';
 import '../models/meal.dart';
 import '../screens/tab_navigation/meal_list_view/meal_list_tile.dart';
-import '../utils/basic_utils.dart';
+import '../utils/debouncer.dart';
 import 'small_circular_progress_indicator.dart';
 import 'user_information.dart';
 
@@ -36,6 +38,7 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
   late StateProvider<bool> _$isLoadingPagination;
   late StateProvider<List<Meal>> _$loadedMeals;
 
+  final Debouncer _scrollDepouncer = Debouncer(milliseconds: 50);
   bool _paginationAtEnd = false;
 
   @override
@@ -45,7 +48,8 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
     _$loadedMeals = StateProvider<List<Meal>>((_) => []);
 
     _loadNextMeals().then((_) => ref.read(_$isLoading.notifier).state = false);
-    widget.scrollController.addListener(_scrollListener);
+    widget.scrollController
+        .addListener(() => _scrollDepouncer.run(_scrollListener));
     super.initState();
   }
 
@@ -126,31 +130,33 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
   }
 
   void _scrollListener() {
-    if (_paginationAtEnd) {
+    final isLoading = ref.read(_$isLoading) || ref.read(_$isLoadingPagination);
+    if (isLoading || _paginationAtEnd) {
       return;
     }
+
     final loadNew = widget.scrollController.offset >=
         widget.scrollController.position.maxScrollExtent * 0.7;
-
-    if (!loadNew) {
-      return;
+    if (loadNew) {
+      _loadNextMeals();
     }
-    _loadNextMeals();
   }
 
   Future<void> _loadNextMeals() async {
+    final isLoading = ref.read(_$isLoading);
+    final refIsLoadingPagination = ref.read(_$isLoadingPagination.notifier);
+    final refLoadedMeals = ref.read(_$loadedMeals.notifier);
     if (!mounted) {
       return;
     }
-    BasicUtils.afterBuild(
-      () => ref.read(_$isLoadingPagination.notifier).state = true,
-      mounted,
-    );
+    if (!isLoading) {
+      // don't show page loading indicator if full is loading
+      refIsLoadingPagination.state = true;
+    }
     const pageSize = 30;
-    final currentMeals = ref.read(_$loadedMeals);
 
     final nextMeals = await widget.loadNextMeals(
-      currentMeals.isEmpty ? null : currentMeals.last.id,
+      refLoadedMeals.state.isEmpty ? null : refLoadedMeals.state.last.id,
     );
 
     _paginationAtEnd = nextMeals.length < pageSize;
@@ -159,7 +165,9 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
       return;
     }
 
-    ref.read(_$loadedMeals.notifier).state = [...currentMeals, ...nextMeals];
-    ref.read(_$isLoadingPagination.notifier).state = false;
+    refLoadedMeals.state = [...refLoadedMeals.state, ...nextMeals];
+    if (!isLoading) {
+      refIsLoadingPagination.state = false;
+    }
   }
 }

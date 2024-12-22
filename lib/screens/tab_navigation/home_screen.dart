@@ -290,21 +290,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
   }
 
   Future<void> _checkPremiumGiftedStatusAndMessage() async {
+    if (!mounted) {
+      return;
+    }
+
     final user = ref.read(userProvider);
-    if (user == null) {
+    if (user == null || user.id == null) {
       return;
     }
 
     final userHasBoughtPremium =
         await InAppPurchaseService.getUserIsSubscribed();
-    if (userHasBoughtPremium && user.id != null) {
+    if (userHasBoughtPremium) {
       FoodlyUserService.resetPremiumGifted(user.id!);
       return;
     }
 
     final showMessage =
         user.isPremiumGifted == true && user.premiumGiftedMessageShown != true;
-    if (showMessage) {
+    if (showMessage && mounted) {
       BasicUtils.afterBuild(
         () => MainSnackbar(
           isSuccess: true,
@@ -313,11 +317,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
           message: 'premium_gifted_msg_message'
               .tr(args: [kAppName, user.premiumGiftedMonths.toString()]),
         ).show(context),
-        mounted,
       );
-      if (user.id != null) {
-        FoodlyUserService.setPremiumGiftedMessageShown(user.id!);
-      }
+      FoodlyUserService.setPremiumGiftedMessageShown(user.id!);
     }
   }
 }
