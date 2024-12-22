@@ -130,7 +130,8 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
   }
 
   void _scrollListener() {
-    if (_paginationAtEnd) {
+    final isLoading = ref.read(_$isLoading) || ref.read(_$isLoadingPagination);
+    if (isLoading || _paginationAtEnd) {
       return;
     }
 
