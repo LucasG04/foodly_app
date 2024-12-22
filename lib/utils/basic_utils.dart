@@ -63,12 +63,8 @@ class BasicUtils {
     ref.read(lastChangedMealProvider.notifier).state = id;
   }
 
-  static void afterBuild(void Function() callback, [bool? mounted]) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted == null || mounted) {
-        callback();
-      }
-    });
+  static void afterBuild(void Function() callback) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => callback());
   }
 
   /// Retuns the current language (e.g., "en").

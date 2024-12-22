@@ -48,7 +48,6 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
     super.initState();
     BasicUtils.afterBuild(
       () => _initialSearch(),
-      mounted,
     );
   }
 
@@ -262,6 +261,10 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
   }
 
   void _initialSearch() {
+    if (!mounted) {
+      return;
+    }
+
     final initialSearch = ref.read(initSearchWebImagePickerProvider);
     if (initialSearch.isEmpty) {
       return;
