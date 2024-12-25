@@ -162,8 +162,20 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                   ),
                   Center(
                     child: TextButton(
-                      onPressed: () =>
-                          ShoppingListService.deleteAllBoughtGrocery(listId),
+                      onPressed: () async {
+                        ShoppingListService.deleteAllBoughtGrocery(
+                          listId,
+                        );
+                        // scroll one pixel up with _scrollController to avoid ui bug
+                        Future.delayed(
+                          const Duration(milliseconds: 250),
+                          () => _scrollController.animateTo(
+                            _scrollController.offset - 1,
+                            duration: const Duration(milliseconds: 1),
+                            curve: Curves.easeInOut,
+                          ),
+                        );
+                      },
                       style: ButtonStyle(
                         shadowColor: WidgetStateProperty.all<Color>(
                           Theme.of(context).colorScheme.error,
