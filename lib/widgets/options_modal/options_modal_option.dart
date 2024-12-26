@@ -26,9 +26,12 @@ class OptionsSheetOptions extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(kRadius),
-          color:
-              Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.06) ??
-                  Colors.black.withOpacity(0.06),
+          color: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.color
+                  ?.withValues(alpha: 0.06) ??
+              Colors.black.withValues(alpha: 0.06),
         ),
         padding: const EdgeInsets.all(kPadding),
         child: Row(

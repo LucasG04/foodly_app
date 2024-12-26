@@ -73,8 +73,9 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                         BoxShadow(
                           offset: const Offset(0, 1),
                           blurRadius: 1,
-                          color:
-                              Theme.of(context).primaryColor.withOpacity(0.16),
+                          color: Theme.of(context)
+                              .primaryColor
+                              .withValues(alpha: 0.16),
                         )
                       ]
                     : [],

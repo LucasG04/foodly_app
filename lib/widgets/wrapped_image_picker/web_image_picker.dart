@@ -250,7 +250,7 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
         borderRadius: const BorderRadius.all(Radius.circular(4.0)),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4.0,
             offset: const Offset(0.0, 4.0),
           ),
