@@ -56,7 +56,7 @@ class NewVersionModal extends ConsumerStatefulWidget {
       deviceLanguageCode,
     );
 
-    if (versions == null || versions.isEmpty) {
+    if (versions == null || versions.isEmpty || !context.mounted) {
       return;
     }
 
