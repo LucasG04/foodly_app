@@ -165,7 +165,8 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal> {
           : Theme.of(context).scaffoldBackgroundColor,
       selected: isSelected,
       selectedColor: Theme.of(context).primaryColor,
-      selectedShadowColor: Theme.of(context).primaryColor.withOpacity(0.3),
+      selectedShadowColor:
+          Theme.of(context).primaryColor.withValues(alpha: 0.3),
       onSelected: (selected) {
         if (selected) {
           ref.read(mealTagFilterProvider.notifier).state = [

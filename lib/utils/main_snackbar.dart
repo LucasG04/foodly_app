@@ -84,7 +84,7 @@ class MainSnackbar {
               Center(
                 child: Text(
                   _getCountdownText(value),
-                  textScaleFactor: 0.85,
+                  textScaler: const TextScaler.linear(0.85),
                   style: TextStyle(
                     color: Theme.of(context).dialogBackgroundColor,
                   ),

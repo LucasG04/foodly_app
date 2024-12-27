@@ -181,7 +181,10 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                           Theme.of(context).colorScheme.error,
                         ),
                         overlayColor: WidgetStateProperty.all<Color>(
-                          Theme.of(context).colorScheme.error.withOpacity(0.1),
+                          Theme.of(context)
+                              .colorScheme
+                              .error
+                              .withValues(alpha: 0.1),
                         ),
                       ),
                       child: Text(

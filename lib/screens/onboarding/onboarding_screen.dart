@@ -100,7 +100,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       );
     } else {
       final popSucceeded = await AutoRouter.of(context).pop();
-      if (!popSucceeded && mounted) {
+      if (!popSucceeded && context.mounted) {
         AutoRouter.of(context).replace(const HomeScreenRoute());
       }
     }

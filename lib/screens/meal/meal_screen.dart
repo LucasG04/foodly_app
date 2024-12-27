@@ -213,7 +213,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                                             .textTheme
                                             .bodyLarge!
                                             .color!
-                                            .withOpacity(0.5),
+                                            .withValues(alpha: 0.5),
                                       ),
                                     ),
                                   ],

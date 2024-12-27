@@ -107,7 +107,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   .toList(),
                               onChanged: (Locale? locale) async {
                                 await context.setLocale(locale!);
-                                if (mounted) {
+                                if (context.mounted) {
                                   Phoenix.rebirth(context);
                                 }
                               },
@@ -352,7 +352,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             onTap: () async {
                               await AuthenticationService.resetPassword(
                                   firebaseUser!.email!);
-                              if (!mounted) {
+                              if (!context.mounted) {
                                 return;
                               }
                               MainSnackbar(
