@@ -42,6 +42,8 @@ class MealService {
   static Future<Meal?> getMealById(String mealId) async {
     _log.finer('Call getMeals with $mealId');
     try {
+      // escape forward slashes
+      mealId = mealId.replaceAll('/', '%2F');
       final doc = await _firestore.doc(mealId).get();
 
       return doc.exists ? doc.data() : null;
@@ -106,6 +108,8 @@ class MealService {
   static Future<void> deleteMeal(String mealId) async {
     _log.finer('Call deleteMeal with $mealId');
     try {
+      // escape forward slashes
+      mealId = mealId.replaceAll('/', '%2F');
       await _firestore.doc(mealId).delete();
     } catch (e) {
       _log.severe('ERR: deleteMeal with $mealId', e);
