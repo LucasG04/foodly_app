@@ -95,6 +95,8 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
     return Image.asset(
       'assets/images/food_fallback.png',
       fit: widget.boxFit,
+      width: double.infinity,
+      height: double.infinity,
     );
   }
 
