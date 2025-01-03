@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -11,6 +10,7 @@ import '../../providers/state_providers.dart';
 import '../../services/link_metadata_service.dart';
 import '../../services/lunix_api_service.dart';
 import '../../utils/basic_utils.dart';
+import '../foodly_network_image.dart';
 import '../main_text_field.dart';
 import '../skeleton_container.dart';
 import '../small_circular_progress_indicator.dart';
@@ -221,26 +221,10 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
         onTap: () => _selectImage(url),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(kRadius),
-          child: ExtendedImage.network(
-            url,
-            fit: BoxFit.cover,
-            loadStateChanged: (state) =>
-                state.extendedImageLoadState == LoadState.failed
-                    ? _buildErrorWidget()
-                    : state.extendedImageLoadState == LoadState.loading
-                        ? const SkeletonContainer(
-                            width: double.infinity,
-                            height: double.infinity,
-                          )
-                        : state.completedWidget,
-          ),
+          child: FoodlyNetworkImage(url),
         ),
       ),
     );
-  }
-
-  Widget _buildErrorWidget() {
-    return Image.asset('assets/images/food_fallback.png');
   }
 
   Widget _buildImageContainer({required Widget child}) {

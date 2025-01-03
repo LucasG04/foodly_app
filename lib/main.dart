@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -30,6 +29,7 @@ import 'providers/state_providers.dart';
 import 'services/app_review_service.dart';
 import 'services/authentication_service.dart';
 import 'services/foodly_user_service.dart';
+import 'services/image_cache_manager.dart';
 import 'services/in_app_purchase_service.dart';
 import 'services/link_metadata_service.dart';
 import 'services/lunix_api_service.dart';
@@ -101,7 +101,7 @@ Future<void> initializeHive() async {
     AppReviewService.initialize(),
     PlanService.initialize(),
     InAppPurchaseService.initialize(),
-    FastCachedImageConfig.init(clearCacheAfter: const Duration(days: 14)),
+    ImageCacheManager.initialize(),
   ]);
 }
 

@@ -96,10 +96,6 @@ dependencies:
   like_button: ^2.0.5
   blur: ^4.0.0
   sticky_headers: ^0.3.0+2
-  # fast_cached_network_image: ^1.2.0
-  fast_cached_network_image:
-    git:
-      url: https://github.com/LucasG04/fast_cached_network_image.git
   custom_rating_bar: ^3.0.0
 
   # Icons/Styles/Animations
