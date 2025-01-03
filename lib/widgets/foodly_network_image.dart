@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -50,9 +52,13 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
     }
 
     try {
-      final response = await _dio.get(imageUrl,
-          options: Options(responseType: ResponseType.bytes));
-      if (response.statusCode == 200 && response.data != null) {
+      final response = await _dio.get(
+        imageUrl,
+        options: Options(responseType: ResponseType.bytes),
+      );
+      if (response.statusCode == 200 &&
+          response.data != null &&
+          await _isValidImage(response.data)) {
         ImageCacheManager.put(url, response.data);
         return response.data;
       } else {
@@ -61,6 +67,21 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
     } catch (e) {
       // Handle network errors gracefully
       throw Exception('Error loading image from $imageUrl: $e');
+    }
+  }
+
+  /// Checks if the given image data is a valid image by attempting to decode it
+  Future<bool> _isValidImage(Uint8List? image) async {
+    if (image == null) {
+      return false;
+    }
+
+    try {
+      final codec = await instantiateImageCodec(image, targetWidth: 32);
+      final frameInfo = await codec.getNextFrame();
+      return frameInfo.image.width > 0;
+    } catch (e) {
+      return false;
     }
   }
 
@@ -85,7 +106,7 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
           }
 
           return AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
+            duration: const Duration(milliseconds: 400),
             child: child,
           );
         },
