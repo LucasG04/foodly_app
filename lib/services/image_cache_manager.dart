@@ -37,12 +37,14 @@ class ImageCacheManager {
 
   /// Evict the least recently used item
   static void _evictLRUItem() {
-    final String lruKey = accessTimeMap.entries
-        .reduce((a, b) => a.value.isBefore(b.value) ? a : b)
-        .key;
+    if (accessTimeMap.isNotEmpty) {
+      final String lruKey = accessTimeMap.entries
+          .reduce((a, b) => a.value.isBefore(b.value) ? a : b)
+          .key;
 
-    imageCache.delete(lruKey);
-    accessTimeMap.remove(lruKey);
+      imageCache.delete(lruKey);
+      accessTimeMap.remove(lruKey);
+    }
   }
 
   /// Evict images that are older than 7 days
