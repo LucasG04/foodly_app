@@ -1,6 +1,8 @@
-import 'package:fast_cached_network_image/fast_cached_network_image.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../services/image_cache_manager.dart';
 import '../services/storage_service.dart';
 import '../utils/basic_utils.dart';
 import 'skeleton_container.dart';
@@ -20,36 +22,63 @@ class FoodlyNetworkImage extends StatefulWidget {
 }
 
 class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
-  String? _cachedImageUrl;
+  final Dio _dio = Dio();
+  late Future<Uint8List?> _imageFuture;
 
   @override
   void initState() {
     super.initState();
-    if (BasicUtils.isStorageMealImage(widget.imageUrl)) {
-      StorageService.getMealImageUrl(widget.imageUrl).then((url) {
-        if (mounted) {
-          setState(() => _cachedImageUrl = url);
-        }
-      });
-    } else {
-      _cachedImageUrl = widget.imageUrl;
+    _imageFuture = _loadImage(widget.imageUrl);
+  }
+
+  Future<Uint8List?> _loadImage(String url) async {
+    // Attempt to load the image from the cache first
+    final cachedImage = ImageCacheManager.get(url);
+    if (cachedImage != null) {
+      return cachedImage;
+    }
+
+    // Determine the actual image URL based on the type of URL
+    String imageUrl = url;
+    if (BasicUtils.isStorageMealImage(url)) {
+      final storageUrl = await StorageService.getMealImageUrl(url);
+      if (storageUrl != null) {
+        imageUrl = storageUrl;
+      } else {
+        throw Exception('Storage URL could not be retrieved for $url');
+      }
+    }
+
+    try {
+      final response = await _dio.get(imageUrl,
+          options: Options(responseType: ResponseType.bytes));
+      if (response.statusCode == 200) {
+        ImageCacheManager.put(url, response.data);
+        return response.data;
+      } else {
+        throw Exception('Failed to load image: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle network errors gracefully
+      throw Exception('Error loading image from $imageUrl: $e');
     }
   }
 
   @override
-  Widget build(BuildContext context) => _cachedImageUrl == null
-      ? _buildLoader()
-      : _buildCachedImage(_cachedImageUrl!);
-
-  FastCachedImage _buildCachedImage(String imageUrl) {
-    return FastCachedImage(
-      url: imageUrl,
-      fit: widget.boxFit,
-      errorBuilder: (_, __, ___) => _buildFallbackImage(),
-      loadingBuilder: (_, __) => _buildLoader(),
-      disableErrorLogs: true,
-    );
-  }
+  Widget build(BuildContext context) => FutureBuilder<Uint8List?>(
+        future: _imageFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return _buildLoader();
+          } else if (snapshot.hasError) {
+            return _buildFallbackImage();
+          } else if (snapshot.hasData) {
+            return Image.memory(snapshot.data!, fit: widget.boxFit);
+          } else {
+            return _buildFallbackImage();
+          }
+        },
+      );
 
   Image _buildFallbackImage() {
     return Image.asset(
