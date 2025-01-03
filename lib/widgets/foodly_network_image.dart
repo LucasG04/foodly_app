@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -75,8 +77,9 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
     }
 
     try {
-      await decodeImageFromList(image);
-      return true;
+      final codec = await instantiateImageCodec(image, targetWidth: 32);
+      final frameInfo = await codec.getNextFrame();
+      return frameInfo.image.width > 0;
     } catch (e) {
       return false;
     }
