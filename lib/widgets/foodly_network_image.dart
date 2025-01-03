@@ -52,7 +52,7 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
     try {
       final response = await _dio.get(imageUrl,
           options: Options(responseType: ResponseType.bytes));
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 && response.data != null) {
         ImageCacheManager.put(url, response.data);
         return response.data;
       } else {
@@ -68,15 +68,26 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
   Widget build(BuildContext context) => FutureBuilder<Uint8List?>(
         future: _imageFuture,
         builder: (context, snapshot) {
+          Widget child;
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return _buildLoader();
+            child = _buildLoader();
           } else if (snapshot.hasError) {
-            return _buildFallbackImage();
+            child = _buildFallbackImage();
           } else if (snapshot.hasData) {
-            return Image.memory(snapshot.data!, fit: widget.boxFit);
+            child = Image.memory(
+              snapshot.data!,
+              fit: widget.boxFit,
+              width: double.infinity,
+              height: double.infinity,
+            );
           } else {
-            return _buildFallbackImage();
+            child = _buildFallbackImage();
           }
+
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: child,
+          );
         },
       );
 
