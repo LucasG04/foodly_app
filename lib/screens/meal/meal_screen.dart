@@ -583,7 +583,9 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
   Future<void> _fetchStats() async {
     final result =
         await MealStatService.getStat(ref.read(planProvider)!.id!, widget.id);
-    ref.read(_$mealStat.notifier).state = result;
+    if (mounted) {
+      ref.read(_$mealStat.notifier).state = result;
+    }
   }
 
   void _checkOwnerOfMeal() {
