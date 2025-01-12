@@ -10,11 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:uni_links/uni_links.dart';
 
@@ -91,8 +90,7 @@ void main() {
 }
 
 Future<void> initializeHive() async {
-  final dir = await getApplicationDocumentsDirectory();
-  Hive.init(dir.path);
+  await Hive.initFlutter();
   Hive.registerAdapter(LinkMetadataAdapter());
   await Future.wait<dynamic>([
     SettingsService.initialize(),
