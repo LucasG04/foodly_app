@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import '../services/image_cache_manager.dart';
 import '../services/storage_service.dart';
@@ -24,6 +25,7 @@ class FoodlyNetworkImage extends StatefulWidget {
 }
 
 class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
+  final _log = Logger('FoodlyNetworkImage');
   final Dio _dio = Dio();
   late Future<Uint8List?> _imageFuture;
 
@@ -47,6 +49,7 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
       if (storageUrl != null) {
         imageUrl = storageUrl;
       } else {
+        _log.severe('Storage URL could not be retrieved for $url');
         throw Exception('Storage URL could not be retrieved for $url');
       }
     }
@@ -65,7 +68,6 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
         throw Exception('Failed to load image: ${response.statusCode}');
       }
     } catch (e) {
-      // Handle network errors gracefully
       throw Exception('Error loading image from $imageUrl: $e');
     }
   }
@@ -96,6 +98,7 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
             child = _buildFallbackImage();
           } else if (snapshot.hasData) {
             child = Image.memory(
+              key: const ValueKey(0),
               snapshot.data!,
               fit: widget.boxFit,
               width: double.infinity,
@@ -115,6 +118,7 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
   Image _buildFallbackImage() {
     return Image.asset(
       'assets/images/food_fallback.png',
+      key: const ValueKey(1),
       fit: widget.boxFit,
       width: double.infinity,
       height: double.infinity,
@@ -123,6 +127,7 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
 
   SkeletonContainer _buildLoader() {
     return const SkeletonContainer(
+      key: ValueKey(2),
       width: double.infinity,
       height: double.infinity,
     );

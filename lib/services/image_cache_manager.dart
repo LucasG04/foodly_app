@@ -1,7 +1,7 @@
 import 'dart:collection';
 import 'dart:typed_data';
 
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class ImageCacheManager {
   ImageCacheManager._();
