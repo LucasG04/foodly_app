@@ -98,6 +98,7 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
             child = _buildFallbackImage();
           } else if (snapshot.hasData) {
             child = Image.memory(
+              key: const ValueKey(0),
               snapshot.data!,
               fit: widget.boxFit,
               width: double.infinity,
@@ -117,6 +118,7 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
   Image _buildFallbackImage() {
     return Image.asset(
       'assets/images/food_fallback.png',
+      key: const ValueKey(1),
       fit: widget.boxFit,
       width: double.infinity,
       height: double.infinity,
@@ -125,6 +127,7 @@ class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
 
   SkeletonContainer _buildLoader() {
     return const SkeletonContainer(
+      key: ValueKey(2),
       width: double.infinity,
       height: double.infinity,
     );
