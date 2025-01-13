@@ -626,11 +626,13 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) => OptionsSheet(options: [
-        OptionsSheetOptions(
-          title: 'meal_details_share_meal'.tr(),
-          icon: EvaIcons.shareOutline,
-          onTap: () => _shareMeal(meal),
-        ),
+        Builder(builder: (ctx) {
+          return OptionsSheetOptions(
+            title: 'meal_details_share_meal'.tr(),
+            icon: EvaIcons.shareOutline,
+            onTap: () => _shareMeal(meal, ctx),
+          );
+        }),
         OptionsSheetOptions(
           title: 'meal_details_add_to_plan'.tr(),
           icon: EvaIcons.fileAddOutline,
@@ -676,11 +678,13 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     });
   }
 
-  void _shareMeal(Meal meal) {
+  void _shareMeal(Meal meal, BuildContext ctx) {
     final langCode = context.locale.languageCode;
+    final box = ctx.findRenderObject() as RenderBox?;
     Share.share(
       '${meal.name} - $kAppWebBaseUrl/meal/${meal.id}?lang=$langCode',
       subject: meal.name,
+      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
     );
   }
 
