@@ -248,13 +248,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             trailing:
                                 const Icon(EvaIcons.arrowIosForwardOutline),
                           ),
-                          SettingsTile(
-                            onTap: () => _shareCode(plan.code!, plan.locked),
-                            leadingIcon: EvaIcons.shareOutline,
-                            text: 'settings_section_plan_share'
-                                .tr(args: [plan.code!]),
-                            trailing:
-                                const Icon(EvaIcons.arrowIosForwardOutline),
+                          Builder(
+                            builder: (BuildContext ctx) => SettingsTile(
+                              onTap: () =>
+                                  _shareCode(plan.code!, plan.locked, ctx),
+                              leadingIcon: EvaIcons.shareOutline,
+                              text: 'settings_section_plan_share'
+                                  .tr(args: [plan.code!]),
+                              trailing:
+                                  const Icon(EvaIcons.arrowIosForwardOutline),
+                            ),
                           ),
                           SettingsTile(
                             onTap: () => _changePlanCode(plan),
@@ -519,17 +522,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     await SettingsService.setShoppingListSort(sort);
   }
 
-  void _shareCode(String code, bool? isPlanLocked) async {
+  void _shareCode(String code, bool? isPlanLocked, BuildContext ctx) async {
     if (isPlanLocked != null && isPlanLocked) {
       MainSnackbar(
         message: 'settings_share_plan_locked'.tr(),
         infinite: true,
-      ).show(context);
+      ).show(ctx);
       return;
     }
+    final box = ctx.findRenderObject() as RenderBox?;
     await Share.share(
       'settings_share_msg'.tr(args: [kAppName, code, kAppDownloadUrl]),
       subject: 'settings_share_msg_short'.tr(args: [kAppName, code]),
+      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
     );
     FirebaseAnalytics.instance.logEvent(name: 'share_code');
   }

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
-import 'options_modal_option.dart';
 
 class OptionsSheet extends StatelessWidget {
-  final List<OptionsSheetOptions> options;
+  final List<Widget> options;
   const OptionsSheet({
     required this.options,
     Key? key,

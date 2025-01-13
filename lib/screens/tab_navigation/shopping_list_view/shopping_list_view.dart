@@ -210,9 +210,11 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
         text: 'shopping_list_title'.tr(),
         checkConnectivity: true,
         actions: [
-          IconButton(
-            onPressed: () => _shareList(todoItems),
-            icon: const Icon(EvaIcons.shareOutline),
+          Builder(
+            builder: (BuildContext ctx) => IconButton(
+              onPressed: () => _shareList(todoItems, ctx),
+              icon: const Icon(EvaIcons.shareOutline),
+            ),
           ),
         ],
       ),
@@ -319,12 +321,12 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
     );
   }
 
-  void _shareList(List<Grocery> groceries) {
+  void _shareList(List<Grocery> groceries, BuildContext ctx) {
     if (groceries.isEmpty) {
       MainSnackbar(
         message: 'shopping_list_share_error'.tr(),
         isError: true,
-      ).show(context);
+      ).show(ctx);
       return;
     }
     final shareText = SettingsService.shoppingListSort == ShoppingListSort.name
@@ -333,7 +335,12 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
     final subject = shareText
         .substring(0, shareText.length > 50 ? 50 : shareText.length)
         .trim();
-    Share.share(shareText, subject: '$subject...');
+    final box = ctx.findRenderObject() as RenderBox?;
+    Share.share(
+      shareText,
+      subject: '$subject...',
+      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+    );
   }
 
   String _getShareTextSortByNames(List<Grocery> groceries) {
