@@ -2,17 +2,26 @@ import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:logging/logging.dart';
 
 class ImageCacheManager {
   ImageCacheManager._();
 
+  static final _log = Logger('ImageCacheManager');
   static const int maxCacheSize = 50;
   static const Duration cacheExpiration = Duration(days: 7);
   static late Box imageCache;
   static final LinkedHashMap<String, DateTime> accessTimeMap = LinkedHashMap();
 
   static Future<void> initialize() async {
-    imageCache = await Hive.openBox('imageCache');
+    const boxName = 'imageCache';
+    try {
+      imageCache = await Hive.openBox(boxName);
+    } catch (e) {
+      _log.severe('Failed to open $boxName box: $e');
+      await Hive.deleteBoxFromDisk(boxName);
+      imageCache = await Hive.openBox(boxName);
+    }
   }
 
   static Uint8List? get(String url) {
