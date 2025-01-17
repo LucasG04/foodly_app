@@ -404,7 +404,9 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
 
   void _listenForInternetConnection() async {
     InternetConnectionChecker.instance.hasConnection.then((result) {
-      ref.read(hasConnectionProvider.notifier).state = result;
+      if (mounted) {
+        ref.read(hasConnectionProvider.notifier).state = result;
+      }
     });
 
     InternetConnectionChecker.instance.onStatusChange.listen((_) async {
