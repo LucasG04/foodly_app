@@ -1,5 +1,5 @@
 import 'dart:collection';
-import 'dart:convert'; // Für die Base64-Kodierung und -Dekodierung
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:firebase_performance/firebase_performance.dart';
