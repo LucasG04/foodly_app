@@ -10,7 +10,6 @@ class VersionService {
   static final _log = Logger('ShoppingListService');
 
   static late Box _settingsBox;
-  static bool _isReady = false;
 
   static final CollectionReference<FoodlyVersion> _firestore = FirebaseFirestore
       .instance
@@ -23,10 +22,7 @@ class VersionService {
   static Future initialize() async {
     _log.fine('Initializing');
     _settingsBox = await Hive.openBox<dynamic>('verison');
-    _isReady = true;
   }
-
-  static bool get isReady => _isReady;
 
   static String? get lastCheckedVersion =>
       _settingsBox.get('lastCheckedVersion') as String?;

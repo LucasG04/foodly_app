@@ -12,20 +12,16 @@ class SettingsService {
   SettingsService._();
 
   static late Box _settingsBox;
-  static bool _isReady = false;
   static WidgetRef? _ref;
 
   static Future initialize() async {
     _settingsBox = await Hive.openBox<dynamic>('settings');
-    _isReady = true;
   }
 
   // ignore: use_setters_to_change_properties
   static void setRef(WidgetRef ref) {
     _ref = ref;
   }
-
-  static bool get isReady => _isReady;
 
   static bool get isFirstUsage =>
       _settingsBox.get('firstUsage', defaultValue: true) as bool;
