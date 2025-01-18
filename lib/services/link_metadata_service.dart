@@ -10,15 +10,11 @@ class LinkMetadataService {
   static final log = Logger('LinkMetadataService');
 
   static late Box<LinkMetadata> _dataBox;
-  static bool _isReady = false;
 
   static Future initialize() async {
     _dataBox = await Hive.openBox('linkmetadata');
-    _isReady = true;
     log.finer('initialized');
   }
-
-  static bool get isReady => _isReady;
 
   static Future<LinkMetadata?> get(String link) async {
     log.finer('Call getFromApi with $link');
