@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:firebase_performance/firebase_performance.dart';
@@ -25,18 +26,16 @@ class ImageCacheManager {
     }
 
     // delete old image box
-    try {
-      await Hive.deleteBoxFromDisk('imageCache2');
-    } catch (e) {
-      _log.fine('Could not delete old imageCache box', e);
-    }
+    Hive.deleteBoxFromDisk('imageCache2')
+        .catchError((e) => _log.fine('Could not delete old imageCache box', e));
   }
 
   static Uint8List? get(String url) {
+    final key = _toKey(url);
     _evictExpiredItems(); // Evict expired items before returning the cached image
-    if (imageCache.containsKey(url)) {
-      accessTimeMap[url] = DateTime.now();
-      return imageCache.get(url);
+    if (imageCache.containsKey(key)) {
+      accessTimeMap[key] = DateTime.now();
+      return imageCache.get(key);
     }
     return null;
   }
@@ -51,9 +50,14 @@ class ImageCacheManager {
       _evictLRUItem(); // Evict LRU if cache is full
     }
 
-    imageCache.put(url, imageBytes);
-    accessTimeMap[url] = DateTime.now();
+    final key = _toKey(url);
+    imageCache.put(key, imageBytes);
+    accessTimeMap[key] = DateTime.now();
     timeTrace.stop();
+  }
+
+  static String _toKey(String url) {
+    return base64UrlEncode(utf8.encode(url));
   }
 
   /// Evict the least recently used item
