@@ -16,7 +16,14 @@ class ImageCacheManager {
   static final LinkedHashMap<String, DateTime> accessTimeMap = LinkedHashMap();
 
   static Future<void> initialize() async {
-    imageCache = await Hive.openBox('imageCache2');
+    try {
+      imageCache = await Hive.openBox('imageCache2');
+    } catch (e) {
+      await Hive.deleteBoxFromDisk('imageCache2');
+      _log.severe('Could not open imageCache2 box', e);
+    } finally {
+      imageCache = await Hive.openBox('imageCache2');
+    }
 
     // delete old image box
     try {
