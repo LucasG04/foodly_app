@@ -16,22 +16,26 @@ class ImageCacheManager {
   static final LinkedHashMap<String, DateTime> accessTimeMap = LinkedHashMap();
 
   static Future<void> initialize() async {
-    imageCache = await Hive.openBox('imageCache2');
+    try {
+      imageCache = await Hive.openBox('imageCache');
+    } catch (e) {
+      await Hive.deleteBoxFromDisk('imageCache');
+      _log.severe('Could not open imageCache box', e);
+    } finally {
+      imageCache = await Hive.openBox('imageCache');
+    }
 
     // delete old image box
-    try {
-      await Hive.deleteBoxFromDisk('imageCache');
-    } catch (e) {
-      _log.fine('Could not delete old imageCache box', e);
-    }
+    Hive.deleteBoxFromDisk('imageCache2')
+        .catchError((e) => _log.fine('Could not delete old imageCache box', e));
   }
 
   static Uint8List? get(String url) {
+    final key = _toKey(url);
     _evictExpiredItems(); // Evict expired items before returning the cached image
-    if (imageCache.containsKey(url)) {
-      accessTimeMap[url] = DateTime.now();
-      final String base64String = imageCache.get(url);
-      return base64Decode(base64String);
+    if (imageCache.containsKey(key)) {
+      accessTimeMap[key] = DateTime.now();
+      return imageCache.get(key);
     }
     return null;
   }
@@ -46,10 +50,14 @@ class ImageCacheManager {
       _evictLRUItem(); // Evict LRU if cache is full
     }
 
-    final String base64String = base64Encode(imageBytes);
-    imageCache.put(url, base64String);
-    accessTimeMap[url] = DateTime.now();
+    final key = _toKey(url);
+    imageCache.put(key, imageBytes);
+    accessTimeMap[key] = DateTime.now();
     timeTrace.stop();
+  }
+
+  static String _toKey(String url) {
+    return base64UrlEncode(utf8.encode(url));
   }
 
   /// Evict the least recently used item
