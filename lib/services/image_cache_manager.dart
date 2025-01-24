@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -6,36 +5,42 @@ import 'package:firebase_performance/firebase_performance.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logging/logging.dart';
 
+import '../models/cached_image.dart';
+
 class ImageCacheManager {
   ImageCacheManager._();
 
   static final _log = Logger('ImageCacheManager');
   static const int maxCacheSize = 50;
   static const Duration cacheExpiration = Duration(days: 7);
-  static late Box imageCache;
-  static final LinkedHashMap<String, DateTime> accessTimeMap = LinkedHashMap();
+  static late Box<CachedImage> imageCache;
 
   static Future<void> initialize() async {
     try {
-      imageCache = await Hive.openBox('imageCache');
+      imageCache = await Hive.openBox<CachedImage>('imageCache3');
     } catch (e) {
-      await Hive.deleteBoxFromDisk('imageCache');
       _log.severe('Could not open imageCache box', e);
     } finally {
-      imageCache = await Hive.openBox('imageCache');
+      imageCache = await Hive.openBox<CachedImage>('imageCache3');
     }
-
-    // delete old image box
-    Hive.deleteBoxFromDisk('imageCache2')
-        .catchError((e) => _log.fine('Could not delete old imageCache box', e));
   }
 
   static Uint8List? get(String url) {
     final key = _toKey(url);
-    _evictExpiredItems(); // Evict expired items before returning the cached image
+    _evictExpiredItems();
+
     if (imageCache.containsKey(key)) {
-      accessTimeMap[key] = DateTime.now();
-      return imageCache.get(key);
+      final cachedImage = imageCache.get(key);
+      if (cachedImage != null) {
+        imageCache.put(
+          key,
+          CachedImage(
+            imageBytes: cachedImage.imageBytes,
+            lastAccessed: DateTime.now(),
+          ),
+        );
+        return cachedImage.imageBytes;
+      }
     }
     return null;
   }
@@ -44,15 +49,20 @@ class ImageCacheManager {
     final timeTrace =
         FirebasePerformance.instance.newTrace('ImageCacheManager-put');
     timeTrace.start();
-    _evictExpiredItems(); // Evict expired items before adding a new one
+    _evictExpiredItems();
 
     if (imageCache.length >= maxCacheSize) {
-      _evictLRUItem(); // Evict LRU if cache is full
+      _evictLRUItem();
     }
 
     final key = _toKey(url);
-    imageCache.put(key, imageBytes);
-    accessTimeMap[key] = DateTime.now();
+    imageCache.put(
+      key,
+      CachedImage(
+        imageBytes: imageBytes,
+        lastAccessed: DateTime.now(),
+      ),
+    );
     timeTrace.stop();
   }
 
@@ -62,27 +72,25 @@ class ImageCacheManager {
 
   /// Evict the least recently used item
   static void _evictLRUItem() {
-    if (accessTimeMap.isNotEmpty) {
-      final String lruKey = accessTimeMap.entries
-          .reduce((a, b) => a.value.isBefore(b.value) ? a : b)
-          .key;
+    if (imageCache.isNotEmpty) {
+      final lruKey = imageCache.keys.cast<String>().reduce((a, b) {
+        final aLastAccessed = imageCache.get(a)?.lastAccessed ?? DateTime.now();
+        final bLastAccessed = imageCache.get(b)?.lastAccessed ?? DateTime.now();
+        return aLastAccessed.isBefore(bLastAccessed) ? a : b;
+      });
 
       imageCache.delete(lruKey);
-      accessTimeMap.remove(lruKey);
     }
   }
 
   /// Evict images that are older than 7 days
   static void _evictExpiredItems() {
     final now = DateTime.now();
-    final expiredKeys = accessTimeMap.entries
-        .where((entry) => now.difference(entry.value) > cacheExpiration)
-        .map((entry) => entry.key)
-        .toList();
-
-    for (final key in expiredKeys) {
-      imageCache.delete(key);
-      accessTimeMap.remove(key);
-    }
+    final expiredKeys = imageCache.keys.cast<String>().where((key) {
+      final cachedImage = imageCache.get(key);
+      return cachedImage != null &&
+          now.difference(cachedImage.lastAccessed) > cacheExpiration;
+    }).toList();
+    expiredKeys.forEach(imageCache.delete);
   }
 }
