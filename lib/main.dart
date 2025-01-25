@@ -20,7 +20,6 @@ import 'package:uni_links/uni_links.dart';
 
 import 'app_router.gr.dart';
 import 'constants.dart';
-import 'models/cached_image.dart';
 import 'models/foodly_user.dart';
 import 'models/link_metadata.dart';
 import 'models/plan.dart';
@@ -95,7 +94,6 @@ void main() {
 Future<void> initializeHive() async {
   await Hive.initFlutter();
   Hive.registerAdapter(LinkMetadataAdapter());
-  Hive.registerAdapter(CachedImageAdapter());
   await Future.wait<dynamic>([
     SettingsService.initialize(),
     LinkMetadataService.initialize(),
