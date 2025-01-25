@@ -5,6 +5,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
@@ -46,6 +47,7 @@ Future<void> _configureFirebase() async {
   await Firebase.initializeApp();
   if (foundation.kDebugMode) {
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
+    await FirebasePerformance.instance.setPerformanceCollectionEnabled(false);
   } else {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     await FirebaseAppCheck.instance.activate(
