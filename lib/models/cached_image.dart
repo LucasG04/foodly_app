@@ -1,16 +1,23 @@
 import 'dart:typed_data';
 
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:objectbox/objectbox.dart';
 
-part 'cached_image.g.dart';
-
-@HiveType(typeId: 2)
+@Entity()
 class CachedImage {
-  @HiveField(0)
-  final Uint8List imageBytes;
+  int id;
 
-  @HiveField(1)
-  final DateTime lastAccessed;
+  @Unique(onConflict: ConflictStrategy.replace)
+  String url;
 
-  CachedImage({required this.imageBytes, required this.lastAccessed});
+  @Property(type: PropertyType.byteVector)
+  Uint8List imageBytes;
+
+  DateTime lastAccessed;
+
+  CachedImage({
+    this.id = 0,
+    required this.url,
+    required this.imageBytes,
+    required this.lastAccessed,
+  });
 }

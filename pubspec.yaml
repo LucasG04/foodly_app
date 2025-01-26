@@ -64,6 +64,8 @@ dependencies:
   internet_connection_checker: ^3.0.1
   uni_links: ^0.5.1
   keep_screen_on: ^3.0.0
+  objectbox: ^4.0.3
+  objectbox_flutter_libs: any
 
   # Firebase
   cloud_firestore: ^5.4.1
@@ -113,11 +115,12 @@ dev_dependencies:
     sdk: flutter
   lints: ^2.0.0
   # build runner via: `dart run build_runner build --delete-conflicting-outputs`
-  build_runner: ^2.4.6
+  build_runner: ^2.4.13
   auto_route_generator: ^5.0.3
   hive_generator: ^2.0.1
   flutter_launcher_icons: ^0.9.0
   envied_generator: ^0.3.0+3
+  objectbox_generator: any
 
 # dependency_overrides:
 #   platform: ^3.1.0
