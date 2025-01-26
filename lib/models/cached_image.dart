@@ -1,8 +1,23 @@
 import 'dart:typed_data';
 
-class CachedImage {
-  final Uint8List imageBytes;
-  final DateTime lastAccessed;
+import 'package:objectbox/objectbox.dart';
 
-  CachedImage({required this.imageBytes, required this.lastAccessed});
+@Entity()
+class CachedImage {
+  int id;
+
+  @Unique(onConflict: ConflictStrategy.replace)
+  String url;
+
+  @Property(type: PropertyType.byteVector)
+  Uint8List imageBytes;
+
+  DateTime lastAccessed;
+
+  CachedImage({
+    this.id = 0,
+    required this.url,
+    required this.imageBytes,
+    required this.lastAccessed,
+  });
 }
