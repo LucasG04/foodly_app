@@ -151,7 +151,8 @@ class ImageCacheManager {
 
     final query = _imageBox
         .query(
-            CachedImage_.lastAccessed.lessThan(cutoff.millisecondsSinceEpoch))
+          CachedImage_.lastAccessed.lessThan(cutoff.millisecondsSinceEpoch),
+        )
         .build();
 
     final expiredItems = query.find();

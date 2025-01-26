@@ -103,6 +103,16 @@ Future<void> initializeHive() async {
     InAppPurchaseService.initialize(),
     ImageCacheManager.initialize(),
   ]);
+
+  // clean up old boxes
+  try {
+    Hive.deleteBoxFromDisk('imageCache');
+    Hive.deleteBoxFromDisk('imageCache2');
+    Hive.deleteBoxFromDisk('imageCache3');
+  } catch (e) {
+    // ignore: avoid_print
+    print('Error while cleaning up old boxes: $e');
+  }
 }
 
 class FoodlyApp extends ConsumerStatefulWidget {
