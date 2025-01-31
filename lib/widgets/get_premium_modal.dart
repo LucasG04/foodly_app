@@ -316,7 +316,9 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
   Future<void> _restorePurchase() async {
     ref.read(_$purchaseState.notifier).state = _PurchaseState.pending;
     final success = await InAppPurchaseService.restore();
-    await _handlePurchase(success);
+    if (mounted) {
+      await _handlePurchase(success);
+    }
   }
 
   Future<void> _subscribeToPremium() async {
@@ -325,7 +327,9 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
     final products = InAppPurchaseService.products;
     if (products.isNotEmpty) {
       final success = await InAppPurchaseService.buy(products[index]);
-      await _handlePurchase(success);
+      if (mounted) {
+        await _handlePurchase(success);
+      }
     } else {
       ref.read(_$purchaseState.notifier).state = _PurchaseState.none;
     }
