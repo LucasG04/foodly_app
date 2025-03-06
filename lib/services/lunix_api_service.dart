@@ -33,8 +33,8 @@ class LunixApiService {
   static String get _lunixApiKey =>
       SettingsService.useDevApi ? Env.lunixApiKeyDev : Env.lunixApiKey;
   static String get apiEndpoint => SettingsService.useDevApi
-      ? 'https://lunix-api-dev.herokuapp.com/foodly'
-      : 'https://lunix-api.herokuapp.com/foodly';
+      ? 'https://lunix-api-dev.golenia.dev/foodly'
+      : 'https://lunix-api.golenia.dev/foodly';
 
   static Future<bool> lunixApiAvailable() async {
     Response? response;
