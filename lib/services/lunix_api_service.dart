@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -25,7 +26,11 @@ class LunixApiService {
   static final _log = Logger('LunixApiService');
   static final Dio _dio = Dio(
     BaseOptions(
-      headers: <String, dynamic>{'x-api-key': _lunixApiKey},
+      headers: <String, dynamic>{
+        'x-api-key': _lunixApiKey,
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('${Env.lunixAuthUsername}:${Env.lunixAuthPassword}'))}'
+      },
     ),
   );
 

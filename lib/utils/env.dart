@@ -17,4 +17,10 @@ abstract class Env {
 
   @EnviedField(varName: 'REVENUECAT_GOOGLE_KEY', obfuscate: true)
   static final String revenuecatGoogleKey = _Env.revenuecatGoogleKey;
+
+  @EnviedField(varName: 'LUNIX_AUTH_USERNAME', obfuscate: true)
+  static final String lunixAuthUsername = _Env.lunixAuthUsername;
+
+  @EnviedField(varName: 'LUNIX_AUTH_PASSWORD', obfuscate: true)
+  static final String lunixAuthPassword = _Env.lunixAuthPassword;
 }
