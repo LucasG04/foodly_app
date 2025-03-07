@@ -31,6 +31,9 @@ class MainSnackbar {
 
   /// Show the snackbar.
   Future<dynamic> show(BuildContext context) {
+    if (!context.mounted) {
+      return Future.value();
+    }
     return Flushbar<dynamic>(
       margin: const EdgeInsets.all(8),
       borderRadius: BorderRadius.circular(10.0),

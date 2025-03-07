@@ -17,6 +17,9 @@ class WidgetUtils {
     bool scrollable = false,
     bool unfocus = true,
   }) {
+    if (!context.mounted) {
+      return Future.value();
+    }
     if (unfocus) {
       FocusScope.of(context).unfocus();
     }
@@ -42,6 +45,9 @@ class WidgetUtils {
     String initialText = '',
     bool required = true,
   }) async {
+    if (!context.mounted) {
+      return Future.value();
+    }
     final result = await showTextInputDialog(
       context: context,
       textFields: [

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -25,7 +26,11 @@ class LunixApiService {
   static final _log = Logger('LunixApiService');
   static final Dio _dio = Dio(
     BaseOptions(
-      headers: <String, dynamic>{'x-api-key': _lunixApiKey},
+      headers: <String, dynamic>{
+        'x-api-key': _lunixApiKey,
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('${Env.lunixAuthUsername}:${Env.lunixAuthPassword}'))}'
+      },
     ),
   );
 
@@ -33,8 +38,8 @@ class LunixApiService {
   static String get _lunixApiKey =>
       SettingsService.useDevApi ? Env.lunixApiKeyDev : Env.lunixApiKey;
   static String get apiEndpoint => SettingsService.useDevApi
-      ? 'https://lunix-api-dev.herokuapp.com/foodly'
-      : 'https://lunix-api.herokuapp.com/foodly';
+      ? 'https://lunix-api-dev.golenia.dev/foodly'
+      : 'https://lunix-api.golenia.dev/foodly';
 
   static Future<bool> lunixApiAvailable() async {
     Response? response;
