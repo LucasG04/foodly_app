@@ -8,13 +8,13 @@ import 'models/shopping_list_sort.dart';
 final kAppName = Platform.isIOS || Platform.isMacOS ? 'Foodster' : 'Foodly';
 const kPlaceholderSymbol = 'p--';
 const kChefkochShareEndpoint = 'https://www.chefkoch.de/rezepte';
-const kAppDownloadUrl = 'https://golenia.dev';
+const kAppDownloadUrl = 'https://lunix.golenia.dev';
 final kAppPrivacyUrl = Platform.isIOS || Platform.isMacOS
-    ? 'https://golenia.dev/privacy/foodster.html'
-    : 'https://golenia.dev/privacy/foodly.html';
+    ? 'https://lunix.golenia.dev/privacy/foodster.html'
+    : 'https://lunix.golenia.dev/privacy/foodly.html';
 final kAppTermsOfUseUrl = Platform.isIOS || Platform.isMacOS
-    ? 'https://golenia.dev/eula/foodster.html'
-    : 'https://golenia.dev/eula/foodly.html';
+    ? 'https://lunix.golenia.dev/eula/foodster.html'
+    : 'https://lunix.golenia.dev/eula/foodly.html';
 const kAppWebBaseUrl = 'https://foodly.golenia.dev';
 
 /// Styling
