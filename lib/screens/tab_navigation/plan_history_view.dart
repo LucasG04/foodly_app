@@ -158,23 +158,7 @@ class PlanHistoryDaysNotifier extends AsyncNotifier<List<PlanDay>> {
           .where((element) => DateUtils.isSameDay(element.date, date))
           .toList();
       days.add(PlanDay(date, mealsForDay));
-
-      // TODO: Ensure meal dates are consistent (though they should be already)
-      // This part might be redundant if PlanService returns correct dates
-      // for (final element in mealsForDay) {
-      //   element.date = date;
-      // }
     }
-
-    // TODO: check if equal check is correct
-    // final differentIds = !meals.every(
-    //   (meal) => updatedMeals.any((updatedMeal) => updatedMeal.id == meal.id),
-    // );
-    // if (differentIds) {
-    //   for (final meal in updatedMeals) {
-    //     PlanService.updateHistoryPlanMealFromPlan(plan.id, meal);
-    //   }
-    // }
 
     return days;
   }
