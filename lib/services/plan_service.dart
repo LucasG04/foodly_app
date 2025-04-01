@@ -205,6 +205,20 @@ class PlanService {
     return _firestore.doc(planId).collection('meals').doc(mealId).delete();
   }
 
+  static Future<void> deletePlanMealFromHistroy(
+      String? planId, String? mealId) {
+    if (planId == null || mealId == null) {
+      return Future.value();
+    }
+    _log.finer(
+        'Call deletePlanMealFromHistroy with planId: $planId | mealId: $mealId');
+    return _firestore
+        .doc(planId)
+        .collection('mealHistory')
+        .doc(mealId)
+        .delete();
+  }
+
   static Future<void> addPlanMealToPlanHistory(
       String planId, PlanMeal planMeal) async {
     _log.finer(

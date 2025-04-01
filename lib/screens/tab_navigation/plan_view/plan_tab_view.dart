@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -165,19 +163,19 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
     for (var i = 0; i < 8; i++) {
       final date = today.add(Duration(days: i));
       days.add(
-        PlanDay(date,
-            updatedMeals.where((element) => element.date == date).toList()),
+        PlanDay(
+            date,
+            updatedMeals
+                .where((element) => DateUtils.isSameDay(element.date, date))
+                .toList()),
       );
-      updatedMeals.where((element) => element.date == date).forEach((element) {
-        element.date = date;
-      });
     }
 
     // apply updates to firebase collection if lists are not equal
     if (!_arePlanMealListsEqual(planMeals, updatedMeals)) {
-      Future.wait(
-        updatedMeals.map((e) => PlanService.updatePlanMealFromPlan(plan.id, e)),
-      );
+      for (final meal in updatedMeals) {
+        PlanService.updatePlanMealFromPlan(plan.id, meal);
+      }
     }
 
     return days;
