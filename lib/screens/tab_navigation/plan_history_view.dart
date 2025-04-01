@@ -61,15 +61,13 @@ class _PlanHistoryViewState extends ConsumerState<PlanHistoryView> {
         ),
         data: (planDays) {
           if (!initialScrolledDown && planDays.isNotEmpty) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
+            BasicUtils.afterBuild(() {
               if (_scrollController.hasClients &&
                   _scrollController.position.maxScrollExtent > 0) {
                 _scrollController
                     .jumpTo(_scrollController.position.maxScrollExtent);
               }
-              if (mounted) {
-                initialScrolledDown = true;
-              }
+              initialScrolledDown = true;
             });
           }
 
