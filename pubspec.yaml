@@ -119,7 +119,7 @@ dev_dependencies:
   auto_route_generator: ^5.0.3
   hive_generator: ^2.0.1
   flutter_launcher_icons: ^0.14.0
-  envied_generator: ^0.3.0+3
+  envied_generator: ^0.5.0
   objectbox_generator: any
 
 # dependency_overrides:
