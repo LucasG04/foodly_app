@@ -17,7 +17,7 @@ dependencies:
   # Util
   flutter_riverpod: ^2.1.1
   auto_route: ^5.0.4
-  intl: ^0.20.0
+  intl: ^0.19.0
   # see hive_ce for continued support; can't upgrade because of https://github.com/petercinibulk/envied/issues/125
   hive: ^2.2.3
   hive_flutter: ^1.1.0
@@ -42,7 +42,7 @@ dependencies:
   path_provider: ^2.1.4
   sign_in_with_apple: ^6.1.4
   crypto: ^3.0.5
-  easy_localization: ^3.0.0
+  easy_localization: ^3.0.7+1
   flutter_localized_locales: ^2.0.3
   # metadata_fetch: ^0.4.1
   metadata_fetch:
