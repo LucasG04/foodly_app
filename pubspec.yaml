@@ -42,7 +42,7 @@ dependencies:
   path_provider: ^2.1.4
   sign_in_with_apple: ^6.1.4
   crypto: ^3.0.5
-  easy_localization: ^3.0.0
+  easy_localization: ^3.0.7+1
   flutter_localized_locales: ^2.0.3
   # metadata_fetch: ^0.4.1
   metadata_fetch:
