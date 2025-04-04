@@ -38,7 +38,7 @@ jobs:
       - name: Build app
         run: flutter build ios --release --no-codesign
       - name: Deploy iOS Beta to TestFlight via Fastlane
-        uses: maierj/fastlane-action@v1.4.0
+        uses: maierj/fastlane-action@v3.1.0
         with:
           lane: closed_beta
           subdirectory: ios
@@ -103,7 +103,7 @@ jobs:
       - name: Build the AAB
         run: flutter build appbundle
       - name: Run Fastlane
-        uses: maierj/fastlane-action@v1.4.0
+        uses: maierj/fastlane-action@v3.1.0
         with:
           lane: internal
           subdirectory: android
