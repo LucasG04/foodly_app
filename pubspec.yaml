@@ -31,7 +31,7 @@ dependencies:
   url_launcher: ^6.3.1
   another_flushbar: ^1.12.30
   share_plus: ^10.0.2
-  email_validator: ^2.0.1
+  email_validator: ^3.0.0
   logging: ^1.0.0
   # receive_sharing_intent: ^1.8.0
   receive_sharing_intent:
