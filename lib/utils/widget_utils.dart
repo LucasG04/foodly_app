@@ -21,7 +21,7 @@ class WidgetUtils {
       return Future.value();
     }
     if (unfocus) {
-      FocusScope.of(context).unfocus();
+      FocusManager.instance.primaryFocus?.unfocus();
     }
     return showBarModalBottomSheet<T>(
       shape: const RoundedRectangleBorder(

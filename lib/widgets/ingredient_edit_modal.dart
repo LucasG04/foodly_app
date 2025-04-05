@@ -16,7 +16,6 @@ import '../../../widgets/suggestion_tile.dart';
 import '../models/grocery.dart';
 import '../models/ingredient.dart';
 import '../services/in_app_purchase_service.dart';
-import 'get_premium_info.dart';
 
 class IngredientEditModal extends ConsumerStatefulWidget {
   final Ingredient ingredient;
@@ -100,30 +99,18 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal> {
                 height: ref.watch(_$suggestions).isNotEmpty ? kPadding : 0,
               );
             }),
-            Consumer(builder: (context, ref, __) {
-              return ref.watch(InAppPurchaseService.$userIsSubscribed)
-                  ? Consumer(builder: (_, ref, __) {
-                      return Wrap(
-                        spacing: kPadding / 2,
-                        runSpacing: kPadding / 2,
-                        children:
-                            ref.watch(_$suggestions).take(6).map((grocery) {
-                          return SuggestionTile(
-                            text: grocery.name.toString(),
-                            onTap: () => _applyGroceryFromSuggestion(grocery),
-                          );
-                        }).toList(),
-                      );
-                    })
-                  : Padding(
-                      padding: const EdgeInsets.only(top: kPadding / 2),
-                      child: GetPremiumInfo(
-                        title: 'get_premium_modal_1_title'.tr(),
-                        description: 'get_premium_modal_1_description_ad'.tr(),
-                        displayProbability: 0.25,
-                      ),
-                    );
-            }),
+            Consumer(
+              builder: (_, ref, __) => Wrap(
+                spacing: kPadding / 2,
+                runSpacing: kPadding / 2,
+                children: ref.watch(_$suggestions).take(6).map((grocery) {
+                  return SuggestionTile(
+                    text: grocery.name.toString(),
+                    onTap: () => _applyGroceryFromSuggestion(grocery),
+                  );
+                }).toList(),
+              ),
+            ),
             const SizedBox(height: kPadding / 2),
             Consumer(builder: (_, ref, __) {
               ref.watch(_$buttonState);
