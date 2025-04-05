@@ -82,7 +82,7 @@ dependencies:
   eva_icons_flutter: ^3.0.0
   extended_image: ^8.1.1
   group_list_view: ^1.1.1
-  adaptive_dialog: ^2.0.0
+  adaptive_dialog: ^2.4.1
   flutter_markdown: ^0.7.4+3
   auto_size_text: ^3.0.0
   # flutter_toggle_tab: ^0.0.5+4
