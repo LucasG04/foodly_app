@@ -21,10 +21,10 @@ packages:
     dependency: "direct main"
     description:
       name: adaptive_dialog
-      sha256: "910debe8766eff4b378ed5164bb470debb87c53a3bdf6adee03c79f64fbf7348"
+      sha256: "4cfd1567ba305c8df05499f2d6df8c19b0a20b31f35b1e58371f990eb9bfe987"
       url: "https://pub.dev"
     source: hosted
-    version: "1.10.1"
+    version: "2.4.1"
   analyzer:
     dependency: transitive
     description:
@@ -2023,4 +2023,4 @@ packages:
     version: "3.1.2"
 sdks:
   dart: ">=3.6.0 <4.0.0"
-  flutter: ">=3.24.0"
+  flutter: ">=3.27.0"
