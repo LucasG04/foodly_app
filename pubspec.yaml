@@ -106,7 +106,7 @@ dependencies:
   # Icons/Styles/Animations
   cupertino_icons: ^1.0.4
   flutter_staggered_animations: ^1.0.0
-  font_awesome_flutter: ^9.2.0
+  font_awesome_flutter: ^10.8.0
 
 dev_dependencies:
   integration_test:
