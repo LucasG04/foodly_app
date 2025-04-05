@@ -9,10 +9,10 @@ class PageCard extends StatelessWidget {
   final double height;
 
   const PageCard({
-    Key? key,
+    super.key,
     required this.page,
     required this.height,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

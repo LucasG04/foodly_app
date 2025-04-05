@@ -18,8 +18,8 @@ class MealListTitle extends StatefulWidget {
     required this.onSearch,
     required this.onSearchClose,
     required this.onRefresh,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<MealListTitle> createState() => _MealListTitleState();

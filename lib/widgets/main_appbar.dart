@@ -14,8 +14,8 @@ class MainAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.onPopRejected,
     this.actions,
     required this.scrollController,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<MainAppBar> createState() => _MainAppBarState();

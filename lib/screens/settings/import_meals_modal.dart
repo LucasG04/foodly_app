@@ -14,7 +14,7 @@ import '../../../widgets/small_circular_progress_indicator.dart';
 class ImportMealsModal extends StatelessWidget {
   final List<String?> planIds;
 
-  const ImportMealsModal(this.planIds, {Key? key}) : super(key: key);
+  const ImportMealsModal(this.planIds, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +88,7 @@ class ImportMealsModal extends StatelessWidget {
 class CopyPlanMealsTile extends ConsumerStatefulWidget {
   final Plan plan;
 
-  const CopyPlanMealsTile(this.plan, {Key? key}) : super(key: key);
+  const CopyPlanMealsTile(this.plan, {super.key});
 
   @override
   _CopyPlanMealsTileState createState() => _CopyPlanMealsTileState();

@@ -30,10 +30,10 @@ class PlanDayMealTile extends ConsumerStatefulWidget {
 
   const PlanDayMealTile(
     this.planMeal, {
-    Key? key,
+    super.key,
     this.enableVoting = false,
     this.readonly = false,
-  }) : super(key: key);
+  });
 
   @override
   PlanDayMealTileState createState() => PlanDayMealTileState();

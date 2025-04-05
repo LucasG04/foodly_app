@@ -12,8 +12,8 @@ class MarkdownEditor extends ConsumerStatefulWidget {
 
   const MarkdownEditor({
     required this.textEditingController,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _MarkdownEditorState createState() => _MarkdownEditorState();

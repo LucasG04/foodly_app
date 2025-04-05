@@ -20,8 +20,8 @@ class SettingsTile extends StatefulWidget {
     this.colorIcon,
     this.colorText,
     this.gradientBorder = false,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<SettingsTile> createState() => _SettingsTileState();

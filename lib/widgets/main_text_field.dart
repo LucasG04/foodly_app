@@ -54,13 +54,12 @@ class MainTextField extends ConsumerStatefulWidget {
     this.pasteFromClipboard = false,
     this.pasteValidator,
     this.submitOnPaste = false,
-    Key? key,
+    super.key,
   })  : assert(
             (obscureText && !pasteFromClipboard) ||
                 (!obscureText && pasteFromClipboard) ||
                 (!obscureText && !pasteFromClipboard),
-            'You cannot use both obscureText and pastFromClipboard'),
-        super(key: key);
+            'You cannot use both obscureText and pastFromClipboard');
 
   @override
   ConsumerState<MainTextField> createState() => _MainTextFieldState();

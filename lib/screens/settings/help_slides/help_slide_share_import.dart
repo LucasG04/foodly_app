@@ -9,7 +9,7 @@ import '../../../../models/page_data.dart';
 import '../../../../widgets/page_card.dart';
 
 class HelpSlideShareImport extends StatelessWidget {
-  HelpSlideShareImport({Key? key}) : super(key: key);
+  HelpSlideShareImport({super.key});
 
   final List<PageData> pages = [
     PageData(

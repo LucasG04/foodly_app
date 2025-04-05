@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../app_router.gr.dart';
 
 class UnknownRouteScreen extends StatelessWidget {
-  const UnknownRouteScreen({Key? key}) : super(key: key);
+  const UnknownRouteScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

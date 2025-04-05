@@ -7,7 +7,7 @@ class ButtonsTab extends StatefulWidget {
   /// Define attribute Widget and State
   ///
   const ButtonsTab({
-    Key? key,
+    super.key,
     this.title,
     this.onPressed,
     required this.width,
@@ -22,7 +22,7 @@ class ButtonsTab extends StatefulWidget {
     this.begin,
     this.end,
     this.marginSelected = EdgeInsets.zero,
-  }) : super(key: key);
+  });
 
   final String? title;
   final Function? onPressed;

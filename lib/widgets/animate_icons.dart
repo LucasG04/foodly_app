@@ -37,8 +37,7 @@ class AnimateIcons extends StatefulWidget {
 
       /// This is the tooltip that will be used for the [endIcon]
       this.endTooltip = '',
-      Key? key})
-      : super(key: key);
+      super.key});
   final IconData? startIcon, endIcon;
   final Duration duration;
   final bool clockwise;

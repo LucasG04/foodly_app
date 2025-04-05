@@ -13,7 +13,7 @@ import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
 
 class ChefkochImportModal extends ConsumerStatefulWidget {
-  const ChefkochImportModal({Key? key}) : super(key: key);
+  const ChefkochImportModal({super.key});
 
   @override
   ConsumerState<ChefkochImportModal> createState() =>

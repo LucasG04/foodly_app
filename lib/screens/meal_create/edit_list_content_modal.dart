@@ -21,8 +21,8 @@ class EditListContentModal extends ConsumerStatefulWidget {
     this.textFieldInfo = '',
     required this.selectedContent,
     required this.allContent,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _EditListContentModalState createState() => _EditListContentModalState();

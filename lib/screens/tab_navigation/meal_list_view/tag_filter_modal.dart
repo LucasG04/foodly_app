@@ -8,7 +8,7 @@ import '../../../services/lunix_api_service.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 
 class TagFilterModal extends ConsumerStatefulWidget {
-  const TagFilterModal({Key? key}) : super(key: key);
+  const TagFilterModal({super.key});
 
   @override
   _TagFilterModalState createState() => _TagFilterModalState();

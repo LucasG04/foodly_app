@@ -23,8 +23,8 @@ class AddToShoppingListModal extends ConsumerStatefulWidget {
 
   const AddToShoppingListModal({
     this.mealId,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _AddToShoppingListModalState createState() => _AddToShoppingListModalState();

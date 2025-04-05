@@ -24,7 +24,7 @@ import 'plan_download_modal.dart';
 import 'review_request_container.dart';
 
 class PlanTabView extends ConsumerStatefulWidget {
-  const PlanTabView({Key? key}) : super(key: key);
+  const PlanTabView({super.key});
   @override
   PlanTabViewState createState() => PlanTabViewState();
 }

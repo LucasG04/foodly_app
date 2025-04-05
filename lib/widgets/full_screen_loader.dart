@@ -10,10 +10,10 @@ class FullScreenLoader extends StatefulWidget {
   final Color loaderColor;
 
   const FullScreenLoader({
-    Key? key,
+    super.key,
     this.backgroundColor = Colors.black26,
     this.loaderColor = Colors.white,
-  }) : super(key: key);
+  });
 
   @override
   State<FullScreenLoader> createState() => _FullScreenLoaderState();

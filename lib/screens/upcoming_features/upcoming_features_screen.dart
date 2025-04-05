@@ -9,7 +9,7 @@ import '../../widgets/small_circular_progress_indicator.dart';
 import 'upcoming_feature_tile.dart';
 
 class UpcomingFeaturesScreen extends ConsumerStatefulWidget {
-  const UpcomingFeaturesScreen({Key? key}) : super(key: key);
+  const UpcomingFeaturesScreen({super.key});
 
   @override
   _UpcomingFeaturesScreenState createState() => _UpcomingFeaturesScreenState();

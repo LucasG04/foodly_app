@@ -12,7 +12,7 @@ import '../../../widgets/skeleton_container.dart';
 class MealListTile extends StatelessWidget {
   final Meal? meal;
 
-  const MealListTile(this.meal, {Key? key}) : super(key: key);
+  const MealListTile(this.meal, {super.key});
 
   double get height => 80.0;
 

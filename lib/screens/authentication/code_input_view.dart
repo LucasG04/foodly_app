@@ -14,8 +14,8 @@ class CodeInputView extends StatefulWidget {
 
   const CodeInputView(
     this.onPageChange, {
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<CodeInputView> createState() => _CodeInputViewState();
