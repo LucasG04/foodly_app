@@ -9,7 +9,7 @@ import '../../services/settings_service.dart';
 import '../../widgets/main_button.dart';
 
 class ChangeMealTypesModal extends ConsumerStatefulWidget {
-  const ChangeMealTypesModal({Key? key}) : super(key: key);
+  const ChangeMealTypesModal({super.key});
 
   @override
   ConsumerState<ChangeMealTypesModal> createState() =>

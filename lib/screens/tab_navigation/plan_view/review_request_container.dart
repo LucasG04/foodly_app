@@ -14,7 +14,7 @@ import '../../../services/app_review_service.dart';
 import '../../../utils/main_snackbar.dart';
 
 class ReviewRequestContainer extends ConsumerStatefulWidget {
-  const ReviewRequestContainer({Key? key}) : super(key: key);
+  const ReviewRequestContainer({super.key});
 
   @override
   _ReviewRequestContainerState createState() => _ReviewRequestContainerState();

@@ -25,10 +25,9 @@ class MainButton extends StatelessWidget {
     this.isProgress = false,
     this.buttonState,
     this.color,
-    Key? key,
+    super.key,
   })  : assert(isProgress && buttonState != null || !isProgress),
-        assert(text != null || iconData != null),
-        super(key: key);
+        assert(text != null || iconData != null);
 
   @override
   Widget build(BuildContext context) {

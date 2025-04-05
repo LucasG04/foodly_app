@@ -15,8 +15,8 @@ class EditGrocerySuggestionSheet extends ConsumerStatefulWidget {
   final Grocery grocery;
   const EditGrocerySuggestionSheet({
     required this.grocery,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   ConsumerState<EditGrocerySuggestionSheet> createState() =>

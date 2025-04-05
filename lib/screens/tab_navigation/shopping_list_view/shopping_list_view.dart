@@ -30,7 +30,7 @@ import 'edit_grocery_suggestion_sheet.dart';
 import 'grouped_shopping_list.dart';
 
 class ShoppingListView extends ConsumerStatefulWidget {
-  const ShoppingListView({Key? key}) : super(key: key);
+  const ShoppingListView({super.key});
   @override
   ConsumerState<ShoppingListView> createState() => _ShoppingListViewState();
 }

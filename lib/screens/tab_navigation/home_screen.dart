@@ -30,7 +30,7 @@ import 'plan_history_view.dart';
 import 'tab_navigation_view.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();

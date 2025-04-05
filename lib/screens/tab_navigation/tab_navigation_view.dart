@@ -18,7 +18,7 @@ import 'plan_view/plan_tab_view.dart';
 import 'shopping_list_view/shopping_list_view.dart';
 
 class TabNavigationView extends ConsumerStatefulWidget {
-  const TabNavigationView({Key? key}) : super(key: key);
+  const TabNavigationView({super.key});
 
   @override
   _TabNavigationViewState createState() => _TabNavigationViewState();

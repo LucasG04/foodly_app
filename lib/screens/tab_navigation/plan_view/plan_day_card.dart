@@ -14,11 +14,11 @@ class PlanDayCard extends StatelessWidget {
   final bool readonly;
 
   const PlanDayCard({
-    Key? key,
+    super.key,
     required this.date,
     required this.meals,
     this.readonly = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +117,7 @@ class PlanDayCard extends StatelessWidget {
                     enableVoting: list.length > 1 && !readonly,
                   ),
                 )
-                .toList(),
+                ,
             _buildAddButton(
               context,
               mealType: mealType,

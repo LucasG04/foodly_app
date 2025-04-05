@@ -9,7 +9,7 @@ import '../../providers/state_providers.dart';
 class UpcomingFeatureTile extends ConsumerWidget {
   final UpcomingFeature upcomingFeature;
 
-  const UpcomingFeatureTile(this.upcomingFeature, {Key? key}) : super(key: key);
+  const UpcomingFeatureTile(this.upcomingFeature, {super.key});
 
   TextStyle get _titleStyle => const TextStyle(fontSize: 16);
 

@@ -21,9 +21,8 @@ class PlanMoveMealModal extends ConsumerStatefulWidget {
     required this.isMoving,
     this.planMeal,
     this.meal,
-    Key? key,
-  })  : assert((isMoving && planMeal != null) || (!isMoving && meal != null)),
-        super(key: key);
+    super.key,
+  })  : assert((isMoving && planMeal != null) || (!isMoving && meal != null));
 
   @override
   PlanMoveMealModalState createState() => PlanMoveMealModalState();

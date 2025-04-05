@@ -12,8 +12,8 @@ class UserInformation extends StatelessWidget {
     required this.assetPath,
     this.title,
     this.message,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

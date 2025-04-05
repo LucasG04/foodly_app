@@ -16,8 +16,8 @@ class LinkPreview extends StatefulWidget {
   const LinkPreview(
     this.link, {
     this.isSmall = true,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<LinkPreview> createState() => _LinkPreviewState();
