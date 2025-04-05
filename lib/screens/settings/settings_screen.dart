@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:concentric_transition/page_route.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -26,6 +28,7 @@ import '../../models/plan.dart';
 import '../../models/shopping_list_sort.dart';
 import '../../services/foodly_user_service.dart';
 import '../../services/in_app_purchase_service.dart';
+import '../../utils/firebase_auth_providers.dart';
 import '../../utils/permission_utils.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
@@ -351,6 +354,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         ], context),
                         _buildSectionTitle('settings_section_account'.tr()),
                         _buildSection([
+                          // if (_showLinkWithApple())
+                          //   SettingsTile(
+                          //     onTap: () => _linkAccountWithApple(),
+                          //     leadingIcon: EvaIcons.activity,
+                          //     text: 'settings_link_account_apple_title'.tr(),
+                          //     trailing:
+                          //         const Icon(EvaIcons.arrowIosForwardOutline),
+                          //   ),
                           SettingsTile(
                             onTap: () async {
                               await AuthenticationService.resetPassword(
@@ -669,6 +680,42 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       await launchUrl(url);
     } else {
       _log.severe('Could not launch $href');
+    }
+  }
+
+  bool _showLinkWithApple() {
+    final isApplePlatform = Platform.isIOS || Platform.isMacOS;
+    if (!isApplePlatform) {
+      return false;
+    }
+    return !AuthenticationService.userHasAuthProvider(
+      FirebaseAuthProvider.apple,
+    );
+  }
+
+  Future<void> _linkAccountWithApple() async {
+    try {
+      final credential = await AuthenticationService.reauthenticateApple();
+      if (credential == null) {
+        return;
+      }
+      await AuthenticationService.linkWithCredential(credential);
+      if (!mounted) {
+        return;
+      }
+      MainSnackbar(
+        message: 'settings_link_account_success'.tr(),
+        isSuccess: true,
+      ).show(context);
+    } catch (e) {
+      _log.severe('ERR! Apple Account linking failed!', e);
+      if (!mounted) {
+        return;
+      }
+      MainSnackbar(
+        message: 'settings_link_account_failed'.tr(),
+        isError: true,
+      ).show(context);
     }
   }
 }

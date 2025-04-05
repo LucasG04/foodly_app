@@ -100,6 +100,15 @@ class AuthenticationService {
     return _auth.currentUser!.reauthenticateWithCredential(credential);
   }
 
+  static Future<UserCredential> linkWithCredential(
+    UserCredential credential,
+  ) async {
+    if (_auth.currentUser == null || credential.credential == null) {
+      throw Exception('No user or credential');
+    }
+    return _auth.currentUser!.linkWithCredential(credential.credential!);
+  }
+
   static bool userHasAuthProvider(String providerId) {
     if (_auth.currentUser == null) {
       return false;
