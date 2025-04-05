@@ -671,7 +671,9 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
       ref.read(_$importButtonState.notifier).state = ButtonState.normal;
       if (value != null && value.id != null) {
         BasicUtils.emitMealsChanged(ref, value.id!);
-        AutoRouter.of(context).popAndPush(MealScreenRoute(id: value.id!));
+        if (mounted) {
+          AutoRouter.of(context).popAndPush(MealScreenRoute(id: value.id!));
+        }
       }
     }).catchError((dynamic e) {
       ref.read(_$importButtonState.notifier).state = ButtonState.normal;
