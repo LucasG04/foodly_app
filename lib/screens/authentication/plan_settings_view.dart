@@ -19,8 +19,8 @@ class PlanSettingsView extends StatefulWidget {
     required this.plan,
     required this.navigateBack,
     required this.navigateForward,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<PlanSettingsView> createState() => _PlanSettingsViewState();

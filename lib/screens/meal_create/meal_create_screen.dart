@@ -37,7 +37,7 @@ import 'save_changes_modal.dart';
 class MealCreateScreen extends ConsumerStatefulWidget {
   final String id;
 
-  const MealCreateScreen({required this.id, Key? key}) : super(key: key);
+  const MealCreateScreen({required this.id, super.key});
 
   @override
   _MealCreateScreenState createState() => _MealCreateScreenState();

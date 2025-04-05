@@ -31,8 +31,7 @@ class MealSelectScreen extends ConsumerStatefulWidget {
   final DateTime date;
   final MealType mealType;
 
-  const MealSelectScreen({required this.date, required this.mealType, Key? key})
-      : super(key: key);
+  const MealSelectScreen({required this.date, required this.mealType, super.key});
 
   @override
   _MealSelectScreenState createState() => _MealSelectScreenState();

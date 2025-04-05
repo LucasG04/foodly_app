@@ -21,7 +21,7 @@ import 'meal_list_tile.dart';
 import 'meal_list_title.dart';
 
 class MealListView extends ConsumerStatefulWidget {
-  const MealListView({Key? key}) : super(key: key);
+  const MealListView({super.key});
 
   @override
   _MealListViewState createState() => _MealListViewState();

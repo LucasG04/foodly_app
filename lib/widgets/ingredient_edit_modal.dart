@@ -24,8 +24,8 @@ class IngredientEditModal extends ConsumerStatefulWidget {
   const IngredientEditModal({
     required this.ingredient,
     this.onSaved,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _IngredientEditModalState createState() => _IngredientEditModalState();

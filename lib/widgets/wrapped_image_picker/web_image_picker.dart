@@ -23,8 +23,8 @@ class WebImagePicker extends ConsumerStatefulWidget {
   const WebImagePicker({
     required this.onPick,
     required this.onClose,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _WebImagePickerState createState() => _WebImagePickerState();

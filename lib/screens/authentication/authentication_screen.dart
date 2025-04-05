@@ -6,7 +6,7 @@ import 'login_view.dart';
 import 'plan_settings_view.dart';
 
 class AuthenticationScreen extends StatefulWidget {
-  const AuthenticationScreen({Key? key}) : super(key: key);
+  const AuthenticationScreen({super.key});
   @override
   State<AuthenticationScreen> createState() => _AuthenticationScreenState();
 }

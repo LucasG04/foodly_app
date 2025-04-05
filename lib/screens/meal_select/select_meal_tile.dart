@@ -22,9 +22,8 @@ class SelectMealTile extends StatefulWidget {
     this.onAddMeal,
     this.secondaryAction,
     this.isLoading = false,
-    Key? key,
-  })  : assert(isLoading || (!isLoading && meal != null && onAddMeal != null)),
-        super(key: key);
+    super.key,
+  })  : assert(isLoading || (!isLoading && meal != null && onAddMeal != null));
 
   @override
   State<SelectMealTile> createState() => _SelectMealTileState();

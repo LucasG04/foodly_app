@@ -17,8 +17,8 @@ class AnimatedShoppingList extends StatelessWidget {
     required this.onTap,
     required this.onEdit,
     required this.onLongPress,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

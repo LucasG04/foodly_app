@@ -13,8 +13,8 @@ class ListTileCard extends StatelessWidget {
     required this.title,
     this.iconColor,
     this.description,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   TextStyle get _titleStyle => const TextStyle(
         fontSize: 16,

@@ -7,10 +7,10 @@ class SmallCircularProgressIndicator extends StatelessWidget {
   double get _iconHeight => 24.0;
 
   const SmallCircularProgressIndicator({
-    Key? key,
+    super.key,
     this.color,
     this.additionalSize = 0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

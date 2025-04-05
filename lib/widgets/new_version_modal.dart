@@ -21,8 +21,8 @@ class NewVersionModal extends ConsumerStatefulWidget {
   const NewVersionModal({
     required this.versions,
     required this.versionNotes,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _NewVersionModalState createState() => _NewVersionModalState();
@@ -193,7 +193,7 @@ class _NewVersionModalState extends ConsumerState<NewVersionModal> {
                         const SizedBox(height: kPadding / 2),
                         ...widget.versionNotes
                             .map((e) => _buildVersionNote(e))
-                            .toList(),
+                            ,
                       ],
                     ),
                   ),

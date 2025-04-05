@@ -8,7 +8,7 @@ import '../../widgets/animate_icons.dart';
 class SearchBar extends StatefulWidget {
   final void Function(String) onSearch;
 
-  const SearchBar({required this.onSearch, Key? key}) : super(key: key);
+  const SearchBar({required this.onSearch, super.key});
 
   @override
   State<SearchBar> createState() => _SearchBarState();

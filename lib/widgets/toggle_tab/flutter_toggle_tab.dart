@@ -21,7 +21,7 @@ class FlutterToggleTab extends StatefulWidget {
   /// It's main attribute is available on Flutter Toggle Tab
   /// is Scroll by default is set to Enable
   const FlutterToggleTab({
-    Key? key,
+    super.key,
     required this.labels,
     required this.selectedTextStyle,
     required this.unSelectedTextStyle,
@@ -39,8 +39,7 @@ class FlutterToggleTab extends StatefulWidget {
     this.marginSelected,
     this.isShadowEnable = true,
     this.buttonKeys,
-  })  : assert(buttonKeys == null || labels.length == buttonKeys.length),
-        super(key: key);
+  })  : assert(buttonKeys == null || labels.length == buttonKeys.length);
 
   final List<String> labels;
   final List<IconData?>? icons;

@@ -13,7 +13,7 @@ import '../small_circular_progress_indicator.dart';
 import 'web_image_picker.dart';
 
 class SelectPickerDialog extends StatefulWidget {
-  const SelectPickerDialog({Key? key}) : super(key: key);
+  const SelectPickerDialog({super.key});
 
   @override
   State<SelectPickerDialog> createState() => _SelectPickerDialogState();

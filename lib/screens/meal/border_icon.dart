@@ -9,13 +9,13 @@ class BorderIcon extends StatelessWidget {
   final bool withBorder;
 
   const BorderIcon({
-    Key? key,
+    super.key,
     required this.child,
     this.width,
     this.height,
     this.padding,
     this.withBorder = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

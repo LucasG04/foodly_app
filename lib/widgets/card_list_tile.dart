@@ -10,13 +10,13 @@ class CardListTile extends StatelessWidget {
   final List<CardListTileAction> actions;
 
   const CardListTile({
-    Key? key,
+    super.key,
     this.height = 75.0,
     this.width,
     this.leading,
     this.content,
     this.actions = const [],
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,7 @@ class CardListTile extends StatelessWidget {
               child: content,
             ),
           ),
-          ...actions.map((e) => _buildActionContainer(e, context)).toList(),
+          ...actions.map((e) => _buildActionContainer(e, context)),
         ],
       ),
     );

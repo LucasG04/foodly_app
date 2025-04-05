@@ -7,8 +7,8 @@ class TagTile extends StatelessWidget {
 
   const TagTile(
     this.text, {
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

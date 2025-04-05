@@ -10,7 +10,7 @@ import '../../../widgets/main_text_field.dart';
 import '../../../widgets/progress_button.dart';
 
 class ChangePlanNameModal extends ConsumerStatefulWidget {
-  const ChangePlanNameModal({Key? key}) : super(key: key);
+  const ChangePlanNameModal({super.key});
 
   @override
   _ChangePlanNameModalState createState() => _ChangePlanNameModalState();

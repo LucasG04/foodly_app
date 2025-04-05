@@ -45,8 +45,8 @@ class MealScreen extends ConsumerStatefulWidget {
   const MealScreen({
     required this.id,
     this.showOptions = true,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _MealScreenState createState() => _MealScreenState();
@@ -254,7 +254,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                           physics: const BouncingScrollPhysics(),
                           child: Row(
                             children: [
-                              ...meal.tags!.map((e) => TagTile(e)).toList(),
+                              ...meal.tags!.map((e) => TagTile(e)),
                               const SizedBox(width: kPadding),
                             ],
                           ),

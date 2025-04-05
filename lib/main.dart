@@ -116,7 +116,7 @@ Future<void> initializeHive() async {
 }
 
 class FoodlyApp extends ConsumerStatefulWidget {
-  const FoodlyApp({foundation.Key? key}) : super(key: key);
+  const FoodlyApp({super.key});
 
   @override
   _FoodlyAppState createState() => _FoodlyAppState();

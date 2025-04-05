@@ -11,8 +11,8 @@ class FoodlyNetworkImage extends StatefulWidget {
   const FoodlyNetworkImage(
     this.imageUrl, {
     this.boxFit = BoxFit.cover,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<FoodlyNetworkImage> createState() => _FoodlyNetworkImageState();
