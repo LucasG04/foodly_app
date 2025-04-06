@@ -15,7 +15,7 @@ dependencies:
     sdk: flutter
 
   # Util
-  flutter_riverpod: ^2.1.1
+  flutter_riverpod: ^2.6.1
   auto_route: ^5.0.4
   intl: ^0.19.0
   # see hive_ce for continued support; can't upgrade because of https://github.com/petercinibulk/envied/issues/125
@@ -32,7 +32,7 @@ dependencies:
   another_flushbar: ^1.12.30
   share_plus: ^10.0.2
   email_validator: ^3.0.0
-  logging: ^1.0.0
+  logging: ^1.3.0
   # receive_sharing_intent: ^1.8.0
   receive_sharing_intent:
     git:
@@ -50,14 +50,14 @@ dependencies:
       url: https://github.com/LucasG04/metadata_fetch.git
       ref: v0.4.3
   flutter_file_dialog: ^3.0.2
-  keyboard_service: ^2.0.1
+  keyboard_service: ^2.0.3
   flutter_image_compress: ^2.3.0
   version: ^3.0.2
   package_info_plus: ^8.1.2
   in_app_update: ^4.0.1 # Android Updates
   update_available: ^3.0.0 # iOS Updates
   envied: ^1.1.1
-  purchases_flutter: ^8.7.0
+  purchases_flutter: ^8.7.1
   permission_handler: ^11.4.0
   flutter_phoenix: ^1.1.0
   clipboard: ^0.1.3
@@ -82,7 +82,7 @@ dependencies:
   eva_icons_flutter: ^3.0.0
   group_list_view: ^1.1.1
   adaptive_dialog: ^2.4.1
-  flutter_markdown: ^0.7.4+3
+  flutter_markdown: ^0.7.7
   auto_size_text: ^3.0.0
   # flutter_toggle_tab: ^0.0.5+4
   badges: ^3.1.2
