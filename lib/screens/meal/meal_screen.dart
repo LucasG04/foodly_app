@@ -74,7 +74,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     ref
         .read(lastChangedMealProvider.notifier)
         .stream
-        .where((mealId) => mealId != null && widget.id == mealId)
+        .where((mealId) => mealId != null && widget.id == mealId && mounted)
         .listen((_) => _fetchMealAndStats())
         .canceledBy(this);
   }
