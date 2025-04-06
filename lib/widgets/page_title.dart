@@ -15,12 +15,12 @@ class PageTitle extends StatelessWidget {
   final bool checkConnectivity;
 
   const PageTitle({
-    Key? key,
+    super.key,
     required this.text,
     this.autoSize = false,
     this.actions,
     this.checkConnectivity = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

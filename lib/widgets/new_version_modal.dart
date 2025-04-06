@@ -21,15 +21,24 @@ class NewVersionModal extends ConsumerStatefulWidget {
   const NewVersionModal({
     required this.versions,
     required this.versionNotes,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _NewVersionModalState createState() => _NewVersionModalState();
 
   static Future<void> open(BuildContext context) async {
-    final Version lastCheckedVersion =
-        Version.parse(VersionService.lastCheckedVersion);
+    Version lastCheckedVersion;
+    try {
+      lastCheckedVersion =
+          Version.parse(VersionService.lastCheckedVersion ?? '');
+    } catch (e) {
+      _log.severe(
+        'NewVersionModal.open() with lastCheckedVersion: ${VersionService.lastCheckedVersion}',
+        e,
+      );
+      return;
+    }
     final publishedVersions = await _getPublishedVersions();
     // ignore: use_build_context_synchronously
     if (!context.mounted) {
@@ -191,9 +200,7 @@ class _NewVersionModalState extends ConsumerState<NewVersionModal> {
                           '${(widget.versions.length > 1 ? 'new_version_modal_version_pl' : 'new_version_modal_version').tr()} ${widget.versions.join(', ')}',
                         ),
                         const SizedBox(height: kPadding / 2),
-                        ...widget.versionNotes
-                            .map((e) => _buildVersionNote(e))
-                            .toList(),
+                        ...widget.versionNotes.map((e) => _buildVersionNote(e)),
                       ],
                     ),
                   ),

@@ -17,7 +17,7 @@ import 'plan_view/plan_day_card.dart';
 import 'plan_view/plan_tab_view.dart';
 
 class PlanHistoryView extends ConsumerStatefulWidget {
-  const PlanHistoryView({Key? key}) : super(key: key);
+  const PlanHistoryView({super.key});
 
   @override
   _PlanHistoryViewState createState() => _PlanHistoryViewState();

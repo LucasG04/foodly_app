@@ -14,8 +14,8 @@ class SmallNumberInput extends StatelessWidget {
     required this.onChanged,
     this.minValue = 0,
     this.maxValue = 99,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

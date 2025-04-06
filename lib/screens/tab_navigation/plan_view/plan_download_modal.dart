@@ -18,9 +18,9 @@ class PlanDownloadModal extends StatefulWidget {
   final Plan plan;
 
   const PlanDownloadModal({
-    Key? key,
+    super.key,
     required this.plan,
-  }) : super(key: key);
+  });
 
   @override
   State<PlanDownloadModal> createState() => _PlanDownloadModalState();

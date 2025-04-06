@@ -45,8 +45,8 @@ class MealScreen extends ConsumerStatefulWidget {
   const MealScreen({
     required this.id,
     this.showOptions = true,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _MealScreenState createState() => _MealScreenState();
@@ -74,7 +74,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
     ref
         .read(lastChangedMealProvider.notifier)
         .stream
-        .where((mealId) => mealId != null && widget.id == mealId)
+        .where((mealId) => mealId != null && widget.id == mealId && mounted)
         .listen((_) => _fetchMealAndStats())
         .canceledBy(this);
   }
@@ -254,7 +254,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                           physics: const BouncingScrollPhysics(),
                           child: Row(
                             children: [
-                              ...meal.tags!.map((e) => TagTile(e)).toList(),
+                              ...meal.tags!.map((e) => TagTile(e)),
                               const SizedBox(width: kPadding),
                             ],
                           ),
@@ -569,10 +569,10 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
 
   Future<void> _fetchMealAndStats() async {
     ref.read(_$isLoading.notifier).state = true;
-    await Future.wait<void>([_fetchMeal()]);
-    ref.read(_$isLoading.notifier).state = false;
-    _fetchStats(); // call after is loading, to avoid riverpod issues
+    await _fetchMeal();
     _checkOwnerOfMeal();
+    ref.read(_$isLoading.notifier).state = false;
+    await _fetchStats();
   }
 
   Future<void> _fetchMeal() async {
@@ -671,7 +671,9 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
       ref.read(_$importButtonState.notifier).state = ButtonState.normal;
       if (value != null && value.id != null) {
         BasicUtils.emitMealsChanged(ref, value.id!);
-        AutoRouter.of(context).popAndPush(MealScreenRoute(id: value.id!));
+        if (mounted) {
+          AutoRouter.of(context).popAndPush(MealScreenRoute(id: value.id!));
+        }
       }
     }).catchError((dynamic e) {
       ref.read(_$importButtonState.notifier).state = ButtonState.normal;

@@ -6,9 +6,8 @@ class OptionsSheet extends StatelessWidget {
   final List<Widget> options;
   const OptionsSheet({
     required this.options,
-    Key? key,
-  })  : assert(options.length != 0),
-        super(key: key);
+    super.key,
+  })  : assert(options.length != 0);
 
   @override
   Widget build(BuildContext context) {

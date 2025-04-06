@@ -17,8 +17,8 @@ class GroupedShoppingList extends StatefulWidget {
     required this.onEdit,
     required this.onLongPress,
     this.pageScrollController,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<GroupedShoppingList> createState() => _GroupedShoppingListState();

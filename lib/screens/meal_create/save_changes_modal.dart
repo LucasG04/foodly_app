@@ -7,7 +7,7 @@ import '../../widgets/main_button.dart';
 enum SaveChangesResult { discard, save, cancel }
 
 class SaveChangesModal extends StatelessWidget {
-  const SaveChangesModal({Key? key}) : super(key: key);
+  const SaveChangesModal({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -41,7 +41,7 @@ import 'settings_reauthenticate_modal.dart';
 import 'settings_tile.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
 }

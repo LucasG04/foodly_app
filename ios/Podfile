@@ -1,6 +1,14 @@
-# Uncomment this line to define a global platform for your project
 platform :ios, '14.0'
-$FirebaseSDKVersion = '11.4.0' # See Podfile.lock at Firebase/Firestore for the current version
+
+$FirebaseSDKVersion = '11.10.0' # See below links of installed packages for the current version
+# https://github.com/firebase/flutterfire/blob/main/packages/cloud_firestore/cloud_firestore/ios/generated_firebase_sdk_version.txt
+# https://github.com/firebase/flutterfire/blob/main/packages/firebase_analytics/firebase_analytics/ios/generated_firebase_sdk_version.txt
+# https://github.com/firebase/flutterfire/blob/main/packages/firebase_app_check/firebase_app_check/ios/generated_firebase_sdk_version.txt
+# https://github.com/firebase/flutterfire/blob/main/packages/firebase_auth/firebase_auth/ios/generated_firebase_sdk_version.txt
+# https://github.com/firebase/flutterfire/blob/main/packages/firebase_core/firebase_core/ios/firebase_sdk_version.rb
+# https://github.com/firebase/flutterfire/blob/main/packages/firebase_crashlytics/firebase_crashlytics/ios/generated_firebase_sdk_version.txt
+# https://github.com/firebase/flutterfire/blob/main/packages/firebase_storage/firebase_storage/ios/generated_firebase_sdk_version.txt
+# https://github.com/firebase/flutterfire/blob/main/packages/firebase_performance/firebase_performance/ios/generated_firebase_sdk_version.txt
 
 # Analytics
 $FirebaseAnalyticsWithoutAdIdSupport = true

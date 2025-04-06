@@ -10,7 +10,7 @@ import '../../primary_colors.dart';
 import '../../services/settings_service.dart';
 
 class SettingsChangePrimaryColorModal extends ConsumerStatefulWidget {
-  const SettingsChangePrimaryColorModal({Key? key}) : super(key: key);
+  const SettingsChangePrimaryColorModal({super.key});
 
   @override
   ConsumerState<SettingsChangePrimaryColorModal> createState() =>

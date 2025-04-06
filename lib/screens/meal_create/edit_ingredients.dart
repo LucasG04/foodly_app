@@ -12,11 +12,11 @@ class EditIngredients extends StatelessWidget {
   final void Function(List<Ingredient>)? onChanged;
 
   const EditIngredients({
-    Key? key,
+    super.key,
     required this.title,
     required this.content,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

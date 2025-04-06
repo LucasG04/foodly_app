@@ -13,8 +13,8 @@ class OptionsSheetOptions extends StatelessWidget {
     required this.title,
     required this.onTap,
     this.textColor,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

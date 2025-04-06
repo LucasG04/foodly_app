@@ -8,7 +8,7 @@ import '../services/authentication_service.dart';
 import 'small_circular_progress_indicator.dart';
 
 class LoadingLogout extends StatefulWidget {
-  const LoadingLogout({Key? key}) : super(key: key);
+  const LoadingLogout({super.key});
 
   @override
   State<LoadingLogout> createState() => _LoadingLogoutState();

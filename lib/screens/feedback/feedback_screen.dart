@@ -19,7 +19,7 @@ import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
 
 class FeedbackScreen extends ConsumerStatefulWidget {
-  const FeedbackScreen({Key? key}) : super(key: key);
+  const FeedbackScreen({super.key});
 
   @override
   _FeedbackScreenState createState() => _FeedbackScreenState();

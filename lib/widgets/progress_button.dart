@@ -22,7 +22,7 @@ class ProgressButton extends StatefulWidget {
   final int errorAnimationSwingCount;
 
   const ProgressButton({
-    Key? key,
+    super.key,
     required this.buttonState,
     required this.onPressed,
     this.child,
@@ -33,7 +33,7 @@ class ProgressButton extends StatefulWidget {
     this.errorAnimationDuration = 400,
     this.errorAnimationSwingFactor = 0.03,
     this.errorAnimationSwingCount = 2,
-  }) : super(key: key);
+  });
 
   @override
   State<ProgressButton> createState() => _ProgressButtonState();

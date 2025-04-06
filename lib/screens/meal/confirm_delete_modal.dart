@@ -8,7 +8,7 @@ import '../../widgets/main_button.dart';
 class ConfirmDeleteModal extends StatelessWidget {
   final Meal meal;
 
-  const ConfirmDeleteModal(this.meal, {Key? key}) : super(key: key);
+  const ConfirmDeleteModal(this.meal, {super.key});
 
   @override
   Widget build(BuildContext context) {

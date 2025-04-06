@@ -15,7 +15,7 @@ import 'main_button.dart';
 import 'small_circular_progress_indicator.dart';
 
 class GetPremiumModal extends ConsumerStatefulWidget {
-  const GetPremiumModal({Key? key}) : super(key: key);
+  const GetPremiumModal({super.key});
 
   @override
   _GetPremiumModalState createState() => _GetPremiumModalState();

@@ -20,13 +20,13 @@ class WrappedImagePicker extends StatefulWidget {
   final String? imageUrl;
 
   const WrappedImagePicker({
-    Key? key,
+    super.key,
     required this.onPick,
     this.onRemove,
     this.onOpen,
     this.edgeLength = 200.0,
     this.imageUrl,
-  }) : super(key: key);
+  });
 
   @override
   State<WrappedImagePicker> createState() => _WrappedImagePickerState();

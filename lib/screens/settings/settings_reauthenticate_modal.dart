@@ -15,7 +15,7 @@ import '../../widgets/progress_button.dart';
 ///
 /// Returns `true` (via Navigator), if the authentication was successful.
 class SettingsReauthenticateModal extends ConsumerStatefulWidget {
-  const SettingsReauthenticateModal({Key? key}) : super(key: key);
+  const SettingsReauthenticateModal({super.key});
 
   @override
   _SettingsReauthenticateModalState createState() =>

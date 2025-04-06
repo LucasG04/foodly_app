@@ -26,8 +26,8 @@ class MealPagination extends ConsumerStatefulWidget {
     required this.loadNextMeals,
     required this.buildMeal,
     required this.scrollController,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _MealPaginationState createState() => _MealPaginationState();

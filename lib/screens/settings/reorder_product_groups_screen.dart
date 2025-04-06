@@ -12,7 +12,7 @@ import '../../widgets/main_appbar.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
 class ReorderProductGroupsScreen extends StatefulWidget {
-  const ReorderProductGroupsScreen({Key? key}) : super(key: key);
+  const ReorderProductGroupsScreen({super.key});
 
   @override
   State<ReorderProductGroupsScreen> createState() =>

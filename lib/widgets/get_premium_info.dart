@@ -18,8 +18,8 @@ class GetPremiumInfo extends StatelessWidget {
     required this.description,
     this.width,
     this.displayProbability = 1.0,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

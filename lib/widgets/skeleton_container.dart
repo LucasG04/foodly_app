@@ -21,8 +21,8 @@ class SkeletonContainer extends StatelessWidget {
     this.backgroundColor,
     this.curve = Curves.fastOutSlowIn,
     this.borderRadius = kRadius,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -57,9 +57,7 @@ class _SkeletonAnimation extends StatefulWidget {
       {required this.child,
       this.shimmerColor = Colors.white54,
       this.gradientColor = const Color.fromARGB(0, 244, 244, 244),
-      this.curve = Curves.fastOutSlowIn,
-      Key? key})
-      : super(key: key);
+      this.curve = Curves.fastOutSlowIn});
 
   @override
   _SkeletonAnimationState createState() => _SkeletonAnimationState();

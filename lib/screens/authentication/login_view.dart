@@ -39,8 +39,8 @@ class LoginView extends ConsumerStatefulWidget {
     required this.isCreatingPlan,
     required this.plan,
     required this.navigateBack,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _LoginViewState createState() => _LoginViewState();

@@ -13,7 +13,7 @@ import '../../widgets/small_circular_progress_indicator.dart';
 class SelectPlanModal extends StatelessWidget {
   final String userId;
 
-  const SelectPlanModal(this.userId, {Key? key}) : super(key: key);
+  const SelectPlanModal(this.userId, {super.key});
 
   @override
   Widget build(BuildContext context) {
