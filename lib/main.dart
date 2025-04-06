@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app_links/app_links.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
@@ -16,7 +17,6 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
-import 'package:uni_links/uni_links.dart';
 
 import 'app_router.gr.dart';
 import 'constants.dart';
@@ -125,6 +125,8 @@ class FoodlyApp extends ConsumerStatefulWidget {
 class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   final _log = Logger('FoodlyApp');
   final _appRouter = AppRouter();
+
+  final _appLinks = AppLinks();
 
   /// Handle the initial uni link only when user is in a plan
   bool _handleInitUniLink = true;
@@ -431,7 +433,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   Future<void> _initUniLinks() async {
     if (_handleInitUniLink) {
       try {
-        final initialLink = await getInitialLink();
+        final initialLink = await _appLinks.getInitialLinkString();
         _processLink(initialLink);
       } catch (e) {
         _log.finer('Failed to get initial link', e);
@@ -439,7 +441,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     }
 
     if (_uniLinkSub == null) {
-      _uniLinkSub = linkStream.listen(
+      _uniLinkSub = _appLinks.stringLinkStream.listen(
         _processLink,
         onError: (dynamic e) => _log.finer('ERR in getLinksStream()', e),
       );
