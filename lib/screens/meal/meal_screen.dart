@@ -569,10 +569,10 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
 
   Future<void> _fetchMealAndStats() async {
     ref.read(_$isLoading.notifier).state = true;
-    await Future.wait<void>([_fetchMeal()]);
-    ref.read(_$isLoading.notifier).state = false;
-    _fetchStats(); // call after is loading, to avoid riverpod issues
+    await _fetchMeal();
     _checkOwnerOfMeal();
+    ref.read(_$isLoading.notifier).state = false;
+    await _fetchStats();
   }
 
   Future<void> _fetchMeal() async {
