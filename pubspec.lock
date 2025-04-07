@@ -1563,11 +1563,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: da6fb81de86a7cb0f7bf88deb0517690ea4f9255
-      resolved-ref: da6fb81de86a7cb0f7bf88deb0517690ea4f9255
+      ref: "2cea396843cd3ab1b5ec4334be4233864637874e"
+      resolved-ref: "2cea396843cd3ab1b5ec4334be4233864637874e"
       url: "https://github.com/KasemJaffer/receive_sharing_intent.git"
     source: git
-    version: "1.8.0"
+    version: "1.8.1"
   riverpod:
     dependency: transitive
     description:
