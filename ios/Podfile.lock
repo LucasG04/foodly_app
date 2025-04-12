@@ -260,7 +260,7 @@ PODS:
   - PurchasesHybridCommon (13.26.1):
     - RevenueCat (= 5.20.2)
   - RecaptchaInterop (101.0.0)
-  - receive_sharing_intent (1.8.0):
+  - receive_sharing_intent (1.8.1):
     - Flutter
   - RevenueCat (5.20.2)
   - SDWebImage (5.21.0):
@@ -479,7 +479,7 @@ SPEC CHECKSUMS:
   purchases_flutter: b1deb60bd7722e4b0529eeb9d2bacbe75310203c
   PurchasesHybridCommon: aeebb5b2a956514f8f3ebde2a1574e07d2164ae8
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
-  receive_sharing_intent: df9c334dc9feadcbd3266e5cb49c8443405e1c9f
+  receive_sharing_intent: 79c848f5b045674ad60b9fea3bafea59962ad2c1
   RevenueCat: 9af6740f8629097fcacda9b3cb6b927319c53a26
   SDWebImage: f84b0feeb08d2d11e6a9b843cb06d75ebf5b8868
   SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
