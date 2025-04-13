@@ -39,6 +39,13 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
     with AutomaticKeepAliveClientMixin {
   final _scrollController = ScrollController();
 
+  final shoppingListStreamProvider =
+      StreamProvider.family<List<Grocery>, String>(
+    (ref, shoppingListId) {
+      return ShoppingListService.streamShoppingList(shoppingListId);
+    },
+  );
+
   @override
   bool get wantKeepAlive => true;
 
@@ -49,32 +56,41 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
       builder: (context, ref, _) {
         final shoppingListId = ref.watch(shoppingListIdProvider);
         final groceryGroups = ref.watch(dataGroceryGroupsProvider);
-        return shoppingListId != null && groceryGroups != null
-            ? StreamBuilder<List<Grocery>>(
-                stream: ShoppingListService.streamShoppingList(shoppingListId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting ||
-                      snapshot.connectionState == ConnectionState.none) {
-                    return _buildLoader();
-                  }
-                  final data = snapshot.data ?? [];
-                  final List<Grocery> todoItems =
-                      data.where((e) => !e.bought).toList();
-                  final List<Grocery> boughtItems =
-                      data.where((e) => e.bought).toList();
-                  boughtItems.sort(
-                    (a, b) => b.lastBoughtEdited.compareTo(a.lastBoughtEdited),
-                  );
+        if (shoppingListId == null || groceryGroups == null) {
+          return _buildLoader();
+        }
 
-                  return _buildShoppingList(
-                    context,
-                    todoItems,
-                    boughtItems,
-                    shoppingListId,
-                  );
-                },
-              )
-            : _buildLoader();
+        final shoppingListAsyncValue =
+            ref.watch(shoppingListStreamProvider(shoppingListId));
+
+        return shoppingListAsyncValue.when(
+          data: (data) {
+            final List<Grocery> todoItems =
+                data.where((e) => !e.bought).toList();
+            final List<Grocery> boughtItems =
+                data.where((e) => e.bought).toList();
+            boughtItems.sort(
+              (a, b) => b.lastBoughtEdited.compareTo(a.lastBoughtEdited),
+            );
+
+            BasicUtils.afterBuild(() {
+              // scroll one pixel up with _scrollController to avoid ui bug
+              if (_scrollController.hasClients) {
+                _scrollController.jumpTo(_scrollController.offset + 0.1);
+              }
+            });
+
+            return _buildShoppingList(
+              context,
+              todoItems,
+              boughtItems,
+              shoppingListId,
+            );
+          },
+          loading: () => _buildLoader(),
+          // TODO: add better error message
+          error: (error, stack) => _buildEmptyShoppingList(),
+        );
       },
     );
   }
@@ -162,19 +178,8 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                   ),
                   Center(
                     child: TextButton(
-                      onPressed: () async {
-                        ShoppingListService.deleteAllBoughtGrocery(
-                          listId,
-                        );
-                        // scroll one pixel up with _scrollController to avoid ui bug
-                        Future.delayed(
-                          const Duration(milliseconds: 250),
-                          () => _scrollController.animateTo(
-                            _scrollController.offset - 1,
-                            duration: const Duration(milliseconds: 1),
-                            curve: Curves.easeInOut,
-                          ),
-                        );
+                      onPressed: () {
+                        ShoppingListService.deleteAllBoughtGrocery(listId);
                       },
                       style: ButtonStyle(
                         shadowColor: WidgetStateProperty.all<Color>(
