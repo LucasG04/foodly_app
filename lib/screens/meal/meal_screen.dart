@@ -683,11 +683,12 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
   void _shareMeal(Meal meal, BuildContext ctx) {
     final langCode = context.locale.languageCode;
     final box = ctx.findRenderObject() as RenderBox?;
-    Share.share(
-      '${meal.name} - $kAppWebBaseUrl/meal/${meal.id}?lang=$langCode',
+    final params = ShareParams(
+      text: '${meal.name} - $kAppWebBaseUrl/meal/${meal.id}?lang=$langCode',
       subject: meal.name,
       sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
     );
+    SharePlus.instance.share(params);
   }
 
   void _openAddToPlan(Meal meal) async {
