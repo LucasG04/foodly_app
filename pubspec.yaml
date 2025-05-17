@@ -96,7 +96,7 @@ dependencies:
   concentric_transition:
     git:
       url: https://github.com/LucasG04/flutter-concentric-transition.git
-  dotted_border: ^2.1.0
+  dotted_border: ^3.0.0
   in_app_review: ^2.0.10
   like_button: ^2.0.5
   blur: ^4.0.0
