@@ -531,11 +531,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       return;
     }
     final box = ctx.findRenderObject() as RenderBox?;
-    await Share.share(
-      'settings_share_msg'.tr(args: [kAppName, code, kAppDownloadUrl]),
+    final params = ShareParams(
+      text: 'settings_share_msg'.tr(args: [kAppName, code, kAppDownloadUrl]),
       subject: 'settings_share_msg_short'.tr(args: [kAppName, code]),
       sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
     );
+    await SharePlus.instance.share(params);
     FirebaseAnalytics.instance.logEvent(name: 'share_code');
   }
 

@@ -341,11 +341,12 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
         .substring(0, shareText.length > 50 ? 50 : shareText.length)
         .trim();
     final box = ctx.findRenderObject() as RenderBox?;
-    Share.share(
-      shareText,
+    final params = ShareParams(
+      text: shareText,
       subject: '$subject...',
       sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
     );
+    SharePlus.instance.share(params);
   }
 
   String _getShareTextSortByNames(List<Grocery> groceries) {
