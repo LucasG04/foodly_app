@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../utils/of_context_mixin.dart';
+
 class MarkdownEditor extends ConsumerStatefulWidget {
   final TextEditingController textEditingController;
 
@@ -20,7 +22,7 @@ class MarkdownEditor extends ConsumerStatefulWidget {
 }
 
 class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
-    with TickerProviderStateMixin {
+    with OfContextMixin, TickerProviderStateMixin {
   static final log = Logger('MarkdownEditor');
 
   late AutoDisposeStateProvider<String> _$currentText;
@@ -42,16 +44,14 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
 
   @override
   Widget build(BuildContext context) {
-    final textColor = Theme.of(context).textTheme.bodyLarge!.color;
+    final textColor = theme.textTheme.bodyLarge!.color;
     return SizedBox(
-      width: MediaQuery.of(context).size.width > 599
-          ? 600.0
-          : MediaQuery.of(context).size.width * 0.9,
-      height: MediaQuery.of(context).size.height < 500
+      width: media.size.width > 599 ? 600.0 : media.size.width * 0.9,
+      height: media.size.height < 500
           ? 250.0
-          : MediaQuery.of(context).size.height > 1000
+          : media.size.height > 1000
               ? 600.0
-              : MediaQuery.of(context).size.height * 0.5,
+              : media.size.height * 0.5,
       child: Column(
         children: [
           TabBar(
@@ -106,7 +106,7 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
                         hintText:
                             '# Title\n## Subtitle\n- The quick brown fox jumps over the lazy dog\n- Lorem ipsum dolor sit amet, ...',
                       ),
-                      cursorColor: Theme.of(context).primaryColor,
+                      cursorColor: theme.primaryColor,
                       minLines: 6,
                     ),
                   ),

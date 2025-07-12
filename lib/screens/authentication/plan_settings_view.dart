@@ -43,15 +43,15 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final contentWidth = size.width > 599 ? 600 : size.width * 0.9;
+    final media = MediaQuery.of(context);
+    final contentWidth = media.size.width > 599 ? 600 : media.size.width * 0.9;
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (MediaQuery.of(context).size.width - contentWidth) / 2,
+        horizontal: (media.size.width - contentWidth) / 2,
       ),
       child: Column(
         children: [
-          SizedBox(height: kPadding + MediaQuery.of(context).padding.top),
+          SizedBox(height: kPadding + media.padding.top),
           FlutterToggleTab(
             width: 80,
             borderRadius: 15,
@@ -89,8 +89,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
             errorText: _nameErrorText,
           ),
           SizedBox(
-            height: size.height * 0.2 +
-                MediaQuery.of(context).viewInsets.bottom / 4,
+            height: media.size.height * 0.2 + media.viewInsets.bottom / 4,
             child: _unknownErrorText != null
                 ? Row(
                     children: [

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
+import '../../utils/of_context_mixin.dart';
 import '../../widgets/animate_icons.dart';
 
 class SearchBar extends StatefulWidget {
@@ -14,7 +15,7 @@ class SearchBar extends StatefulWidget {
   State<SearchBar> createState() => _SearchBarState();
 }
 
-class _SearchBarState extends State<SearchBar> {
+class _SearchBarState extends State<SearchBar> with OfContextMixin {
   final FocusNode _focusNode = FocusNode();
   TextEditingController? _textEditingController;
   AnimateIconController? _closeIconController;
@@ -47,9 +48,7 @@ class _SearchBarState extends State<SearchBar> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width > 649
-          ? 650.0
-          : MediaQuery.of(context).size.width * 0.95,
+      width: media.size.width > 649 ? 650.0 : media.size.width * 0.95,
       child: Card(
         child: Column(
           children: [
@@ -59,12 +58,12 @@ class _SearchBarState extends State<SearchBar> {
                 focusNode: _focusNode,
                 controller: _textEditingController,
                 style: const TextStyle(fontSize: 20.0),
-                cursorColor: Theme.of(context).primaryColor,
+                cursorColor: theme.primaryColor,
                 decoration: InputDecoration(
                   suffixIcon: _buildClearIcon(),
                   icon: Icon(
                     EvaIcons.searchOutline,
-                    color: Theme.of(context).primaryColor,
+                    color: theme.primaryColor,
                   ),
                   border: InputBorder.none,
                   focusedBorder: InputBorder.none,
@@ -106,7 +105,7 @@ class _SearchBarState extends State<SearchBar> {
       controller: _closeIconController,
       startIcon: null,
       endIcon: EvaIcons.close,
-      color: Theme.of(context).textTheme.bodyLarge!.color,
+      color: theme.textTheme.bodyLarge!.color,
     );
   }
 }

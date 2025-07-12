@@ -1,12 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '../../constants.dart';
 import '../../utils/debouncer.dart';
+import '../../utils/of_context_mixin.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/user_information.dart';
 
@@ -28,7 +28,8 @@ class EditListContentModal extends ConsumerStatefulWidget {
   _EditListContentModalState createState() => _EditListContentModalState();
 }
 
-class _EditListContentModalState extends ConsumerState<EditListContentModal> {
+class _EditListContentModalState extends ConsumerState<EditListContentModal>
+    with OfContextMixin {
   late List<String> _selectedContent;
   late List<String> _allContent;
 
@@ -68,13 +69,11 @@ class _EditListContentModalState extends ConsumerState<EditListContentModal> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width > 599
-        ? 580.0
-        : MediaQuery.of(context).size.width * 0.8;
+    final width = media.size.width > 599 ? 580.0 : media.size.width * 0.8;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (MediaQuery.of(context).size.width - width) / 2,
+        horizontal: (media.size.width - width) / 2,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,7 +95,7 @@ class _EditListContentModalState extends ConsumerState<EditListContentModal> {
                   TextButton(
                     onPressed: _closeModal,
                     style: TextButton.styleFrom(
-                      foregroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: theme.primaryColor,
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -134,14 +133,14 @@ class _EditListContentModalState extends ConsumerState<EditListContentModal> {
                       key: _animationLimiterKey,
                       child: ListView.separated(
                         shrinkWrap: true,
-                        itemBuilder: (ctx, index) =>
+                        itemBuilder: (_, index) =>
                             AnimationConfiguration.staggeredList(
                           position: index,
                           duration: const Duration(milliseconds: 375),
                           child: SlideAnimation(
                             verticalOffset: 50.0,
                             child: FadeInAnimation(
-                              child: _buildListTile(list, index, ctx),
+                              child: _buildListTile(list, index),
                             ),
                           ),
                         ),
@@ -159,7 +158,7 @@ class _EditListContentModalState extends ConsumerState<EditListContentModal> {
     );
   }
 
-  Widget _buildListTile(List<String> list, int index, BuildContext ctx) {
+  Widget _buildListTile(List<String> list, int index) {
     if (list.isEmpty && _textEditingController.text.isNotEmpty) {
       return _buildAddToListTile();
     }
@@ -170,7 +169,7 @@ class _EditListContentModalState extends ConsumerState<EditListContentModal> {
       title: Text(text),
       trailing: isSelected ? const Icon(EvaIcons.checkmark) : const SizedBox(),
       selected: isSelected,
-      selectedColor: Theme.of(ctx).primaryColor,
+      selectedColor: theme.primaryColor,
       onTap: () => _selectValue(text),
       shape: _listTileShape,
       dense: true,
@@ -185,7 +184,7 @@ class _EditListContentModalState extends ConsumerState<EditListContentModal> {
       onTap: () => _selectValue(value),
       trailing: Icon(
         EvaIcons.plusCircleOutline,
-        color: Theme.of(context).primaryColor,
+        color: theme.primaryColor,
       ),
       shape: _listTileShape,
       dense: true,

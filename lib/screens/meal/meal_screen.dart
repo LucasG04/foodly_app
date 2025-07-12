@@ -22,6 +22,7 @@ import '../../services/plan_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/convert_util.dart';
 import '../../utils/main_snackbar.dart';
+import '../../utils/of_context_mixin.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/foodly_network_image.dart';
@@ -52,7 +53,8 @@ class MealScreen extends ConsumerStatefulWidget {
   _MealScreenState createState() => _MealScreenState();
 }
 
-class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
+class _MealScreenState extends ConsumerState<MealScreen>
+    with DisposableWidget, OfContextMixin {
   final _$isLoading = AutoDisposeStateProvider<bool>((_) => true);
   final _$meal = AutoDisposeStateProvider<Meal?>((_) => null);
   final _$mealStat = AutoDisposeStateProvider<MealStat?>((_) => null);
@@ -88,7 +90,6 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
     const sidePadding = EdgeInsets.symmetric(horizontal: kPadding);
     final currentPlanId = ref.read(planProvider)!.id;
     final meal = ref.watch(_$meal);
@@ -99,8 +100,8 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
           : CustomScrollView(
               slivers: [
                 SliverAppBar(
-                  expandedHeight: size.width > 700.0 ? 400.0 : 250.0,
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  expandedHeight: media.size.width > 700.0 ? 400.0 : 250.0,
+                  backgroundColor: theme.scaffoldBackgroundColor,
                   elevation: 4,
                   stretch: true,
                   flexibleSpace: FlexibleSpaceBar(
@@ -123,9 +124,8 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                             ),
                           ),
                         Positioned(
-                          width: size.width,
-                          top:
-                              kPadding / 2 + MediaQuery.of(context).padding.top,
+                          width: media.size.width,
+                          top: kPadding / 2 + media.padding.top,
                           child: Padding(
                             padding: sidePadding,
                             child: Row(
@@ -209,10 +209,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                                       style: TextStyle(
                                         fontSize: 16.0,
                                         fontWeight: FontWeight.bold,
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge!
-                                            .color!
+                                        color: theme.textTheme.bodyLarge!.color!
                                             .withValues(alpha: 0.5),
                                       ),
                                     ),
@@ -483,7 +480,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
           ElevatedButton(
             onPressed: _openGetPremium,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).textTheme.bodyLarge!.color,
+              backgroundColor: theme.textTheme.bodyLarge!.color,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -492,13 +489,13 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
                 Text(
                   'meal_details_stats_unlock'.tr(),
                   style: TextStyle(
-                    color: Theme.of(context).scaffoldBackgroundColor,
+                    color: theme.scaffoldBackgroundColor,
                   ),
                 ),
                 Icon(
                   EvaIcons.arrowIosForwardOutline,
-                  size: Theme.of(context).textTheme.bodyLarge!.fontSize! + 5,
-                  color: Theme.of(context).scaffoldBackgroundColor,
+                  size: theme.textTheme.bodyLarge!.fontSize! + 5,
+                  color: theme.scaffoldBackgroundColor,
                 ),
               ],
             ),
@@ -540,7 +537,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
       width: 150,
       padding: const EdgeInsets.all(kPadding / 2),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
+        color: theme.cardTheme.color,
         borderRadius: BorderRadius.circular(kRadius),
         boxShadow: const [kSmallShadow],
       ),
@@ -648,7 +645,7 @@ class _MealScreenState extends ConsumerState<MealScreen> with DisposableWidget {
         OptionsSheetOptions(
           title: 'meal_details_delete'.tr(),
           icon: EvaIcons.minusCircleOutline,
-          textColor: Theme.of(context).colorScheme.error,
+          textColor: theme.colorScheme.error,
           onTap: () => _openConfirmDelete(meal),
         ),
       ]),

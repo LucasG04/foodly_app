@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../constants.dart';
+import '../utils/of_context_mixin.dart';
 
 class MainTextField extends ConsumerStatefulWidget {
   final TextEditingController? controller;
@@ -55,7 +56,7 @@ class MainTextField extends ConsumerStatefulWidget {
     this.pasteValidator,
     this.submitOnPaste = false,
     super.key,
-  })  : assert(
+  }) : assert(
             (obscureText && !pasteFromClipboard) ||
                 (!obscureText && pasteFromClipboard) ||
                 (!obscureText && !pasteFromClipboard),
@@ -65,7 +66,8 @@ class MainTextField extends ConsumerStatefulWidget {
   ConsumerState<MainTextField> createState() => _MainTextFieldState();
 }
 
-class _MainTextFieldState extends ConsumerState<MainTextField> {
+class _MainTextFieldState extends ConsumerState<MainTextField>
+    with OfContextMixin {
   final _$hasFocus = AutoDisposeStateProvider<bool>((_) => false);
   late bool _obscureText;
   FocusNode? _focusNode;
@@ -123,7 +125,7 @@ class _MainTextFieldState extends ConsumerState<MainTextField> {
         autofillHints: widget.autofillHints,
         textCapitalization:
             widget.textCapitalization ?? TextCapitalization.none,
-        cursorColor: Theme.of(context).primaryColor,
+        cursorColor: theme.primaryColor,
         decoration: InputDecoration(
           hintText: widget.placeholder,
           border: OutlineInputBorder(
@@ -133,10 +135,10 @@ class _MainTextFieldState extends ConsumerState<MainTextField> {
             borderSide: BorderSide(color: Colors.grey[300]!),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Theme.of(context).primaryColor),
+            borderSide: BorderSide(color: theme.primaryColor),
           ),
           fillColor: ref.read(_$hasFocus)
-              ? Theme.of(context).scaffoldBackgroundColor
+              ? theme.scaffoldBackgroundColor
               : Colors.grey[300],
           filled: false,
           isDense: true,
@@ -153,12 +155,12 @@ class _MainTextFieldState extends ConsumerState<MainTextField> {
                         ? Icon(
                             EvaIcons.eyeOutline,
                             size: kIconHeight,
-                            color: Theme.of(context).primaryColor,
+                            color: theme.primaryColor,
                           )
                         : Icon(
                             EvaIcons.eyeOff2Outline,
                             size: kIconHeight,
-                            color: Theme.of(context).primaryColor,
+                            color: theme.primaryColor,
                           ),
                   ),
                 )

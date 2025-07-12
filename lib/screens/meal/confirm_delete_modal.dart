@@ -12,13 +12,13 @@ class ConfirmDeleteModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width > 599
-        ? 580.0
-        : MediaQuery.of(context).size.width * 0.8;
+    final media = MediaQuery.of(context);
+    final theme = Theme.of(context);
+    final width = media.size.width > 599 ? 580.0 : media.size.width * 0.8;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (MediaQuery.of(context).size.width - width) / 2,
+        horizontal: (media.size.width - width) / 2,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,9 +37,9 @@ class ConfirmDeleteModal extends StatelessWidget {
           ),
           RichText(
             text: TextSpan(
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    fontSize: 16.0,
-                  ),
+              style: theme.textTheme.bodyLarge!.copyWith(
+                fontSize: 16.0,
+              ),
               children: <TextSpan>[
                 TextSpan(text: '${'modal_delete_sure_leading'.tr()} '),
                 TextSpan(
@@ -57,7 +57,7 @@ class ConfirmDeleteModal extends StatelessWidget {
             child: MainButton(
               text: 'modal_delete_delete'.tr(),
               onTap: () => Navigator.pop(context, true),
-              color: Theme.of(context).colorScheme.error,
+              color: theme.colorScheme.error,
             ),
           ),
           const SizedBox(height: kPadding * 2),

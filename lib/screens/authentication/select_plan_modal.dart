@@ -18,12 +18,11 @@ class SelectPlanModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final width =
-        size.width > 599 ? 580.0 : MediaQuery.of(context).size.width * 0.8;
+    final width = size.width > 599 ? 580.0 : size.width * 0.8;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (MediaQuery.of(context).size.width - width) / 2,
+        horizontal: (size.width - width) / 2,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

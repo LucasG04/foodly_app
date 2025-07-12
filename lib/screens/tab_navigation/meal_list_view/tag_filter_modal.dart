@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/lunix_api_service.dart';
+import '../../../utils/of_context_mixin.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 
 class TagFilterModal extends ConsumerStatefulWidget {
@@ -14,7 +15,8 @@ class TagFilterModal extends ConsumerStatefulWidget {
   _TagFilterModalState createState() => _TagFilterModalState();
 }
 
-class _TagFilterModalState extends ConsumerState<TagFilterModal> {
+class _TagFilterModalState extends ConsumerState<TagFilterModal>
+    with OfContextMixin {
   // empty_space is a distance of empty padding, only after scrolling through it the content starts getting under the app bar.
   static const double kEmptySpace = kPadding / 2;
 
@@ -35,12 +37,10 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width > 700
-        ? 700.0
-        : MediaQuery.of(context).size.width * 0.9;
+    final width = media.size.width > 700 ? 700.0 : media.size.width * 0.9;
 
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.8,
+      height: media.size.height * 0.8,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -48,9 +48,9 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal> {
           Expanded(
             child: Container(
               width: double.infinity,
-              color: Theme.of(context).scaffoldBackgroundColor,
+              color: theme.scaffoldBackgroundColor,
               padding: EdgeInsets.symmetric(
-                horizontal: (MediaQuery.of(context).size.width - width) / 2,
+                horizontal: (media.size.width - width) / 2,
               ),
               child: SingleChildScrollView(
                 controller: _scrollController,
@@ -111,7 +111,7 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal> {
     return Consumer(builder: (context, ref, _) {
       return Card(
         margin: EdgeInsets.zero,
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: theme.scaffoldBackgroundColor,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(10.0),
@@ -119,11 +119,11 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal> {
           ),
         ),
         elevation: ref.watch(_$isScrollToTop) ? 0 : 2,
-        surfaceTintColor: Theme.of(context).scaffoldBackgroundColor,
-        shadowColor: Theme.of(context).primaryColor,
+        surfaceTintColor: theme.scaffoldBackgroundColor,
+        shadowColor: theme.primaryColor,
         child: Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: (MediaQuery.of(context).size.width - width) / 2,
+            horizontal: (media.size.width - width) / 2,
             vertical: kPadding / 2,
           ),
           child: Row(
@@ -160,13 +160,11 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal> {
           color: isSelected ? Colors.white : Colors.black,
         ),
       ),
-      backgroundColor: isSelected
-          ? Theme.of(context).primaryColor
-          : Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor:
+          isSelected ? theme.primaryColor : theme.scaffoldBackgroundColor,
       selected: isSelected,
-      selectedColor: Theme.of(context).primaryColor,
-      selectedShadowColor:
-          Theme.of(context).primaryColor.withValues(alpha: 0.3),
+      selectedColor: theme.primaryColor,
+      selectedShadowColor: theme.primaryColor.withValues(alpha: 0.3),
       onSelected: (selected) {
         if (selected) {
           ref.read(mealTagFilterProvider.notifier).state = [
