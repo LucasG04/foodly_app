@@ -18,6 +18,7 @@ import '../../services/meal_stat_service.dart';
 import '../../services/plan_service.dart';
 import '../../services/settings_service.dart';
 import '../../utils/main_snackbar.dart';
+import '../../utils/of_context_mixin.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/get_premium_info.dart';
 import '../../widgets/main_appbar.dart';
@@ -31,13 +32,15 @@ class MealSelectScreen extends ConsumerStatefulWidget {
   final DateTime date;
   final MealType mealType;
 
-  const MealSelectScreen({required this.date, required this.mealType, super.key});
+  const MealSelectScreen(
+      {required this.date, required this.mealType, super.key});
 
   @override
   _MealSelectScreenState createState() => _MealSelectScreenState();
 }
 
-class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
+class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
+    with OfContextMixin {
   final _$isSearching = StateProvider.autoDispose<bool>((_) => false);
   final _$randomMeal = FutureProvider.autoDispose<Meal?>(
       (ref) => LunixApiService.getRandomMeal(ref.read(planProvider)!.id!));
@@ -47,7 +50,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
   List<Meal> searchedMeals = [];
 
   double get _containerWidth {
-    final width = MediaQuery.of(context).size.width * 0.9;
+    final width = media.size.width * 0.9;
     return width > 599 ? 600 : width;
   }
 
@@ -218,8 +221,8 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen> {
                       onPressed: _showRecommendationsInfo,
                       icon: Icon(
                         EvaIcons.infoOutline,
-                        color: Theme.of(context).textTheme.bodyLarge?.color ??
-                            Theme.of(context).primaryColor,
+                        color: theme.textTheme.bodyLarge?.color ??
+                            theme.primaryColor,
                       ),
                       splashRadius: 25.0,
                     ),

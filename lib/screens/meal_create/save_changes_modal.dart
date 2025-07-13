@@ -11,13 +11,12 @@ class SaveChangesModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width > 599
-        ? 580.0
-        : MediaQuery.of(context).size.width * 0.8;
+    final media = MediaQuery.of(context);
+    final width = media.size.width > 599 ? 580.0 : media.size.width * 0.8;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (MediaQuery.of(context).size.width - width) / 2,
+        horizontal: (media.size.width - width) / 2,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

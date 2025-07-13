@@ -1,6 +1,8 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/of_context_mixin.dart';
+
 class MainAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String text;
   final bool showBack;
@@ -24,7 +26,7 @@ class MainAppBar extends StatefulWidget implements PreferredSizeWidget {
   Size get preferredSize => Size.fromHeight(AppBar().preferredSize.height);
 }
 
-class _MainAppBarState extends State<MainAppBar> {
+class _MainAppBarState extends State<MainAppBar> with OfContextMixin {
   bool _isScrollToTop = true;
   // empty_space is a distance of empty padding, only after scrolling through it the content starts getting under the app bar.
   static const double kEmptySpace = 10.0;
@@ -52,20 +54,20 @@ class _MainAppBarState extends State<MainAppBar> {
         style: TextStyle(
           fontWeight: FontWeight.w600,
           fontFamily: 'Poppins',
-          color: Theme.of(context).textTheme.bodyLarge!.color,
+          color: theme.textTheme.bodyLarge!.color,
         ),
         overflow: TextOverflow.fade,
       ),
       centerTitle: true,
       elevation: _isScrollToTop ? 0 : 2,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      surfaceTintColor: Theme.of(context).scaffoldBackgroundColor,
-      shadowColor: Theme.of(context).primaryColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      surfaceTintColor: theme.scaffoldBackgroundColor,
+      shadowColor: theme.primaryColor,
       leading: widget.showBack
           ? IconButton(
               icon: Icon(
-                _getIconData(Theme.of(context).platform),
-                color: Theme.of(context).textTheme.bodyLarge!.color,
+                _getIconData(theme.platform),
+                color: theme.textTheme.bodyLarge!.color,
               ),
               tooltip: MaterialLocalizations.of(context).backButtonTooltip,
               onPressed: () async {

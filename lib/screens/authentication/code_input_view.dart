@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../constants.dart';
 import '../../services/plan_service.dart';
+import '../../utils/of_context_mixin.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import 'authentication_keys.dart';
@@ -21,7 +22,7 @@ class CodeInputView extends StatefulWidget {
   State<CodeInputView> createState() => _CodeInputViewState();
 }
 
-class _CodeInputViewState extends State<CodeInputView> {
+class _CodeInputViewState extends State<CodeInputView> with OfContextMixin {
   late bool _loadingCode;
   TextEditingController? _codeController;
   String? _errorText;
@@ -35,18 +36,16 @@ class _CodeInputViewState extends State<CodeInputView> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final contentWidth = size.width > 599 ? 600 : size.width * 0.9;
+    final contentWidth = media.size.width > 599 ? 600 : media.size.width * 0.9;
     return Stack(
       children: <Widget>[
         ListView(
           padding: EdgeInsets.symmetric(
-            horizontal: (MediaQuery.of(context).size.width - contentWidth) / 2,
+            horizontal: (media.size.width - contentWidth) / 2,
           ),
           children: [
             SizedBox(
-                height: size.height * 0.41 -
-                    MediaQuery.of(context).viewInsets.bottom / 6),
+                height: media.size.height * 0.41 - media.viewInsets.bottom / 6),
             SizedBox(
               width: contentWidth * 0.7,
               child: Text(
@@ -64,13 +63,13 @@ class _CodeInputViewState extends State<CodeInputView> {
                   key: AuthenticationKeys.buttonForgotCode,
                   child: Text(
                     'login_code_forgot',
-                    style: TextStyle(color: Theme.of(context).primaryColor),
+                    style: TextStyle(color: theme.primaryColor),
                   ).tr(),
                   onPressed: () => widget.onPageChange(CodeInputResult.FORGOT),
                 ),
               ),
             ),
-            SizedBox(height: size.height * 0.1),
+            SizedBox(height: media.size.height * 0.1),
             SizedBox(
               width: contentWidth * 0.7,
               child: const Text(
@@ -93,18 +92,18 @@ class _CodeInputViewState extends State<CodeInputView> {
           clipper: LoginDesignClipper(),
           shadow: Shadow(
             blurRadius: 24,
-            color: Theme.of(context).primaryColor,
+            color: theme.primaryColor,
           ),
           child: Container(
-            height: size.height * 0.4,
-            width: size.width,
-            color: Theme.of(context).primaryColor,
+            height: media.size.height * 0.4,
+            width: media.size.width,
+            color: theme.primaryColor,
             child: Container(
               margin: const EdgeInsets.only(left: 24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  SizedBox(height: size.height * 0.1),
+                  SizedBox(height: media.size.height * 0.1),
                   const Text(
                     'login_code_welcome',
                     style: TextStyle(
@@ -153,7 +152,7 @@ class _CodeInputViewState extends State<CodeInputView> {
             : IconButton(
                 icon: Icon(
                   EvaIcons.checkmark,
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: theme.colorScheme.secondary,
                 ),
                 onPressed: () => _validateCode(_codeController!.text),
               ),

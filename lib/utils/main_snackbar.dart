@@ -34,6 +34,7 @@ class MainSnackbar {
     if (!context.mounted) {
       return Future.value();
     }
+    final theme = Theme.of(context);
     return Flushbar<dynamic>(
       margin: const EdgeInsets.all(8),
       borderRadius: BorderRadius.circular(10.0),
@@ -43,7 +44,7 @@ class MainSnackbar {
       isDismissible: isDismissible || infinite,
       onTap: infinite ? (_) => Navigator.maybePop(context) : null,
       icon: isCountdown
-          ? _buildCountdown()
+          ? _buildCountdown(theme)
           : isSuccess
               ? Icon(
                   EvaIcons.checkmarkCircle2Outline,
@@ -53,18 +54,18 @@ class MainSnackbar {
                   ? Icon(
                       EvaIcons.alertCircleOutline,
                       size: 28.0,
-                      color: Theme.of(context).colorScheme.error,
+                      color: theme.colorScheme.error,
                     )
                   : Icon(
                       EvaIcons.infoOutline,
                       size: 28.0,
-                      color: Theme.of(context).primaryColor,
+                      color: theme.primaryColor,
                     ),
       mainButton: action,
     ).show(context);
   }
 
-  Widget _buildCountdown() {
+  Widget _buildCountdown(ThemeData theme) {
     return Container(
       constraints: const BoxConstraints(maxHeight: 22.0),
       child: TweenAnimationBuilder(
@@ -81,7 +82,7 @@ class MainSnackbar {
                   strokeWidth: 2.0,
                   value: _getProgressValue(value),
                   color: Colors.grey[850],
-                  backgroundColor: Theme.of(context).dialogBackgroundColor,
+                  backgroundColor: theme.dialogBackgroundColor,
                 ),
               ),
               Center(
@@ -89,7 +90,7 @@ class MainSnackbar {
                   _getCountdownText(value),
                   textScaler: const TextScaler.linear(0.85),
                   style: TextStyle(
-                    color: Theme.of(context).dialogBackgroundColor,
+                    color: theme.dialogBackgroundColor,
                   ),
                 ),
               ),

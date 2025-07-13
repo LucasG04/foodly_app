@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../constants.dart';
 import '../../../providers/state_providers.dart';
+import '../../../utils/of_context_mixin.dart';
 import 'tag_filter_modal.dart';
 
 class MealListTitle extends StatefulWidget {
@@ -25,7 +26,7 @@ class MealListTitle extends StatefulWidget {
   State<MealListTitle> createState() => _MealListTitleState();
 }
 
-class _MealListTitleState extends State<MealListTitle> {
+class _MealListTitleState extends State<MealListTitle> with OfContextMixin {
   bool _searchActive = false;
   TextEditingController? _textEditingController;
 
@@ -43,9 +44,7 @@ class _MealListTitleState extends State<MealListTitle> {
       child: Center(
         child: SizedBox(
           height: 50.0,
-          width: MediaQuery.of(context).size.width > 599
-              ? 600.0
-              : MediaQuery.of(context).size.width * 0.9,
+          width: media.size.width > 599 ? 600.0 : media.size.width * 0.9,
           child: Row(
             children: [
               Expanded(
@@ -69,7 +68,7 @@ class _MealListTitleState extends State<MealListTitle> {
                         ref.watch(mealTagFilterProvider).length;
                     return badges.Badge(
                       badgeStyle: badges.BadgeStyle(
-                        badgeColor: Theme.of(context).primaryColor,
+                        badgeColor: theme.primaryColor,
                       ),
                       position: badges.BadgePosition.topEnd(top: 0, end: 3),
                       badgeAnimation: const badges.BadgeAnimation.scale(
@@ -142,7 +141,7 @@ class _MealListTitleState extends State<MealListTitle> {
       controller: _textEditingController,
       autofocus: true,
       onChanged: widget.onSearch,
-      cursorColor: Theme.of(context).primaryColor,
+      cursorColor: theme.primaryColor,
       style: const TextStyle(
         fontSize: 32.0,
         fontWeight: FontWeight.w700,
@@ -151,10 +150,10 @@ class _MealListTitleState extends State<MealListTitle> {
       decoration: InputDecoration(
         hintText: '${'meal_list_search'.tr()}...',
         enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Theme.of(context).primaryColor),
+          borderSide: BorderSide(color: theme.primaryColor),
         ),
         focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Theme.of(context).primaryColor),
+          borderSide: BorderSide(color: theme.primaryColor),
         ),
       ),
     );

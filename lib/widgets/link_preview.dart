@@ -6,6 +6,7 @@ import '../constants.dart';
 import '../models/link_metadata.dart';
 import '../services/link_metadata_service.dart';
 import '../utils/basic_utils.dart';
+import '../utils/of_context_mixin.dart';
 import 'foodly_network_image.dart';
 import 'skeleton_container.dart';
 
@@ -23,7 +24,7 @@ class LinkPreview extends StatefulWidget {
   State<LinkPreview> createState() => _LinkPreviewState();
 }
 
-class _LinkPreviewState extends State<LinkPreview> {
+class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
   @override
   Widget build(BuildContext context) {
     if (!BasicUtils.isValidUri(widget.link)) {
@@ -35,8 +36,8 @@ class _LinkPreviewState extends State<LinkPreview> {
     }
     return metadata != null
         ? widget.isSmall
-            ? _buildSmallCard(metadata, context)
-            : _buildLargeCard(metadata, context)
+            ? _buildSmallCard(metadata)
+            : _buildLargeCard(metadata)
         : FutureBuilder<LinkMetadata?>(
             future: LinkMetadataService.getFromApi(widget.link),
             builder: (context, snapshot) {
@@ -49,13 +50,13 @@ class _LinkPreviewState extends State<LinkPreview> {
               }
 
               return widget.isSmall
-                  ? _buildSmallCard(snapshot.data!, context)
-                  : _buildLargeCard(snapshot.data!, context);
+                  ? _buildSmallCard(snapshot.data!)
+                  : _buildLargeCard(snapshot.data!);
             },
           );
   }
 
-  Widget _buildLargeCard(LinkMetadata metadata, BuildContext context) {
+  Widget _buildLargeCard(LinkMetadata metadata) {
     return GestureDetector(
       onTap: metadata.url != null
           ? () => launchUrl(Uri.parse(metadata.url!))
@@ -65,7 +66,7 @@ class _LinkPreviewState extends State<LinkPreview> {
           children: [
             if (metadata.image != null)
               SizedBox(
-                height: _getLargeImageHeight(context),
+                height: _getLargeImageHeight(),
                 width: double.infinity,
                 child: FoodlyNetworkImage(metadata.image!),
               ),
@@ -94,8 +95,8 @@ class _LinkPreviewState extends State<LinkPreview> {
     );
   }
 
-  Widget _buildSmallCard(LinkMetadata metadata, BuildContext context) {
-    final height = _getSmallCardHeight(context);
+  Widget _buildSmallCard(LinkMetadata metadata) {
+    final height = _getSmallCardHeight();
     return GestureDetector(
       onTap: metadata.url != null
           ? () => launchUrl(Uri.parse(metadata.url!))
@@ -158,26 +159,25 @@ class _LinkPreviewState extends State<LinkPreview> {
   }
 
   Widget _buildLargeSkeletonCard(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return Card(
       child: Column(
         children: [
           SkeletonContainer(
-            width: size.width,
-            height: Theme.of(context).textTheme.bodyLarge!.fontSize,
+            width: media.size.width,
+            height: theme.textTheme.bodyLarge!.fontSize,
           ),
           Padding(
             padding: const EdgeInsets.all(kPadding / 2),
             child: Column(
               children: [
                 SkeletonContainer(
-                  width: size.width * 0.5,
-                  height: _getLargeImageHeight(context),
+                  width: media.size.width * 0.5,
+                  height: _getLargeImageHeight(),
                 ),
                 const SizedBox(height: kPadding / 4),
                 SkeletonContainer(
-                  width: size.width,
-                  height: Theme.of(context).textTheme.bodyLarge!.fontSize! * 2,
+                  width: media.size.width,
+                  height: theme.textTheme.bodyLarge!.fontSize! * 2,
                 ),
               ],
             ),
@@ -188,8 +188,7 @@ class _LinkPreviewState extends State<LinkPreview> {
   }
 
   Widget _buildSmallSkeletonCard(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final height = _getSmallCardHeight(context);
+    final height = _getSmallCardHeight();
     return Container(
       width: double.infinity,
       height: height,
@@ -212,11 +211,11 @@ class _LinkPreviewState extends State<LinkPreview> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SkeletonContainer(
-                    width: size.width * 0.4,
+                    width: media.size.width * 0.4,
                     height: Theme.of(context).textTheme.bodyLarge!.fontSize,
                   ),
                   SkeletonContainer(
-                    width: size.width * 0.6,
+                    width: media.size.width * 0.6,
                     height:
                         Theme.of(context).textTheme.bodyLarge!.fontSize! * 2,
                   ),
@@ -229,8 +228,7 @@ class _LinkPreviewState extends State<LinkPreview> {
     );
   }
 
-  double _getLargeImageHeight(BuildContext context) =>
-      MediaQuery.of(context).size.height * 0.2;
+  double _getLargeImageHeight() => media.size.height * 0.2;
 
-  double _getSmallCardHeight(BuildContext context) => 75.0;
+  double _getSmallCardHeight() => 75.0;
 }

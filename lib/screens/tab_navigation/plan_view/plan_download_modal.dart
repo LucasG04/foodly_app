@@ -10,6 +10,7 @@ import '../../../models/plan_meal.dart';
 import '../../../services/lunix_api_service.dart';
 import '../../../services/settings_service.dart';
 import '../../../utils/main_snackbar.dart';
+import '../../../utils/of_context_mixin.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/progress_button.dart';
 import '../../settings/settings_tile.dart';
@@ -26,7 +27,8 @@ class PlanDownloadModal extends StatefulWidget {
   State<PlanDownloadModal> createState() => _PlanDownloadModalState();
 }
 
-class _PlanDownloadModalState extends State<PlanDownloadModal> {
+class _PlanDownloadModalState extends State<PlanDownloadModal>
+    with OfContextMixin {
   ButtonState _buttonState = ButtonState.normal;
   bool _excludeToday = false;
   bool _portraitFormat = false;
@@ -41,13 +43,11 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width > 599
-        ? 580.0
-        : MediaQuery.of(context).size.width * 0.8;
+    final width = media.size.width > 599 ? 580.0 : media.size.width * 0.8;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (MediaQuery.of(context).size.width - width) / 2,
+        horizontal: (media.size.width - width) / 2,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -68,7 +68,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
                   onPressed: _openDocxInfo,
                   icon: Icon(
                     EvaIcons.infoOutline,
-                    color: Theme.of(context).primaryColor,
+                    color: theme.primaryColor,
                   ),
                   splashRadius: 25.0,
                 ),
@@ -80,7 +80,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
             trailing: Checkbox(
               value: _excludeToday,
               onChanged: _excludeTodayChange,
-              activeColor: Theme.of(context).primaryColor,
+              activeColor: theme.primaryColor,
             ),
             onTap: () => _excludeTodayChange(!_excludeToday),
           ),
@@ -89,7 +89,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
             trailing: Checkbox(
               value: _portraitFormat,
               onChanged: _portraitFormatChange,
-              activeColor: Theme.of(context).primaryColor,
+              activeColor: theme.primaryColor,
             ),
             onTap: () => _portraitFormatChange(!_portraitFormat),
           ),
@@ -99,7 +99,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
               trailing: Checkbox(
                 value: _includeBreakfast,
                 onChanged: _includeBreakfastChange,
-                activeColor: Theme.of(context).primaryColor,
+                activeColor: theme.primaryColor,
               ),
               onTap: () => _includeBreakfastChange(!_includeBreakfast),
             ),
@@ -107,7 +107,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal> {
             text: 'plan_download_modal_type'.tr(),
             trailing: DropdownButton<_PlanDocType>(
               value: _docType,
-              dropdownColor: Theme.of(context).scaffoldBackgroundColor,
+              dropdownColor: theme.scaffoldBackgroundColor,
               items: _PlanDocType.values
                   .map((type) => DropdownMenuItem<_PlanDocType>(
                         value: type,

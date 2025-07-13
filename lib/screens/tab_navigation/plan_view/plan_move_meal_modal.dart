@@ -9,6 +9,7 @@ import '../../../providers/state_providers.dart';
 import '../../../services/plan_service.dart';
 import '../../../services/settings_service.dart';
 import '../../../utils/basic_utils.dart';
+import '../../../utils/of_context_mixin.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/progress_button.dart';
 
@@ -22,13 +23,14 @@ class PlanMoveMealModal extends ConsumerStatefulWidget {
     this.planMeal,
     this.meal,
     super.key,
-  })  : assert((isMoving && planMeal != null) || (!isMoving && meal != null));
+  }) : assert((isMoving && planMeal != null) || (!isMoving && meal != null));
 
   @override
   PlanMoveMealModalState createState() => PlanMoveMealModalState();
 }
 
-class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal> {
+class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
+    with OfContextMixin {
   late DateTime _selectedDate;
   late MealType _selectedMealType;
   late final List<DateTime> _dropdownValues;
@@ -47,13 +49,11 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width > 599
-        ? 580.0
-        : MediaQuery.of(context).size.width * 0.8;
+    final width = media.size.width > 599 ? 580.0 : media.size.width * 0.8;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (MediaQuery.of(context).size.width - width) / 2,
+        horizontal: (media.size.width - width) / 2,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -82,7 +82,7 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal> {
           const SizedBox(height: kPadding),
           DropdownButton(
             value: _selectedDate,
-            dropdownColor: Theme.of(context).scaffoldBackgroundColor,
+            dropdownColor: theme.scaffoldBackgroundColor,
             items: _dropdownValues
                 .map(
                   (date) => DropdownMenuItem(
@@ -101,7 +101,7 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal> {
               value: MealType.BREAKFAST,
               groupValue: _selectedMealType,
               onChanged: _changeMealType,
-              activeColor: Theme.of(context).primaryColor,
+              activeColor: theme.primaryColor,
             ),
           if (_showMealTile(MealType.LUNCH))
             RadioListTile(
@@ -109,7 +109,7 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal> {
               value: MealType.LUNCH,
               groupValue: _selectedMealType,
               onChanged: _changeMealType,
-              activeColor: Theme.of(context).primaryColor,
+              activeColor: theme.primaryColor,
             ),
           if (_showMealTile(MealType.DINNER))
             RadioListTile(
@@ -117,7 +117,7 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal> {
               value: MealType.DINNER,
               groupValue: _selectedMealType,
               onChanged: _changeMealType,
-              activeColor: Theme.of(context).primaryColor,
+              activeColor: theme.primaryColor,
             ),
           const SizedBox(height: kPadding),
           Center(

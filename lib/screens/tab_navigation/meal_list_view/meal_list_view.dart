@@ -13,6 +13,7 @@ import '../../../services/lunix_api_service.dart';
 import '../../../services/meal_service.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/debouncer.dart';
+import '../../../utils/of_context_mixin.dart';
 import '../../../widgets/disposable_widget.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import '../../../widgets/user_information.dart';
@@ -28,7 +29,7 @@ class MealListView extends ConsumerStatefulWidget {
 }
 
 class _MealListViewState extends ConsumerState<MealListView>
-    with AutomaticKeepAliveClientMixin, DisposableWidget {
+    with AutomaticKeepAliveClientMixin, DisposableWidget, OfContextMixin {
   late AutoDisposeStateProvider<bool> _$isLoading;
   late StateProvider<bool> _$isLoadingPagination;
   late StateProvider<bool> _$isSearching;
@@ -130,9 +131,7 @@ class _MealListViewState extends ConsumerState<MealListView>
   Widget _buildSubtitle(BuildContext context, String value) {
     return Center(
       child: Container(
-        width: MediaQuery.of(context).size.width > 599
-            ? 600.0
-            : MediaQuery.of(context).size.width * 0.9,
+        width: media.size.width > 599 ? 600.0 : media.size.width * 0.9,
         margin: const EdgeInsets.only(top: kPadding),
         child: Text(
           value,
@@ -211,11 +210,11 @@ class _MealListViewState extends ConsumerState<MealListView>
           ),
           icon: Icon(
             EvaIcons.questionMarkCircleOutline,
-            color: Theme.of(context).primaryColor,
+            color: theme.primaryColor,
           ),
           label: Text(
             'meal_list_help_import',
-            style: TextStyle(color: Theme.of(context).primaryColor),
+            style: TextStyle(color: theme.primaryColor),
           ).tr(),
         ),
       ],

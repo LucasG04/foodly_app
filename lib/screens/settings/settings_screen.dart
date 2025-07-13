@@ -26,6 +26,7 @@ import '../../models/plan.dart';
 import '../../models/shopping_list_sort.dart';
 import '../../services/foodly_user_service.dart';
 import '../../services/in_app_purchase_service.dart';
+import '../../utils/of_context_mixin.dart';
 import '../../utils/permission_utils.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
@@ -46,7 +47,8 @@ class SettingsScreen extends ConsumerStatefulWidget {
   _SettingsScreenState createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen>
+    with OfContextMixin {
   final Logger _log = Logger('SettingsScreen');
   final ScrollController _scrollController = ScrollController();
   final _$loadingChangePlanLockState =
@@ -81,7 +83,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   controller: _scrollController,
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: (MediaQuery.of(context).size.width -
+                      horizontal: (media.size.width -
                               BasicUtils.contentWidth(context)) /
                           2,
                     ),
@@ -94,8 +96,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             text: 'settings_section_general_language'.tr(),
                             trailing: DropdownButton<Locale>(
                               value: context.locale,
-                              dropdownColor:
-                                  Theme.of(context).scaffoldBackgroundColor,
+                              dropdownColor: theme.scaffoldBackgroundColor,
                               items: context.supportedLocales
                                   .map((locale) => DropdownMenuItem<Locale>(
                                         value: locale,
@@ -401,7 +402,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             return RichText(
                               textAlign: TextAlign.center,
                               text: TextSpan(
-                                style: Theme.of(context).textTheme.bodyLarge,
+                                style: theme.textTheme.bodyLarge,
                                 children: <TextSpan>[
                                   TextSpan(text: 'settings_sign_in_as'.tr()),
                                   TextSpan(
@@ -425,14 +426,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 onPressed: () => _launchUrl(kAppPrivacyUrl),
                                 child: Text(
                                   'settings_privacy'.tr(),
-                                  style: Theme.of(context).textTheme.bodyLarge,
+                                  style: theme.textTheme.bodyLarge,
                                 ),
                               ),
                               TextButton(
                                 onPressed: () => _launchUrl(kAppTermsOfUseUrl),
                                 child: Text(
                                   'settings_terms_of_use'.tr(),
-                                  style: Theme.of(context).textTheme.bodyLarge,
+                                  style: theme.textTheme.bodyLarge,
                                 ),
                               ),
                             ],
@@ -463,7 +464,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               );
               return DropdownButton<_ShoppingListSortValue>(
                 value: sortObject,
-                dropdownColor: Theme.of(context).scaffoldBackgroundColor,
+                dropdownColor: theme.scaffoldBackgroundColor,
                 items: shoppingListSorts
                     .map((sort) => DropdownMenuItem<_ShoppingListSortValue>(
                           value: sort,
@@ -486,10 +487,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Widget _buildSection(List<Widget> widgets, BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.9,
+      width: media.size.width * 0.9,
       margin: const EdgeInsets.only(bottom: kPadding),
       decoration: BoxDecoration(
-        color: Theme.of(context).dialogBackgroundColor,
+        color: theme.dialogBackgroundColor,
         borderRadius: BorderRadius.circular(kRadius),
       ),
       child: Wrap(children: widgets),

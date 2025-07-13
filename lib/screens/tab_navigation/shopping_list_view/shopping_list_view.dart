@@ -19,6 +19,7 @@ import '../../../services/shopping_list_service.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/convert_util.dart';
 import '../../../utils/main_snackbar.dart';
+import '../../../utils/of_context_mixin.dart';
 import '../../../utils/permission_utils.dart';
 import '../../../utils/widget_utils.dart';
 import '../../../widgets/ingredient_edit_modal.dart';
@@ -36,7 +37,7 @@ class ShoppingListView extends ConsumerStatefulWidget {
 }
 
 class _ShoppingListViewState extends ConsumerState<ShoppingListView>
-    with AutomaticKeepAliveClientMixin {
+    with AutomaticKeepAliveClientMixin, OfContextMixin {
   final _scrollController = ScrollController();
 
   final shoppingListStreamProvider =
@@ -160,7 +161,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                 title: Text(
                   'shopping_list_already_bought',
                   style: TextStyle(
-                    color: Theme.of(context).primaryColor,
+                    color: theme.primaryColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ).tr(),
@@ -183,19 +184,16 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                       },
                       style: ButtonStyle(
                         shadowColor: WidgetStateProperty.all<Color>(
-                          Theme.of(context).colorScheme.error,
+                          theme.colorScheme.error,
                         ),
                         overlayColor: WidgetStateProperty.all<Color>(
-                          Theme.of(context)
-                              .colorScheme
-                              .error
-                              .withValues(alpha: 0.1),
+                          theme.colorScheme.error.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Text(
                         'shopping_list_remove_all',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
+                          color: theme.colorScheme.error,
                         ),
                       ).tr(),
                     ),
@@ -392,7 +390,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
       isCountdown: true,
       isDismissible: true,
       action: IconButton(
-        icon: Icon(EvaIcons.undoOutline, color: Theme.of(context).primaryColor),
+        icon: Icon(EvaIcons.undoOutline, color: theme.primaryColor),
         onPressed: () {
           ShoppingListService.addGrocery(
             listId,
@@ -436,7 +434,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
           onPressed: () => Navigator.of(context).pop(),
           child: Text(
             'shopping_dialog_action_cancel'.tr().toUpperCase(),
-            style: TextStyle(color: Theme.of(context).primaryColor),
+            style: TextStyle(color: theme.primaryColor),
           ),
         ),
         CupertinoDialogAction(
@@ -447,7 +445,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
           isDefaultAction: true,
           child: Text(
             'update_dialog_action_delete'.tr().toUpperCase(),
-            style: TextStyle(color: Theme.of(context).primaryColor),
+            style: TextStyle(color: theme.primaryColor),
           ),
         ),
       ],
@@ -469,7 +467,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
         TextButton(
           child: Text(
             'shopping_dialog_action_cancel'.tr(),
-            style: TextStyle(color: Theme.of(context).primaryColor),
+            style: TextStyle(color: theme.primaryColor),
           ),
           onPressed: () {
             Navigator.of(context).pop();
@@ -478,7 +476,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
         TextButton(
           child: Text(
             'update_dialog_action_delete'.tr(),
-            style: TextStyle(color: Theme.of(context).primaryColor),
+            style: TextStyle(color: theme.primaryColor),
           ),
           onPressed: () {
             ShoppingListService.deleteAllBoughtGrocery(listId);
