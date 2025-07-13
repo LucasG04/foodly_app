@@ -50,7 +50,7 @@ android {
 
     defaultConfig {
         applicationId "io.golenia.foodly"
-        minSdkVersion 33
+        minSdkVersion 24
         targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
