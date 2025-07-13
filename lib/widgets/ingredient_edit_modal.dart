@@ -16,6 +16,7 @@ import '../../../widgets/suggestion_tile.dart';
 import '../models/grocery.dart';
 import '../models/ingredient.dart';
 import '../services/in_app_purchase_service.dart';
+import '../utils/of_context_mixin.dart';
 
 class IngredientEditModal extends ConsumerStatefulWidget {
   final Ingredient ingredient;
@@ -31,7 +32,8 @@ class IngredientEditModal extends ConsumerStatefulWidget {
   _IngredientEditModalState createState() => _IngredientEditModalState();
 }
 
-class _IngredientEditModalState extends ConsumerState<IngredientEditModal> {
+class _IngredientEditModalState extends ConsumerState<IngredientEditModal>
+    with OfContextMixin {
   static final _log = Logger('IngredientEditModal');
   late Debouncer _nameDebouncer;
   late TextEditingController _nameController;
@@ -81,13 +83,11 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width > 599
-        ? 580.0
-        : MediaQuery.of(context).size.width * 0.9;
+    final width = media.size.width > 599 ? 580.0 : media.size.width * 0.9;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (MediaQuery.of(context).size.width - width) / 2,
+        horizontal: (media.size.width - width) / 2,
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -170,9 +170,9 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal> {
               }),
             ),
             SizedBox(
-              height: MediaQuery.of(context).viewInsets.bottom == 0
+              height: media.viewInsets.bottom == 0
                   ? kPadding * 2
-                  : MediaQuery.of(context).viewInsets.bottom,
+                  : media.viewInsets.bottom,
             ),
           ],
         ),

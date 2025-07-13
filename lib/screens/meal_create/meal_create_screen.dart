@@ -18,6 +18,7 @@ import '../../services/meal_service.dart';
 import '../../services/storage_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
+import '../../utils/of_context_mixin.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/link_preview.dart';
 import '../../widgets/main_appbar.dart';
@@ -43,7 +44,8 @@ class MealCreateScreen extends ConsumerStatefulWidget {
   _MealCreateScreenState createState() => _MealCreateScreenState();
 }
 
-class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
+class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
+    with OfContextMixin {
   bool _mealSaved = false;
   bool _isFirstCall = true;
   final ScrollController _scrollController = ScrollController();
@@ -111,9 +113,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final fullWidth = MediaQuery.of(context).size.width > 699
-        ? 700.0
-        : MediaQuery.of(context).size.width * 0.8;
+    final fullWidth = media.size.width > 699 ? 700.0 : media.size.width * 0.8;
 
     // ignore: deprecated_member_use, see https://github.com/flutter/flutter/issues/138614
     return WillPopScope(
@@ -129,7 +129,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
               IconButton(
                 icon: Icon(
                   EvaIcons.downloadOutline,
-                  color: Theme.of(context).textTheme.bodyLarge!.color,
+                  color: theme.textTheme.bodyLarge!.color,
                 ),
                 onPressed: () => _openChefkochImport(),
               ),
@@ -178,9 +178,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
                                     Flexible(
                                       child: Text(
                                         'meal_create_servings_title',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge,
+                                        style: theme.textTheme.bodyLarge,
                                         overflow: TextOverflow.ellipsis,
                                       ).tr(),
                                     ),
@@ -202,8 +200,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen> {
                                   width: double.infinity,
                                   child: Text(
                                     'meal_create_instruction_title',
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
+                                    style: theme.textTheme.bodyLarge,
                                   ).tr(),
                                 ),
                                 MarkdownEditor(

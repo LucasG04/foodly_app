@@ -23,7 +23,7 @@ class SelectMealTile extends StatefulWidget {
     this.secondaryAction,
     this.isLoading = false,
     super.key,
-  })  : assert(isLoading || (!isLoading && meal != null && onAddMeal != null));
+  }) : assert(isLoading || (!isLoading && meal != null && onAddMeal != null));
 
   @override
   State<SelectMealTile> createState() => _SelectMealTileState();
@@ -34,6 +34,7 @@ class _SelectMealTileState extends State<SelectMealTile> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
     return Align(
       child: GestureDetector(
         onTap: () {
@@ -69,7 +70,7 @@ class _SelectMealTileState extends State<SelectMealTile> {
                 child: widget.isLoading
                     ? SkeletonContainer(
                         height: 16.0,
-                        width: MediaQuery.of(context).size.width * 0.5,
+                        width: width * 0.5,
                       )
                     : AutoSizeText(
                         widget.meal!.name,

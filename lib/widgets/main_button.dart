@@ -31,7 +31,8 @@ class MainButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = color ?? Theme.of(context).primaryColor;
+    final theme = Theme.of(context);
+    final textColor = color ?? theme.primaryColor;
     return !isProgress
         ? InkWell(
             onTap: onTap,
@@ -44,7 +45,7 @@ class MainButton extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     )
                   : BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
+                      color: theme.scaffoldBackgroundColor,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: textColor),
                     ),
@@ -53,14 +54,12 @@ class MainButton extends StatelessWidget {
                     ? Text(
                         text!,
                         style: !isSecondary
-                            ? Theme.of(context)
-                                .textTheme
-                                .labelLarge!
+                            ? theme.textTheme.labelLarge!
                                 .copyWith(color: Colors.white)
-                            : Theme.of(context).textTheme.bodyLarge!.copyWith(
-                                  color: kTextHeadlineColor,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            : theme.textTheme.bodyLarge!.copyWith(
+                                color: kTextHeadlineColor,
+                                fontWeight: FontWeight.bold,
+                              ),
                       )
                     : Icon(
                         iconData,
@@ -81,7 +80,7 @@ class MainButton extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     )
                   : BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
+                      color: theme.scaffoldBackgroundColor,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: textColor),
                     ),
@@ -92,14 +91,11 @@ class MainButton extends StatelessWidget {
               child: Text(
                 text!,
                 style: !isSecondary
-                    ? Theme.of(context)
-                        .textTheme
-                        .labelLarge!
-                        .copyWith(color: Colors.white)
-                    : Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: kTextHeadlineColor,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ? theme.textTheme.labelLarge!.copyWith(color: Colors.white)
+                    : theme.textTheme.bodyLarge!.copyWith(
+                        color: kTextHeadlineColor,
+                        fontWeight: FontWeight.bold,
+                      ),
               ),
             ),
           );

@@ -11,6 +11,7 @@ import '../../models/ingredient.dart';
 import '../../providers/state_providers.dart';
 import '../../services/shopping_list_service.dart';
 import '../../utils/basic_utils.dart';
+import '../../utils/of_context_mixin.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/ingredient_edit_modal.dart';
 import 'meal_list_view/meal_list_view.dart';
@@ -24,7 +25,8 @@ class TabNavigationView extends ConsumerStatefulWidget {
   _TabNavigationViewState createState() => _TabNavigationViewState();
 }
 
-class _TabNavigationViewState extends ConsumerState<TabNavigationView> {
+class _TabNavigationViewState extends ConsumerState<TabNavigationView>
+    with OfContextMixin {
   final PageController _pageController = PageController(initialPage: 1);
   int _currentIndex = 1;
   bool _navbarAnimating = false;
@@ -53,7 +55,7 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView> {
       ),
       floatingActionButton: _showActionButton()
           ? FloatingActionButton(
-              backgroundColor: Theme.of(context).primaryColor,
+              backgroundColor: theme.primaryColor,
               child: const Icon(
                 EvaIcons.plus,
                 color: Colors.white,
@@ -74,9 +76,9 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView> {
           : null,
       bottomNavigationBar: SnakeNavigationBar.color(
         currentIndex: _currentIndex,
-        snakeViewColor: Theme.of(context).primaryColor,
-        unselectedItemColor: Theme.of(context).primaryColor,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        snakeViewColor: theme.primaryColor,
+        unselectedItemColor: theme.primaryColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 1,
         onTap: (value) async {
           setState(() {

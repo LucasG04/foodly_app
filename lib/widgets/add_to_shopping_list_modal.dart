@@ -13,6 +13,7 @@ import '../services/meal_service.dart';
 import '../services/shopping_list_service.dart';
 import '../utils/basic_utils.dart';
 import '../utils/convert_util.dart';
+import '../utils/of_context_mixin.dart';
 import 'main_button.dart';
 import 'progress_button.dart';
 import 'small_circular_progress_indicator.dart';
@@ -30,8 +31,8 @@ class AddToShoppingListModal extends ConsumerStatefulWidget {
   _AddToShoppingListModalState createState() => _AddToShoppingListModalState();
 }
 
-class _AddToShoppingListModalState
-    extends ConsumerState<AddToShoppingListModal> {
+class _AddToShoppingListModalState extends ConsumerState<AddToShoppingListModal>
+    with OfContextMixin {
   final AutoDisposeStateProvider<ButtonState> _$buttonState =
       AutoDisposeStateProvider((_) => ButtonState.normal);
   final AutoDisposeStateProvider<bool> _$loadingData =
@@ -64,13 +65,11 @@ class _AddToShoppingListModalState
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width > 599
-        ? 580.0
-        : MediaQuery.of(context).size.width * 0.8;
+    final width = media.size.width > 599 ? 580.0 : media.size.width * 0.8;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (MediaQuery.of(context).size.width - width) / 2,
+        horizontal: (media.size.width - width) / 2,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -128,9 +127,7 @@ class _AddToShoppingListModalState
     required BuildContext context,
     required Widget child,
   }) {
-    final height = MediaQuery.of(context).size.height > 200
-        ? 200.0
-        : MediaQuery.of(context).size.height * 0.4;
+    final height = media.size.height > 200 ? 200.0 : media.size.height * 0.4;
     return SizedBox(
       height: height,
       child: Center(child: child),
@@ -179,7 +176,7 @@ class _AddToShoppingListModalState
                   subtitle: amountString.isEmpty
                       ? null
                       : _buildAmountSubtitle(ingredient),
-                  activeColor: Theme.of(context).primaryColor,
+                  activeColor: theme.primaryColor,
                 );
               },
             );

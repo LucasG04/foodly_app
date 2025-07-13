@@ -8,6 +8,7 @@ import '../../providers/data_provider.dart';
 import '../../services/lunix_api_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
+import '../../utils/of_context_mixin.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
@@ -20,7 +21,8 @@ class ChefkochImportModal extends ConsumerStatefulWidget {
       _ChefkochImportModalState();
 }
 
-class _ChefkochImportModalState extends ConsumerState<ChefkochImportModal> {
+class _ChefkochImportModalState extends ConsumerState<ChefkochImportModal>
+    with OfContextMixin {
   TextEditingController _linkController = TextEditingController();
   String? _linkErrorText;
 
@@ -36,13 +38,11 @@ class _ChefkochImportModalState extends ConsumerState<ChefkochImportModal> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width > 599
-        ? 580.0
-        : MediaQuery.of(context).size.width * 0.8;
+    final width = media.size.width > 599 ? 580.0 : media.size.width * 0.8;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (MediaQuery.of(context).size.width - width) / 2,
+        horizontal: (media.size.width - width) / 2,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,7 +65,7 @@ class _ChefkochImportModalState extends ConsumerState<ChefkochImportModal> {
                 IconButton(
                   onPressed: _showInfo,
                   icon: const Icon(EvaIcons.infoOutline),
-                  color: Theme.of(context).primaryColor,
+                  color: theme.primaryColor,
                 ),
               ],
             ),
@@ -82,12 +82,11 @@ class _ChefkochImportModalState extends ConsumerState<ChefkochImportModal> {
             submitOnPaste: true,
           ),
           SizedBox(
-            height: MediaQuery.of(context).viewInsets.bottom == 0
+            height: media.viewInsets.bottom == 0
                 ? kPadding * 2
-                : MediaQuery.of(context).viewInsets.bottom >
-                        60 // 60 for MainButton
-                    ? MediaQuery.of(context).viewInsets.bottom - 60
-                    : MediaQuery.of(context).viewInsets.bottom,
+                : media.viewInsets.bottom > 60 // 60 for MainButton
+                    ? media.viewInsets.bottom - 60
+                    : media.viewInsets.bottom,
           ),
           Center(
             child: MainButton(

@@ -8,6 +8,7 @@ import '../../../models/grocery_group.dart';
 import '../../../providers/data_provider.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/lunix_api_service.dart';
+import '../../../utils/of_context_mixin.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/progress_button.dart';
 
@@ -24,7 +25,7 @@ class EditGrocerySuggestionSheet extends ConsumerStatefulWidget {
 }
 
 class _EditGrocerySuggestionSheetState
-    extends ConsumerState<EditGrocerySuggestionSheet> {
+    extends ConsumerState<EditGrocerySuggestionSheet> with OfContextMixin {
   final AutoDisposeStateProvider<ButtonState> _$buttonState =
       AutoDisposeStateProvider((_) => ButtonState.normal);
   final AutoDisposeStateProvider<GroceryGroup?> _$selectedGroup =
@@ -33,13 +34,11 @@ class _EditGrocerySuggestionSheetState
   @override
   Widget build(BuildContext context) {
     final productGroups = ref.read(dataGroceryGroupsProvider) ?? [];
-    final width = MediaQuery.of(context).size.width > 599
-        ? 580.0
-        : MediaQuery.of(context).size.width * 0.9;
+    final width = media.size.width > 599 ? 580.0 : media.size.width * 0.9;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (MediaQuery.of(context).size.width - width) / 2,
+        horizontal: (media.size.width - width) / 2,
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -49,9 +48,9 @@ class _EditGrocerySuggestionSheetState
             const SizedBox(height: kPadding / 2),
             Text(
               widget.grocery.name.toString(),
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              style: theme.textTheme.bodyLarge!.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -66,7 +65,7 @@ class _EditGrocerySuggestionSheetState
                     final selectedGroup = ref.watch(_$selectedGroup);
                     return DropdownButton<GroceryGroup>(
                       value: selectedGroup,
-                      dropdownColor: Theme.of(context).scaffoldBackgroundColor,
+                      dropdownColor: theme.scaffoldBackgroundColor,
                       items: productGroups
                           .map((group) => DropdownMenuItem<GroceryGroup>(
                                 value: group,
@@ -94,9 +93,9 @@ class _EditGrocerySuggestionSheetState
               }),
             ),
             SizedBox(
-              height: MediaQuery.of(context).viewInsets.bottom == 0
+              height: media.viewInsets.bottom == 0
                   ? kPadding * 2
-                  : MediaQuery.of(context).viewInsets.bottom,
+                  : media.viewInsets.bottom,
             ),
           ],
         ),
