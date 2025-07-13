@@ -36,8 +36,8 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
     }
     return metadata != null
         ? widget.isSmall
-            ? _buildSmallCard(metadata, context)
-            : _buildLargeCard(metadata, context)
+            ? _buildSmallCard(metadata)
+            : _buildLargeCard(metadata)
         : FutureBuilder<LinkMetadata?>(
             future: LinkMetadataService.getFromApi(widget.link),
             builder: (context, snapshot) {
@@ -50,13 +50,13 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
               }
 
               return widget.isSmall
-                  ? _buildSmallCard(snapshot.data!, context)
-                  : _buildLargeCard(snapshot.data!, context);
+                  ? _buildSmallCard(snapshot.data!)
+                  : _buildLargeCard(snapshot.data!);
             },
           );
   }
 
-  Widget _buildLargeCard(LinkMetadata metadata, BuildContext context) {
+  Widget _buildLargeCard(LinkMetadata metadata) {
     return GestureDetector(
       onTap: metadata.url != null
           ? () => launchUrl(Uri.parse(metadata.url!))
@@ -66,7 +66,7 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
           children: [
             if (metadata.image != null)
               SizedBox(
-                height: _getLargeImageHeight(context),
+                height: _getLargeImageHeight(),
                 width: double.infinity,
                 child: FoodlyNetworkImage(metadata.image!),
               ),
@@ -95,7 +95,7 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
     );
   }
 
-  Widget _buildSmallCard(LinkMetadata metadata, BuildContext context) {
+  Widget _buildSmallCard(LinkMetadata metadata) {
     final height = _getSmallCardHeight();
     return GestureDetector(
       onTap: metadata.url != null
@@ -172,7 +172,7 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
               children: [
                 SkeletonContainer(
                   width: media.size.width * 0.5,
-                  height: _getLargeImageHeight(context),
+                  height: _getLargeImageHeight(),
                 ),
                 const SizedBox(height: kPadding / 4),
                 SkeletonContainer(
@@ -228,7 +228,7 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
     );
   }
 
-  double _getLargeImageHeight(BuildContext context) => media.size.height * 0.2;
+  double _getLargeImageHeight() => media.size.height * 0.2;
 
   double _getSmallCardHeight() => 75.0;
 }
