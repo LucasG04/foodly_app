@@ -116,7 +116,7 @@ dev_dependencies:
   lints: ^5.1.1
   # build runner via: `dart run build_runner build --delete-conflicting-outputs`
   build_runner: ^2.4.13
-  auto_route_generator: ^5.0.3
+  auto_route_generator: ^10.0.0
   hive_generator: ^2.0.1
   flutter_launcher_icons: ^0.14.3
   envied_generator: ^1.1.1
