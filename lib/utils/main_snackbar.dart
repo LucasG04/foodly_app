@@ -82,7 +82,7 @@ class MainSnackbar {
                   strokeWidth: 2.0,
                   value: _getProgressValue(value),
                   color: Colors.grey[850],
-                  backgroundColor: theme.dialogBackgroundColor,
+                  backgroundColor: theme.dialogTheme.backgroundColor,
                 ),
               ),
               Center(
@@ -90,7 +90,7 @@ class MainSnackbar {
                   _getCountdownText(value),
                   textScaler: const TextScaler.linear(0.85),
                   style: TextStyle(
-                    color: theme.dialogBackgroundColor,
+                    color: theme.dialogTheme.backgroundColor,
                   ),
                 ),
               ),
