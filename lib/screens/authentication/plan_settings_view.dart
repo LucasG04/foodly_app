@@ -67,17 +67,16 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
             ),
             labels: ['plan_settings_create_plan'.tr()],
           ),
-          Expanded(
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: Wrap(
-                children: [
-                  Text(
-                    'plan_settings_what_name',
-                    style: _titleTextStyle,
-                  ).tr(),
-                ],
-              ),
+          const SizedBox(height: kPadding * 2),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Wrap(
+              children: [
+                Text(
+                  'plan_settings_what_name',
+                  style: _titleTextStyle,
+                ).tr(),
+              ],
             ),
           ),
           const SizedBox(height: kPadding),
@@ -88,6 +87,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
             textInputAction: TextInputAction.go,
             errorText: _nameErrorText,
           ),
+          const Spacer(),
           SizedBox(
             height: media.size.height * 0.2 + media.viewInsets.bottom / 4,
             child: _unknownErrorText != null

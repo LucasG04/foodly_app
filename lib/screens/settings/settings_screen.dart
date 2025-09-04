@@ -490,7 +490,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       width: media.size.width * 0.9,
       margin: const EdgeInsets.only(bottom: kPadding),
       decoration: BoxDecoration(
-        color: theme.dialogBackgroundColor,
+        color: theme.dialogTheme.backgroundColor,
         borderRadius: BorderRadius.circular(kRadius),
       ),
       child: Wrap(children: widgets),
