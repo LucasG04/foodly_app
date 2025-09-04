@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -23,14 +25,19 @@ class CodeInputView extends StatefulWidget {
 }
 
 class _CodeInputViewState extends State<CodeInputView> with OfContextMixin {
+  final Random _rng = Random.secure();
+
   late bool _loadingCode;
-  TextEditingController? _codeController;
+  late TextEditingController _codeController;
+  late String _joinCodePlaceholder;
+
   String? _errorText;
 
   @override
   void initState() {
     _loadingCode = false;
     _codeController = TextEditingController();
+    _joinCodePlaceholder = _generatePlaceholderJoinCode();
     super.initState();
   }
 
@@ -140,7 +147,7 @@ class _CodeInputViewState extends State<CodeInputView> with OfContextMixin {
         fontFamily: 'Poppins',
       ),
       decoration: InputDecoration(
-        hintText: '8Lu261gO',
+        hintText: _joinCodePlaceholder,
         hintStyle: const TextStyle(
           color: Colors.grey,
         ),
@@ -154,7 +161,7 @@ class _CodeInputViewState extends State<CodeInputView> with OfContextMixin {
                   EvaIcons.checkmark,
                   color: theme.colorScheme.secondary,
                 ),
-                onPressed: () => _validateCode(_codeController!.text),
+                onPressed: () => _validateCode(_codeController.text),
               ),
         errorText: _errorText,
       ),
@@ -188,6 +195,38 @@ class _CodeInputViewState extends State<CodeInputView> with OfContextMixin {
         _loadingCode = false;
       });
     }
+  }
+
+  String _generatePlaceholderJoinCode() {
+    const foodWords = [
+      'PASTA',
+      'SUSHI',
+      'CURRY',
+      'PIZZA',
+      'TACOS',
+      'RAMEN',
+      'KEBAB',
+      'MEAL',
+      'SALAD',
+      'TAPAS',
+      'DONUT'
+    ];
+    final word = foodWords[_rng.nextInt(foodWords.length)];
+    const digits = '35689';
+    final numDigits = 8 - word.length;
+    // Generate random digits
+    final digitList =
+        List.generate(numDigits, (_) => digits[_rng.nextInt(digits.length)]);
+    // Prepare positions to insert digits
+    final positions = List<int>.generate(word.length + 1, (i) => i);
+    positions.shuffle(_rng);
+    final insertPositions = positions.take(numDigits).toList()..sort();
+    // Insert digits into word at random positions
+    final result = word.split('');
+    for (int i = 0; i < numDigits; i++) {
+      result.insert(insertPositions[i], digitList[i]);
+    }
+    return result.join();
   }
 }
 

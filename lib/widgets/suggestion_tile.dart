@@ -17,7 +17,7 @@ class SuggestionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Ink(
       decoration: BoxDecoration(
-        color: Theme.of(context).dialogBackgroundColor,
+        color: Theme.of(context).dialogTheme.backgroundColor,
         borderRadius: BorderRadius.circular(kRadius),
         boxShadow: const [kSmallShadow],
       ),

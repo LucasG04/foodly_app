@@ -145,6 +145,7 @@ class AuthenticationService {
     return OAuthProvider('apple.com').credential(
       idToken: appleCredential.identityToken,
       rawNonce: rawNonce,
+      accessToken: appleCredential.authorizationCode,
     );
   }
 
