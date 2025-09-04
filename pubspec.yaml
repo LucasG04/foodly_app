@@ -71,7 +71,7 @@ dependencies:
   # If updating any version, check the firebase sdk version in "/ios/Podfile"
   cloud_firestore: ^5.6.6
   firebase_analytics: ^11.4.5
-  firebase_app_check: ^0.3.2+5
+  firebase_app_check: ^0.4.0
   firebase_auth: ^5.5.2
   firebase_core: ^3.13.0
   firebase_crashlytics: ^4.3.5
