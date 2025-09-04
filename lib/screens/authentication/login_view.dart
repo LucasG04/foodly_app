@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../app_router.gr.dart';
@@ -47,6 +48,8 @@ class LoginView extends ConsumerStatefulWidget {
 }
 
 class _LoginViewState extends ConsumerState<LoginView> {
+  static final _log = Logger('LoginView');
+
   ButtonState? _buttonState;
   late bool _isRegistering;
   late bool _forgotPlan;
@@ -312,6 +315,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
       if (!mounted) {
         return;
       }
+      _log.severe('ERR! _authWithApple', e);
       setState(() {
         _unknownErrorText = 'login_error_unknown'.tr();
         _buttonState = ButtonState.error;
