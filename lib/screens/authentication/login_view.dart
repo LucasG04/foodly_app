@@ -109,35 +109,34 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     AuthenticationKeys.buttonGroupLogin
                   ],
           ),
-          Expanded(
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: Wrap(
-                children: [
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 250),
-                    child: _isRegistering
-                        ? Text(
-                            '${'login_register_leading'.tr()} ',
-                            key: const ValueKey<int>(0),
-                            style: _titleTextStyle,
-                          )
-                        : Text(
-                            '${'login_login_leading'.tr()} ',
-                            key: const ValueKey<int>(1),
-                            style: _titleTextStyle,
-                          ),
+          const SizedBox(height: kPadding * 2),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Wrap(
+              children: [
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child: _isRegistering
+                      ? Text(
+                          '${'login_register_leading'.tr()} ',
+                          key: const ValueKey<int>(0),
+                          style: _titleTextStyle,
+                        )
+                      : Text(
+                          '${'login_login_leading'.tr()} ',
+                          key: const ValueKey<int>(1),
+                          style: _titleTextStyle,
+                        ),
+                ),
+                Text(
+                  widget.isCreatingPlan!
+                      ? 'login_cta_create'
+                      : 'login_cta_join',
+                  style: _titleTextStyle.copyWith(
+                    fontWeight: FontWeight.w400,
                   ),
-                  Text(
-                    widget.isCreatingPlan!
-                        ? 'login_cta_create'
-                        : 'login_cta_join',
-                    style: _titleTextStyle.copyWith(
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ).tr(),
-                ],
-              ),
+                ).tr(),
+              ],
             ),
           ),
           const SizedBox(height: kPadding),
@@ -177,9 +176,6 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 ),
               ],
             ),
-          ),
-          SizedBox(
-            height: MediaQuery.of(context).viewInsets.bottom / 6,
           ),
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 250),
@@ -224,6 +220,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   )
                 : const SizedBox(),
           ),
+          const Spacer(),
           LayoutBuilder(builder: (context, constraints) {
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
