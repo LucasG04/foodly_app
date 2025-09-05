@@ -225,7 +225,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
     }
   }
 
-  bool _checkLockPlan() {
+  bool _checkUserShouldLockPlan() {
+    if (!mounted) {
+      return false;
+    }
     final plan = ref.read(planProvider);
     if (plan == null) {
       return false;
@@ -286,7 +289,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
       return;
     }
 
-    _checkLockPlan();
+    _checkUserShouldLockPlan();
   }
 
   Future<void> _checkPremiumGiftedStatusAndMessage() async {
