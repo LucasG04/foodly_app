@@ -89,7 +89,7 @@ class _SettingsTileState extends State<SettingsTile>
         padding: const EdgeInsets.all(kPadding / 2),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(kRadius),
-          color: Theme.of(context).dialogBackgroundColor,
+          color: Theme.of(context).dialogTheme.backgroundColor,
         ),
         child: Row(
           children: [
