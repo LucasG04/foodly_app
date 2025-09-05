@@ -91,7 +91,8 @@ class _SettingsChangePrimaryColorModalState
                     ),
                     child: Consumer(
                       builder: (context, ref, child) {
-                        if (ref.watch(_$selected).value == color.value) {
+                        if (ref.watch(_$selected).toARGB32() ==
+                            color.toARGB32()) {
                           return child!;
                         }
                         return GestureDetector(

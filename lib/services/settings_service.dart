@@ -96,7 +96,7 @@ class SettingsService {
   }
 
   static Future<void> setPrimaryColor(Color value) async {
-    await _settingsBox.put('primaryColor', value.value);
+    await _settingsBox.put('primaryColor', value.toARGB32());
   }
 
   static Future<void> setShoppingListSort(ShoppingListSort value) async {
