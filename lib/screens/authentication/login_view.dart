@@ -113,34 +113,34 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   ],
           ),
           const SizedBox(height: kPadding * 2),
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: Wrap(
-              children: [
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
-                  child: _isRegistering
-                      ? Text(
-                          '${'login_register_leading'.tr()} ',
-                          key: const ValueKey<int>(0),
-                          style: _titleTextStyle,
-                        )
-                      : Text(
-                          '${'login_login_leading'.tr()} ',
-                          key: const ValueKey<int>(1),
-                          style: _titleTextStyle,
-                        ),
-                ),
-                Text(
-                  widget.isCreatingPlan!
-                      ? 'login_cta_create'
-                      : 'login_cta_join',
-                  style: _titleTextStyle.copyWith(
-                    fontWeight: FontWeight.w400,
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 250),
+            child: _isRegistering
+                ? SizedBox(
+                    key: const ValueKey<int>(0),
+                    width: size.width,
+                    child: Text(
+                      '${'login_register_leading'.tr()} ',
+                      style: _titleTextStyle,
+                    ),
+                  )
+                : SizedBox(
+                    key: const ValueKey<int>(1),
+                    width: size.width,
+                    child: Text(
+                      '${'login_login_leading'.tr()} ',
+                      style: _titleTextStyle,
+                    ),
                   ),
-                ).tr(),
-              ],
-            ),
+          ),
+          SizedBox(
+            width: size.width,
+            child: Text(
+              widget.isCreatingPlan! ? 'login_cta_create' : 'login_cta_join',
+              style: _titleTextStyle.copyWith(
+                fontWeight: FontWeight.w400,
+              ),
+            ).tr(),
           ),
           const SizedBox(height: kPadding),
           AutofillGroup(
@@ -156,13 +156,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   autofocus: true,
                   keyboardType: TextInputType.emailAddress,
                   onSubmit: () => _passwordFocusNode.requestFocus(),
-                  autofillHints: [
-                    AutofillHints.email,
-                    // ignore: prefer_if_elements_to_conditional_expressions
-                    _isRegistering
-                        ? AutofillHints.newUsername
-                        : AutofillHints.username,
-                  ],
+                  autofillHints: const [AutofillHints.email],
                 ),
                 MainTextField(
                   key: AuthenticationKeys.inputPassword,
@@ -292,7 +286,6 @@ class _LoginViewState extends ConsumerState<LoginView> {
       return;
     }
 
-    TextInput.finishAutofillContext();
     try {
       final userId = await (_isRegistering && !_forgotPlan
           ? AuthenticationService.registerUser(
@@ -300,6 +293,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
           : AuthenticationService.signInUser(
               _emailController.text, _passwordController.text));
       await _processAuthentication(userId, FirebaseAuthProvider.password);
+      TextInput.finishAutofillContext();
     } catch (e) {
       _handleMailAuthException(e);
     }

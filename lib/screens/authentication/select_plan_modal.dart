@@ -4,7 +4,6 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
-import '../../models/foodly_user.dart';
 import '../../models/plan.dart';
 import '../../services/foodly_user_service.dart';
 import '../../services/plan_service.dart';
@@ -14,6 +13,14 @@ class SelectPlanModal extends StatelessWidget {
   final String userId;
 
   const SelectPlanModal(this.userId, {super.key});
+
+  Future<List<Plan>?> _loadUserPlans() async {
+    final user = await FoodlyUserService.getUserById(userId);
+    if (user?.plans == null || user!.plans!.isEmpty) {
+      return null;
+    }
+    return PlanService.getPlansByIds(user.plans!);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,15 +57,15 @@ class SelectPlanModal extends StatelessWidget {
               ),
             ),
           ),
-          FutureBuilder<FoodlyUser?>(
-            future: FoodlyUserService.getUserById(userId),
+          FutureBuilder<List<Plan>?>(
+            future: _loadUserPlans(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return SizedBox(
                   height: size.height * 0.3,
                   child: const Center(child: SmallCircularProgressIndicator()),
                 );
-              } else if (!snapshot.hasData) {
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return SizedBox(
                   height: size.height * 0.3,
                   child: Center(
@@ -69,46 +76,21 @@ class SelectPlanModal extends StatelessWidget {
                   ),
                 );
               }
-              return _buildPlanList(snapshot.data!, size.height * 0.3);
+
+              return ListView.builder(
+                shrinkWrap: true,
+                itemCount: snapshot.data!.length,
+                itemBuilder: (ctx, index) => ListTile(
+                  title: Text(snapshot.data![index].name!),
+                  subtitle: Text(snapshot.data![index].code!),
+                  onTap: () => Navigator.pop(ctx, snapshot.data![index]),
+                  trailing: const Icon(Icons.arrow_forward_ios_rounded),
+                ),
+              );
             },
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildPlanList(FoodlyUser user, double emptySpaceHeight) {
-    return FutureBuilder<List<Plan>>(
-      future: PlanService.getPlansByIds(user.plans!),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return SizedBox(
-            height: emptySpaceHeight,
-            child: const Center(child: SmallCircularProgressIndicator()),
-          );
-        } else if (!snapshot.hasData) {
-          return SizedBox(
-            height: emptySpaceHeight,
-            child: Center(
-              child: const Text(
-                'modal_select_plan_no_plan',
-                textAlign: TextAlign.center,
-              ).tr(),
-            ),
-          );
-        }
-
-        return ListView.builder(
-          shrinkWrap: true,
-          itemCount: snapshot.data!.length,
-          itemBuilder: (ctx, index) => ListTile(
-            title: Text(snapshot.data![index].name!),
-            subtitle: Text(snapshot.data![index].code!),
-            onTap: () => Navigator.pop(ctx, snapshot.data![index]),
-            trailing: const Icon(Icons.arrow_forward_ios_rounded),
-          ),
-        );
-      },
     );
   }
 }
