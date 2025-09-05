@@ -156,13 +156,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   autofocus: true,
                   keyboardType: TextInputType.emailAddress,
                   onSubmit: () => _passwordFocusNode.requestFocus(),
-                  autofillHints: [
-                    AutofillHints.email,
-                    // ignore: prefer_if_elements_to_conditional_expressions
-                    _isRegistering
-                        ? AutofillHints.newUsername
-                        : AutofillHints.username,
-                  ],
+                  autofillHints: const [AutofillHints.email],
                 ),
                 MainTextField(
                   key: AuthenticationKeys.inputPassword,
@@ -292,7 +286,6 @@ class _LoginViewState extends ConsumerState<LoginView> {
       return;
     }
 
-    TextInput.finishAutofillContext();
     try {
       final userId = await (_isRegistering && !_forgotPlan
           ? AuthenticationService.registerUser(
@@ -300,6 +293,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
           : AuthenticationService.signInUser(
               _emailController.text, _passwordController.text));
       await _processAuthentication(userId, FirebaseAuthProvider.password);
+      TextInput.finishAutofillContext();
     } catch (e) {
       _handleMailAuthException(e);
     }

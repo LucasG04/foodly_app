@@ -86,6 +86,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
             title: 'plan_settings_name_title'.tr(),
             textInputAction: TextInputAction.go,
             errorText: _nameErrorText,
+            onSubmit: _updatePlanSettings,
           ),
           const Spacer(),
           SizedBox(
