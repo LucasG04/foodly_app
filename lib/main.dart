@@ -405,7 +405,8 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
 
     bool shouldRestartApp = false;
 
-    if (SettingsService.primaryColor.value != defaultPrimaryColor.value) {
+    if (SettingsService.primaryColor.toARGB32() !=
+        defaultPrimaryColor.toARGB32()) {
       await SettingsService.setPrimaryColor(defaultPrimaryColor);
       shouldRestartApp = true;
     }
