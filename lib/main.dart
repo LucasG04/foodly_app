@@ -11,6 +11,7 @@ import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -184,6 +185,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
                 localizationsDelegates: [
                   ...context.localizationDelegates,
                   const LocaleNamesLocalizationsDelegate(),
+                  FlutterQuillLocalizations.delegate,
                 ],
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,

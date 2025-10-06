@@ -24,9 +24,9 @@ import '../../widgets/link_preview.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
-import '../../widgets/markdown_editor.dart';
 import '../../widgets/meal_tag.dart';
 import '../../widgets/progress_button.dart';
+import '../../widgets/rich_text_editor.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import '../../widgets/small_number_input.dart';
 import '../../widgets/wrapped_image_picker/wrapped_image_picker.dart';
@@ -203,9 +203,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                     style: theme.textTheme.bodyLarge,
                                   ).tr(),
                                 ),
-                                MarkdownEditor(
-                                  textEditingController:
-                                      _instructionsController,
+                                RichTextEditor(
+                                  controller: _instructionsController,
                                 ),
                                 const Divider(),
                                 Consumer(builder: (context, ref, _) {

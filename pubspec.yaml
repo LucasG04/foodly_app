@@ -102,6 +102,7 @@ dependencies:
   blur: ^4.0.2
   sticky_headers: ^0.3.0+2
   custom_rating_bar: ^3.0.0
+  flutter_quill: ^11.4.2
 
   # Icons/Styles/Animations
   cupertino_icons: ^1.0.8
