@@ -45,8 +45,7 @@ class SkeletonContainer extends StatelessWidget {
   }
 }
 
-/// author: Mahen Gandhi <mahen.gandhi@civilmachines.com>
-/// github: https://github.com/imlegend19
+/// author: https://github.com/imlegend19
 class _SkeletonAnimation extends StatefulWidget {
   final Widget child;
   final Color shimmerColor;
