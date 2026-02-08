@@ -95,30 +95,33 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
             isExpanded: true,
           ),
           const SizedBox(height: kPadding / 2),
-          if (_showMealTile(MealType.BREAKFAST))
-            RadioListTile(
-              title: const Text('plan_move_breakfast').tr(),
-              value: MealType.BREAKFAST,
-              groupValue: _selectedMealType,
-              onChanged: _changeMealType,
-              activeColor: theme.primaryColor,
+          RadioGroup<MealType>(
+            groupValue: _selectedMealType,
+            onChanged: _changeMealType,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_showMealTile(MealType.BREAKFAST))
+                  RadioListTile(
+                    title: const Text('plan_move_breakfast').tr(),
+                    value: MealType.BREAKFAST,
+                    activeColor: theme.primaryColor,
+                  ),
+                if (_showMealTile(MealType.LUNCH))
+                  RadioListTile(
+                    title: const Text('plan_move_lunch').tr(),
+                    value: MealType.LUNCH,
+                    activeColor: theme.primaryColor,
+                  ),
+                if (_showMealTile(MealType.DINNER))
+                  RadioListTile(
+                    title: const Text('plan_move_dinner').tr(),
+                    value: MealType.DINNER,
+                    activeColor: theme.primaryColor,
+                  ),
+              ],
             ),
-          if (_showMealTile(MealType.LUNCH))
-            RadioListTile(
-              title: const Text('plan_move_lunch').tr(),
-              value: MealType.LUNCH,
-              groupValue: _selectedMealType,
-              onChanged: _changeMealType,
-              activeColor: theme.primaryColor,
-            ),
-          if (_showMealTile(MealType.DINNER))
-            RadioListTile(
-              title: const Text('plan_move_dinner').tr(),
-              value: MealType.DINNER,
-              groupValue: _selectedMealType,
-              onChanged: _changeMealType,
-              activeColor: theme.primaryColor,
-            ),
+          ),
           const SizedBox(height: kPadding),
           Center(
             child: MainButton(
