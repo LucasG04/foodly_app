@@ -28,7 +28,7 @@
 			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = A04D7DF7282005CD000551F7;
-			remoteInfo = "Chefkoch-Import";
+			remoteInfo = ReceiveShare;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -82,7 +82,7 @@
 		A04D7DFA282005CD000551F7 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		A04D7DFD282005CD000551F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		A04D7DFF282005CD000551F7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A04D7E0828200CB6000551F7 /* Chefkoch-Import.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Chefkoch-Import.entitlements"; sourceTree = "<group>"; };
+		A04D7E0828200CB6000551F7 /* ReceiveShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ReceiveShare.entitlements; sourceTree = "<group>"; };
 		A0608D9C28E05C930023D226 /* RunnerDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RunnerDebug.entitlements; sourceTree = "<group>"; };
 		A0B9A2D3BB66F9B21B2E2478 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		A0D25C73292B63D3009359B9 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
@@ -138,7 +138,7 @@
 			children = (
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
-				A04D7DF9282005CD000551F7 /* Chefkoch-Import */,
+				A04D7DF9282005CD000551F7 /* ReceiveShare */,
 				97C146EF1CF9000F007C117D /* Products */,
 				DF847A4710F2C0088E52A70C /* Pods */,
 				4839025C1337F83FE68FA509 /* Frameworks */,
@@ -174,15 +174,15 @@
 			path = Runner;
 			sourceTree = "<group>";
 		};
-		A04D7DF9282005CD000551F7 /* Chefkoch-Import */ = {
+		A04D7DF9282005CD000551F7 /* ReceiveShare */ = {
 			isa = PBXGroup;
 			children = (
-				A04D7E0828200CB6000551F7 /* Chefkoch-Import.entitlements */,
+				A04D7E0828200CB6000551F7 /* ReceiveShare.entitlements */,
 				A04D7DFA282005CD000551F7 /* ShareViewController.swift */,
 				A04D7DFC282005CD000551F7 /* MainInterface.storyboard */,
 				A04D7DFF282005CD000551F7 /* Info.plist */,
 			);
-			path = "Chefkoch-Import";
+			path = ReceiveShare;
 			sourceTree = "<group>";
 		};
 		DF847A4710F2C0088E52A70C /* Pods */ = {
@@ -241,7 +241,7 @@
 			dependencies = (
 			);
 			name = ReceiveShare;
-			productName = "Chefkoch-Import";
+			productName = ReceiveShare;
 			productReference = A04D7DF8282005CD000551F7 /* ReceiveShare.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
@@ -755,7 +755,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = "Chefkoch-Import/Chefkoch-Import.entitlements";
+				CODE_SIGN_ENTITLEMENTS = ReceiveShare/ReceiveShare.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -763,8 +763,8 @@
 				DEVELOPMENT_TEAM = LZFZ6S8L49;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Chefkoch-Import/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Chefkoch-Import";
+				INFOPLIST_FILE = ReceiveShare/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ReceiveShare;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -796,7 +796,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = "Chefkoch-Import/Chefkoch-Import.entitlements";
+				CODE_SIGN_ENTITLEMENTS = ReceiveShare/ReceiveShare.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
@@ -805,8 +805,8 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = LZFZ6S8L49;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Chefkoch-Import/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Chefkoch-Import";
+				INFOPLIST_FILE = ReceiveShare/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ReceiveShare;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -836,7 +836,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = "Chefkoch-Import/Chefkoch-Import.entitlements";
+				CODE_SIGN_ENTITLEMENTS = ReceiveShare/ReceiveShare.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
@@ -845,8 +845,8 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = LZFZ6S8L49;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Chefkoch-Import/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Chefkoch-Import";
+				INFOPLIST_FILE = ReceiveShare/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ReceiveShare;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				LD_RUNPATH_SEARCH_PATHS = (

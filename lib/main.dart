@@ -16,7 +16,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:share_handler/share_handler.dart';
 
 import 'app_router.gr.dart';
 import 'constants.dart';
@@ -351,36 +351,29 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
 
   void _listenForShareIntent() {
     // For sharing or opening urls/text coming from outside the app while the app is in the memory
-    ReceiveSharingIntent.instance
-        .getMediaStream()
+    ShareHandlerPlatform.instance.sharedMediaStream
         .listen(
           _handleReceivedMealShare,
           onError: (dynamic err) =>
-              _log.severe('ERR in ReceiveSharingIntent.getMediaStream()', err),
+              _log.severe('ERR in ShareHandlerPlatform.sharedMediaStream', err),
         )
         .canceledBy(this);
 
     // For sharing or opening urls/text coming from outside the app while the app is closed
-    ReceiveSharingIntent.instance.getInitialMedia().then((data) {
+    ShareHandlerPlatform.instance.getInitialSharedMedia().then((data) {
       _handleReceivedMealShare(data);
-      ReceiveSharingIntent.instance.reset();
     }).catchError((dynamic err) {
-      _log.severe('ERR in ReceiveSharingIntent.getInitialMedia()', err);
+      _log.severe('ERR in ShareHandlerPlatform.getInitialSharedMedia()', err);
     });
   }
 
-  void _handleReceivedMealShare(List<SharedMediaFile>? value) {
-    if (AuthenticationService.currentUser == null ||
-        value == null ||
-        value.isEmpty) {
+  void _handleReceivedMealShare(SharedMedia? value) {
+    if (AuthenticationService.currentUser == null || value == null) {
       return;
     }
-    final isCorrectType =
-        [SharedMediaType.text, SharedMediaType.url].contains(value.first.type);
-    final sharedText = value.first.type == SharedMediaType.url
-        ? value.first.path
-        : value.first.message ?? value.first.path;
-    if (!isCorrectType || sharedText.isEmpty) {
+
+    final sharedText = value.content ?? '';
+    if (sharedText.isEmpty) {
       return;
     }
 
