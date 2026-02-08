@@ -59,6 +59,8 @@
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+
+	<!-- Share Handler -->
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -71,6 +73,24 @@
 		</dict>
 		<dict/>
 	</array>
+	<!-- Share AirDrop support -->
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<string>No</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>ShareHandler</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.text</string>
+				<string>public.url</string>
+			</array>
+		</dict>
+	</array>
+
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>https</string>
