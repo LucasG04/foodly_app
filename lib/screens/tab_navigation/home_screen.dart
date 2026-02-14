@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
@@ -128,7 +129,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
       return false;
     }
     NewVersionModal.open(context).then((_) {
-      VersionService.setLastCheckedVersion(packageInfo.version);
+      unawaited(VersionService.setLastCheckedVersion(packageInfo.version));
     });
     return true;
   }
