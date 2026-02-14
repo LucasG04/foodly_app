@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:isar/isar.dart';
 import 'package:logging/logging.dart';
 
 import '../constants.dart';
@@ -12,6 +12,14 @@ import 'app_review_service.dart';
 import 'authentication_service.dart';
 import 'meal_stat_service.dart';
 import 'shopping_list_service.dart';
+import 'storage_service.dart';
+
+@collection
+class PlanData {
+  Id id = Isar.autoIncrement;
+
+  int? lastLockedCheck;
+}
 
 class PlanService {
   static final _log = Logger('PlanService');
@@ -23,12 +31,24 @@ class PlanService {
             toFirestore: (model, _) => model.toMap(),
           );
 
-  static late Box _planBox;
+  static late Isar _isar;
 
   PlanService._();
 
   static Future initialize() async {
-    _planBox = await Hive.openBox<dynamic>('plan');
+    _isar = await StorageService.getIsar();
+  }
+
+  static PlanData _getPlan() {
+    return _isar.planDatas.where().findFirstSync() ?? PlanData();
+  }
+
+  static Future<void> _updatePlan(void Function(PlanData) update) async {
+    await _isar.writeTxn(() async {
+      var plan = _isar.planDatas.where().findFirstSync() ?? PlanData();
+      update(plan);
+      await _isar.planDatas.put(plan);
+    });
   }
 
   static Future<String?> getCurrentPlanId() async {
@@ -306,7 +326,8 @@ class PlanService {
 
   static DateTime? lastLockedChecked() {
     _log.finer('Call lastLockedChecked');
-    final milliseconds = _planBox.get('lastLockedCheck') as int?;
+    final plan = _getPlan();
+    final milliseconds = plan.lastLockedCheck;
     return milliseconds != null
         ? DateTime.fromMillisecondsSinceEpoch(milliseconds)
         : null;
@@ -314,8 +335,9 @@ class PlanService {
 
   static Future<void> setLastLockedCheck() async {
     _log.finer('Call setLastLockedCheck');
-    await _planBox.put(
-        'lastLockedCheck', DateTime.now().millisecondsSinceEpoch);
+    await _updatePlan((plan) {
+      plan.lastLockedCheck = DateTime.now().millisecondsSinceEpoch;
+    });
   }
 }
 

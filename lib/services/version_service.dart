@@ -1,15 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:isar/isar.dart';
 import 'package:logging/logging.dart';
 
 import '../models/foodly_version.dart';
+import 'storage_service.dart';
+
+@collection
+class VersionData {
+  Id id = Isar.autoIncrement;
+
+  String? lastCheckedVersion;
+  DateTime? lastCheckedForUpdate;
+}
 
 class VersionService {
   VersionService._();
 
   static final _log = Logger('ShoppingListService');
 
-  static late Box _settingsBox;
+  static late Isar _isar;
 
   static final CollectionReference<FoodlyVersion> _firestore = FirebaseFirestore
       .instance
@@ -21,21 +30,41 @@ class VersionService {
 
   static Future initialize() async {
     _log.fine('Initializing');
-    _settingsBox = await Hive.openBox<dynamic>('verison');
+    _isar = await StorageService.getIsar();
   }
 
-  static String? get lastCheckedVersion =>
-      _settingsBox.get('lastCheckedVersion') as String?;
+  static VersionData _getVersion() {
+    return _isar.versionDatas.where().findFirstSync() ?? VersionData();
+  }
+
+  static Future<void> _updateVersion(void Function(VersionData) update) async {
+    await _isar.writeTxn(() async {
+      var version = _isar.versionDatas.where().findFirstSync() ?? VersionData();
+      update(version);
+      await _isar.versionDatas.put(version);
+    });
+  }
+
+  static String? get lastCheckedVersion {
+    final version = _getVersion();
+    return version.lastCheckedVersion;
+  }
 
   static set lastCheckedVersion(String? version) {
-    _settingsBox.put('lastCheckedVersion', version);
+    _updateVersion((data) {
+      data.lastCheckedVersion = version;
+    });
   }
 
-  static DateTime? get lastCheckedForUpdate =>
-      _settingsBox.get('lastCheckedForUpdate') as DateTime?;
+  static DateTime? get lastCheckedForUpdate {
+    final version = _getVersion();
+    return version.lastCheckedForUpdate;
+  }
 
   static set lastCheckedForUpdate(DateTime? date) {
-    _settingsBox.put('lastCheckedForUpdate', date);
+    _updateVersion((data) {
+      data.lastCheckedForUpdate = date;
+    });
   }
 
   static Future<List<FoodlyVersion>?> getNotesForVersionsAndLanguage(
