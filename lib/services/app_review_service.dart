@@ -3,6 +3,8 @@ import 'package:isar/isar.dart';
 
 import 'storage_service.dart';
 
+part 'app_review_service.g.dart';
+
 @collection
 class AppReviewData {
   Id id = Isar.autoIncrement;

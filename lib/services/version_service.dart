@@ -5,6 +5,8 @@ import 'package:logging/logging.dart';
 import '../models/foodly_version.dart';
 import 'storage_service.dart';
 
+part 'version_service.g.dart';
+
 @collection
 class VersionData {
   Id id = Isar.autoIncrement;

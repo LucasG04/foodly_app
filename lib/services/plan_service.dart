@@ -14,6 +14,8 @@ import 'meal_stat_service.dart';
 import 'shopping_list_service.dart';
 import 'storage_service.dart';
 
+part 'plan_service.g.dart';
+
 @collection
 class PlanData {
   Id id = Isar.autoIncrement;

@@ -9,6 +9,8 @@ import '../primary_colors.dart';
 import 'in_app_purchase_service.dart';
 import 'storage_service.dart';
 
+part 'settings_service.g.dart';
+
 @collection
 class SettingsData {
   Id id = Isar.autoIncrement;
