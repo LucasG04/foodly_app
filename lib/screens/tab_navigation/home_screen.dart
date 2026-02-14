@@ -113,7 +113,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
     );
 
     if (lastCheckedVersionString == null) {
-      VersionService.lastCheckedVersion = packageInfo.version;
+      await VersionService.setLastCheckedVersion(packageInfo.version);
       return false;
     }
 
@@ -128,7 +128,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
       return false;
     }
     NewVersionModal.open(context).then((_) {
-      VersionService.lastCheckedVersion = packageInfo.version;
+      VersionService.setLastCheckedVersion(packageInfo.version);
     });
     return true;
   }
@@ -137,7 +137,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
     if (!_shouldCheckForUpdate()) {
       return;
     }
-    VersionService.lastCheckedForUpdate = DateTime.now();
+    await VersionService.setLastCheckedForUpdate(DateTime.now());
 
     if (Platform.isAndroid) {
       _checkForUpdateAndroid();

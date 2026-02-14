@@ -52,7 +52,7 @@ class VersionService {
     return version.lastCheckedVersion;
   }
 
-  static set lastCheckedVersion(String? version) async {
+  static Future<void> setLastCheckedVersion(String? version) async {
     await _updateVersion((data) {
       data.lastCheckedVersion = version;
     });
@@ -63,7 +63,7 @@ class VersionService {
     return version.lastCheckedForUpdate;
   }
 
-  static set lastCheckedForUpdate(DateTime? date) async {
+  static Future<void> setLastCheckedForUpdate(DateTime? date) async {
     await _updateVersion((data) {
       data.lastCheckedForUpdate = date;
     });
