@@ -67,8 +67,8 @@ class AppReviewService {
   }
 
   /// Resets all counters and flags. Used for testing.
-  static void reset() {
-    _updateReview((review) {
+  static Future<void> reset() async {
+    await _updateReview((review) {
       review.lastRequest = DateTime.now().subtract(const Duration(days: 70));
       review.hasRated = false;
       review.planMeal = 20;
@@ -77,26 +77,26 @@ class AppReviewService {
     });
   }
 
-  static void discardRequest() {
-    _updateReview((review) {
+  static Future<void> discardRequest() async {
+    await _updateReview((review) {
       review.lastRequest = DateTime.now();
     });
   }
 
-  static void logPlanMeal() {
-    _updateReview((review) {
+  static Future<void> logPlanMeal() async {
+    await _updateReview((review) {
       review.planMeal = (review.planMeal ?? 0) + 1;
     });
   }
 
-  static void logGroceryBought(bool listIsEmpty) {
-    _updateReview((review) {
+  static Future<void> logGroceryBought(bool listIsEmpty) async {
+    await _updateReview((review) {
       review.groceryBought = (review.groceryBought ?? 0) + 1;
     });
   }
 
-  static void logMealCreated() {
-    _updateReview((review) {
+  static Future<void> logMealCreated() async {
+    await _updateReview((review) {
       review.mealCreated = (review.mealCreated ?? 0) + 1;
     });
   }

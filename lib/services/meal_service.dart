@@ -86,7 +86,7 @@ class MealService {
       final created = await _firestore.add(meal);
       meal.id = created.id;
       await MealStatService.bumpStat(meal.planId!, meal.id!);
-      AppReviewService.logMealCreated();
+      await AppReviewService.logMealCreated();
       return meal;
     } catch (e) {
       _log.severe('ERR: createMeal with ${meal.toMap()}', e);

@@ -205,7 +205,7 @@ class PlanService {
           bumpCount: true, bumpLastPlanned: true);
     }
     await _firestore.doc(planId).collection('meals').add(planMeal.toMap());
-    AppReviewService.logPlanMeal();
+    await AppReviewService.logPlanMeal();
   }
 
   static Future<void> updatePlanMealFromPlan(String? planId, PlanMeal meal) {

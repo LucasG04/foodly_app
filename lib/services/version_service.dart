@@ -52,8 +52,8 @@ class VersionService {
     return version.lastCheckedVersion;
   }
 
-  static set lastCheckedVersion(String? version) {
-    _updateVersion((data) {
+  static set lastCheckedVersion(String? version) async {
+    await _updateVersion((data) {
       data.lastCheckedVersion = version;
     });
   }
@@ -63,8 +63,8 @@ class VersionService {
     return version.lastCheckedForUpdate;
   }
 
-  static set lastCheckedForUpdate(DateTime? date) {
-    _updateVersion((data) {
+  static set lastCheckedForUpdate(DateTime? date) async {
+    await _updateVersion((data) {
       data.lastCheckedForUpdate = date;
     });
   }

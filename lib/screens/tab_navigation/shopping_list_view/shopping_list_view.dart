@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -373,7 +374,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
 
   void _removeBoughtGrocery(String listId, Grocery grocery, List<Grocery> items,
       List<Grocery> boughtItems) {
-    AppReviewService.logGroceryBought(items.isEmpty);
+    unawaited(AppReviewService.logGroceryBought(items.isEmpty));
     if (!SettingsService.removeBoughtImmediately) {
       ShoppingListService.groceryToggleBought(
         listId,

@@ -202,10 +202,10 @@ class SettingsService {
 
   static List<MealType> _convertToMealTypes(List<int>? value) {
     final defaultValues = [MealType.LUNCH, MealType.DINNER];
+    if (value == null) {
+      return defaultValues;
+    }
     try {
-      if (value == null) {
-        return defaultValues;
-      }
       return value.map((e) => MealType.values[e]).toList();
     } catch (e) {
       return defaultValues;
