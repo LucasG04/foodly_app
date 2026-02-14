@@ -1,34 +1,53 @@
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:isar/isar.dart';
+
+import 'storage_service.dart';
+
+part 'app_review_service.g.dart';
+
+@collection
+class AppReviewData {
+  Id id = Isar.autoIncrement;
+
+  int? planMeal;
+  int? groceryBought;
+  int? mealCreated;
+  DateTime? lastRequest;
+  bool? hasRated;
+}
 
 class AppReviewService {
   AppReviewService._();
 
-  static late Box _eventBox;
-
-  static const _boxKeyPlanMeal = 'planMeal';
-  static const _boxKeyGrocery = 'groceryBought';
-  static const _boxKeyMealCreated = 'mealCreated';
-  static const _boxKeyLastRequest = 'lastRequest';
-  static const _boxKeyHasRated = 'hasRated';
+  static late Isar _isar;
 
   static Future initialize() async {
-    _eventBox = await Hive.openBox<dynamic>('reviewevents');
+    _isar = await StorageService.getIsar();
+  }
+
+  static AppReviewData _getReview() {
+    return _isar.appReviewDatas.where().findFirstSync() ?? AppReviewData();
+  }
+
+  static Future<void> _updateReview(void Function(AppReviewData) update) async {
+    await _isar.writeTxn(() async {
+      var review = _isar.appReviewDatas.where().findFirstSync() ?? AppReviewData();
+      update(review);
+      await _isar.appReviewDatas.put(review);
+    });
   }
 
   static Stream<bool> shouldRequestReview() async* {
-    await for (final _ in _eventBox.watch()) {
-      if (_eventBox.get(_boxKeyHasRated, defaultValue: false) as bool) {
+    await for (final _ in _isar.appReviewDatas.watchLazy()) {
+      final review = _getReview();
+      if (review.hasRated ?? false) {
         yield false;
         continue;
       }
 
-      final planMealCount =
-          _eventBox.get(_boxKeyPlanMeal, defaultValue: 0) as int;
-      final groceryCount =
-          _eventBox.get(_boxKeyGrocery, defaultValue: 0) as int;
-      final mealCreatedCount =
-          _eventBox.get(_boxKeyMealCreated, defaultValue: 0) as int;
+      final planMealCount = review.planMeal ?? 0;
+      final groceryCount = review.groceryBought ?? 0;
+      final mealCreatedCount = review.mealCreated ?? 0;
 
       yield planMealCount >= 20 &&
           groceryCount >= 50 &&
@@ -41,41 +60,50 @@ class AppReviewService {
     final InAppReview inAppReview = InAppReview.instance;
     if (await inAppReview.isAvailable()) {
       inAppReview.requestReview();
-      _eventBox.put(_boxKeyHasRated, true);
+      await _updateReview((review) {
+        review.hasRated = true;
+      });
     }
   }
 
   /// Resets all counters and flags. Used for testing.
-  static void reset() {
-    _eventBox.put(
-        _boxKeyLastRequest, DateTime.now().subtract(const Duration(days: 70)));
-    _eventBox.put(_boxKeyHasRated, false);
-    _eventBox.put(_boxKeyPlanMeal, 20);
-    _eventBox.put(_boxKeyGrocery, 50);
-    _eventBox.put(_boxKeyMealCreated, 5);
+  static Future<void> reset() async {
+    await _updateReview((review) {
+      review.lastRequest = DateTime.now().subtract(const Duration(days: 70));
+      review.hasRated = false;
+      review.planMeal = 20;
+      review.groceryBought = 50;
+      review.mealCreated = 5;
+    });
   }
 
-  static void discardRequest() {
-    _eventBox.put(_boxKeyLastRequest, DateTime.now());
+  static Future<void> discardRequest() async {
+    await _updateReview((review) {
+      review.lastRequest = DateTime.now();
+    });
   }
 
-  static void logPlanMeal() {
-    final count = _eventBox.get(_boxKeyPlanMeal, defaultValue: 0) as int;
-    _eventBox.put(_boxKeyPlanMeal, count + 1);
+  static Future<void> logPlanMeal() async {
+    await _updateReview((review) {
+      review.planMeal = (review.planMeal ?? 0) + 1;
+    });
   }
 
-  static void logGroceryBought(bool listIsEmpty) {
-    final count = _eventBox.get(_boxKeyGrocery, defaultValue: 0) as int;
-    _eventBox.put(_boxKeyGrocery, count + 1);
+  static Future<void> logGroceryBought(bool listIsEmpty) async {
+    await _updateReview((review) {
+      review.groceryBought = (review.groceryBought ?? 0) + 1;
+    });
   }
 
-  static void logMealCreated() {
-    final count = _eventBox.get(_boxKeyMealCreated, defaultValue: 0) as int;
-    _eventBox.put(_boxKeyMealCreated, count + 1);
+  static Future<void> logMealCreated() async {
+    await _updateReview((review) {
+      review.mealCreated = (review.mealCreated ?? 0) + 1;
+    });
   }
 
   static Duration get _timeSinceLastReviewRequest {
-    final lastRequest = _eventBox.get(_boxKeyLastRequest) as DateTime?;
+    final review = _getReview();
+    final lastRequest = review.lastRequest;
     if (lastRequest == null) {
       return const Duration(days: 60);
     }

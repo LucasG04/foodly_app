@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -21,8 +20,6 @@ import 'package:share_handler/share_handler.dart';
 import 'app_router.gr.dart';
 import 'constants.dart';
 import 'models/foodly_user.dart';
-import 'models/link_metadata.dart';
-import 'models/plan.dart';
 import 'primary_colors.dart';
 import 'providers/data_provider.dart';
 import 'providers/state_providers.dart';
@@ -69,7 +66,7 @@ void main() {
       WidgetsFlutterBinding.ensureInitialized();
       await EasyLocalization.ensureInitialized();
       await _configureFirebase();
-      await initializeHive();
+      await initializeIsar();
       runApp(
         Phoenix(
           child: ProviderScope(
@@ -91,9 +88,7 @@ void main() {
   );
 }
 
-Future<void> initializeHive() async {
-  await Hive.initFlutter();
-  Hive.registerAdapter(LinkMetadataAdapter());
+Future<void> initializeIsar() async {
   await Future.wait<dynamic>([
     SettingsService.initialize(),
     LinkMetadataService.initialize(),
@@ -103,16 +98,6 @@ Future<void> initializeHive() async {
     InAppPurchaseService.initialize(),
     ImageCacheManager.initialize(),
   ]);
-
-  // clean up old boxes
-  try {
-    Hive.deleteBoxFromDisk('imageCache');
-    Hive.deleteBoxFromDisk('imageCache2');
-    Hive.deleteBoxFromDisk('imageCache3');
-  } catch (e) {
-    // ignore: avoid_print
-    print('Error while cleaning up old boxes: $e');
-  }
 }
 
 class FoodlyApp extends ConsumerStatefulWidget {
