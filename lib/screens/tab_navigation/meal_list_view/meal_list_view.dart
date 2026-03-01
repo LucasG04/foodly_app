@@ -40,9 +40,11 @@ class _MealListViewState extends ConsumerState<MealListView>
   final Debouncer _searchDebouncer = Debouncer(milliseconds: 500);
   final Debouncer _scrollDepouncer = Debouncer(milliseconds: 50);
   bool _paginationAtEnd = false;
+  // Cache the latest tag query to avoid refetching on rebuild.
   Future<List<Meal>>? _tagSearchFuture;
   List<String> _lastTagSearch = const [];
   String? _lastTagPlanId;
+  // Monotonic token to drop stale async search results.
   int _searchRequestToken = 0;
 
   @override
@@ -303,6 +305,7 @@ class _MealListViewState extends ConsumerState<MealListView>
   Future<List<Meal>> _searchMealsByTagsCached(List<String> selectedTags) {
     final planId = ref.read(planProvider)!.id!;
 
+    // Reuse the previous future as long as plan + tags are unchanged.
     if (_tagSearchFuture != null &&
         _lastTagPlanId == planId &&
         listEquals(_lastTagSearch, selectedTags)) {
@@ -333,6 +336,7 @@ class _MealListViewState extends ConsumerState<MealListView>
   }
 
   void _closeSearch() {
+    // Invalidate pending search calls before closing search mode.
     _searchRequestToken++;
     ref.read(_$isSearching.notifier).state = false;
   }
@@ -366,6 +370,7 @@ class _MealListViewState extends ConsumerState<MealListView>
     if (query.isEmpty) {
       return;
     }
+    // Each new request invalidates older ones.
     final requestToken = ++_searchRequestToken;
 
     ref.read(_$isLoading.notifier).state = true;
@@ -376,6 +381,7 @@ class _MealListViewState extends ConsumerState<MealListView>
     );
 
     if (!mounted || requestToken != _searchRequestToken) {
+      // Ignore outdated responses that returned too late.
       return;
     }
 
@@ -432,6 +438,7 @@ class _MealListViewState extends ConsumerState<MealListView>
   }
 
   void _refreshMeals() async {
+    // Prevent in-flight search results from applying after refresh.
     _searchRequestToken++;
     final refIsLoading = ref.read(_$isLoading.notifier);
     refIsLoading.state = true;
