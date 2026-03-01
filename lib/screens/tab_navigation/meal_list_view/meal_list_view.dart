@@ -2,9 +2,9 @@ import 'package:concentric_transition/concentric_transition.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:group_list_view/group_list_view.dart';
 
 import '../../../constants.dart';
 import '../../../models/meal.dart';
@@ -40,6 +40,12 @@ class _MealListViewState extends ConsumerState<MealListView>
   final Debouncer _searchDebouncer = Debouncer(milliseconds: 500);
   final Debouncer _scrollDepouncer = Debouncer(milliseconds: 50);
   bool _paginationAtEnd = false;
+  // Cache the latest tag query to avoid refetching on rebuild.
+  Future<List<Meal>>? _tagSearchFuture;
+  List<String> _lastTagSearch = const [];
+  String? _lastTagPlanId;
+  // Monotonic token to drop stale async search results.
+  int _searchRequestToken = 0;
 
   @override
   bool get wantKeepAlive => true;
@@ -61,6 +67,8 @@ class _MealListViewState extends ConsumerState<MealListView>
 
   @override
   void dispose() {
+    _searchDebouncer.dispose();
+    _scrollDepouncer.dispose();
     _scrollController.dispose();
     cancelSubscriptions();
     super.dispose();
@@ -70,59 +78,62 @@ class _MealListViewState extends ConsumerState<MealListView>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      body: SingleChildScrollView(
+      body: CustomScrollView(
         controller: _scrollController,
-        child: Column(
-          children: [
-            const SizedBox(height: kPadding),
-            MealListTitle(
+        slivers: [
+          const SliverToBoxAdapter(child: SizedBox(height: kPadding)),
+          SliverToBoxAdapter(
+            child: MealListTitle(
               onSearch: (query) {
                 if (query.length > 2) {
                   _searchDebouncer.run(() => _searchMeal(query));
                 }
               },
-              onSearchClose: () =>
-                  ref.read(_$isSearching.notifier).state = false,
+              onSearchClose: _closeSearch,
               onRefresh: _refreshMeals,
             ),
-            Consumer(
-              builder: (context, ref, _) {
-                final isLoading = ref.watch(_$isLoading);
-                final selectedTags = ref.watch(mealTagFilterProvider);
+          ),
+          Consumer(
+            builder: (context, ref, _) {
+              final isLoading = ref.watch(_$isLoading);
+              final selectedTags = ref.watch(mealTagFilterProvider);
 
-                if (isLoading) {
-                  return _buildLoadingMealList();
-                }
+              if (isLoading) {
+                return _buildLoadingMealList();
+              }
 
-                return selectedTags.isEmpty
-                    ? _buildMealList()
-                    : _buildGroupedTagList(selectedTags);
-              },
-            ),
-            Consumer(builder: (context, ref, _) {
-              final isLoadingPagination = ref.watch(_$isLoadingPagination);
-              return isLoadingPagination
+              return selectedTags.isEmpty
+                  ? _buildMealList()
+                  : _buildGroupedTagList(selectedTags);
+            },
+          ),
+          Consumer(builder: (context, ref, _) {
+            final isLoadingPagination = ref.watch(_$isLoadingPagination);
+            return SliverToBoxAdapter(
+              child: isLoadingPagination
                   ? const Padding(
                       padding: EdgeInsets.symmetric(vertical: kPadding / 2),
-                      child: SmallCircularProgressIndicator(),
+                      child: Center(
+                        child: SmallCircularProgressIndicator(),
+                      ),
                     )
-                  : const SizedBox();
-            }),
-          ],
-        ),
+                  : const SizedBox(),
+            );
+          }),
+        ],
       ),
     );
   }
 
-  Padding _buildLoadingMealList() {
-    return Padding(
+  Widget _buildLoadingMealList() {
+    return SliverPadding(
       padding: const EdgeInsets.symmetric(vertical: kPadding / 2),
-      child: ListView(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        children: List.generate(
-          10,
-          (_) => const MealListTile(null),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (_, __) => const MealListTile(null),
+          childCount: 10,
+          addAutomaticKeepAlives: false,
+          addSemanticIndexes: false,
         ),
       ),
     );
@@ -152,7 +163,7 @@ class _MealListViewState extends ConsumerState<MealListView>
     });
   }
 
-  Consumer _buildSearchedMealList() {
+  Widget _buildSearchedMealList() {
     return Consumer(builder: (context, ref, _) {
       final filteredMeals = ref.watch(_$filteredMeals);
 
@@ -160,19 +171,27 @@ class _MealListViewState extends ConsumerState<MealListView>
         return _buildEmptySearchedMeals();
       }
 
-      return Padding(
+      return SliverPadding(
         padding: const EdgeInsets.symmetric(vertical: kPadding / 2),
-        child: ListView.builder(
-          itemCount: filteredMeals.length,
-          itemBuilder: (_, index) => MealListTile(filteredMeals[index]),
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
+        sliver: SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (_, index) {
+              final meal = filteredMeals[index];
+              return MealListTile(
+                meal,
+                key: ValueKey<String>('search-${meal.id ?? index.toString()}'),
+              );
+            },
+            childCount: filteredMeals.length,
+            addAutomaticKeepAlives: false,
+            addSemanticIndexes: false,
+          ),
         ),
       );
     });
   }
 
-  Consumer _buildPaginatedMealList() {
+  Widget _buildPaginatedMealList() {
     return Consumer(builder: (context, ref, _) {
       final loadedMeals = ref.watch(_$loadedMeals);
 
@@ -180,115 +199,193 @@ class _MealListViewState extends ConsumerState<MealListView>
         return _buildEmptyMeals();
       }
 
-      return Padding(
+      return SliverPadding(
         padding: const EdgeInsets.symmetric(vertical: kPadding / 2),
-        child: ListView.builder(
-          itemCount: loadedMeals.length,
-          itemBuilder: (_, index) => MealListTile(loadedMeals[index]),
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
+        sliver: SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (_, index) {
+              final meal = loadedMeals[index];
+              return MealListTile(
+                meal,
+                key: ValueKey<String>('loaded-${meal.id ?? index.toString()}'),
+              );
+            },
+            childCount: loadedMeals.length,
+            addAutomaticKeepAlives: false,
+            addSemanticIndexes: false,
+          ),
         ),
       );
     });
   }
 
   Widget _buildEmptyMeals() {
-    return Column(
-      children: [
-        UserInformation(
-          assetPath: 'assets/images/undraw_empty.png',
-          title: 'meal_list_empty_title'.tr(),
-          message: 'meal_list_empty_subtitle'.tr(),
-        ),
-        const SizedBox(height: kPadding),
-        TextButton.icon(
-          onPressed: () => Navigator.push(
-            context,
-            ConcentricPageRoute<HelpSlideShareImport>(
-              builder: (_) => HelpSlideShareImport(),
+    return SliverToBoxAdapter(
+      child: Column(
+        children: [
+          UserInformation(
+            assetPath: 'assets/images/undraw_empty.png',
+            title: 'meal_list_empty_title'.tr(),
+            message: 'meal_list_empty_subtitle'.tr(),
+          ),
+          const SizedBox(height: kPadding),
+          TextButton.icon(
+            onPressed: () => Navigator.push(
+              context,
+              ConcentricPageRoute<HelpSlideShareImport>(
+                builder: (_) => HelpSlideShareImport(),
+              ),
             ),
+            icon: Icon(
+              EvaIcons.questionMarkCircleOutline,
+              color: theme.primaryColor,
+            ),
+            label: Text(
+              'meal_list_help_import',
+              style: TextStyle(color: theme.primaryColor),
+            ).tr(),
           ),
-          icon: Icon(
-            EvaIcons.questionMarkCircleOutline,
-            color: theme.primaryColor,
-          ),
-          label: Text(
-            'meal_list_help_import',
-            style: TextStyle(color: theme.primaryColor),
-          ).tr(),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildEmptySearchedMeals() {
-    return Column(
-      children: [
-        UserInformation(
-          assetPath: 'assets/images/undraw_void.png',
-          title: 'meal_list_empty_search_title'.tr(),
-          message: 'meal_list_empty_search_subtitle'.tr(),
-        ),
-      ],
+    return SliverToBoxAdapter(
+      child: Column(
+        children: [
+          UserInformation(
+            assetPath: 'assets/images/undraw_void.png',
+            title: 'meal_list_empty_search_title'.tr(),
+            message: 'meal_list_empty_search_subtitle'.tr(),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildGroupedTagList(List<String> selectedTags) {
     return FutureBuilder<List<Meal>>(
-        future: LunixApiService.searchMealsByTags(
-          ref.read(planProvider)!.id!,
-          selectedTags,
-        ),
+        future: _searchMealsByTagsCached(selectedTags),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return _buildLoadingMealList();
           }
 
           final groups = _groupMealsByTags(snapshot.data!, selectedTags);
+          final rows = _buildGroupRows(groups);
 
-          return GroupListView(
-            itemBuilder: (_, item) => MealListTile(
-              groups[item.section].meals[item.index],
+          return SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (_, index) {
+                final row = rows[index];
+
+                if (row.isHeader) {
+                  return KeyedSubtree(
+                    key: ValueKey<String>('header-${row.tag!}'),
+                    child: _buildSubtitle(context, row.tag!),
+                  );
+                }
+
+                final meal = row.meal!;
+                return MealListTile(
+                  meal,
+                  key: ValueKey<String>(
+                      'grouped-${meal.id ?? index.toString()}'),
+                );
+              },
+              childCount: rows.length,
+              addAutomaticKeepAlives: false,
+              addSemanticIndexes: false,
             ),
-            sectionsCount: groups.length,
-            groupHeaderBuilder: (_, group) => _buildSubtitle(
-              context,
-              groups[group].tag,
-            ),
-            countOfItemInSection: (section) => groups[section].meals.length,
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
           );
         });
   }
 
-  List<TagGroup> _groupMealsByTags(List<Meal> meals, List<String> tags) {
-    final List<TagGroup> tagList =
-        tags.map((tag) => TagGroup(tag, [])).toList();
+  Future<List<Meal>> _searchMealsByTagsCached(List<String> selectedTags) {
+    final planId = ref.read(planProvider)!.id!;
 
-    for (final group in tagList) {
-      group.meals =
-          meals.where((element) => element.tags!.contains(group.tag)).toList();
+    // Reuse the previous future as long as plan + tags are unchanged.
+    if (_tagSearchFuture != null &&
+        _lastTagPlanId == planId &&
+        listEquals(_lastTagSearch, selectedTags)) {
+      return _tagSearchFuture!;
     }
 
-    return tagList;
+    _lastTagSearch = List<String>.from(selectedTags);
+    _lastTagPlanId = planId;
+    _tagSearchFuture = LunixApiService.searchMealsByTags(
+      planId,
+      selectedTags,
+    );
+
+    return _tagSearchFuture!;
+  }
+
+  List<_GroupRow> _buildGroupRows(List<TagGroup> groups) {
+    final rows = <_GroupRow>[];
+
+    for (final group in groups) {
+      rows.add(_GroupRow.header(group.tag));
+      for (final meal in group.meals) {
+        rows.add(_GroupRow.meal(meal));
+      }
+    }
+
+    return rows;
+  }
+
+  void _closeSearch() {
+    // Invalidate pending search calls before closing search mode.
+    _searchRequestToken++;
+    ref.read(_$isSearching.notifier).state = false;
+  }
+
+  List<TagGroup> _groupMealsByTags(List<Meal> meals, List<String> tags) {
+    final groupedMeals = <String, List<Meal>>{
+      for (final tag in tags) tag: <Meal>[],
+    };
+    final selectedTags = tags.toSet();
+
+    for (final meal in meals) {
+      final mealTags = meal.tags;
+      if (mealTags == null || mealTags.isEmpty) {
+        continue;
+      }
+
+      for (final mealTag in mealTags) {
+        if (!selectedTags.contains(mealTag)) {
+          continue;
+        }
+        groupedMeals[mealTag]!.add(meal);
+      }
+    }
+
+    return tags
+        .map((tag) => TagGroup(tag, groupedMeals[tag]!))
+        .toList(growable: false);
   }
 
   Future<void> _searchMeal(String query) async {
     if (query.isEmpty) {
       return;
     }
+    // Each new request invalidates older ones.
+    final requestToken = ++_searchRequestToken;
+
     ref.read(_$isLoading.notifier).state = true;
     ref.read(mealTagFilterProvider.notifier).state = [];
-    ref.read(_$filteredMeals.notifier).state =
-        await LunixApiService.searchMeals(
+    final filteredMeals = await LunixApiService.searchMeals(
       ref.read(planProvider)!.id!,
       query,
     );
 
-    if (!mounted) {
+    if (!mounted || requestToken != _searchRequestToken) {
+      // Ignore outdated responses that returned too late.
       return;
     }
+
+    ref.read(_$filteredMeals.notifier).state = filteredMeals;
     ref.read(_$isSearching.notifier).state = true;
     ref.read(_$isLoading.notifier).state = false;
     FirebaseAnalytics.instance.logEvent(
@@ -335,11 +432,14 @@ class _MealListViewState extends ConsumerState<MealListView>
   bool _paginationActive() {
     return ref.read(mealTagFilterProvider).isEmpty &&
         !ref.read(_$isLoading) &&
+        !ref.read(_$isLoadingPagination) &&
         !ref.read(_$isSearching) &&
         ref.read(_$loadedMeals).isNotEmpty;
   }
 
   void _refreshMeals() async {
+    // Prevent in-flight search results from applying after refresh.
+    _searchRequestToken++;
     final refIsLoading = ref.read(_$isLoading.notifier);
     refIsLoading.state = true;
     ref.read(_$loadedMeals.notifier).state = [];
@@ -370,4 +470,21 @@ class TagGroup {
   String tag;
 
   TagGroup(this.tag, this.meals);
+}
+
+class _GroupRow {
+  final String? tag;
+  final Meal? meal;
+  final bool isHeader;
+
+  const _GroupRow._(
+      {required this.tag, required this.meal, required this.isHeader});
+
+  factory _GroupRow.header(String tag) {
+    return _GroupRow._(tag: tag, meal: null, isHeader: true);
+  }
+
+  factory _GroupRow.meal(Meal meal) {
+    return _GroupRow._(tag: null, meal: meal, isHeader: false);
+  }
 }
