@@ -1,4 +1,4 @@
-platform :ios, '14.0'
+platform :ios, '15.0'
 
 $FirebaseSDKVersion = '12.8.0' # See below links of installed packages for the current version
 # https://github.com/firebase/flutterfire/blob/main/packages/cloud_firestore/cloud_firestore/ios/generated_firebase_sdk_version.txt
