@@ -42,6 +42,8 @@ class _MealListViewState extends ConsumerState<MealListView>
   bool _paginationAtEnd = false;
   Future<List<Meal>>? _tagSearchFuture;
   List<String> _lastTagSearch = const [];
+  String? _lastTagPlanId;
+  int _searchRequestToken = 0;
 
   @override
   bool get wantKeepAlive => true;
@@ -63,6 +65,8 @@ class _MealListViewState extends ConsumerState<MealListView>
 
   @override
   void dispose() {
+    _searchDebouncer.dispose();
+    _scrollDepouncer.dispose();
     _scrollController.dispose();
     cancelSubscriptions();
     super.dispose();
@@ -83,8 +87,7 @@ class _MealListViewState extends ConsumerState<MealListView>
                   _searchDebouncer.run(() => _searchMeal(query));
                 }
               },
-              onSearchClose: () =>
-                  ref.read(_$isSearching.notifier).state = false,
+              onSearchClose: _closeSearch,
               onRefresh: _refreshMeals,
             ),
           ),
@@ -108,7 +111,9 @@ class _MealListViewState extends ConsumerState<MealListView>
               child: isLoadingPagination
                   ? const Padding(
                       padding: EdgeInsets.symmetric(vertical: kPadding / 2),
-                      child: SmallCircularProgressIndicator(),
+                      child: Center(
+                        child: SmallCircularProgressIndicator(),
+                      ),
                     )
                   : const SizedBox(),
             );
@@ -125,6 +130,8 @@ class _MealListViewState extends ConsumerState<MealListView>
         delegate: SliverChildBuilderDelegate(
           (_, __) => const MealListTile(null),
           childCount: 10,
+          addAutomaticKeepAlives: false,
+          addSemanticIndexes: false,
         ),
       ),
     );
@@ -166,8 +173,16 @@ class _MealListViewState extends ConsumerState<MealListView>
         padding: const EdgeInsets.symmetric(vertical: kPadding / 2),
         sliver: SliverList(
           delegate: SliverChildBuilderDelegate(
-            (_, index) => MealListTile(filteredMeals[index]),
+            (_, index) {
+              final meal = filteredMeals[index];
+              return MealListTile(
+                meal,
+                key: ValueKey<String>('search-${meal.id ?? index.toString()}'),
+              );
+            },
             childCount: filteredMeals.length,
+            addAutomaticKeepAlives: false,
+            addSemanticIndexes: false,
           ),
         ),
       );
@@ -186,8 +201,16 @@ class _MealListViewState extends ConsumerState<MealListView>
         padding: const EdgeInsets.symmetric(vertical: kPadding / 2),
         sliver: SliverList(
           delegate: SliverChildBuilderDelegate(
-            (_, index) => MealListTile(loadedMeals[index]),
+            (_, index) {
+              final meal = loadedMeals[index];
+              return MealListTile(
+                meal,
+                key: ValueKey<String>('loaded-${meal.id ?? index.toString()}'),
+              );
+            },
             childCount: loadedMeals.length,
+            addAutomaticKeepAlives: false,
+            addSemanticIndexes: false,
           ),
         ),
       );
@@ -256,25 +279,42 @@ class _MealListViewState extends ConsumerState<MealListView>
                 final row = rows[index];
 
                 if (row.isHeader) {
-                  return _buildSubtitle(context, row.tag!);
+                  return KeyedSubtree(
+                    key: ValueKey<String>('header-${row.tag!}'),
+                    child: _buildSubtitle(context, row.tag!),
+                  );
                 }
 
-                return MealListTile(row.meal);
+                final meal = row.meal!;
+                return MealListTile(
+                  meal,
+                  key: ValueKey<String>(
+                      'grouped-${meal.id ?? index.toString()}'),
+                );
               },
               childCount: rows.length,
+              addAutomaticKeepAlives: false,
+              addSemanticIndexes: false,
             ),
           );
         });
   }
 
   Future<List<Meal>> _searchMealsByTagsCached(List<String> selectedTags) {
-    if (_tagSearchFuture != null && listEquals(_lastTagSearch, selectedTags)) {
+    final planId = ref.read(planProvider)!.id!;
+
+    if (_tagSearchFuture != null &&
+        _lastTagPlanId == planId &&
+        listEquals(_lastTagSearch, selectedTags)) {
       return _tagSearchFuture!;
     }
 
     _lastTagSearch = List<String>.from(selectedTags);
+    _lastTagPlanId = planId;
     _tagSearchFuture = LunixApiService.searchMealsByTags(
-        ref.read(planProvider)!.id!, selectedTags);
+      planId,
+      selectedTags,
+    );
 
     return _tagSearchFuture!;
   }
@@ -292,33 +332,54 @@ class _MealListViewState extends ConsumerState<MealListView>
     return rows;
   }
 
-  List<TagGroup> _groupMealsByTags(List<Meal> meals, List<String> tags) {
-    final List<TagGroup> tagList =
-        tags.map((tag) => TagGroup(tag, [])).toList();
+  void _closeSearch() {
+    _searchRequestToken++;
+    ref.read(_$isSearching.notifier).state = false;
+  }
 
-    for (final group in tagList) {
-      group.meals =
-          meals.where((element) => element.tags!.contains(group.tag)).toList();
+  List<TagGroup> _groupMealsByTags(List<Meal> meals, List<String> tags) {
+    final groupedMeals = <String, List<Meal>>{
+      for (final tag in tags) tag: <Meal>[],
+    };
+    final selectedTags = tags.toSet();
+
+    for (final meal in meals) {
+      final mealTags = meal.tags;
+      if (mealTags == null || mealTags.isEmpty) {
+        continue;
+      }
+
+      for (final mealTag in mealTags) {
+        if (!selectedTags.contains(mealTag)) {
+          continue;
+        }
+        groupedMeals[mealTag]!.add(meal);
+      }
     }
 
-    return tagList;
+    return tags
+        .map((tag) => TagGroup(tag, groupedMeals[tag]!))
+        .toList(growable: false);
   }
 
   Future<void> _searchMeal(String query) async {
     if (query.isEmpty) {
       return;
     }
+    final requestToken = ++_searchRequestToken;
+
     ref.read(_$isLoading.notifier).state = true;
     ref.read(mealTagFilterProvider.notifier).state = [];
-    ref.read(_$filteredMeals.notifier).state =
-        await LunixApiService.searchMeals(
+    final filteredMeals = await LunixApiService.searchMeals(
       ref.read(planProvider)!.id!,
       query,
     );
 
-    if (!mounted) {
+    if (!mounted || requestToken != _searchRequestToken) {
       return;
     }
+
+    ref.read(_$filteredMeals.notifier).state = filteredMeals;
     ref.read(_$isSearching.notifier).state = true;
     ref.read(_$isLoading.notifier).state = false;
     FirebaseAnalytics.instance.logEvent(
@@ -371,6 +432,7 @@ class _MealListViewState extends ConsumerState<MealListView>
   }
 
   void _refreshMeals() async {
+    _searchRequestToken++;
     final refIsLoading = ref.read(_$isLoading.notifier);
     refIsLoading.state = true;
     ref.read(_$loadedMeals.notifier).state = [];
