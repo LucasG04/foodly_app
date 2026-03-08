@@ -1,22 +1,20 @@
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:isar/isar.dart';
 
 part 'link_metadata.g.dart';
 
-@HiveType(typeId: 1)
+@collection
 class LinkMetadata {
-  @HiveField(0)
+  Id id = Isar.autoIncrement;
+
+  @Index(unique: true)
   String? url;
 
-  @HiveField(1)
   String? image;
 
-  @HiveField(2)
   String? title;
 
-  @HiveField(3)
   String? description;
 
-  @HiveField(4)
   DateTime? cachedAt;
 
   LinkMetadata({

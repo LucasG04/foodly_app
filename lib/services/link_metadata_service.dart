@@ -1,18 +1,19 @@
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:isar/isar.dart';
 import 'package:logging/logging.dart';
 import 'package:metadata_fetch/metadata_fetch.dart';
 
 import '../models/link_metadata.dart';
+import 'storage_service.dart';
 
 class LinkMetadataService {
   LinkMetadataService._();
 
   static final log = Logger('LinkMetadataService');
 
-  static late Box<LinkMetadata> _dataBox;
+  static late Isar _isar;
 
   static Future initialize() async {
-    _dataBox = await Hive.openBox('linkmetadata');
+    _isar = await StorageService.getIsar();
     log.finer('initialized');
   }
 
@@ -48,13 +49,13 @@ class LinkMetadataService {
       throw Exception('Requested Link is not cached yet');
     }
 
-    return _dataBox.get(link);
+    return _isar.linkMetadatas.filter().urlEqualTo(link).findFirstSync();
   }
 
   static bool isCached(String? link,
       [Duration cacheDuration = const Duration(days: 7)]) {
     log.finer('Call isCached with $link');
-    final cachedData = _dataBox.get(link);
+    final cachedData = _isar.linkMetadatas.filter().urlEqualTo(link).findFirstSync();
     final validCacheDate = DateTime.now().subtract(cacheDuration);
     return cachedData != null && cachedData.cachedAt!.isAfter(validCacheDate);
   }
@@ -64,7 +65,15 @@ class LinkMetadataService {
     if (data.url == null) {
       return;
     }
-    await _dataBox.put(data.url, data).catchError((dynamic err) {
+    
+    await _isar.writeTxn(() async {
+      // Check if entry exists and update or insert
+      final existing = await _isar.linkMetadatas.filter().urlEqualTo(data.url).findFirst();
+      if (existing != null) {
+        data.id = existing.id;
+      }
+      await _isar.linkMetadatas.put(data);
+    }).catchError((dynamic err) {
       log.severe('ERR _cacheData with key ${data.url}');
       log.severe(err);
     });

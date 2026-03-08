@@ -1,21 +1,39 @@
 import 'package:flutter/painting.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:isar/isar.dart';
 
 import '../constants.dart';
 import '../models/plan_meal.dart';
 import '../models/shopping_list_sort.dart';
 import '../primary_colors.dart';
 import 'in_app_purchase_service.dart';
+import 'storage_service.dart';
+
+part 'settings_service.g.dart';
+
+@collection
+class SettingsData {
+  Id id = Isar.autoIncrement;
+
+  bool? firstUsage;
+  bool? multipleMealsPerTime;
+  bool? showSuggestions;
+  bool? removeBoughtImmediately;
+  int? primaryColor;
+  int? shoppingListSort;
+  List<String>? productGroupOrder;
+  List<int>? activeMealTypes;
+  bool? useDevApi;
+}
 
 class SettingsService {
   SettingsService._();
 
-  static late Box _settingsBox;
+  static late Isar _isar;
   static WidgetRef? _ref;
 
   static Future initialize() async {
-    _settingsBox = await Hive.openBox<dynamic>('settings');
+    _isar = await StorageService.getIsar();
   }
 
   // ignore: use_setters_to_change_properties
@@ -23,34 +41,56 @@ class SettingsService {
     _ref = ref;
   }
 
-  static bool get isFirstUsage =>
-      _settingsBox.get('firstUsage', defaultValue: true) as bool;
-
-  static Future<void> setFirstUsageFalse() async {
-    await _settingsBox.put('firstUsage', false);
+  static SettingsData _getSettings() {
+    return _isar.settingsDatas.where().findFirstSync() ?? SettingsData();
   }
 
-  static bool get multipleMealsPerTime =>
-      _settingsBox.get('multipleMealsPerTime', defaultValue: false) as bool;
+  static Future<void> _updateSettings(void Function(SettingsData) update) async {
+    await _isar.writeTxn(() async {
+      var settings = _isar.settingsDatas.where().findFirstSync() ?? SettingsData();
+      update(settings);
+      await _isar.settingsDatas.put(settings);
+    });
+  }
+
+  static bool get isFirstUsage {
+    final settings = _getSettings();
+    return settings.firstUsage ?? true;
+  }
+
+  static Future<void> setFirstUsageFalse() async {
+    await _updateSettings((settings) {
+      settings.firstUsage = false;
+    });
+  }
+
+  static bool get multipleMealsPerTime {
+    final settings = _getSettings();
+    return settings.multipleMealsPerTime ?? false;
+  }
 
   static bool get showSuggestions {
-    final showSuggestions =
-        _settingsBox.get('showSuggestions', defaultValue: true) as bool;
+    final settings = _getSettings();
+    final showSuggestions = settings.showSuggestions ?? true;
     final userHasPremium =
         _ref?.read(InAppPurchaseService.$userIsSubscribed) ?? false;
     return showSuggestions && userHasPremium;
   }
 
-  static bool get removeBoughtImmediately =>
-      _settingsBox.get('removeBoughtImmediately', defaultValue: false) as bool;
+  static bool get removeBoughtImmediately {
+    final settings = _getSettings();
+    return settings.removeBoughtImmediately ?? false;
+  }
 
   static Color get primaryColor {
-    final value = _settingsBox.get('primaryColor') as int?;
+    final settings = _getSettings();
+    final value = settings.primaryColor;
     return value != null ? Color(value) : defaultPrimaryColor;
   }
 
   static ShoppingListSort? get shoppingListSort {
-    final value = _settingsBox.get('shoppingListSort') as int?;
+    final settings = _getSettings();
+    final value = settings.shoppingListSort;
     if (value == null) {
       return defaultShoppingListSort;
     }
@@ -69,88 +109,103 @@ class SettingsService {
   }
 
   static List<String> get productGroupOrder {
-    final value = _settingsBox.get('productGroupOrder') as List<dynamic>?;
-    if (value == null) {
-      return <String>[];
-    }
-    return value.cast<String>();
+    final settings = _getSettings();
+    return settings.productGroupOrder ?? <String>[];
   }
 
   static List<MealType> get activeMealTypes {
-    return _convertToMealTypes(_settingsBox.get('activeMealTypes'));
+    final settings = _getSettings();
+    return _convertToMealTypes(settings.activeMealTypes);
   }
 
-  static bool get useDevApi =>
-      _settingsBox.get('useDevApi', defaultValue: false) as bool;
+  static bool get useDevApi {
+    final settings = _getSettings();
+    return settings.useDevApi ?? false;
+  }
 
   static Future<void> setMultipleMealsPerTime(bool value) async {
-    await _settingsBox.put('multipleMealsPerTime', value);
+    await _updateSettings((settings) {
+      settings.multipleMealsPerTime = value;
+    });
   }
 
   static Future<void> setShowSuggestions(bool value) async {
-    await _settingsBox.put('showSuggestions', value);
+    await _updateSettings((settings) {
+      settings.showSuggestions = value;
+    });
   }
 
   static Future<void> setRemoveBoughtImmediately(bool value) async {
-    await _settingsBox.put('removeBoughtImmediately', value);
+    await _updateSettings((settings) {
+      settings.removeBoughtImmediately = value;
+    });
   }
 
   static Future<void> setPrimaryColor(Color value) async {
-    await _settingsBox.put('primaryColor', value.toARGB32());
+    await _updateSettings((settings) {
+      settings.primaryColor = value.toARGB32();
+    });
   }
 
   static Future<void> setShoppingListSort(ShoppingListSort value) async {
-    await _settingsBox.put('shoppingListSort', value.index);
+    await _updateSettings((settings) {
+      settings.shoppingListSort = value.index;
+    });
   }
 
   static Future<void> setProductGroupOrder(List<String> value) async {
-    await _settingsBox.put('productGroupOrder', value);
+    await _updateSettings((settings) {
+      settings.productGroupOrder = value;
+    });
   }
 
   static Future<void> setActiveMealTypes(List<MealType> value) async {
-    await _settingsBox.put(
-      'activeMealTypes',
-      value.map((e) => e.index).toList(),
-    );
+    await _updateSettings((settings) {
+      settings.activeMealTypes = value.map((e) => e.index).toList();
+    });
   }
 
   static Future<void> setUseDevApi(bool value) async {
-    await _settingsBox.put('useDevApi', value);
+    await _updateSettings((settings) {
+      settings.useDevApi = value;
+    });
   }
 
-  static Stream<BoxEvent> streamShoppingListSort() {
-    return _settingsBox.watch(key: 'shoppingListSort');
+  static Stream<void> streamShoppingListSort() {
+    return _isar.settingsDatas.watchLazy();
   }
 
-  static Stream<BoxEvent> streamMultipleMealsPerTime() {
-    return _settingsBox.watch(key: 'multipleMealsPerTime');
+  static Stream<void> streamMultipleMealsPerTime() {
+    return _isar.settingsDatas.watchLazy();
   }
 
   static Stream<List<MealType>> streamActiveMealTypes() {
-    return _settingsBox
-        .watch(key: 'activeMealTypes')
-        .map((event) => _convertToMealTypes(event.value));
+    return _isar.settingsDatas.watchLazy().map((_) {
+      final settings = _getSettings();
+      return _convertToMealTypes(settings.activeMealTypes);
+    });
   }
 
   static Stream<List<String>> streamProductGroupOrder() {
-    return _settingsBox
-        .watch(key: 'productGroupOrder')
-        .map((event) => event.value as List<String>);
+    return _isar.settingsDatas.watchLazy().map((_) {
+      final settings = _getSettings();
+      return settings.productGroupOrder ?? <String>[];
+    });
   }
 
   static Stream<bool> streamUseDevApi() {
-    return _settingsBox
-        .watch(key: 'useDevApi')
-        .map((event) => event.value as bool);
+    return _isar.settingsDatas.watchLazy().map((_) {
+      final settings = _getSettings();
+      return settings.useDevApi ?? false;
+    });
   }
 
-  static List<MealType> _convertToMealTypes(dynamic value) {
+  static List<MealType> _convertToMealTypes(List<int>? value) {
     final defaultValues = [MealType.LUNCH, MealType.DINNER];
+    if (value == null) {
+      return defaultValues;
+    }
     try {
-      value as List<int>?;
-      if (value == null) {
-        return defaultValues;
-      }
       return value.map((e) => MealType.values[e]).toList();
     } catch (e) {
       return defaultValues;

@@ -1,7 +1,15 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:isar/isar.dart';
 import 'package:logging/logging.dart';
+import 'package:path_provider/path_provider.dart';
+
+import '../models/link_metadata.dart';
+import '../services/app_review_service.dart';
+import '../services/plan_service.dart';
+import '../services/settings_service.dart';
+import '../services/version_service.dart';
 
 class StorageService {
   static final _log = Logger('StorageService');
@@ -9,6 +17,27 @@ class StorageService {
   StorageService._();
 
   static const String _storageMealImageFolder = 'meal-images/';
+
+  static Isar? _isar;
+
+  static Future<Isar> getIsar() async {
+    if (_isar != null) {
+      return _isar!;
+    }
+
+    final dir = await getApplicationDocumentsDirectory();
+    _isar = await Isar.open(
+      [
+        LinkMetadataSchema,
+        SettingsDataSchema,
+        VersionDataSchema,
+        AppReviewDataSchema,
+        PlanDataSchema,
+      ],
+      directory: dir.path,
+    );
+    return _isar!;
+  }
 
   static Future<Reference?> uploadFile(XFile? file) async {
     _log.finer('Call uploadFile');
