@@ -27,18 +27,24 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
 
   late AutoDisposeStateProvider<String> _$currentText;
   late TabController _tabController;
+  late ScrollController _editScrollController;
+  late ScrollController _previewScrollController;
 
   @override
   void initState() {
     _$currentText = StateProvider.autoDispose<String>(
         (_) => widget.textEditingController.text);
     _tabController = TabController(vsync: this, length: 2);
+    _editScrollController = ScrollController();
+    _previewScrollController = ScrollController();
     super.initState();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _editScrollController.dispose();
+    _previewScrollController.dispose();
     super.dispose();
   }
 
@@ -97,7 +103,7 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
                     thickness: 2.5,
                     child: TextFormField(
                       controller: widget.textEditingController,
-                      scrollController: ScrollController(),
+                      scrollController: _editScrollController,
                       maxLines: null,
                       onChanged: (data) =>
                           ref.read(_$currentText.notifier).state = data,
@@ -119,7 +125,7 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
                   child: Scrollbar(
                     thickness: 2.5,
                     child: SingleChildScrollView(
-                      controller: ScrollController(),
+                      controller: _previewScrollController,
                       child: Consumer(builder: (context, ref, child) {
                         final text = ref.watch(_$currentText);
                         return MarkdownBody(
