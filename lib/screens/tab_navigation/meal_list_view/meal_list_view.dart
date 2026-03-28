@@ -46,6 +46,8 @@ class _MealListViewState extends ConsumerState<MealListView>
   String? _lastTagPlanId;
   // Monotonic token to drop stale async search results.
   int _searchRequestToken = 0;
+  // Bumped on refresh to force MealListTitle to reconstruct (resets search UI).
+  int _searchGeneration = 0;
 
   @override
   bool get wantKeepAlive => true;
@@ -84,6 +86,7 @@ class _MealListViewState extends ConsumerState<MealListView>
           const SliverToBoxAdapter(child: SizedBox(height: kPadding)),
           SliverToBoxAdapter(
             child: MealListTitle(
+              key: ValueKey(_searchGeneration),
               onSearch: (query) {
                 if (query.length > 2) {
                   _searchDebouncer.run(() => _searchMeal(query));
@@ -447,6 +450,7 @@ class _MealListViewState extends ConsumerState<MealListView>
     ref.read(_$isLoadingPagination.notifier).state = false;
     ref.read(_$isSearching.notifier).state = false;
     ref.read(mealTagFilterProvider.notifier).state = [];
+    setState(() { _searchGeneration++; });
     await _loadNextMeals(ref);
     if (!mounted) {
       return;
