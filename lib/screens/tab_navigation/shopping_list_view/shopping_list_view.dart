@@ -201,6 +201,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                 ],
               ),
             ),
+            const SizedBox(height: kPadding * 2),
         ],
       ),
     );
