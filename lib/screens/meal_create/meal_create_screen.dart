@@ -37,8 +37,13 @@ import 'save_changes_modal.dart';
 
 class MealCreateScreen extends ConsumerStatefulWidget {
   final String id;
+  final bool navigateToDetailOnCreate;
 
-  const MealCreateScreen({required this.id, super.key});
+  const MealCreateScreen({
+    required this.id,
+    this.navigateToDetailOnCreate = false,
+    super.key,
+  });
 
   @override
   _MealCreateScreenState createState() => _MealCreateScreenState();
@@ -74,9 +79,6 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
   @override
   void initState() {
     super.initState();
-    _sourceController.addListener(
-      () => _onSourceTextChange(_sourceController.text),
-    );
     final plan = ref.read(planProvider);
     _$meal = AutoDisposeStateProvider<Meal>(
       (_) => Meal(name: '', planId: plan?.id),
@@ -113,7 +115,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
 
   @override
   Widget build(BuildContext context) {
-    final fullWidth = media.size.width > 699 ? 700.0 : media.size.width * 0.8;
+    final fullWidth = mediaSize.width > 699 ? 700.0 : mediaSize.width * 0.85;
 
     // ignore: deprecated_member_use, see https://github.com/flutter/flutter/issues/138614
     return WillPopScope(
@@ -159,17 +161,18 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                   title: 'meal_create_title_title'.tr(),
                                   required: true,
                                 ),
-                                const Divider(),
+                                _buildDivider(),
                                 Consumer(builder: (context, ref, _) {
-                                  final meal = ref.watch(_$meal);
+                                  final ingredients = ref.watch(
+                                      _$meal.select((m) => m.ingredients ?? []));
                                   return EditIngredients(
-                                    content: meal.ingredients ?? [],
+                                    content: ingredients,
                                     onChanged: (value) => _changeMealValue(
                                         (meal) => meal.ingredients = value),
                                     title: 'meal_create_ingredients_title'.tr(),
                                   );
                                 }),
-                                const Divider(),
+                                _buildDivider(),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -195,7 +198,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                     }),
                                   ],
                                 ),
-                                const Divider(),
+                                _buildDivider(),
                                 SizedBox(
                                   width: double.infinity,
                                   child: Text(
@@ -207,7 +210,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                   textEditingController:
                                       _instructionsController,
                                 ),
-                                const Divider(),
+                                _buildDivider(),
                                 Consumer(builder: (context, ref, _) {
                                   final mealImageUrl = ref
                                       .watch(_$meal.select((m) => m.imageUrl));
@@ -221,7 +224,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                     onOpen: _onOpenImagePicker,
                                   );
                                 }),
-                                const Divider(),
+                                _buildDivider(),
                                 Row(
                                   children: [
                                     Flexible(
@@ -259,7 +262,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                     ),
                                   ),
                                 ),
-                                const Divider(),
+                                _buildDivider(),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -272,14 +275,15 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                   ],
                                 ),
                                 Consumer(builder: (context, ref, _) {
-                                  final meal = ref.watch(_$meal);
-                                  return meal.tags == null || meal.tags!.isEmpty
+                                  final tags =
+                                      ref.watch(_$meal.select((m) => m.tags));
+                                  return tags == null || tags.isEmpty
                                       ? const Text('-')
                                       : SizedBox(
                                           width: double.infinity,
                                           child: Wrap(
                                             clipBehavior: Clip.hardEdge,
-                                            children: meal.tags!
+                                            children: tags
                                                 .map((e) => MealTag(e))
                                                 .toList(),
                                           ),
@@ -311,6 +315,13 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       ),
     );
   }
+
+  Center _buildDivider() => Center(
+        child: SizedBox(
+          width: mediaSize.width > 699 ? 650.0 : mediaSize.width * 0.8,
+          child: const Divider(),
+        ),
+      );
 
   Future<Meal?> _initialParseId() async {
     if (widget.id == 'create') {
@@ -449,7 +460,15 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         BasicUtils.getActiveLanguage(context),
       );
       BasicUtils.emitMealsChanged(ref, newMeal?.id ?? '');
-      AutoRouter.of(context).pop();
+      if (_isCreatingMeal &&
+          widget.navigateToDetailOnCreate &&
+          newMeal?.id != null) {
+        // Replace this screen with the detail view — no pop means no flash
+        // of the underlying list.
+        AutoRouter.of(context).replace(MealScreenRoute(id: newMeal!.id!));
+      } else {
+        AutoRouter.of(context).pop();
+      }
       return true;
     } catch (e) {
       if (!mounted) {
@@ -495,6 +514,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       _titleController.text = result.name;
       meal.imageUrl = result.imageUrl;
       _sourceController.text = result.source!;
+      _onSourceTextChange(result.source!);
       _durationController.text = (result.duration ?? '').toString();
       _instructionsController.text = result.instructions!;
       meal.ingredients = result.ingredients ?? [];

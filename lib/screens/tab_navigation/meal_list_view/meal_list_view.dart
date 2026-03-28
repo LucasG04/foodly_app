@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:concentric_transition/concentric_transition.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -40,12 +41,15 @@ class _MealListViewState extends ConsumerState<MealListView>
   final Debouncer _searchDebouncer = Debouncer(milliseconds: 500);
   final Debouncer _scrollDepouncer = Debouncer(milliseconds: 50);
   bool _paginationAtEnd = false;
+  QueryDocumentSnapshot<Meal>? _lastMealDoc;
   // Cache the latest tag query to avoid refetching on rebuild.
   Future<List<Meal>>? _tagSearchFuture;
   List<String> _lastTagSearch = const [];
   String? _lastTagPlanId;
   // Monotonic token to drop stale async search results.
   int _searchRequestToken = 0;
+  // Bumped on refresh to force MealListTitle to reconstruct (resets search UI).
+  int _searchGeneration = 0;
 
   @override
   bool get wantKeepAlive => true;
@@ -53,13 +57,15 @@ class _MealListViewState extends ConsumerState<MealListView>
   @override
   void initState() {
     _$isLoading = StateProvider.autoDispose<bool>((_) => true);
-    _$isLoadingPagination = StateProvider<bool>((_) => true);
+    _$isLoadingPagination = StateProvider<bool>((_) => false);
     _$isSearching = StateProvider<bool>((_) => false);
     _$loadedMeals = StateProvider<List<Meal>>((_) => []);
     _$filteredMeals = StateProvider<List<Meal>>((_) => []);
 
-    _loadNextMeals(ref)
-        .then((_) => ref.read(_$isLoading.notifier).state = false);
+    BasicUtils.afterBuild(() {
+      _loadNextMeals(ref)
+          .then((_) => ref.read(_$isLoading.notifier).state = false);
+    });
     _scrollController.addListener(() => _scrollDepouncer.run(_scrollListener));
     _listenForMealsChange(ref);
     super.initState();
@@ -84,6 +90,7 @@ class _MealListViewState extends ConsumerState<MealListView>
           const SliverToBoxAdapter(child: SizedBox(height: kPadding)),
           SliverToBoxAdapter(
             child: MealListTitle(
+              key: ValueKey(_searchGeneration),
               onSearch: (query) {
                 if (query.length > 2) {
                   _searchDebouncer.run(() => _searchMeal(query));
@@ -142,7 +149,7 @@ class _MealListViewState extends ConsumerState<MealListView>
   Widget _buildSubtitle(BuildContext context, String value) {
     return Center(
       child: Container(
-        width: media.size.width > 599 ? 600.0 : media.size.width * 0.9,
+        width: mediaSize.width > 599 ? 600.0 : mediaSize.width * 0.9,
         margin: const EdgeInsets.only(top: kPadding),
         child: Text(
           value,
@@ -413,13 +420,16 @@ class _MealListViewState extends ConsumerState<MealListView>
     const pageSize = 30;
     final refMeals = ref.read(_$loadedMeals.notifier);
 
-    final nextMeals = await MealService.getMealsPaginated(
+    final (nextMeals, lastDoc) = await MealService.getMealsPaginated(
       ref.read(planProvider)!.id!,
-      lastMealId: refMeals.state.isEmpty ? null : refMeals.state.last.id,
+      lastDocument: refMeals.state.isEmpty ? null : _lastMealDoc,
       amount: pageSize, // ignore: avoid_redundant_argument_values
     );
 
     _paginationAtEnd = nextMeals.length < pageSize;
+    if (lastDoc != null) {
+      _lastMealDoc = lastDoc;
+    }
 
     if (!mounted) {
       return;
@@ -447,6 +457,8 @@ class _MealListViewState extends ConsumerState<MealListView>
     ref.read(_$isLoadingPagination.notifier).state = false;
     ref.read(_$isSearching.notifier).state = false;
     ref.read(mealTagFilterProvider.notifier).state = [];
+    _lastMealDoc = null;
+    setState(() { _searchGeneration++; });
     await _loadNextMeals(ref);
     if (!mounted) {
       return;

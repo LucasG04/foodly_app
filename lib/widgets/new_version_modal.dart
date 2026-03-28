@@ -184,7 +184,7 @@ class _NewVersionModalState extends ConsumerState<NewVersionModal> {
             controller: _scrollController,
             child: Container(
               constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height * 0.8,
+                minHeight: MediaQuery.sizeOf(context).height * 0.8,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,

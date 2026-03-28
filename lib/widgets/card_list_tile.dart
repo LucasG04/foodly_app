@@ -20,7 +20,7 @@ class CardListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double width = MediaQuery.of(context).size.width * 0.9;
+    final double width = MediaQuery.sizeOf(context).width * 0.9;
     return Container(
       width: width > 599 ? 600 : width,
       height: height,

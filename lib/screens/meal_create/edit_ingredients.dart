@@ -72,6 +72,13 @@ class EditIngredients extends StatelessWidget {
       ),
     );
 
+    // Flutter restores focus to the last focused child of the parent route's
+    // FocusScopeNode when a modal route is popped. Defer the unfocus to the
+    // next frame so it runs after any pending focus restoration.
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => FocusManager.instance.primaryFocus?.unfocus(),
+    );
+
     if (result == null) {
       return;
     }

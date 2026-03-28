@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../constants.dart';
 import '../../models/plan.dart';
+import '../../utils/of_context_mixin.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
@@ -26,7 +27,8 @@ class PlanSettingsView extends StatefulWidget {
   State<PlanSettingsView> createState() => _PlanSettingsViewState();
 }
 
-class _PlanSettingsViewState extends State<PlanSettingsView> {
+class _PlanSettingsViewState extends State<PlanSettingsView>
+    with OfContextMixin {
   ButtonState? _buttonState;
 
   TextEditingController? _nameController;
@@ -43,15 +45,14 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
 
   @override
   Widget build(BuildContext context) {
-    final media = MediaQuery.of(context);
-    final contentWidth = media.size.width > 599 ? 600 : media.size.width * 0.9;
+    final contentWidth = mediaSize.width > 599 ? 600 : mediaSize.width * 0.9;
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (media.size.width - contentWidth) / 2,
+        horizontal: (mediaSize.width - contentWidth) / 2,
       ),
       child: Column(
         children: [
-          SizedBox(height: kPadding + media.padding.top),
+          SizedBox(height: kPadding + mediaPadding.top),
           FlutterToggleTab(
             width: 80,
             borderRadius: 15,
@@ -90,7 +91,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView> {
           ),
           const Spacer(),
           SizedBox(
-            height: media.size.height * 0.2 + media.viewInsets.bottom / 4,
+            height: mediaSize.height * 0.2 + mediaViewInsets.bottom / 4,
             child: _unknownErrorText != null
                 ? Row(
                     children: [

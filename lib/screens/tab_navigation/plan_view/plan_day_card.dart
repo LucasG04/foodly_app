@@ -22,7 +22,7 @@ class PlanDayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
     final breakfastList = meals.where((e) => e.type == MealType.BREAKFAST);
     final lunchList = meals.where((e) => e.type == MealType.LUNCH);
     final dinnerList = meals.where((e) => e.type == MealType.DINNER);

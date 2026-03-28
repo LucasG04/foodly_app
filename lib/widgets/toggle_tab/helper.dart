@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 
 double widthInPercent(double percent, BuildContext context) {
   final toDouble = percent / 100;
-  return MediaQuery.of(context).size.width * toDouble;
+  return MediaQuery.sizeOf(context).width * toDouble;
 }
 
 double heightInPercent(double percent, BuildContext context) {
   final toDouble = percent / 100;
-  return MediaQuery.of(context).size.height * toDouble;
+  return MediaQuery.sizeOf(context).height * toDouble;
 }
 
 const BoxShadow bsInner = BoxShadow(

@@ -200,7 +200,7 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
   }
 
   Widget _buildPremiumDurationSelector(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
     return Consumer(
       builder: (context, ref, _) {
         final purchaseState = ref.watch(_$purchaseState);

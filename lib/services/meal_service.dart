@@ -142,16 +142,18 @@ class MealService {
     return tags;
   }
 
-  static Future<List<Meal>> getMealsPaginated(String planId,
-      {String? lastMealId, int amount = 30}) async {
-    _log.finer('Call getMealsPaginated with $planId, $lastMealId, $amount');
+  static Future<(List<Meal>, QueryDocumentSnapshot<Meal>?)> getMealsPaginated(
+    String planId, {
+    DocumentSnapshot<Meal>? lastDocument,
+    int amount = 30,
+  }) async {
+    _log.finer('Call getMealsPaginated with $planId, $lastDocument, $amount');
     Query<Meal> query;
-    if (lastMealId != null) {
-      final startAfter = await _firestore.doc(lastMealId).get();
+    if (lastDocument != null) {
       query = _firestore
           .where('planId', isEqualTo: planId)
           .orderBy('name')
-          .startAfterDocument(startAfter)
+          .startAfterDocument(lastDocument)
           .limit(amount);
     } else {
       query = _firestore
@@ -161,7 +163,7 @@ class MealService {
     }
 
     final snaps = await query.get();
-
-    return snaps.docs.map((e) => e.data()).toList();
+    final lastDoc = snaps.docs.isNotEmpty ? snaps.docs.last : null;
+    return (snaps.docs.map((e) => e.data()).toList(), lastDoc);
   }
 }

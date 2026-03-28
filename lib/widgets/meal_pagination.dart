@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,10 +13,11 @@ import 'small_circular_progress_indicator.dart';
 import 'user_information.dart';
 
 class MealPagination extends ConsumerStatefulWidget {
-  /// Returns the next page of meals.
-  /// The last loaded meal id will be passed
-  /// (if it's the first load, `null` is passed).
-  final Future<List<Meal>> Function(String?) loadNextMeals;
+  /// Returns the next page of meals and the last document snapshot (cursor).
+  /// The last document snapshot is passed as cursor (null on first load).
+  final Future<(List<Meal>, QueryDocumentSnapshot<Meal>?)> Function(
+    DocumentSnapshot<Meal>?,
+  ) loadNextMeals;
 
   /// Builds a meal tile with the passed meal
   final Widget Function(Meal) buildMeal;
@@ -40,6 +42,7 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
 
   final Debouncer _scrollDepouncer = Debouncer(milliseconds: 50);
   bool _paginationAtEnd = false;
+  QueryDocumentSnapshot<Meal>? _lastMealDoc;
 
   @override
   void initState() {
@@ -155,11 +158,14 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
     }
     const pageSize = 30;
 
-    final nextMeals = await widget.loadNextMeals(
-      refLoadedMeals.state.isEmpty ? null : refLoadedMeals.state.last.id,
+    final (nextMeals, lastDoc) = await widget.loadNextMeals(
+      refLoadedMeals.state.isEmpty ? null : _lastMealDoc,
     );
 
     _paginationAtEnd = nextMeals.length < pageSize;
+    if (lastDoc != null) {
+      _lastMealDoc = lastDoc;
+    }
 
     if (!mounted) {
       return;

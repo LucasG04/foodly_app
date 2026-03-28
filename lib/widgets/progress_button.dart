@@ -187,7 +187,7 @@ class _ProgressButtonState extends State<ProgressButton>
           parent: _progressAnimationController, curve: Curves.linear),
     );
 
-    final maxWidth = MediaQuery.of(context).size.width - kPadding * 2;
+    final maxWidth = MediaQuery.sizeOf(context).width - kPadding * 2;
     _widthAnimation = Tween<double>(
       begin: constraints.maxWidth > maxWidth ? 300 : constraints.maxWidth,
       end: buttonHeight, // Circular progress must be contained in a square

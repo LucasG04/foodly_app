@@ -77,15 +77,15 @@ class _LoginViewState extends ConsumerState<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery.sizeOf(context);
     final contentWidth = BasicUtils.contentWidth(context);
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (MediaQuery.of(context).size.width - contentWidth) / 2,
+        horizontal: (size.width - contentWidth) / 2,
       ),
       child: Column(
         children: [
-          SizedBox(height: kPadding + MediaQuery.of(context).padding.top),
+          SizedBox(height: kPadding + MediaQuery.paddingOf(context).top),
           FlutterToggleTab(
             width: 50,
             borderRadius: 15,

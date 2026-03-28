@@ -8,10 +8,7 @@ class UnknownRouteScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size =
-        MediaQuery.of(context).size.width < MediaQuery.of(context).size.height
-            ? MediaQuery.of(context).size.width
-            : MediaQuery.of(context).size.height;
+    final size = MediaQuery.sizeOf(context).shortestSide;
     return Scaffold(
       body: Center(
         child: Column(

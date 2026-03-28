@@ -100,7 +100,7 @@ class _MealScreenState extends ConsumerState<MealScreen>
           : CustomScrollView(
               slivers: [
                 SliverAppBar(
-                  expandedHeight: media.size.width > 700.0 ? 400.0 : 250.0,
+                  expandedHeight: mediaSize.width > 700.0 ? 400.0 : 250.0,
                   backgroundColor: theme.scaffoldBackgroundColor,
                   elevation: 4,
                   stretch: true,
@@ -124,8 +124,8 @@ class _MealScreenState extends ConsumerState<MealScreen>
                             ),
                           ),
                         Positioned(
-                          width: media.size.width,
-                          top: kPadding / 2 + media.padding.top,
+                          width: mediaSize.width,
+                          top: kPadding / 2 + mediaPadding.top,
                           child: Padding(
                             padding: sidePadding,
                             child: Row(

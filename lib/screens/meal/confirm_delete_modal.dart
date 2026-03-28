@@ -12,13 +12,13 @@ class ConfirmDeleteModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final media = MediaQuery.of(context);
     final theme = Theme.of(context);
-    final width = media.size.width > 599 ? 580.0 : media.size.width * 0.8;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final width = screenWidth > 599 ? 580.0 : screenWidth * 0.8;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (media.size.width - width) / 2,
+        horizontal: (screenWidth - width) / 2,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

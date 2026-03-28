@@ -36,9 +36,9 @@ class _UpcomingFeaturesScreenState
 
   @override
   Widget build(BuildContext context) {
-    final fullWidth = MediaQuery.of(context).size.width > 699
+    final fullWidth = MediaQuery.sizeOf(context).width > 699
         ? 700.0
-        : MediaQuery.of(context).size.width * 0.9;
+        : MediaQuery.sizeOf(context).width * 0.9;
 
     return Scaffold(
       appBar: MainAppBar(
