@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:concentric_transition/concentric_transition.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -40,6 +41,7 @@ class _MealListViewState extends ConsumerState<MealListView>
   final Debouncer _searchDebouncer = Debouncer(milliseconds: 500);
   final Debouncer _scrollDepouncer = Debouncer(milliseconds: 50);
   bool _paginationAtEnd = false;
+  QueryDocumentSnapshot<Meal>? _lastMealDoc;
   // Cache the latest tag query to avoid refetching on rebuild.
   Future<List<Meal>>? _tagSearchFuture;
   List<String> _lastTagSearch = const [];
@@ -416,13 +418,16 @@ class _MealListViewState extends ConsumerState<MealListView>
     const pageSize = 30;
     final refMeals = ref.read(_$loadedMeals.notifier);
 
-    final nextMeals = await MealService.getMealsPaginated(
+    final (nextMeals, lastDoc) = await MealService.getMealsPaginated(
       ref.read(planProvider)!.id!,
-      lastMealId: refMeals.state.isEmpty ? null : refMeals.state.last.id,
+      lastDocument: refMeals.state.isEmpty ? null : _lastMealDoc,
       amount: pageSize, // ignore: avoid_redundant_argument_values
     );
 
     _paginationAtEnd = nextMeals.length < pageSize;
+    if (lastDoc != null) {
+      _lastMealDoc = lastDoc;
+    }
 
     if (!mounted) {
       return;
@@ -450,6 +455,7 @@ class _MealListViewState extends ConsumerState<MealListView>
     ref.read(_$isLoadingPagination.notifier).state = false;
     ref.read(_$isSearching.notifier).state = false;
     ref.read(mealTagFilterProvider.notifier).state = [];
+    _lastMealDoc = null;
     setState(() { _searchGeneration++; });
     await _loadNextMeals(ref);
     if (!mounted) {

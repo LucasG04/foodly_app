@@ -253,9 +253,9 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
   Widget _buildPaginatedMealList() {
     final planId = ref.read(planProvider)!.id!;
     return MealPagination(
-      loadNextMeals: (lastMealId) => MealService.getMealsPaginated(
+      loadNextMeals: (lastDoc) => MealService.getMealsPaginated(
         planId,
-        lastMealId: lastMealId,
+        lastDocument: lastDoc,
       ),
       buildMeal: (meal) => SelectMealTile(
         meal: meal,
