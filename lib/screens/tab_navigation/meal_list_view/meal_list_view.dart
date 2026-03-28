@@ -62,8 +62,10 @@ class _MealListViewState extends ConsumerState<MealListView>
     _$loadedMeals = StateProvider<List<Meal>>((_) => []);
     _$filteredMeals = StateProvider<List<Meal>>((_) => []);
 
-    _loadNextMeals(ref)
-        .then((_) => ref.read(_$isLoading.notifier).state = false);
+    BasicUtils.afterBuild(() {
+      _loadNextMeals(ref)
+          .then((_) => ref.read(_$isLoading.notifier).state = false);
+    });
     _scrollController.addListener(() => _scrollDepouncer.run(_scrollListener));
     _listenForMealsChange(ref);
     super.initState();
