@@ -43,16 +43,16 @@ class _CodeInputViewState extends State<CodeInputView> with OfContextMixin {
 
   @override
   Widget build(BuildContext context) {
-    final contentWidth = media.size.width > 599 ? 600 : media.size.width * 0.9;
+    final contentWidth = mediaSize.width > 599 ? 600 : mediaSize.width * 0.9;
     return Stack(
       children: <Widget>[
         ListView(
           padding: EdgeInsets.symmetric(
-            horizontal: (media.size.width - contentWidth) / 2,
+            horizontal: (mediaSize.width - contentWidth) / 2,
           ),
           children: [
             SizedBox(
-                height: media.size.height * 0.41 - media.viewInsets.bottom / 6),
+                height: mediaSize.height * 0.41 - mediaViewInsets.bottom / 6),
             SizedBox(
               width: contentWidth * 0.7,
               child: Text(
@@ -76,7 +76,7 @@ class _CodeInputViewState extends State<CodeInputView> with OfContextMixin {
                 ),
               ),
             ),
-            SizedBox(height: media.size.height * 0.1),
+            SizedBox(height: mediaSize.height * 0.1),
             SizedBox(
               width: contentWidth * 0.7,
               child: const Text(
@@ -102,15 +102,15 @@ class _CodeInputViewState extends State<CodeInputView> with OfContextMixin {
             color: theme.primaryColor,
           ),
           child: Container(
-            height: media.size.height * 0.4,
-            width: media.size.width,
+            height: mediaSize.height * 0.4,
+            width: mediaSize.width,
             color: theme.primaryColor,
             child: Container(
               margin: const EdgeInsets.only(left: 24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  SizedBox(height: media.size.height * 0.1),
+                  SizedBox(height: mediaSize.height * 0.1),
                   const Text(
                     'login_code_welcome',
                     style: TextStyle(

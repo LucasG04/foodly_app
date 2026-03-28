@@ -24,7 +24,7 @@ class SelectPlanModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery.sizeOf(context);
     final width = size.width > 599 ? 580.0 : size.width * 0.8;
 
     return Container(

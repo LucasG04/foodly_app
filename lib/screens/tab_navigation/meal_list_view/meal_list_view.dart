@@ -57,7 +57,7 @@ class _MealListViewState extends ConsumerState<MealListView>
   @override
   void initState() {
     _$isLoading = StateProvider.autoDispose<bool>((_) => true);
-    _$isLoadingPagination = StateProvider<bool>((_) => true);
+    _$isLoadingPagination = StateProvider<bool>((_) => false);
     _$isSearching = StateProvider<bool>((_) => false);
     _$loadedMeals = StateProvider<List<Meal>>((_) => []);
     _$filteredMeals = StateProvider<List<Meal>>((_) => []);
@@ -147,7 +147,7 @@ class _MealListViewState extends ConsumerState<MealListView>
   Widget _buildSubtitle(BuildContext context, String value) {
     return Center(
       child: Container(
-        width: media.size.width > 599 ? 600.0 : media.size.width * 0.9,
+        width: mediaSize.width > 599 ? 600.0 : mediaSize.width * 0.9,
         margin: const EdgeInsets.only(top: kPadding),
         child: Text(
           value,

@@ -200,7 +200,7 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
       child: Column(
         children: [
           SkeletonContainer(
-            width: media.size.width,
+            width: mediaSize.width,
             height: theme.textTheme.bodyLarge!.fontSize,
           ),
           Padding(
@@ -208,12 +208,12 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
             child: Column(
               children: [
                 SkeletonContainer(
-                  width: media.size.width * 0.5,
+                  width: mediaSize.width * 0.5,
                   height: _getLargeImageHeight(),
                 ),
                 const SizedBox(height: kPadding / 4),
                 SkeletonContainer(
-                  width: media.size.width,
+                  width: mediaSize.width,
                   height: theme.textTheme.bodyLarge!.fontSize! * 2,
                 ),
               ],
@@ -248,11 +248,11 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SkeletonContainer(
-                    width: media.size.width * 0.4,
+                    width: mediaSize.width * 0.4,
                     height: Theme.of(context).textTheme.bodyLarge!.fontSize,
                   ),
                   SkeletonContainer(
-                    width: media.size.width * 0.6,
+                    width: mediaSize.width * 0.6,
                     height:
                         Theme.of(context).textTheme.bodyLarge!.fontSize! * 2,
                   ),
@@ -265,7 +265,7 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
     );
   }
 
-  double _getLargeImageHeight() => media.size.height * 0.2;
+  double _getLargeImageHeight() => mediaSize.height * 0.2;
 
   double _getSmallCardHeight() => 75.0;
 

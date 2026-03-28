@@ -50,7 +50,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
   List<Meal> searchedMeals = [];
 
   double get _containerWidth {
-    final width = media.size.width * 0.9;
+    final width = mediaSize.width * 0.9;
     return width > 599 ? 600 : width;
   }
 

@@ -65,11 +65,11 @@ class _AddToShoppingListModalState extends ConsumerState<AddToShoppingListModal>
 
   @override
   Widget build(BuildContext context) {
-    final width = media.size.width > 599 ? 580.0 : media.size.width * 0.8;
+    final width = mediaSize.width > 599 ? 580.0 : mediaSize.width * 0.8;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (media.size.width - width) / 2,
+        horizontal: (mediaSize.width - width) / 2,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -127,7 +127,7 @@ class _AddToShoppingListModalState extends ConsumerState<AddToShoppingListModal>
     required BuildContext context,
     required Widget child,
   }) {
-    final height = media.size.height > 200 ? 200.0 : media.size.height * 0.4;
+    final height = mediaSize.height > 200 ? 200.0 : mediaSize.height * 0.4;
     return SizedBox(
       height: height,
       child: Center(child: child),

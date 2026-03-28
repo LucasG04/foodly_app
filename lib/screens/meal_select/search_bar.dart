@@ -48,7 +48,7 @@ class _SearchBarState extends State<SearchBar> with OfContextMixin {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: media.size.width > 649 ? 650.0 : media.size.width * 0.95,
+      width: mediaSize.width > 649 ? 650.0 : mediaSize.width * 0.95,
       child: Card(
         child: Column(
           children: [

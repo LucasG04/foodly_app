@@ -52,12 +52,12 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
   Widget build(BuildContext context) {
     final textColor = theme.textTheme.bodyLarge!.color;
     return SizedBox(
-      width: media.size.width > 599 ? 600.0 : media.size.width * 0.9,
-      height: media.size.height < 500
+      width: mediaSize.width > 599 ? 600.0 : mediaSize.width * 0.9,
+      height: mediaSize.height < 500
           ? 250.0
-          : media.size.height > 1000
+          : mediaSize.height > 1000
               ? 600.0
-              : media.size.height * 0.5,
+              : mediaSize.height * 0.5,
       child: Column(
         children: [
           TabBar(

@@ -115,7 +115,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
 
   @override
   Widget build(BuildContext context) {
-    final fullWidth = media.size.width > 699 ? 700.0 : media.size.width * 0.85;
+    final fullWidth = mediaSize.width > 699 ? 700.0 : mediaSize.width * 0.85;
 
     // ignore: deprecated_member_use, see https://github.com/flutter/flutter/issues/138614
     return WillPopScope(
@@ -318,7 +318,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
 
   Center _buildDivider() => Center(
         child: SizedBox(
-          width: media.size.width > 699 ? 650.0 : media.size.width * 0.8,
+          width: mediaSize.width > 699 ? 650.0 : mediaSize.width * 0.8,
           child: const Divider(),
         ),
       );

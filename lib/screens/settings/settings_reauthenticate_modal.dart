@@ -32,12 +32,12 @@ class _SettingsReauthenticateModalState
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width > 599
+    final width = MediaQuery.sizeOf(context).width > 599
         ? 580.0
-        : MediaQuery.of(context).size.width * 0.8;
+        : MediaQuery.sizeOf(context).width * 0.8;
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (MediaQuery.of(context).size.width - width) / 2,
+        horizontal: (MediaQuery.sizeOf(context).width - width) / 2,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,9 +76,9 @@ class _SettingsReauthenticateModalState
               FirebaseAuthProvider.password))
             ..._buildPassword(),
           SizedBox(
-            height: MediaQuery.of(context).viewInsets.bottom == 0
+            height: MediaQuery.viewInsetsOf(context).bottom == 0
                 ? kPadding * 2
-                : MediaQuery.of(context).viewInsets.bottom,
+                : MediaQuery.viewInsetsOf(context).bottom,
           ),
         ],
       ),

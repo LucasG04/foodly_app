@@ -36,9 +36,9 @@ class BasicUtils {
     BuildContext context, {
     double smallMultiplier = 0.9,
   }) {
-    return MediaQuery.of(context).size.width > 599
+    return MediaQuery.sizeOf(context).width > 599
         ? 600.0
-        : MediaQuery.of(context).size.width * smallMultiplier;
+        : MediaQuery.sizeOf(context).width * smallMultiplier;
   }
 
   static String? getUrlFromString(String input) {

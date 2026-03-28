@@ -79,7 +79,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         itemBuilder: (index, value) {
           return PageCard(
             page: pages[index],
-            height: MediaQuery.of(context).size.height * heightMultiplier,
+            height: MediaQuery.sizeOf(context).height * heightMultiplier,
           );
         },
       ),

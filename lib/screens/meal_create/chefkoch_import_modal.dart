@@ -38,11 +38,11 @@ class _ChefkochImportModalState extends ConsumerState<ChefkochImportModal>
 
   @override
   Widget build(BuildContext context) {
-    final width = media.size.width > 599 ? 580.0 : media.size.width * 0.8;
+    final width = mediaSize.width > 599 ? 580.0 : mediaSize.width * 0.8;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (media.size.width - width) / 2,
+        horizontal: (mediaSize.width - width) / 2,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,11 +82,11 @@ class _ChefkochImportModalState extends ConsumerState<ChefkochImportModal>
             submitOnPaste: true,
           ),
           SizedBox(
-            height: media.viewInsets.bottom == 0
+            height: mediaViewInsets.bottom == 0
                 ? kPadding * 2
-                : media.viewInsets.bottom > 60 // 60 for MainButton
-                    ? media.viewInsets.bottom - 60
-                    : media.viewInsets.bottom,
+                : mediaViewInsets.bottom > 60 // 60 for MainButton
+                    ? mediaViewInsets.bottom - 60
+                    : mediaViewInsets.bottom,
           ),
           Center(
             child: MainButton(
