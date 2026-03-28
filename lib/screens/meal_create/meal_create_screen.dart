@@ -37,8 +37,13 @@ import 'save_changes_modal.dart';
 
 class MealCreateScreen extends ConsumerStatefulWidget {
   final String id;
+  final bool navigateToDetailOnCreate;
 
-  const MealCreateScreen({required this.id, super.key});
+  const MealCreateScreen({
+    required this.id,
+    this.navigateToDetailOnCreate = false,
+    super.key,
+  });
 
   @override
   _MealCreateScreenState createState() => _MealCreateScreenState();
@@ -455,7 +460,15 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         BasicUtils.getActiveLanguage(context),
       );
       BasicUtils.emitMealsChanged(ref, newMeal?.id ?? '');
-      AutoRouter.of(context).pop();
+      if (_isCreatingMeal &&
+          widget.navigateToDetailOnCreate &&
+          newMeal?.id != null) {
+        // Replace this screen with the detail view — no pop means no flash
+        // of the underlying list.
+        AutoRouter.of(context).replace(MealScreenRoute(id: newMeal!.id!));
+      } else {
+        AutoRouter.of(context).pop();
+      }
       return true;
     } catch (e) {
       if (!mounted) {

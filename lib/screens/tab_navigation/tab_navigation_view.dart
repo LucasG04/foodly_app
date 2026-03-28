@@ -139,6 +139,8 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView>
   }
 
   void _openMealCreate() {
-    AutoRouter.of(context).push(MealCreateScreenRoute(id: 'create'));
+    AutoRouter.of(context).push(
+      MealCreateScreenRoute(id: 'create', navigateToDetailOnCreate: true),
+    );
   }
 }
