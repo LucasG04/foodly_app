@@ -25,6 +25,30 @@ class LinkPreview extends StatefulWidget {
 }
 
 class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
+  Future<LinkMetadata?>? _metadataFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _initFuture(widget.link);
+  }
+
+  @override
+  void didUpdateWidget(LinkPreview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.link != widget.link) {
+      _initFuture(widget.link);
+    }
+  }
+
+  void _initFuture(String link) {
+    if (BasicUtils.isValidUri(link) && !LinkMetadataService.isCached(link)) {
+      _metadataFuture = LinkMetadataService.getFromApi(link);
+    } else {
+      _metadataFuture = null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!BasicUtils.isValidUri(widget.link)) {
@@ -39,7 +63,7 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
             ? _buildSmallCard(metadata)
             : _buildLargeCard(metadata)
         : FutureBuilder<LinkMetadata?>(
-            future: LinkMetadataService.getFromApi(widget.link),
+            future: _metadataFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return widget.isSmall
