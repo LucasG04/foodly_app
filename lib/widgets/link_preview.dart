@@ -1,4 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:clipboard/clipboard.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -6,8 +9,12 @@ import '../constants.dart';
 import '../models/link_metadata.dart';
 import '../services/link_metadata_service.dart';
 import '../utils/basic_utils.dart';
+import '../utils/main_snackbar.dart';
 import '../utils/of_context_mixin.dart';
+import '../utils/widget_utils.dart';
 import 'foodly_network_image.dart';
+import 'options_modal/options_modal.dart';
+import 'options_modal/options_modal_option.dart';
 import 'skeleton_container.dart';
 
 class LinkPreview extends StatefulWidget {
@@ -85,6 +92,9 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
       onTap: metadata.url != null
           ? () => launchUrl(Uri.parse(metadata.url!))
           : () {},
+      onLongPress: metadata.url != null
+          ? () => _openLinkOptions(context, metadata.url!)
+          : () {},
       child: Card(
         child: Column(
           children: [
@@ -124,6 +134,9 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
     return GestureDetector(
       onTap: metadata.url != null
           ? () => launchUrl(Uri.parse(metadata.url!))
+          : () {},
+      onLongPress: metadata.url != null
+          ? () => _openLinkOptions(context, metadata.url!)
           : () {},
       child: Container(
         width: double.infinity,
@@ -255,4 +268,34 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
   double _getLargeImageHeight() => media.size.height * 0.2;
 
   double _getSmallCardHeight() => 75.0;
+
+  void _openLinkOptions(BuildContext context, String url) {
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => OptionsSheet(options: [
+        OptionsSheetOptions(
+          title: 'link_preview_options_open_link'.tr(),
+          icon: EvaIcons.externalLinkOutline,
+          onTap: () =>
+              launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+        ),
+        OptionsSheetOptions(
+          title: 'link_preview_options_copy_link'.tr(),
+          icon: EvaIcons.copyOutline,
+          onTap: () async {
+            await FlutterClipboard.copy(url);
+            if (!context.mounted) {
+              return;
+            }
+            MainSnackbar(
+              message: 'link_preview_options_copy_link_success'.tr(),
+              duration: 3,
+              isDismissible: true,
+              isCountdown: true,
+            ).show(context);
+          },
+        ),
+      ]),
+    );
+  }
 }

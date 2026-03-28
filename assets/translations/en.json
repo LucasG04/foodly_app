@@ -310,5 +310,8 @@
   "page_title_connectivity_error_message": "It seems that you are not connected to the Internet at the moment. This may cause problems when using {}.\nPlease check your connection.",
   "premium_gifted_msg_title": "Premium for free!",
   "premium_gifted_msg_message": "Thanks to your feedback, {} has been improved. As a thank you, you get Premium for {} month(s) for free.",
-  "edit_grocery_suggestion_group": "Product group"
+  "edit_grocery_suggestion_group": "Product group",
+  "link_preview_options_open_link": "Open in external browser",
+  "link_preview_options_copy_link": "Copy link",
+  "link_preview_options_copy_link_success": "Link copied to clipboard"
 }
