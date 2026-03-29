@@ -136,6 +136,9 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   // ignore: cancel_subscriptions
   StreamSubscription<String?>? _uniLinkSub;
 
+  bool _initialDataLoadStarted = false;
+  String? _lastLoadedShoppingListPlanId;
+
   @override
   void initState() {
     _initializeLogger();
@@ -159,11 +162,17 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active ||
             snapshot.connectionState == ConnectionState.done) {
-          Future.wait([
-            _loadBaseData(),
-            _loadActivePlan(),
-            _loadActiveUser(),
-          ]).whenComplete(() => afterUserAndPlanLoaded());
+          if (snapshot.data == null) {
+            _initialDataLoadStarted = false;
+            _lastLoadedShoppingListPlanId = null;
+          } else if (!_initialDataLoadStarted) {
+            _initialDataLoadStarted = true;
+            Future.wait([
+              _loadBaseData(),
+              _loadActivePlan(),
+              _loadActiveUser(),
+            ]).whenComplete(() => afterUserAndPlanLoaded());
+          }
 
           return Consumer(
             builder: (context, ref, _) {
@@ -171,7 +180,10 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
               _log.finer('PlanProvider Update: ${plan?.id}');
 
               if (plan != null) {
-                _loadActiveShoppingList();
+                if (plan.id != _lastLoadedShoppingListPlanId) {
+                  _lastLoadedShoppingListPlanId = plan.id;
+                  _loadActiveShoppingList();
+                }
               } else {
                 ref.read(shoppingListIdProvider.notifier).state = null;
               }
@@ -297,6 +309,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       planId,
     );
     while (shoppingList == null) {
+      await Future.delayed(const Duration(milliseconds: 500));
       shoppingList = await ShoppingListService.getShoppingListByPlanId(
         planId,
       );
