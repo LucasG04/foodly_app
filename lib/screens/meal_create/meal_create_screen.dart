@@ -612,9 +612,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
 
   void _changeMealValue(Function(Meal) changeProperty) {
     final meal = ref.read(_$meal);
-    final copy = Meal.fromMap(meal.id, meal.toMap());
-    changeProperty(copy);
-    ref.read(_$meal.notifier).state = copy;
+    changeProperty(meal);
+    ref.read(_$meal.notifier).state = Meal.fromMap(meal.id, meal.toMap());
   }
 
   void _onOpenImagePicker() {
