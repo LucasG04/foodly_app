@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../services/in_app_purchase_service.dart';
+import 'basic_utils.dart';
 
 class WidgetUtils {
   /// Shows a `BarModalBottomSheet` with rounded corners. Used as wrapper.
@@ -16,14 +17,11 @@ class WidgetUtils {
     required Widget Function(BuildContext) builder,
     bool scrollable = false,
     bool unfocus = true,
-  }) {
+  }) async {
     if (!context.mounted) {
       return Future.value();
     }
-    if (unfocus) {
-      FocusManager.instance.primaryFocus?.unfocus();
-    }
-    return showBarModalBottomSheet<T>(
+    final result = await showBarModalBottomSheet<T>(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
@@ -37,6 +35,15 @@ class WidgetUtils {
                 child: builder(context),
               ),
     );
+    // Flutter restores focus to the last focused child of the parent route's
+    // FocusScopeNode when a modal route is popped.
+    // To prevent this, unfocus after the bottom sheet is closed.
+    if (unfocus) {
+      BasicUtils.afterBuild(
+        () => FocusManager.instance.primaryFocus?.unfocus(),
+      );
+    }
+    return result;
   }
 
   /// Shows a edit dialog for a placeholder plan meal.
