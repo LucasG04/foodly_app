@@ -217,6 +217,14 @@ class PlanDayCard extends StatelessWidget {
   }
 
   bool _shouldAddDivider(MealType mealType) {
+    if (readonly) {
+      final hasLunch = meals.any((e) => e.type == MealType.LUNCH);
+      final hasDinner = meals.any((e) => e.type == MealType.DINNER);
+      final forBreakfast = mealType == MealType.BREAKFAST &&
+          (hasLunch || hasDinner);
+      final forLunch = mealType == MealType.LUNCH && hasDinner;
+      return forBreakfast || forLunch;
+    }
     final currentTypes = SettingsService.activeMealTypes;
     final forBreakfast = mealType == MealType.BREAKFAST &&
         (currentTypes.contains(MealType.LUNCH) ||
