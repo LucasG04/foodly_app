@@ -68,7 +68,7 @@ Future<void> _configureFirebaseSettings() async {
         providerAndroid: foundation.kDebugMode
             ? const AndroidDebugProvider()
             : const AndroidPlayIntegrityProvider(),
-),
+      ),
     ]);
   }
 }
@@ -178,8 +178,16 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
           if (snapshot.data == null) {
             _initialDataLoadStarted = false;
             _lastLoadedShoppingListPlanId = null;
+            BasicUtils.afterBuild(() {
+              ref.read(initialUserLoadingProvider.notifier).state = false;
+              ref.read(initialPlanLoadingProvider.notifier).state = false;
+            });
           } else if (!_initialDataLoadStarted) {
             _initialDataLoadStarted = true;
+            BasicUtils.afterBuild(() {
+              ref.read(initialUserLoadingProvider.notifier).state = true;
+              ref.read(initialPlanLoadingProvider.notifier).state = true;
+            });
             Future.wait([
               _loadBaseData(),
               _loadActivePlan(),
@@ -278,6 +286,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       final FoodlyUser? user =
           await FoodlyUserService.getUserById(firebaseUser.uid);
       if (user == null) {
+        refInitLoading.state = false;
         return;
       }
       refUserProvider.state = user;
