@@ -40,8 +40,9 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
   @override
   void initState() {
     _dropdownValues = getDropdownValues();
-    _selectedDate =
+    final rawDate =
         widget.isMoving ? widget.planMeal!.date : _dropdownValues.first;
+    _selectedDate = DateTime(rawDate.year, rawDate.month, rawDate.day);
     _selectedMealType =
         widget.isMoving ? widget.planMeal!.type : MealType.LUNCH;
     super.initState();
@@ -160,12 +161,7 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
   }
 
   List<DateTime> getDropdownValues() {
-    final dates =
-        BasicUtils.getPlanDateTimes(ref.read(planProvider)!.hourDiffToUtc!);
-    for (var date in dates) {
-      date = DateTime(date.year, date.month, date.day);
-    }
-    return dates;
+    return BasicUtils.getPlanDateTimes(ref.read(planProvider)!.hourDiffToUtc!);
   }
 
   Future<void> _save() async {

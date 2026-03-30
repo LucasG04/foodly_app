@@ -33,6 +33,7 @@ class LinkPreview extends StatefulWidget {
 
 class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
   Future<LinkMetadata?>? _metadataFuture;
+  bool _isPressed = false;
 
   @override
   void initState() {
@@ -87,8 +88,39 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
           );
   }
 
-  Widget _buildLargeCard(LinkMetadata metadata) {
+  Widget _buildPressable({
+    required Widget child,
+    required VoidCallback? onTap,
+    required VoidCallback? onLongPress,
+  }) {
     return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) => setState(() => _isPressed = false),
+      onTapCancel: () => setState(() => _isPressed = false),
+      onLongPressStart: (_) => setState(() => _isPressed = true),
+      onLongPressEnd: (_) => setState(() => _isPressed = false),
+      onTap: onTap,
+      onLongPress: onLongPress == null
+          ? null
+          : () {
+              setState(() => _isPressed = false);
+              onLongPress();
+            },
+      child: AnimatedScale(
+        scale: _isPressed ? 0.97 : 1.0,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeInOut,
+        child: AnimatedOpacity(
+          opacity: _isPressed ? 0.82 : 1.0,
+          duration: const Duration(milliseconds: 120),
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLargeCard(LinkMetadata metadata) {
+    return _buildPressable(
       onTap: metadata.url != null
           ? () => launchUrl(Uri.parse(metadata.url!))
           : () {},
@@ -131,7 +163,7 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
 
   Widget _buildSmallCard(LinkMetadata metadata) {
     final height = _getSmallCardHeight();
-    return GestureDetector(
+    return _buildPressable(
       onTap: metadata.url != null
           ? () => launchUrl(Uri.parse(metadata.url!))
           : () {},
