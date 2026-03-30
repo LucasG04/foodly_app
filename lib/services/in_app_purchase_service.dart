@@ -39,7 +39,6 @@ class InAppPurchaseService {
     }
 
     _loadOfferings();
-    await fetchUserSubscription();
   }
 
   // ignore: use_setters_to_change_properties

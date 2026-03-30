@@ -44,14 +44,16 @@ import 'widgets/disposable_widget.dart';
 
 Future<void> _configureFirebase() async {
   await Firebase.initializeApp();
+}
+
+Future<void> _configureFirebaseSettings() async {
   if (foundation.kDebugMode) {
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
-    await FirebasePerformance.instance.setPerformanceCollectionEnabled(false);
+    await Future.wait([
+      FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false),
+      FirebasePerformance.instance.setPerformanceCollectionEnabled(false),
+    ]);
   } else {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-    await FirebaseAppCheck.instance.activate(
-      appleProvider: AppleProvider.appAttestWithDeviceCheckFallback,
-    );
     final packageInfo = await PackageInfo.fromPlatform();
     await Future.wait([
       FirebaseAnalytics.instance
@@ -59,6 +61,14 @@ Future<void> _configureFirebase() async {
       FirebaseCrashlytics.instance.setCustomKey('version', packageInfo.version),
       FirebaseCrashlytics.instance
           .setCustomKey('buildNumber', packageInfo.buildNumber),
+      FirebaseAppCheck.instance.activate(
+        providerApple: foundation.kDebugMode
+            ? const AppleDebugProvider()
+            : const AppleAppAttestWithDeviceCheckFallbackProvider(),
+        providerAndroid: foundation.kDebugMode
+            ? const AndroidDebugProvider()
+            : const AndroidPlayIntegrityProvider(),
+),
     ]);
   }
 }
@@ -67,9 +77,12 @@ void main() {
   runZonedGuarded<void>(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
-      await EasyLocalization.ensureInitialized();
       await _configureFirebase();
-      await initializeHive();
+      await Future.wait([
+        EasyLocalization.ensureInitialized(),
+        _configureFirebaseSettings(),
+        initializeHive(),
+      ]);
       runApp(
         Phoenix(
           child: ProviderScope(
