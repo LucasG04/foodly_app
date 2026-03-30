@@ -44,14 +44,16 @@ import 'widgets/disposable_widget.dart';
 
 Future<void> _configureFirebase() async {
   await Firebase.initializeApp();
+}
+
+Future<void> _configureFirebaseSettings() async {
   if (foundation.kDebugMode) {
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
-    await FirebasePerformance.instance.setPerformanceCollectionEnabled(false);
+    await Future.wait([
+      FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false),
+      FirebasePerformance.instance.setPerformanceCollectionEnabled(false),
+    ]);
   } else {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-    await FirebaseAppCheck.instance.activate(
-      appleProvider: AppleProvider.appAttestWithDeviceCheckFallback,
-    );
     final packageInfo = await PackageInfo.fromPlatform();
     await Future.wait([
       FirebaseAnalytics.instance
@@ -59,6 +61,14 @@ Future<void> _configureFirebase() async {
       FirebaseCrashlytics.instance.setCustomKey('version', packageInfo.version),
       FirebaseCrashlytics.instance
           .setCustomKey('buildNumber', packageInfo.buildNumber),
+      FirebaseAppCheck.instance.activate(
+        providerApple: foundation.kDebugMode
+            ? const AppleDebugProvider()
+            : const AppleAppAttestWithDeviceCheckFallbackProvider(),
+        providerAndroid: foundation.kDebugMode
+            ? const AndroidDebugProvider()
+            : const AndroidPlayIntegrityProvider(),
+),
     ]);
   }
 }
@@ -67,9 +77,12 @@ void main() {
   runZonedGuarded<void>(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
-      await EasyLocalization.ensureInitialized();
       await _configureFirebase();
-      await initializeHive();
+      await Future.wait([
+        EasyLocalization.ensureInitialized(),
+        _configureFirebaseSettings(),
+        initializeHive(),
+      ]);
       runApp(
         Phoenix(
           child: ProviderScope(
@@ -136,6 +149,9 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   // ignore: cancel_subscriptions
   StreamSubscription<String?>? _uniLinkSub;
 
+  bool _initialDataLoadStarted = false;
+  String? _lastLoadedShoppingListPlanId;
+
   @override
   void initState() {
     _initializeLogger();
@@ -159,11 +175,17 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active ||
             snapshot.connectionState == ConnectionState.done) {
-          Future.wait([
-            _loadBaseData(),
-            _loadActivePlan(),
-            _loadActiveUser(),
-          ]).whenComplete(() => afterUserAndPlanLoaded());
+          if (snapshot.data == null) {
+            _initialDataLoadStarted = false;
+            _lastLoadedShoppingListPlanId = null;
+          } else if (!_initialDataLoadStarted) {
+            _initialDataLoadStarted = true;
+            Future.wait([
+              _loadBaseData(),
+              _loadActivePlan(),
+              _loadActiveUser(),
+            ]).whenComplete(() => afterUserAndPlanLoaded());
+          }
 
           return Consumer(
             builder: (context, ref, _) {
@@ -171,7 +193,10 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
               _log.finer('PlanProvider Update: ${plan?.id}');
 
               if (plan != null) {
-                _loadActiveShoppingList();
+                if (plan.id != _lastLoadedShoppingListPlanId) {
+                  _lastLoadedShoppingListPlanId = plan.id;
+                  _loadActiveShoppingList();
+                }
               } else {
                 ref.read(shoppingListIdProvider.notifier).state = null;
               }
@@ -297,6 +322,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       planId,
     );
     while (shoppingList == null) {
+      await Future.delayed(const Duration(milliseconds: 500));
       shoppingList = await ShoppingListService.getShoppingListByPlanId(
         planId,
       );

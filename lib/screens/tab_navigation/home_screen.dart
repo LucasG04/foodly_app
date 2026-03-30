@@ -14,6 +14,7 @@ import 'package:version/version.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
+import '../../models/foodly_user.dart';
 import '../../providers/state_providers.dart';
 import '../../services/foodly_user_service.dart';
 import '../../services/in_app_purchase_service.dart';
@@ -49,10 +50,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
         .stream
         .listen((_) => _changePage())
         .canceledBy(this);
-
-    Future.delayed(const Duration(seconds: 1), () {
-      _checkPremiumGiftedStatusAndMessage();
-    });
   }
 
   @override
@@ -64,6 +61,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
   @override
   Widget build(BuildContext _) {
     return Consumer(builder: (context, ref, _) {
+      ref.listen<FoodlyUser?>(userProvider, (previous, next) {
+        if (previous == null && next != null) {
+          _checkPremiumGiftedStatusAndMessage();
+        }
+      });
+
       final initialUserLoading = ref.watch(initialUserLoadingProvider);
       final initialPlanLoading = ref.watch(initialPlanLoadingProvider);
       final user = ref.watch(userProvider);
