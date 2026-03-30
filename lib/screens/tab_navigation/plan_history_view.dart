@@ -16,6 +16,11 @@ import '../../widgets/small_circular_progress_indicator.dart';
 import 'plan_view/plan_day_card.dart';
 import 'plan_view/plan_tab_view.dart';
 
+final planHistoryDaysProvider =
+    AsyncNotifierProvider<PlanHistoryDaysNotifier, List<PlanDay>>(
+  PlanHistoryDaysNotifier.new,
+);
+
 class PlanHistoryView extends ConsumerStatefulWidget {
   const PlanHistoryView({super.key});
 
@@ -24,11 +29,6 @@ class PlanHistoryView extends ConsumerStatefulWidget {
 }
 
 class _PlanHistoryViewState extends ConsumerState<PlanHistoryView> {
-  final planHistoryDaysProvider =
-      AsyncNotifierProvider<PlanHistoryDaysNotifier, List<PlanDay>>(
-    PlanHistoryDaysNotifier.new,
-  );
-
   final ScrollController _scrollController = ScrollController();
   bool initialScrolledDown = false;
 
@@ -78,19 +78,16 @@ class _PlanHistoryViewState extends ConsumerState<PlanHistoryView> {
                 Center(
                   child: SizedBox(
                     width: BasicUtils.contentWidth(context),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      padding: EdgeInsets.zero,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: planDays.length,
-                      itemBuilder: (context, index) {
-                        final day = planDays[index];
-                        return PlanDayCard(
-                          date: day.date,
-                          meals: day.meals,
-                          readonly: true,
-                        );
-                      },
+                    child: Column(
+                      children: planDays
+                          .map(
+                            (day) => PlanDayCard(
+                              date: day.date,
+                              meals: day.meals,
+                              readonly: true,
+                            ),
+                          )
+                          .toList(),
                     ),
                   ),
                 ),
