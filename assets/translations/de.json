@@ -313,5 +313,15 @@
   "edit_grocery_suggestion_group": "Produktgruppe",
   "link_preview_options_open_link": "In externem Browser öffnen",
   "link_preview_options_copy_link": "Link kopieren",
-  "link_preview_options_copy_link_success": "Link in die Zwischenablage kopiert"
+  "link_preview_options_copy_link_success": "Link in die Zwischenablage kopiert",
+  "loading_hint_0": "Im Kochbuch blättern...",
+  "loading_hint_1": "Ofen vorheizen...",
+  "loading_hint_2": "Essensplan prüfen...",
+  "loading_hint_3": "Messer schärfen...",
+  "loading_hint_4": "Gemüse waschen...",
+  "loading_hint_5": "Im Topf rühren...",
+  "loading_hint_6": "Teig ausrollen...",
+  "loading_hint_7": "Nach Geschmack würzen...",
+  "loading_hint_8": "Herd anheizen...",
+  "loading_hint_9": "Zutaten einkaufen..."
 }
