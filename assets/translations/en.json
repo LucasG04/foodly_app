@@ -313,5 +313,15 @@
   "edit_grocery_suggestion_group": "Product group",
   "link_preview_options_open_link": "Open in external browser",
   "link_preview_options_copy_link": "Copy link",
-  "link_preview_options_copy_link_success": "Link copied to clipboard"
+  "link_preview_options_copy_link_success": "Link copied to clipboard",
+  "loading_hint_0": "Fliping through the cookbook...",
+  "loading_hint_1": "Preheating the oven...",
+  "loading_hint_2": "Checking tonight's menu...",
+  "loading_hint_3": "Sharpening the knives...",
+  "loading_hint_4": "Washing the vegetables...",
+  "loading_hint_5": "Stirring the pot...",
+  "loading_hint_6": "Rolling out the dough...",
+  "loading_hint_7": "Seasoning to taste...",
+  "loading_hint_8": "Firing up the stove...",
+  "loading_hint_9": "Shopping for ingredients..."
 }

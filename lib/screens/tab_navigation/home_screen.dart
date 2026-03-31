@@ -24,8 +24,8 @@ import '../../services/version_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
 import '../../widgets/disposable_widget.dart';
+import '../../widgets/loading_screen.dart';
 import '../../widgets/new_version_modal.dart';
-import '../../widgets/small_circular_progress_indicator.dart';
 import 'home_screen_dialogs.dart';
 import 'plan_history_view.dart';
 import 'tab_navigation_view.dart';
@@ -80,9 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
       } else if (!initialUserLoading && !initialPlanLoading && user != null) {
         return _buildNavigationView();
       } else {
-        return const Scaffold(
-          body: Center(child: SmallCircularProgressIndicator()),
-        );
+        return const LoadingScreen();
       }
     });
   }
