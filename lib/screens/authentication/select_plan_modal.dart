@@ -9,13 +9,26 @@ import '../../services/foodly_user_service.dart';
 import '../../services/plan_service.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
-class SelectPlanModal extends StatelessWidget {
+class SelectPlanModal extends StatefulWidget {
   final String userId;
 
   const SelectPlanModal(this.userId, {super.key});
 
+  @override
+  State<SelectPlanModal> createState() => _SelectPlanModalState();
+}
+
+class _SelectPlanModalState extends State<SelectPlanModal> {
+  late final Future<List<Plan>?> _plansFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _plansFuture = _loadUserPlans();
+  }
+
   Future<List<Plan>?> _loadUserPlans() async {
-    final user = await FoodlyUserService.getUserById(userId);
+    final user = await FoodlyUserService.getUserById(widget.userId);
     if (user?.plans == null || user!.plans!.isEmpty) {
       return null;
     }
@@ -35,30 +48,27 @@ class SelectPlanModal extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: kPadding),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AutoSizeText(
-                    'modal_select_plan_title'.tr().toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: kPadding),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                AutoSizeText(
+                  'modal_select_plan_title'.tr().toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
-                  GestureDetector(
-                    child: const Icon(EvaIcons.close),
-                    onTap: () => Navigator.maybePop(context),
-                  ),
-                ],
-              ),
+                ),
+                IconButton(
+                  icon: const Icon(EvaIcons.close),
+                  onPressed: () => Navigator.maybePop(context),
+                ),
+              ],
             ),
           ),
           FutureBuilder<List<Plan>?>(
-            future: _loadUserPlans(),
+            future: _plansFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return SizedBox(
@@ -69,23 +79,26 @@ class SelectPlanModal extends StatelessWidget {
                 return SizedBox(
                   height: size.height * 0.3,
                   child: Center(
-                    child: const Text(
-                      'modal_select_plan_no_plan',
+                    child: Text(
+                      'modal_select_plan_no_plan'.tr(),
                       textAlign: TextAlign.center,
-                    ).tr(),
+                    ),
                   ),
                 );
               }
 
-              return ListView.builder(
-                shrinkWrap: true,
-                itemCount: snapshot.data!.length,
-                itemBuilder: (ctx, index) => ListTile(
-                  title: Text(snapshot.data![index].name!),
-                  subtitle: Text(snapshot.data![index].code!),
-                  onTap: () => Navigator.pop(ctx, snapshot.data![index]),
-                  trailing: const Icon(Icons.arrow_forward_ios_rounded),
-                ),
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: snapshot.data!
+                    .map(
+                      (plan) => ListTile(
+                        title: Text(plan.name!),
+                        subtitle: Text(plan.code!),
+                        onTap: () => Navigator.pop(context, plan),
+                        trailing: const Icon(Icons.arrow_forward_ios_rounded),
+                      ),
+                    )
+                    .toList(),
               );
             },
           ),
