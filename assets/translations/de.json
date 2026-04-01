@@ -137,7 +137,7 @@
   "meal_create_servings_title": "Portionen",
   "meal_create_instruction_title": "Anleitung",
   "meal_create_source_title": "Quelle",
-  "meal_create_source_placeholder": "Kochbuch von Oma",
+  "meal_create_source_placeholder": "Oma o. https://chefkoch.de/...",
   "meal_create_duration_title": "Dauer (min)",
   "meal_create_tags_title": "Kategorien",
   "meal_create_error_unknown": "Es ist ein Fehler aufgetreten. Prüfe deine Internetverbindung oder versuche es später erneut.",

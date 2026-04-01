@@ -137,7 +137,7 @@
   "meal_create_servings_title": "Servings",
   "meal_create_instruction_title": "Instruction",
   "meal_create_source_title": "Source",
-  "meal_create_source_placeholder": "Grandma's cookbook",
+  "meal_create_source_placeholder": "Grandma or https://tasty.co/...",
   "meal_create_duration_title": "Duration (min)",
   "meal_create_tags_title": "Categories",
   "meal_create_error_unknown": "An error has occurred. Check your internet connection or try again later.",
