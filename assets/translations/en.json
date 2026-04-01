@@ -137,7 +137,7 @@
   "meal_create_servings_title": "Servings",
   "meal_create_instruction_title": "Instruction",
   "meal_create_source_title": "Source",
-  "meal_create_source_placeholder": "Grandma's cookbook",
+  "meal_create_source_placeholder": "Grandma or https://tasty.co/...",
   "meal_create_duration_title": "Duration (min)",
   "meal_create_tags_title": "Categories",
   "meal_create_error_unknown": "An error has occurred. Check your internet connection or try again later.",
@@ -314,7 +314,7 @@
   "link_preview_options_open_link": "Open in external browser",
   "link_preview_options_copy_link": "Copy link",
   "link_preview_options_copy_link_success": "Link copied to clipboard",
-  "loading_hint_0": "Fliping through the cookbook...",
+  "loading_hint_0": "Flipping through the cookbook...",
   "loading_hint_1": "Preheating the oven...",
   "loading_hint_2": "Checking tonight's menu...",
   "loading_hint_3": "Sharpening the knives...",
@@ -323,5 +323,9 @@
   "loading_hint_6": "Rolling out the dough...",
   "loading_hint_7": "Seasoning to taste...",
   "loading_hint_8": "Firing up the stove...",
-  "loading_hint_9": "Shopping for ingredients..."
+  "loading_hint_9": "Shopping for ingredients...",
+  "loading_warning_no_connection": "No connection — check your Wi-Fi or mobile data",
+  "loading_warning_slow_connection": "Slow connection — switching to Wi-Fi may help",
+  "loading_warning_slow_server": "This is taking longer than usual…",
+  "loading_warning_close_app": "Still stuck? Try fully closing and reopening the app."
 }

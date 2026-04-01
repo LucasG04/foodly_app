@@ -137,7 +137,7 @@
   "meal_create_servings_title": "Portionen",
   "meal_create_instruction_title": "Anleitung",
   "meal_create_source_title": "Quelle",
-  "meal_create_source_placeholder": "Kochbuch von Oma",
+  "meal_create_source_placeholder": "Oma o. https://chefkoch.de/...",
   "meal_create_duration_title": "Dauer (min)",
   "meal_create_tags_title": "Kategorien",
   "meal_create_error_unknown": "Es ist ein Fehler aufgetreten. Prüfe deine Internetverbindung oder versuche es später erneut.",
@@ -323,5 +323,9 @@
   "loading_hint_6": "Teig ausrollen...",
   "loading_hint_7": "Nach Geschmack würzen...",
   "loading_hint_8": "Herd anheizen...",
-  "loading_hint_9": "Zutaten einkaufen..."
+  "loading_hint_9": "Zutaten einkaufen...",
+  "loading_warning_no_connection": "Keine Verbindung – prüfe dein WLAN oder mobile Daten",
+  "loading_warning_slow_connection": "Langsame Verbindung – vielleicht hilft ein Wechsel ins WLAN",
+  "loading_warning_slow_server": "Das dauert länger als üblich…",
+  "loading_warning_close_app": "Noch immer? Schließe die App komplett und öffne sie erneut."
 }
