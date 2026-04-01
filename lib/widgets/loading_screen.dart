@@ -36,7 +36,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
   static const _nextMessageDelay = Duration(milliseconds: 500);
 
   static const _warningDelay = Duration(seconds: 8);
-  static const _closeAppDelay = Duration(seconds: 10);
+
+  /// Will start a after checking for good internet connection of user
+  static const _closeAppDelay = Duration(seconds: 12);
 
   Timer? _timer;
   Timer? _connectionCheckTimer;
@@ -132,7 +134,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
         InternetConnectionStatus.connected => _LoadingWarning.slowServer,
       };
     });
-    // Only escalate to close-app when the connection is fine but the server
+    // Only escalate to close-app message when the connection is fine but the server
     // is slow. For connection issues the user can't do more than check Wi-Fi.
     if (status == InternetConnectionStatus.connected) {
       _closeAppTimer = Timer(_closeAppDelay, _showCloseAppWarning);
