@@ -334,5 +334,6 @@
   "ingredient_group_delete_dialog_title": "Gruppe löschen",
   "ingredient_group_delete_dialog_message": "Alle Zutaten dieser Gruppe werden ebenfalls gelöscht.",
   "ingredient_group_name_required": "Bitte gib einen Namen ein.",
-  "ingredient_group_name_duplicate": "Eine Gruppe mit diesem Namen existiert bereits."
+  "ingredient_group_name_duplicate": "Eine Gruppe mit diesem Namen existiert bereits.",
+  "ingredient_group_drop_here": "Hier ablegen"
 }

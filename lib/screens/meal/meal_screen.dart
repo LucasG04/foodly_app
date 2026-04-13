@@ -342,15 +342,26 @@ class _MealScreenState extends ConsumerState<MealScreen>
           );
   }
 
+  List<Ingredient> _sortedIngredients(Meal meal) {
+    final ingredients = meal.ingredients!;
+    final groups =
+        Ingredient.orderedGroupsSorted(ingredients, meal.ingredientGroupOrder);
+    return groups.expand((group) {
+      return (ingredients.where((i) => i.group == group).toList()
+        ..sort((a, b) => (a.sortKey ?? 9999).compareTo(b.sortKey ?? 9999)));
+    }).toList();
+  }
+
   Widget _buildIngredientSection(Meal meal) {
     final isEmpty = meal.ingredients == null || meal.ingredients!.isEmpty;
     if (isEmpty) {
       return const SizedBox();
     }
 
-    final ingredients = meal.ingredients!;
+    final ingredients = _sortedIngredients(meal);
     final hasNamedGroups = ingredients.any((i) => i.group != null);
-    final groups = Ingredient.orderedGroups(ingredients);
+    final groups =
+        Ingredient.orderedGroupsSorted(ingredients, meal.ingredientGroupOrder);
 
     return Padding(
       padding: const EdgeInsets.only(top: kPadding),

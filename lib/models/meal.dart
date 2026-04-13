@@ -14,6 +14,7 @@ class Meal {
   String? createdBy;
   bool? isPublic;
   DateTime? createdAt;
+  List<String>? ingredientGroupOrder;
 
   Meal({
     this.id,
@@ -29,6 +30,7 @@ class Meal {
     this.createdBy,
     this.isPublic,
     this.createdAt,
+    this.ingredientGroupOrder,
   });
 
   Map<String, dynamic> toMap() {
@@ -45,6 +47,8 @@ class Meal {
       'createdBy': createdBy,
       'isPublic': isPublic ?? false,
       'createdAt': createdAt?.millisecondsSinceEpoch,
+      if (ingredientGroupOrder != null && ingredientGroupOrder!.isNotEmpty)
+        'ingredientGroupOrder': ingredientGroupOrder,
     };
   }
 
@@ -68,11 +72,16 @@ class Meal {
       createdAt: map['createdAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int)
           : null,
+      ingredientGroupOrder: map['ingredientGroupOrder'] != null
+          ? List<String>.from(map['ingredientGroupOrder'] as List<dynamic>)
+          : null,
     );
   }
 
   @override
   String toString() {
-    return 'Meal(id: $id, name: $name, source: $source, servings: $servings, instruction: $instructions, duration: $duration, ingredients: $ingredients, tags: $tags, createdAt: $createdAt)';
+    return 'Meal(id: $id, name: $name, source: $source, servings: $servings, '
+        'instruction: $instructions, duration: $duration, '
+        'ingredients: $ingredients, tags: $tags, createdAt: $createdAt)';
   }
 }

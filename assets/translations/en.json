@@ -334,5 +334,6 @@
   "ingredient_group_delete_dialog_title": "Delete group",
   "ingredient_group_delete_dialog_message": "All ingredients in this group will also be deleted.",
   "ingredient_group_name_required": "Please enter a name.",
-  "ingredient_group_name_duplicate": "A group with this name already exists."
+  "ingredient_group_name_duplicate": "A group with this name already exists.",
+  "ingredient_group_drop_here": "Drop here"
 }
