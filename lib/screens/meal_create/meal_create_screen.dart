@@ -165,10 +165,16 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                 Consumer(builder: (context, ref, _) {
                                   final ingredients = ref.watch(
                                       _$meal.select((m) => m.ingredients ?? []));
+                                  final groupOrder = ref.watch(
+                                      _$meal.select((m) => m.ingredientGroupOrder));
                                   return EditIngredients(
                                     content: ingredients,
-                                    onChanged: (value) => _changeMealValue(
-                                        (meal) => meal.ingredients = value),
+                                    groupOrder: groupOrder,
+                                    onChanged: (updatedIngredients, updatedGroupOrder) =>
+                                        _changeMealValue((meal) {
+                                      meal.ingredients = updatedIngredients;
+                                      meal.ingredientGroupOrder = updatedGroupOrder;
+                                    }),
                                     title: 'meal_create_ingredients_title'.tr(),
                                   );
                                 }),
@@ -500,7 +506,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         ref.read(_$updatedImage.notifier).state != null ||
         !_ingredientsEquals(
             meal.ingredients ?? [], _originalMeal.ingredients ?? []) ||
-        !listEquals<String>(meal.tags ?? [], _originalMeal.tags ?? []);
+        !listEquals<String>(meal.tags ?? [], _originalMeal.tags ?? []) ||
+        !listEquals<String>(meal.ingredientGroupOrder ?? [],
+            _originalMeal.ingredientGroupOrder ?? []);
   }
 
   void _openChefkochImport() async {
@@ -580,7 +588,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     for (var i = 0; i < a.length; i++) {
       if (a[i].amount != b[i].amount ||
           a[i].name != b[i].name ||
-          a[i].unit != b[i].unit) {
+          a[i].unit != b[i].unit ||
+          a[i].group != b[i].group ||
+          a[i].sortKey != b[i].sortKey) {
         return false;
       }
     }
