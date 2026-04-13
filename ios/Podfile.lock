@@ -207,7 +207,7 @@ PODS:
   - GoogleUtilities/UserDefaults (8.1.0):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
-  - GTMSessionFetcher/Core (5.1.0)
+  - GTMSessionFetcher/Core (5.2.0)
   - image_picker_ios (0.0.1):
     - Flutter
   - in_app_review (2.0.0):
@@ -466,7 +466,7 @@ SPEC CHECKSUMS:
   GoogleAppMeasurement: 72c9a682fec6290327ea5e3c4b829b247fcb2c17
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
-  GTMSessionFetcher: b8ab00db932816e14b0a0664a08cb73dda6d164b
+  GTMSessionFetcher: 904bdd2a82c635bcd6f44edf94cc8775c5d1d6e6
   image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
   in_app_review: 7dd1ea365263f834b8464673f9df72c80c17c937
   integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e

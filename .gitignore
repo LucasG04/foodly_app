@@ -27,6 +27,8 @@ ios/build
 .svn/
 hosting.*
 CLAUDE.md
+.superpowers/
+docs/
 
 # IntelliJ related
 *.iml
