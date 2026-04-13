@@ -237,11 +237,13 @@ class _MealScreenState extends ConsumerState<MealScreen>
                             ],
                           ),
                         ),
-                        if (meal.source != null && meal.source!.isNotEmpty) ...[
+                        if (meal.source != null &&
+                            BasicUtils.isValidUri(meal.source!)) ...[
                           const SizedBox(height: kPadding),
                           Padding(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: kPadding),
+                              horizontal: kPadding,
+                            ),
                             child: LinkPreview(meal.source!),
                           ),
                         ],
@@ -342,42 +344,98 @@ class _MealScreenState extends ConsumerState<MealScreen>
 
   Widget _buildIngredientSection(Meal meal) {
     final isEmpty = meal.ingredients == null || meal.ingredients!.isEmpty;
-    return isEmpty
-        ? const SizedBox()
-        : Padding(
-            padding: const EdgeInsets.only(top: kPadding),
-            child: _buildSection(
-              'meal_details_ingredient'.tr(),
-              meal.ingredients != null
-                  ? ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: meal.ingredients!.length,
-                      separatorBuilder: (_, __) => const Divider(),
-                      itemBuilder: (_, index) => _buildIngredientTile(
-                        meal.ingredients![index],
-                      ),
-                      padding: EdgeInsets.zero,
-                    )
-                  : const SizedBox(),
-              Consumer(builder: (context, ref, _) {
-                final servings = ref.watch(_$servings);
-                return SmallNumberInput(
-                  value: servings,
-                  minValue: 1,
-                  maxValue: 30,
-                  onChanged: (value) =>
-                      ref.read(_$servings.notifier).state = value,
-                );
-              }),
-            ),
+    if (isEmpty) {
+      return const SizedBox();
+    }
+
+    final ingredients = meal.ingredients!;
+    final hasNamedGroups = ingredients.any((i) => i.group != null);
+    final groups = Ingredient.orderedGroups(ingredients);
+
+    return Padding(
+      padding: const EdgeInsets.only(top: kPadding),
+      child: _buildSection(
+        'meal_details_ingredient'.tr(),
+        hasNamedGroups
+            ? Builder(
+                builder: (context) => _buildGroupedIngredientList(
+                  context,
+                  ingredients,
+                  groups,
+                ),
+              )
+            : ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: ingredients.length,
+                separatorBuilder: (_, __) => const Divider(),
+                itemBuilder: (_, index) =>
+                    _buildIngredientTile(ingredients[index]),
+                padding: EdgeInsets.zero,
+              ),
+        Consumer(builder: (context, ref, _) {
+          final servings = ref.watch(_$servings);
+          return SmallNumberInput(
+            value: servings,
+            minValue: 1,
+            maxValue: 30,
+            onChanged: (value) => ref.read(_$servings.notifier).state = value,
           );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildGroupedIngredientList(
+    BuildContext context,
+    List<Ingredient> ingredients,
+    List<String?> groups,
+  ) {
+    final widgets = <Widget>[];
+
+    for (final group in groups) {
+      final groupItems = ingredients.where((i) => i.group == group).toList();
+      if (groupItems.isEmpty) {
+        continue;
+      }
+
+      if (group != null) {
+        if (widgets.isNotEmpty) {
+          widgets.add(const SizedBox(height: kPadding / 2));
+        }
+        widgets.add(
+          Text(
+            group,
+            style: const TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        );
+        widgets.add(const SizedBox(height: kPadding / 2));
+      }
+
+      for (var i = 0; i < groupItems.length; i++) {
+        widgets.add(_buildIngredientTile(groupItems[i]));
+        if (i < groupItems.length - 1) {
+          widgets.add(const Padding(
+            padding: EdgeInsets.symmetric(horizontal: kPadding / 2),
+            child: Divider(),
+          ));
+        }
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: widgets,
+    );
   }
 
   Widget _buildIngredientTile(Ingredient ingredient) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: kPadding / 2),
       child: LayoutBuilder(builder: (context, constraints) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -438,7 +496,7 @@ class _MealScreenState extends ConsumerState<MealScreen>
                   ],
                 ),
         ),
-        const SizedBox(height: kPadding),
+        const SizedBox(height: kPadding / 2),
         Container(width: double.infinity, padding: sidePadding, child: content),
       ],
     );

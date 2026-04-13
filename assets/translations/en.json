@@ -327,5 +327,12 @@
   "loading_warning_no_connection": "No connection — check your Wi-Fi or mobile data",
   "loading_warning_slow_connection": "Slow connection — switching to Wi-Fi may help",
   "loading_warning_slow_server": "This is taking longer than usual…",
-  "loading_warning_close_app": "Still stuck? Try fully closing and reopening the app."
+  "loading_warning_close_app": "Still stuck? Try fully closing and reopening the app.",
+  "ingredient_group_add_button": "Add ingredient group",
+  "ingredient_group_add_dialog_title": "New group",
+  "ingredient_group_rename_dialog_title": "Rename group",
+  "ingredient_group_delete_dialog_title": "Delete group",
+  "ingredient_group_delete_dialog_message": "All ingredients in this group will also be deleted.",
+  "ingredient_group_name_required": "Please enter a name.",
+  "ingredient_group_name_duplicate": "A group with this name already exists."
 }
