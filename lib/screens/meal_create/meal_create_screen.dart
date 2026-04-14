@@ -59,6 +59,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _durationController = TextEditingController();
+  final TextEditingController _kcalController = TextEditingController();
   final TextEditingController _instructionsController = TextEditingController();
   final TextEditingController _sourceController = TextEditingController();
 
@@ -163,17 +164,19 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                 ),
                                 _buildDivider(),
                                 Consumer(builder: (context, ref, _) {
-                                  final ingredients = ref.watch(
-                                      _$meal.select((m) => m.ingredients ?? []));
-                                  final groupOrder = ref.watch(
-                                      _$meal.select((m) => m.ingredientGroupOrder));
+                                  final ingredients = ref.watch(_$meal
+                                      .select((m) => m.ingredients ?? []));
+                                  final groupOrder = ref.watch(_$meal
+                                      .select((m) => m.ingredientGroupOrder));
                                   return EditIngredients(
                                     content: ingredients,
                                     groupOrder: groupOrder,
-                                    onChanged: (updatedIngredients, updatedGroupOrder) =>
+                                    onChanged: (updatedIngredients,
+                                            updatedGroupOrder) =>
                                         _changeMealValue((meal) {
                                       meal.ingredients = updatedIngredients;
-                                      meal.ingredientGroupOrder = updatedGroupOrder;
+                                      meal.ingredientGroupOrder =
+                                          updatedGroupOrder;
                                     }),
                                     title: 'meal_create_ingredients_title'.tr(),
                                   );
@@ -231,18 +234,23 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                   );
                                 }),
                                 _buildDivider(),
+                                MainTextField(
+                                  controller: _sourceController,
+                                  title: 'meal_create_source_title'.tr(),
+                                  placeholder:
+                                      'meal_create_source_placeholder'.tr(),
+                                  onChange: (newText) =>
+                                      _onSourceTextChange(newText.trim()),
+                                ),
                                 Row(
                                   children: [
                                     Flexible(
-                                      flex: 2,
                                       child: MainTextField(
-                                        controller: _sourceController,
-                                        title: 'meal_create_source_title'.tr(),
-                                        placeholder:
-                                            'meal_create_source_placeholder'
-                                                .tr(),
-                                        onChange: (newText) =>
-                                            _onSourceTextChange(newText.trim()),
+                                        controller: _kcalController,
+                                        title: 'meal_create_kcal_title'.tr(),
+                                        placeholder: '450',
+                                        textAlign: TextAlign.end,
+                                        keyboardType: TextInputType.number,
                                       ),
                                     ),
                                     const SizedBox(width: kPadding / 2),
@@ -350,6 +358,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         _sourceController.text = meal.source ?? '';
         _onSourceTextChange(meal.source ?? '');
         _durationController.text = (meal.duration ?? '').toString();
+        _kcalController.text = (meal.kcal ?? '').toString();
         _instructionsController.text = meal.instructions ?? '';
         meal.ingredients = meal.ingredients ?? [];
         meal.tags = meal.tags ?? [];
@@ -365,6 +374,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         _sourceController.text = meal.source ?? '';
         _onSourceTextChange(meal.source ?? '');
         _durationController.text = (meal.duration ?? '').toString();
+        _kcalController.text = (meal.kcal ?? '').toString();
         _instructionsController.text = meal.instructions ?? '';
         meal.ingredients = meal.ingredients ?? [];
         meal.tags = meal.tags ?? [];
@@ -419,6 +429,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     meal.name = _titleController.text;
     meal.source = _sourceController.text;
     meal.duration = int.tryParse(_durationController.text.trim());
+    meal.kcal = int.tryParse(_kcalController.text.trim());
     meal.instructions = _instructionsController.text;
     meal.createdBy = _isCreatingMeal
         ? AuthenticationService.currentUser!.uid
@@ -502,6 +513,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     return _titleController.text != _originalMeal.name ||
         _sourceController.text != (_originalMeal.source ?? '') ||
         _durationController.text != (_originalMeal.duration ?? '').toString() ||
+        _kcalController.text != (_originalMeal.kcal ?? '').toString() ||
         _instructionsController.text != (_originalMeal.instructions ?? '') ||
         ref.read(_$updatedImage.notifier).state != null ||
         !_ingredientsEquals(
@@ -524,6 +536,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       _sourceController.text = result.source!;
       _onSourceTextChange(result.source!);
       _durationController.text = (result.duration ?? '').toString();
+      _kcalController.text = (result.kcal ?? '').toString();
       _instructionsController.text = result.instructions!;
       meal.ingredients = result.ingredients ?? [];
       meal.servings = result.servings;
