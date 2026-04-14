@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -34,6 +36,8 @@ class _EditIngredientsState extends State<EditIngredients> {
   List<String>? _groupOrder;
   bool _isDraggingIngredient = false;
   Ingredient? _draggedIngredient;
+  Timer? _autoScrollTimer;
+  double _dragDy = 0;
 
   @override
   void initState() {
@@ -54,6 +58,55 @@ class _EditIngredientsState extends State<EditIngredients> {
             widget.groupOrder != null ? List.from(widget.groupOrder!) : null;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _autoScrollTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startAutoScroll() {
+    _autoScrollTimer?.cancel();
+    // Use the State's own context (above ReorderableListView in the tree) so
+    // that Scrollable.maybeOf finds the parent SingleChildScrollView instead of
+    // the ReorderableListView, which has NeverScrollableScrollPhysics.
+    final scrollable = Scrollable.maybeOf(context);
+    if (scrollable == null) {
+      return;
+    }
+    _autoScrollTimer = Timer.periodic(
+      const Duration(milliseconds: 16),
+      (_) {
+        if (!mounted) {
+          _stopAutoScroll();
+          return;
+        }
+        const edgeThreshold = 100.0;
+        const maxSpeed = 12.0;
+        final screenHeight = MediaQuery.of(context).size.height;
+        double delta = 0;
+        if (_dragDy < edgeThreshold) {
+          delta = -maxSpeed * (1 - _dragDy / edgeThreshold);
+        } else if (_dragDy > screenHeight - edgeThreshold) {
+          delta = maxSpeed * (1 - (screenHeight - _dragDy) / edgeThreshold);
+        }
+        if (delta == 0) {
+          return;
+        }
+        final position = scrollable.position;
+        final newOffset = (position.pixels + delta).clamp(
+          position.minScrollExtent,
+          position.maxScrollExtent,
+        );
+        position.jumpTo(newOffset);
+      },
+    );
+  }
+
+  void _stopAutoScroll() {
+    _autoScrollTimer?.cancel();
+    _autoScrollTimer = null;
   }
 
   void _notify() => widget.onChanged(_ingredients, _groupOrder);
@@ -151,47 +204,18 @@ class _EditIngredientsState extends State<EditIngredients> {
   Widget _buildIngredientTile(BuildContext context, Ingredient ingredient) {
     final amount =
         ConvertUtil.amountToString(ingredient.amount, ingredient.unit);
-    final iconColor = Theme.of(context).iconTheme.color?.withValues(alpha: 0.5);
 
     return LayoutBuilder(
       key: ObjectKey(ingredient),
       builder: (context, constraints) {
         final tile = ListTile(
-          leading: Draggable<Ingredient>(
-            data: ingredient,
-            onDragStarted: () => setState(() {
-              _isDraggingIngredient = true;
-              _draggedIngredient = ingredient;
-            }),
-            onDragEnd: (_) {
-              setState(() {
-                _isDraggingIngredient = false;
-                _draggedIngredient = null;
-              });
-            },
-            feedback: Material(
-              elevation: 4,
-              borderRadius: BorderRadius.circular(kRadius),
-              child: SizedBox(
-                width: constraints.maxWidth,
-                child: ListTile(
-                  dense: true,
-                  leading: Icon(EvaIcons.menu, color: iconColor),
-                  title: Text(
-                    ingredient.name ?? '',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  subtitle: amount.isNotEmpty ? Text(amount) : null,
-                ),
-              ),
-            ),
-            child: Icon(EvaIcons.menu, color: iconColor),
-          ),
           title: Text(ingredient.name ?? ''),
           subtitle: amount.isNotEmpty ? Text(amount) : null,
           trailing: IconButton(
-            icon: Icon(EvaIcons.minusCircleOutline,
-                color: Theme.of(context).iconTheme.color),
+            icon: Icon(
+              EvaIcons.minusCircleOutline,
+              color: Theme.of(context).iconTheme.color,
+            ),
             onPressed: () {
               setState(() => _ingredients.remove(ingredient));
               _notify();
@@ -206,7 +230,42 @@ class _EditIngredientsState extends State<EditIngredients> {
 
         return Opacity(
           opacity: _draggedIngredient == ingredient ? 0.3 : 1.0,
-          child: tile,
+          child: LongPressDraggable<Ingredient>(
+            data: ingredient,
+            onDragStarted: () {
+              setState(() {
+                _isDraggingIngredient = true;
+                _draggedIngredient = ingredient;
+              });
+              _startAutoScroll();
+            },
+            onDragUpdate: (details) {
+              _dragDy = details.globalPosition.dy;
+            },
+            onDragEnd: (_) {
+              _stopAutoScroll();
+              setState(() {
+                _isDraggingIngredient = false;
+                _draggedIngredient = null;
+              });
+            },
+            feedback: Material(
+              elevation: 4,
+              borderRadius: BorderRadius.circular(kRadius),
+              child: SizedBox(
+                width: constraints.maxWidth,
+                child: ListTile(
+                  dense: true,
+                  title: Text(
+                    ingredient.name ?? '',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  subtitle: amount.isNotEmpty ? Text(amount) : null,
+                ),
+              ),
+            ),
+            child: tile,
+          ),
         );
       },
     );
@@ -229,8 +288,7 @@ class _EditIngredientsState extends State<EditIngredients> {
       ),
       builder: (context, candidateData, _) => AnimatedContainer(
         duration: const Duration(milliseconds: 100),
-        height:
-            candidateData.isNotEmpty ? 36 : (_isDraggingIngredient ? 16 : 4),
+        height: candidateData.isNotEmpty ? 36 : 4,
         margin: const EdgeInsets.symmetric(
           horizontal: EditIngredients._listTileHorizontalPadding,
         ),
