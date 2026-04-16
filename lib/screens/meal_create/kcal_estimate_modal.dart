@@ -18,11 +18,38 @@ class KcalEstimateModal extends StatefulWidget {
 class _KcalEstimateModalState extends State<KcalEstimateModal> {
   int? _selectedValue;
   final TextEditingController _editController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(_onFocusChange);
+  }
 
   @override
   void dispose() {
     _editController.dispose();
+    _scrollController.dispose();
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
     super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (_focusNode.hasFocus) {
+      // Wait for AnimatedSize (300ms) to finish before scrolling,
+      // so maxScrollExtent reflects the fully expanded layout.
+      Future.delayed(const Duration(milliseconds: 350), () {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    }
   }
 
   void _selectValue(int value) {
@@ -46,6 +73,7 @@ class _KcalEstimateModalState extends State<KcalEstimateModal> {
     final horizontalPad = (screenWidth - contentWidth) / 2 + kPadding;
 
     return SingleChildScrollView(
+      controller: _scrollController,
       padding: EdgeInsets.fromLTRB(
         horizontalPad,
         kPadding,
@@ -113,7 +141,10 @@ class _KcalEstimateModalState extends State<KcalEstimateModal> {
                       const SizedBox(height: kPadding),
                       TextField(
                         controller: _editController,
+                        focusNode: _focusNode,
                         keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) => _apply(),
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
                         ],
