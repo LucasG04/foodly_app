@@ -12,14 +12,17 @@ import '../../models/ingredient.dart';
 import '../../models/meal.dart';
 import '../../providers/state_providers.dart';
 import '../../services/authentication_service.dart';
+import '../../services/in_app_purchase_service.dart';
 import '../../services/link_metadata_service.dart';
 import '../../services/lunix_api_service.dart';
 import '../../services/meal_service.dart';
+import '../../services/rate_limit_exception.dart';
 import '../../services/storage_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/widget_utils.dart';
+import '../../widgets/get_premium_modal.dart';
 import '../../widgets/link_preview.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/main_button.dart';
@@ -33,6 +36,7 @@ import '../../widgets/wrapped_image_picker/wrapped_image_picker.dart';
 import 'chefkoch_import_modal.dart';
 import 'edit_ingredients.dart';
 import 'edit_list_content_modal.dart';
+import 'kcal_estimate_modal.dart';
 import 'save_changes_modal.dart';
 
 class MealCreateScreen extends ConsumerStatefulWidget {
@@ -66,6 +70,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
   final _$buttonState =
       AutoDisposeStateProvider<ButtonState>((_) => ButtonState.normal);
   final _$isLoading = AutoDisposeStateProvider<bool>((_) => true);
+  final _$isAiLoading = AutoDisposeStateProvider<bool>((_) => false);
   final _$sourceLinkMetadata = AutoDisposeStateProvider<String?>((_) => null);
   final _$updatedImage = AutoDisposeStateProvider<String?>((_) => null);
   late final AutoDisposeStateProvider<Meal> _$meal;
@@ -245,16 +250,19 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                 Row(
                                   children: [
                                     Flexible(
+                                      flex: 3,
                                       child: MainTextField(
                                         controller: _kcalController,
                                         title: 'meal_create_kcal_title'.tr(),
                                         placeholder: '450',
                                         textAlign: TextAlign.end,
                                         keyboardType: TextInputType.number,
+                                        suffix: _buildKcalAiButton(),
                                       ),
                                     ),
-                                    const SizedBox(width: kPadding / 2),
+                                    const SizedBox(width: kPadding),
                                     Flexible(
+                                      flex: 2,
                                       child: MainTextField(
                                         controller: _durationController,
                                         title:
@@ -327,6 +335,38 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildKcalAiButton() {
+    return Consumer(
+      builder: (context, ref, _) {
+        final isSubscribed = ref.watch(InAppPurchaseService.$userIsSubscribed);
+        final isAiLoading = ref.watch(_$isAiLoading);
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          child: isAiLoading
+              ? const SizedBox(
+                  key: ValueKey('loader'),
+                  width: 48,
+                  height: 48,
+                  child: Center(
+                    child: SmallCircularProgressIndicator(),
+                  ),
+                )
+              : IconButton(
+                  key: const ValueKey('ai'),
+                  onPressed: isSubscribed ? _estimateKcal : _openGetPremium,
+                  icon: Icon(
+                    Icons.auto_awesome,
+                    color: isSubscribed
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.grey,
+                  ),
+                  tooltip: 'meal_create_kcal_ai_button'.tr(),
+                ),
+        );
+      },
     );
   }
 
@@ -642,5 +682,63 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
   void _onOpenImagePicker() {
     ref.read(initSearchWebImagePickerProvider.notifier).state =
         _titleController.text;
+  }
+
+  void _openGetPremium() {
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => const GetPremiumModal(),
+    );
+  }
+
+  Future<void> _estimateKcal() async {
+    final meal = ref.read(_$meal);
+    final hasName = _titleController.text.isNotEmpty;
+    final hasIngredient = meal.ingredients?.isNotEmpty == true;
+    if (!hasName || !hasIngredient) {
+      MainSnackbar(
+        message: 'meal_create_kcal_ai_missing_input'.tr(),
+        isError: true,
+      ).show(context);
+      return;
+    }
+
+    ref.read(_$isAiLoading.notifier).state = true;
+    try {
+      final lang = context.locale.languageCode;
+      final estimate = await LunixApiService.estimateKcal(meal, lang);
+      if (!mounted) {
+        return;
+      }
+      final result = await WidgetUtils.showFoodlyBottomSheet<int>(
+        context: context,
+        builder: (_) => KcalEstimateModal(estimate: estimate),
+      );
+      if (result != null) {
+        _kcalController.text = result.toString();
+      }
+    } on RateLimitException catch (e) {
+      if (!mounted) {
+        return;
+      }
+      final minutes = (e.retryAfterSeconds / 60).ceil();
+      MainSnackbar(
+        message:
+            'meal_create_kcal_ai_rate_limit'.tr(args: [minutes.toString()]),
+        isError: true,
+      ).show(context);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      MainSnackbar(
+        message: 'meal_create_error_unknown'.tr(),
+        isError: true,
+      ).show(context);
+    } finally {
+      if (mounted) {
+        ref.read(_$isAiLoading.notifier).state = false;
+      }
+    }
   }
 }

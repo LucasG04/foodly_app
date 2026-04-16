@@ -91,20 +91,23 @@ class _MainTextFieldState extends ConsumerState<MainTextField>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: widget.title != null
-            ? [
-                Text(
-                  widget.required
-                      ? '${widget.title} *'.trim()
-                      : widget.title ?? '',
-                  style: const TextStyle(color: Colors.black),
-                ),
-                const SizedBox(height: 5),
-                _buildInput(),
-              ]
-            : [
-                _buildInput(),
+        children: [
+          if (widget.title != null) ...[
+            Text(
+              widget.required ? '${widget.title} *'.trim() : widget.title ?? '',
+              style: const TextStyle(color: Colors.black),
+            ),
+            const SizedBox(height: 5),
+          ],
+          Row(
+            children: [
+              Expanded(child: _buildInput()),
+              if (widget.suffix != null) ...[
+                widget.suffix!,
               ],
+            ],
+          )
+        ],
       ),
     );
   }
