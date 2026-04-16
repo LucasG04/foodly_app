@@ -216,23 +216,70 @@ class _MealScreenState extends ConsumerState<MealScreen>
                                   ],
                                 ),
                               ),
-                              BorderIcon(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 15,
-                                  horizontal: 15,
-                                ),
-                                withBorder: true,
-                                child: Text(
-                                  'meal_details_duration_trailing'.tr(
-                                    args: [
-                                      (meal.duration ?? '?').toString(),
-                                    ],
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  BorderIcon(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 7.5,
+                                      horizontal: 15,
+                                    ),
+                                    withBorder: true,
+                                    child: Text(
+                                      'meal_details_duration_trailing'.tr(
+                                        args: [
+                                          (meal.duration ?? '?').toString(),
+                                        ],
+                                      ),
+                                      style: const TextStyle(
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
-                                  style: const TextStyle(
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                  if (meal.kcal != null && meal.kcal! > 0) ...[
+                                    const SizedBox(height: 8),
+                                    Consumer(
+                                      builder: (context, ref, _) {
+                                        final servings = ref.watch(_$servings);
+                                        final mealServings = meal.servings;
+                                        final storedKcal = meal.kcal!;
+                                        final displayKcal = mealServings > 0
+                                            ? (storedKcal /
+                                                    mealServings *
+                                                    servings)
+                                                .round()
+                                            : storedKcal;
+                                        final isScaled =
+                                            servings != mealServings;
+                                        return BorderIcon(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 7.5,
+                                            horizontal: 15,
+                                          ),
+                                          withBorder: true,
+                                          child: Text(
+                                            isScaled
+                                                ? 'meal_details_kcal_scaled'.tr(
+                                                    args: [
+                                                      displayKcal.toString(),
+                                                    ],
+                                                  )
+                                                : 'meal_details_kcal'.tr(
+                                                    args: [
+                                                      displayKcal.toString(),
+                                                    ],
+                                                  ),
+                                            style: const TextStyle(
+                                              fontSize: 16.0,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ],
                               ),
                             ],
                           ),

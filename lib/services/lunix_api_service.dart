@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import '../constants.dart';
 import '../models/grocery.dart';
 import '../models/grocery_group.dart';
+import '../models/kcal_estimate.dart';
 import '../models/lunix_docx.dart';
 import '../models/lunix_image.dart';
 import '../models/meal.dart';
@@ -18,6 +19,7 @@ import '../models/upcoming_feature.dart';
 import '../utils/basic_utils.dart';
 import '../utils/env.dart';
 import 'meal_service.dart';
+import 'rate_limit_exception.dart';
 import 'settings_service.dart';
 
 class LunixApiService {
@@ -465,6 +467,32 @@ class LunixApiService {
     } catch (e) {
       _log.severe('ERR in getRandomMeal with $planId. API Request failed', e);
       return null;
+    }
+  }
+
+  static Future<KcalEstimate> estimateKcal(Meal meal, String language) async {
+    _log.finer('Call estimateKcal() for meal: ${meal.id}');
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        '$apiEndpoint/meal-kcal-estimate',
+        data: <String, dynamic>{
+          'name': meal.name,
+          'servings': meal.servings,
+          'instructions': meal.instructions,
+          'ingredients': meal.ingredients?.map((i) => i.toMap()).toList() ?? [],
+          'language': language,
+          'mealId': meal.id,
+        },
+      );
+      return KcalEstimate.fromMap(response.data!);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 429) {
+        final seconds =
+            (e.response?.data as Map?)?['retryAfterSeconds'] as int? ?? 60;
+        throw RateLimitException(retryAfterSeconds: seconds);
+      }
+      _log.severe('ERR in estimateKcal', e);
+      rethrow;
     }
   }
 }

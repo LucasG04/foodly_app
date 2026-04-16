@@ -15,6 +15,7 @@ class Meal {
   bool? isPublic;
   DateTime? createdAt;
   List<String>? ingredientGroupOrder;
+  int? kcal;
 
   Meal({
     this.id,
@@ -31,6 +32,7 @@ class Meal {
     this.isPublic,
     this.createdAt,
     this.ingredientGroupOrder,
+    this.kcal,
   });
 
   Map<String, dynamic> toMap() {
@@ -49,6 +51,7 @@ class Meal {
       'createdAt': createdAt?.millisecondsSinceEpoch,
       if (ingredientGroupOrder != null && ingredientGroupOrder!.isNotEmpty)
         'ingredientGroupOrder': ingredientGroupOrder,
+      'kcal': kcal,
     };
   }
 
@@ -75,6 +78,7 @@ class Meal {
       ingredientGroupOrder: map['ingredientGroupOrder'] != null
           ? List<String>.from(map['ingredientGroupOrder'] as List<dynamic>)
           : null,
+      kcal: map['kcal'] as int?,
     );
   }
 
@@ -82,6 +86,7 @@ class Meal {
   String toString() {
     return 'Meal(id: $id, name: $name, source: $source, servings: $servings, '
         'instruction: $instructions, duration: $duration, '
-        'ingredients: $ingredients, tags: $tags, createdAt: $createdAt)';
+        'ingredients: $ingredients, tags: $tags, createdAt: $createdAt, '
+        'kcal: $kcal)';
   }
 }

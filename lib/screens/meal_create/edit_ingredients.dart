@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -34,17 +32,33 @@ class EditIngredients extends StatefulWidget {
 class _EditIngredientsState extends State<EditIngredients> {
   late List<Ingredient> _ingredients;
   List<String>? _groupOrder;
-  bool _isDraggingIngredient = false;
-  Ingredient? _draggedIngredient;
-  Timer? _autoScrollTimer;
-  double _dragDy = 0;
 
   @override
   void initState() {
     super.initState();
-    _ingredients = List.from(widget.content);
+    _ingredients = _normalizeSortKeys(List.from(widget.content));
     _groupOrder =
         widget.groupOrder != null ? List.from(widget.groupOrder!) : null;
+  }
+
+  /// Assigns stable [Ingredient.sortKey] values to any ingredient whose
+  /// sortKey is null, preserving the relative order within each group.
+  List<Ingredient> _normalizeSortKeys(List<Ingredient> ingredients) {
+    final groups = ingredients.map((i) => i.group).toSet();
+    final result = List<Ingredient>.from(ingredients);
+    for (final group in groups) {
+      final groupItems = result
+          .where((i) => i.group == group)
+          .toList()
+        ..sort((a, b) => (a.sortKey ?? 9999).compareTo(b.sortKey ?? 9999));
+      for (var i = 0; i < groupItems.length; i++) {
+        if (groupItems[i].sortKey == null) {
+          final idx = result.indexOf(groupItems[i]);
+          result[idx] = groupItems[i].copyWith(sortKey: i);
+        }
+      }
+    }
+    return result;
   }
 
   @override
@@ -58,55 +72,6 @@ class _EditIngredientsState extends State<EditIngredients> {
             widget.groupOrder != null ? List.from(widget.groupOrder!) : null;
       });
     }
-  }
-
-  @override
-  void dispose() {
-    _autoScrollTimer?.cancel();
-    super.dispose();
-  }
-
-  void _startAutoScroll() {
-    _autoScrollTimer?.cancel();
-    // Use the State's own context (above ReorderableListView in the tree) so
-    // that Scrollable.maybeOf finds the parent SingleChildScrollView instead of
-    // the ReorderableListView, which has NeverScrollableScrollPhysics.
-    final scrollable = Scrollable.maybeOf(context);
-    if (scrollable == null) {
-      return;
-    }
-    _autoScrollTimer = Timer.periodic(
-      const Duration(milliseconds: 16),
-      (_) {
-        if (!mounted) {
-          _stopAutoScroll();
-          return;
-        }
-        const edgeThreshold = 100.0;
-        const maxSpeed = 12.0;
-        final screenHeight = MediaQuery.of(context).size.height;
-        double delta = 0;
-        if (_dragDy < edgeThreshold) {
-          delta = -maxSpeed * (1 - _dragDy / edgeThreshold);
-        } else if (_dragDy > screenHeight - edgeThreshold) {
-          delta = maxSpeed * (1 - (screenHeight - _dragDy) / edgeThreshold);
-        }
-        if (delta == 0) {
-          return;
-        }
-        final position = scrollable.position;
-        final newOffset = (position.pixels + delta).clamp(
-          position.minScrollExtent,
-          position.maxScrollExtent,
-        );
-        position.jumpTo(newOffset);
-      },
-    );
-  }
-
-  void _stopAutoScroll() {
-    _autoScrollTimer?.cancel();
-    _autoScrollTimer = null;
   }
 
   void _notify() => widget.onChanged(_ingredients, _groupOrder);
@@ -136,6 +101,8 @@ class _EditIngredientsState extends State<EditIngredients> {
             elevation: 6,
             borderRadius: BorderRadius.circular(kRadius),
             clipBehavior: Clip.antiAlias,
+            color: Theme.of(context).scaffoldBackgroundColor,
+            surfaceTintColor: Colors.transparent,
             child: Stack(
               children: [
                 child,
@@ -175,14 +142,32 @@ class _EditIngredientsState extends State<EditIngredients> {
         .toList()
       ..sort((a, b) => (a.sortKey ?? 9999).compareTo(b.sortKey ?? 9999));
 
-    final tiles = <Widget>[
-      _buildGroupHeader(context, group, outerIndex),
-      _buildInsertionPoint(context, group, 0),
-      for (var i = 0; i < groupIngredients.length; i++) ...[
-        _buildIngredientTile(context, groupIngredients[i]),
-        _buildInsertionPoint(context, group, i + 1),
-      ],
-      if (!_isDraggingIngredient)
+    return Column(
+      key: ValueKey(group ?? '__null__'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildGroupHeader(context, group, outerIndex),
+        ReorderableListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          buildDefaultDragHandles: false,
+          itemCount: groupIngredients.length,
+          proxyDecorator: (child, index, animation) => Material(
+            elevation: 4,
+            borderRadius: BorderRadius.circular(kRadius),
+            color: Theme.of(context).scaffoldBackgroundColor,
+            surfaceTintColor: Colors.transparent,
+            child: child,
+          ),
+          itemBuilder: (context, index) => _buildIngredientTile(
+            context,
+            groupIngredients[index],
+            index,
+            key: ObjectKey(groupIngredients[index]),
+          ),
+          onReorder: (oldIndex, newIndex) =>
+              _onIngredientReorder(group, oldIndex, newIndex),
+        ),
         Center(
           child: IconButton(
             icon: Icon(
@@ -192,157 +177,72 @@ class _EditIngredientsState extends State<EditIngredients> {
             onPressed: () => _editIngredient(context, group: group),
           ),
         ),
-    ];
-
-    return Column(
-      key: ValueKey(group ?? '__null__'),
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: tiles,
+      ],
     );
   }
 
-  Widget _buildIngredientTile(BuildContext context, Ingredient ingredient) {
+  Widget _buildIngredientTile(
+    BuildContext context,
+    Ingredient ingredient,
+    int index, {
+    required Key key,
+  }) {
     final amount =
         ConvertUtil.amountToString(ingredient.amount, ingredient.unit);
 
-    return LayoutBuilder(
-      key: ObjectKey(ingredient),
-      builder: (context, constraints) {
-        final tile = ListTile(
-          title: Text(ingredient.name ?? ''),
-          subtitle: amount.isNotEmpty ? Text(amount) : null,
-          trailing: IconButton(
-            icon: Icon(
-              EvaIcons.minusCircleOutline,
-              color: Theme.of(context).iconTheme.color,
-            ),
-            onPressed: () {
-              setState(() => _ingredients.remove(ingredient));
-              _notify();
-            },
-          ),
-          onTap: () => _editIngredient(context, existing: ingredient),
-          dense: true,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: EditIngredients._listTileHorizontalPadding,
-          ),
-        );
-
-        return Opacity(
-          opacity: _draggedIngredient == ingredient ? 0.3 : 1.0,
-          child: LongPressDraggable<Ingredient>(
-            data: ingredient,
-            onDragStarted: () {
-              setState(() {
-                _isDraggingIngredient = true;
-                _draggedIngredient = ingredient;
-              });
-              _startAutoScroll();
-            },
-            onDragUpdate: (details) {
-              _dragDy = details.globalPosition.dy;
-            },
-            onDragEnd: (_) {
-              _stopAutoScroll();
-              setState(() {
-                _isDraggingIngredient = false;
-                _draggedIngredient = null;
-              });
-            },
-            feedback: Material(
-              elevation: 4,
-              borderRadius: BorderRadius.circular(kRadius),
-              child: SizedBox(
-                width: constraints.maxWidth,
-                child: ListTile(
-                  dense: true,
-                  title: Text(
-                    ingredient.name ?? '',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  subtitle: amount.isNotEmpty ? Text(amount) : null,
-                ),
-              ),
-            ),
-            child: tile,
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildInsertionPoint(
-    BuildContext context,
-    String? group,
-    int insertAtIndex,
-  ) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final dividerColor = Theme.of(context).dividerColor;
-
-    return DragTarget<Ingredient>(
-      onWillAcceptWithDetails: (_) => _isDraggingIngredient,
-      onAcceptWithDetails: (details) => _onIngredientInsert(
-        details.data,
-        group,
-        insertAtIndex,
+    return ListTile(
+      key: key,
+      leading: ReorderableDragStartListener(
+        index: index,
+        child: Icon(
+          EvaIcons.menu,
+          size: 18,
+          color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.5),
+        ),
       ),
-      builder: (context, candidateData, _) => AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
-        height: candidateData.isNotEmpty ? 36 : 4,
-        margin: const EdgeInsets.symmetric(
-          horizontal: EditIngredients._listTileHorizontalPadding,
+      title: Text(ingredient.name ?? ''),
+      subtitle: amount.isNotEmpty ? Text(amount) : null,
+      trailing: IconButton(
+        icon: Icon(
+          EvaIcons.minusCircleOutline,
+          color: Theme.of(context).iconTheme.color,
         ),
-        decoration: BoxDecoration(
-          color: candidateData.isNotEmpty
-              ? colorScheme.primaryContainer
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(kRadius),
-          border: (_isDraggingIngredient && candidateData.isEmpty)
-              ? Border.all(
-                  color: dividerColor.withValues(alpha: 0.3),
-                  width: 0.5,
-                )
-              : null,
-        ),
+        onPressed: () {
+          setState(() => _ingredients.remove(ingredient));
+          _notify();
+        },
+      ),
+      onTap: () => _editIngredient(context, existing: ingredient),
+      dense: true,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: EditIngredients._listTileHorizontalPadding,
       ),
     );
   }
 
-  void _onIngredientInsert(
-      Ingredient ingredient, String? targetGroup, int insertAtIndex) {
-    final groups = Ingredient.orderedGroupsSorted(_ingredients, _groupOrder);
-    final newIngredients = <Ingredient>[];
-    var targetHandled = false;
-
-    for (final g in groups) {
-      // All items in this group excluding dragged, sorted by sortKey.
-      final groupItems = _ingredients
-          .where((i) => i.group == g && i != ingredient)
-          .toList()
-        ..sort((a, b) => (a.sortKey ?? 9999).compareTo(b.sortKey ?? 9999));
-
-      if (g == targetGroup) {
-        targetHandled = true;
-        groupItems.insert(
-          insertAtIndex.clamp(0, groupItems.length),
-          ingredient.copyWith(group: targetGroup),
-        );
-      }
-
-      for (var i = 0; i < groupItems.length; i++) {
-        newIngredients.add(groupItems[i].copyWith(sortKey: i));
-      }
+  void _onIngredientReorder(String? group, int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex--;
     }
+    final groupIngredients = _ingredients
+        .where((i) => i.group == group)
+        .toList()
+      ..sort((a, b) => (a.sortKey ?? 9999).compareTo(b.sortKey ?? 9999));
 
-    // Edge case: targetGroup had no ingredients (empty group not in orderedGroupsSorted result).
-    if (!targetHandled) {
-      newIngredients.add(ingredient.copyWith(group: targetGroup, sortKey: 0));
-    }
+    final ingredient = groupIngredients.removeAt(oldIndex);
+    groupIngredients.insert(newIndex, ingredient);
+
+    final reindexed = groupIngredients
+        .asMap()
+        .entries
+        .map((e) => e.value.copyWith(sortKey: e.key))
+        .toList();
 
     setState(() {
-      _ingredients = newIngredients;
-      _isDraggingIngredient = false;
-      _draggedIngredient = null;
+      _ingredients = [
+        ..._ingredients.where((i) => i.group != group),
+        ...reindexed,
+      ];
     });
     _notify();
   }
