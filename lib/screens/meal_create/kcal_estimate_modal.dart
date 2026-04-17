@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -18,11 +19,38 @@ class KcalEstimateModal extends StatefulWidget {
 class _KcalEstimateModalState extends State<KcalEstimateModal> {
   int? _selectedValue;
   final TextEditingController _editController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(_onFocusChange);
+  }
 
   @override
   void dispose() {
     _editController.dispose();
+    _scrollController.dispose();
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
     super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (_focusNode.hasFocus) {
+      // Wait for AnimatedSize (300ms) to finish before scrolling,
+      // so maxScrollExtent reflects the fully expanded layout.
+      Future.delayed(const Duration(milliseconds: 350), () {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    }
   }
 
   void _selectValue(int value) {
@@ -46,6 +74,7 @@ class _KcalEstimateModalState extends State<KcalEstimateModal> {
     final horizontalPad = (screenWidth - contentWidth) / 2 + kPadding;
 
     return SingleChildScrollView(
+      controller: _scrollController,
       padding: EdgeInsets.fromLTRB(
         horizontalPad,
         kPadding,
@@ -56,6 +85,22 @@ class _KcalEstimateModalState extends State<KcalEstimateModal> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'meal_create_kcal_ai_title'.tr().toUpperCase(),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(EvaIcons.close),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
           Text(
             widget.estimate.explanation,
             style: Theme.of(context)
@@ -113,7 +158,10 @@ class _KcalEstimateModalState extends State<KcalEstimateModal> {
                       const SizedBox(height: kPadding),
                       TextField(
                         controller: _editController,
+                        focusNode: _focusNode,
                         keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) => _apply(),
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
                         ],

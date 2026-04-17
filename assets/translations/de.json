@@ -141,6 +141,7 @@
   "meal_create_duration_title": "Dauer (min)",
   "meal_create_kcal_title": "kcal",
   "meal_create_kcal_ai_button": "kcal schätzen (KI)",
+  "meal_create_kcal_ai_title": "kcal-Schätzung",
   "meal_create_kcal_ai_min": "Min",
   "meal_create_kcal_ai_recommended": "Empfohlen",
   "meal_create_kcal_ai_max": "Max",
