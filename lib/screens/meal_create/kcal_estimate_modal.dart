@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -84,6 +85,22 @@ class _KcalEstimateModalState extends State<KcalEstimateModal> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'meal_create_kcal_ai_title'.tr().toUpperCase(),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(EvaIcons.close),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
           Text(
             widget.estimate.explanation,
             style: Theme.of(context)
