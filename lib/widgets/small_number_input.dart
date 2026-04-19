@@ -17,6 +17,8 @@ class SmallNumberInput extends StatelessWidget {
     super.key,
   });
 
+  int get _effectiveValue => value.clamp(minValue, maxValue);
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -28,7 +30,10 @@ class SmallNumberInput extends StatelessWidget {
           padding: EdgeInsets.zero,
           splashRadius: kPadding,
         ),
-        SizedBox(width: kPadding * 1.5, child: _buildText(context, value)),
+        SizedBox(
+          width: kPadding * 1.5,
+          child: _buildText(context, _effectiveValue),
+        ),
         IconButton(
           icon: const Icon(EvaIcons.plusCircleOutline),
           onPressed: _increase,
@@ -51,16 +56,16 @@ class SmallNumberInput extends StatelessWidget {
   }
 
   void _decrease() {
-    if (value <= minValue) {
+    if (_effectiveValue <= minValue) {
       return;
     }
-    onChanged(value - 1);
+    onChanged(_effectiveValue - 1);
   }
 
   void _increase() {
-    if (value >= maxValue) {
+    if (_effectiveValue >= maxValue) {
       return;
     }
-    onChanged(value + 1);
+    onChanged(_effectiveValue + 1);
   }
 }
