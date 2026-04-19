@@ -59,6 +59,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
   bool _isFirstCall = true;
   final ScrollController _scrollController = ScrollController();
 
+  /// ID for API rate limitng on kcal estimation for creating
+  final String _generateKcalIdForApiOnCreate = UniqueKey().toString();
+
   late bool _isCreatingMeal;
 
   final TextEditingController _titleController = TextEditingController();
@@ -572,14 +575,16 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     if (result != null) {
       final meal = ref.read(_$meal.notifier).state;
       _titleController.text = result.name;
+      meal.name = result.name;
       meal.imageUrl = result.imageUrl;
       _sourceController.text = result.source!;
       _onSourceTextChange(result.source!);
       _durationController.text = (result.duration ?? '').toString();
       _kcalController.text = (result.kcal ?? '').toString();
       _instructionsController.text = result.instructions!;
+      meal.instructions = result.instructions;
       meal.ingredients = result.ingredients ?? [];
-      meal.servings = result.servings;
+      meal.servings = result.servings < 1 ? 1 : result.servings;
       meal.tags = result.tags;
       ref.read(_$meal.notifier).state = Meal.fromMap(meal.id, meal.toMap());
     }
@@ -706,6 +711,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     ref.read(_$isAiLoading.notifier).state = true;
     try {
       final lang = context.locale.languageCode;
+      meal.id ??= _generateKcalIdForApiOnCreate;
       final estimate = await LunixApiService.estimateKcal(meal, lang);
       if (!mounted) {
         return;
