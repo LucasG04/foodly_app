@@ -43,8 +43,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
 
   @override
   void initState() {
-    _showAlerts();
     super.initState();
+    _showAlerts();
     ref
         .read(planHistoryPageChanged.notifier)
         .stream
@@ -118,8 +118,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
       return false;
     }
 
-    final Version currentVersion = Version.parse(packageInfo.version);
-    final Version lastCheckedVersion = Version.parse(lastCheckedVersionString);
+    Version currentVersion;
+    Version lastCheckedVersion;
+    try {
+      currentVersion = Version.parse(packageInfo.version);
+      lastCheckedVersion = Version.parse(lastCheckedVersionString);
+    } catch (e) {
+      _log.severe(
+        '_checkForNewFeaturesNotification() failed to parse versions: ${packageInfo.version} / $lastCheckedVersionString',
+        e,
+      );
+      return false;
+    }
 
     if (lastCheckedVersion >= currentVersion) {
       return false;
@@ -128,7 +138,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
     if (!mounted) {
       return false;
     }
-    NewVersionModal.open(context).then((_) {
+    await NewVersionModal.open(context).then((_) {
       VersionService.lastCheckedVersion = packageInfo.version;
     });
     return true;
@@ -280,10 +290,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
   }
 
   void _showAlerts() async {
-    final newFeaturesShown = await _checkForNewFeaturesNotification();
-    if (newFeaturesShown) {
-      return;
-    }
+    await _checkForNewFeaturesNotification();
 
     if (_shouldCheckForUpdate()) {
       _checkForUpdate();
