@@ -15,14 +15,17 @@ import 'package:version/version.dart';
 import '../../app_router.gr.dart';
 import '../../constants.dart';
 import '../../models/foodly_user.dart';
+import '../../models/foodly_version.dart';
 import '../../providers/state_providers.dart';
 import '../../services/foodly_user_service.dart';
 import '../../services/in_app_purchase_service.dart';
+import '../../services/lunix_api_service.dart';
 import '../../services/plan_service.dart';
 import '../../services/settings_service.dart';
 import '../../services/version_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
+import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/loading_screen.dart';
 import '../../widgets/new_version_modal.dart';
@@ -135,12 +138,48 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
       return false;
     }
 
-    if (!mounted) {
+    final versions = await LunixApiService.getAllPublishedVersions();
+    final publishedVersions = versions.map((e) => Version.parse(e)).toList();
+    final newVersions = publishedVersions.where((v) => v > lastCheckedVersion).toList();
+
+    if (newVersions.isEmpty || !mounted) {
       return false;
     }
-    await NewVersionModal.open(context).then((_) {
-      VersionService.lastCheckedVersion = packageInfo.version;
-    });
+
+    String deviceLanguageCode;
+    try {
+      deviceLanguageCode = context.locale.languageCode;
+    } catch (e) {
+      deviceLanguageCode = 'en';
+    }
+
+    final List<FoodlyVersion>? versionNotes =
+        await VersionService.getNotesForVersionsAndLanguage(
+      newVersions.map((e) => e.toString()).toList(),
+      deviceLanguageCode,
+    );
+
+    if (versionNotes == null || versionNotes.isEmpty || !mounted) {
+      return false;
+    }
+
+    final versionGroups = versionNotes.map((v) {
+      final notes = NewVersionModal.checkVersionNotesForVariables(v.notes);
+      return VersionGroup(
+        version: v.version,
+        emoji: v.emoji,
+        notes: notes
+            .map((n) => VersionNote(title: n.title, description: n.description))
+            .toList(),
+      );
+    }).toList();
+
+    // ignore: use_build_context_synchronously
+    await WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => NewVersionModal(versionGroups: versionGroups),
+    );
+    VersionService.lastCheckedVersion = packageInfo.version;
     return true;
   }
 
