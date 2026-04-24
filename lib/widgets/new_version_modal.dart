@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../constants.dart';
-import '../models/foodly_version.dart';
+import '../models/foodly_change.dart';
 import 'main_button.dart';
 
 class NewVersionModal extends ConsumerStatefulWidget {
@@ -18,16 +18,19 @@ class NewVersionModal extends ConsumerStatefulWidget {
   @override
   _NewVersionModalState createState() => _NewVersionModalState();
 
-  static List<FoodlyVersionNote> checkVersionNotesForVariables(
-      List<FoodlyVersionNote> notes) {
-    return notes.map((e) {
-      if (e.title.contains('{appName}')) {
-        e.title = e.title.replaceAll('{appName}', kAppName);
+  static List<ChangeTranslation> checkVersionNotesForVariables(
+      List<ChangeTranslation> translations) {
+    return translations.map((t) {
+      final title = t.title.replaceAll('{appName}', kAppName);
+      final description = t.description.replaceAll('{appName}', kAppName);
+      if (title == t.title && description == t.description) {
+        return t;
       }
-      if (e.description.contains('{appName}')) {
-        e.description = e.description.replaceAll('{appName}', kAppName);
-      }
-      return e;
+      return ChangeTranslation(
+        language: t.language,
+        title: title,
+        description: description,
+      );
     }).toList();
   }
 }
@@ -141,37 +144,21 @@ class _NewVersionModalState extends ConsumerState<NewVersionModal> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Text(
-                group.version,
-                style: TextStyle(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.5),
-                ),
-              ),
-              if (group.emoji != null) ...[
-                const SizedBox(width: kPadding / 2),
-                Text(
-                  group.emoji!,
-                  style: const TextStyle(fontSize: 16),
-                  strutStyle: const StrutStyle(
-                    fontSize: 16,
-                    forceStrutHeight:
-                        true, // Zwingt das Widget, die Höhe strikt zu berechnen
-                  ),
-                )
-              ],
-            ],
+          Text(
+            group.version,
+            style: TextStyle(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.5),
+            ),
           ),
           const SizedBox(height: kPadding / 2),
           ...group.notes.asMap().entries.map((entry) {
             final isFirst = entry.key == 0;
             return Padding(
               padding: EdgeInsets.only(top: isFirst ? 0 : kPadding / 2),
-              child: _buildNoteCard(entry.value, group.emoji),
+              child: _buildNoteCard(entry.value),
             );
           }),
         ],
@@ -179,7 +166,7 @@ class _NewVersionModalState extends ConsumerState<NewVersionModal> {
     );
   }
 
-  Widget _buildNoteCard(VersionNote note, String? emoji) {
+  Widget _buildNoteCard(VersionNote note) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
@@ -192,11 +179,27 @@ class _NewVersionModalState extends ConsumerState<NewVersionModal> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  note.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                  ),
+                Row(
+                  children: [
+                    if (note.emoji != null) ...[
+                      Text(
+                        note.emoji!,
+                        style: const TextStyle(fontSize: 16),
+                        strutStyle: const StrutStyle(
+                          fontSize: 16,
+                          forceStrutHeight:
+                              true, // Zwingt das Widget, die Höhe strikt zu berechnen
+                        ),
+                      ),
+                      const SizedBox(width: kPadding / 4),
+                    ],
+                    Text(
+                      note.title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: kPadding / 2),
                 Text(
@@ -233,21 +236,21 @@ class _NewVersionModalState extends ConsumerState<NewVersionModal> {
 class VersionNote {
   String title;
   String description;
+  String? emoji;
 
   VersionNote({
     required this.title,
     required this.description,
+    this.emoji,
   });
 }
 
 class VersionGroup {
   final String version;
-  final String? emoji;
   final List<VersionNote> notes;
 
   const VersionGroup({
     required this.version,
-    this.emoji,
     required this.notes,
   });
 }

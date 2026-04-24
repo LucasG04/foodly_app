@@ -14,8 +14,8 @@ import 'package:version/version.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
+import '../../models/foodly_change.dart';
 import '../../models/foodly_user.dart';
-import '../../models/foodly_version.dart';
 import '../../providers/state_providers.dart';
 import '../../services/foodly_user_service.dart';
 import '../../services/in_app_purchase_service.dart';
@@ -138,14 +138,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
       return false;
     }
 
-    final versions = await LunixApiService.getAllPublishedVersions();
-    final publishedVersions = versions.map((e) => Version.parse(e)).toList();
-    final newVersions = publishedVersions.where((v) => v > lastCheckedVersion).toList();
-
-    if (newVersions.isEmpty || !mounted) {
-      return false;
-    }
-
     String deviceLanguageCode;
     try {
       deviceLanguageCode = context.locale.languageCode;
@@ -153,26 +145,59 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
       deviceLanguageCode = 'en';
     }
 
-    final List<FoodlyVersion>? versionNotes =
-        await VersionService.getNotesForVersionsAndLanguage(
-      newVersions.map((e) => e.toString()).toList(),
-      deviceLanguageCode,
+    final changes = await LunixApiService.getChanges(
+      lastCheckedVersion.toString(),
+      currentVersion.toString(),
     );
 
-    if (versionNotes == null || versionNotes.isEmpty || !mounted) {
+    if (changes.isEmpty || !mounted) {
       return false;
     }
 
-    final versionGroups = versionNotes.map((v) {
-      final notes = NewVersionModal.checkVersionNotesForVariables(v.notes);
-      return VersionGroup(
-        version: v.version,
-        emoji: v.emoji,
-        notes: notes
-            .map((n) => VersionNote(title: n.title, description: n.description))
-            .toList(),
-      );
-    }).toList();
+    final Map<String, List<FoodlyChange>> changesByVersion = {};
+    for (final change in changes) {
+      changesByVersion.putIfAbsent(change.version, () => []).add(change);
+    }
+
+    final versionGroups = changesByVersion.entries
+        .map((entry) {
+          final versionChanges = entry.value;
+          final emoji = versionChanges.first.emoji;
+
+          final notes = versionChanges.expand((c) {
+            final withVars = NewVersionModal.checkVersionNotesForVariables(
+              c.translations,
+            );
+            final translation = withVars.firstWhere(
+              (t) => t.language == deviceLanguageCode,
+              orElse: () => withVars.isNotEmpty
+                  ? withVars.first
+                  : ChangeTranslation(
+                      language: deviceLanguageCode,
+                      title: '',
+                      description: '',
+                    ),
+            );
+            if (translation.title.isEmpty) {
+              return <VersionNote>[];
+            }
+            return [
+              VersionNote(
+                title: translation.title,
+                description: translation.description,
+                emoji: c.emoji ?? emoji,
+              )
+            ];
+          }).toList();
+
+          return VersionGroup(version: entry.key, notes: notes);
+        })
+        .where((g) => g.notes.isNotEmpty)
+        .toList();
+
+    if (versionGroups.isEmpty || !mounted) {
+      return false;
+    }
 
     // ignore: use_build_context_synchronously
     await WidgetUtils.showFoodlyBottomSheet<void>(
