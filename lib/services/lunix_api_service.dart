@@ -7,6 +7,7 @@ import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../constants.dart';
+import '../models/foodly_change.dart';
 import '../models/grocery.dart';
 import '../models/grocery_group.dart';
 import '../models/kcal_estimate.dart';
@@ -182,26 +183,28 @@ class LunixApiService {
     return LunixImageResponse.fromMap(response.data as Map<String, dynamic>);
   }
 
-  static Future<List<String>> getAllPublishedVersions() async {
-    _log.finer('Call getAllPublishedVersions()');
+  static Future<List<FoodlyChange>> getChanges(String from, String to) async {
+    _log.finer('Call getChanges() from $from to $to');
     Response? response;
     try {
       response = await _dio.get<List<dynamic>>(
-        '$apiEndpoint/published-versions',
+        '$apiEndpoint/changes',
+        queryParameters: <String, dynamic>{
+          'from': from,
+          'to': to,
+        },
       );
     } catch (e) {
-      _log.severe('ERR in getAllPublishedVersions. Response is null', e);
+      _log.severe('ERR in getChanges', e);
     }
 
     if (response == null || response.data == null) {
       return [];
     }
 
-    final List<String> data = (response.data as List<dynamic>)
-        .map((dynamic e) => e.toString())
+    return (response.data as List<dynamic>)
+        .map((dynamic e) => FoodlyChange.fromMap(e as Map<String, dynamic>))
         .toList();
-
-    return response.data != null ? data : [];
   }
 
   static Future<List<Meal>> searchMeals(String planId, String query) async {
