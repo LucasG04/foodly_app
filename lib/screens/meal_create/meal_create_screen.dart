@@ -697,9 +697,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
   }
 
   Future<void> _estimateKcal() async {
-    final meal = ref.read(_$meal);
+    final baseMeal = ref.read(_$meal);
     final hasName = _titleController.text.isNotEmpty;
-    final hasIngredient = meal.ingredients?.isNotEmpty == true;
+    final hasIngredient = baseMeal.ingredients?.isNotEmpty == true;
     if (!hasName || !hasIngredient) {
       MainSnackbar(
         message: 'meal_create_kcal_ai_missing_input'.tr(),
@@ -711,8 +711,10 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     ref.read(_$isAiLoading.notifier).state = true;
     try {
       final lang = context.locale.languageCode;
-      meal.id ??= _generateKcalIdForApiOnCreate;
-      final estimate = await LunixApiService.estimateKcal(meal, lang);
+      final mealForApi = Meal.fromMap(baseMeal.id, baseMeal.toMap());
+      mealForApi.name = _titleController.text;
+      mealForApi.id ??= _generateKcalIdForApiOnCreate;
+      final estimate = await LunixApiService.estimateKcal(mealForApi, lang);
       if (!mounted) {
         return;
       }

@@ -481,7 +481,7 @@ class LunixApiService {
         data: <String, dynamic>{
           'name': meal.name,
           'servings': meal.servings,
-          'instructions': meal.instructions,
+          'instructions': meal.instructions ?? '',
           'ingredients': meal.ingredients?.map((i) => i.toMap()).toList() ?? [],
           'language': language,
           'mealId': meal.id,
