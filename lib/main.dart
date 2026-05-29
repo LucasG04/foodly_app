@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
@@ -210,8 +211,10 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
               }
 
               return MaterialApp.router(
-                routerDelegate: _appRouter.delegate(),
-                routeInformationParser: _appRouter.defaultRouteParser(),
+                routerDelegate: _appRouter.delegate(
+                  initialRoutes: [const HomeScreenRoute()],
+                ),
+                routeInformationParser: _DeepLinkGuardedParser(_appRouter.defaultRouteParser()),
                 debugShowCheckedModeBanner: false,
                 themeMode: ThemeMode.light,
                 localizationsDelegates: [
@@ -517,6 +520,26 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     }
 
     _appRouter.push(MealScreenRoute(id: mealId));
+  }
+}
+
+// Prevents auto_route from processing external deep link URLs (https://...) as
+// navigation targets. Deep links are handled by app_links instead.
+class _DeepLinkGuardedParser extends RouteInformationParser<UrlState> {
+  _DeepLinkGuardedParser(this._inner);
+  final RouteInformationParser<UrlState> _inner;
+
+  @override
+  Future<UrlState> parseRouteInformation(RouteInformation routeInformation) {
+    if (routeInformation.uri.hasScheme) {
+      return Future.value(UrlState(Uri(path: '/'), const []));
+    }
+    return _inner.parseRouteInformation(routeInformation);
+  }
+
+  @override
+  RouteInformation? restoreRouteInformation(UrlState configuration) {
+    return _inner.restoreRouteInformation(configuration);
   }
 }
 
