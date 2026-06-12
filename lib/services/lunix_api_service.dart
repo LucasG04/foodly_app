@@ -395,6 +395,28 @@ class LunixApiService {
     }
   }
 
+  static Future<Meal?> getMealFromText(String text, String langCode) async {
+    _log.finer('Call getMealFromText()');
+
+    try {
+      final response = await _dio.post<dynamic>(
+        '$apiEndpoint/generate-meal-from-text',
+        data: <String, dynamic>{
+          'text': text,
+          'language': langCode,
+        },
+      );
+      if (response.statusCode != 200) {
+        return null;
+      }
+
+      return Meal.fromMap(null, response.data as Map<String, dynamic>);
+    } catch (e) {
+      _log.severe('ERR in getMealFromText. API Request failed', e);
+      return null;
+    }
+  }
+
   static Future<List<String>> getSupportedImportSites() async {
     _log.finer('Call getSupportedImportSites()');
 

@@ -29,13 +29,15 @@ import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/markdown_editor.dart';
 import '../../widgets/meal_tag.dart';
+import '../../widgets/options_modal/options_modal.dart';
+import '../../widgets/options_modal/options_modal_option.dart';
 import '../../widgets/progress_button.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import '../../widgets/small_number_input.dart';
 import '../../widgets/wrapped_image_picker/wrapped_image_picker.dart';
-import 'chefkoch_import_modal.dart';
 import 'edit_ingredients.dart';
 import 'edit_list_content_modal.dart';
+import 'import_modal.dart';
 import 'kcal_estimate_modal.dart';
 import 'save_changes_modal.dart';
 
@@ -142,7 +144,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                   EvaIcons.downloadOutline,
                   color: theme.textTheme.bodyLarge!.color,
                 ),
-                onPressed: () => _openChefkochImport(),
+                onPressed: () => _openImport(),
               ),
             ],
             onPopRejected: () {
@@ -566,22 +568,42 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
             _originalMeal.ingredientGroupOrder ?? []);
   }
 
-  void _openChefkochImport() async {
+  void _openImport() {
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => OptionsSheet(
+        options: [
+          OptionsSheetOptions(
+            icon: EvaIcons.link2Outline,
+            title: 'import_options_link'.tr(),
+            onTap: () => _openImportModal(ImportType.link),
+          ),
+          OptionsSheetOptions(
+            icon: EvaIcons.fileTextOutline,
+            title: 'import_options_text'.tr(),
+            onTap: () => _openImportModal(ImportType.text),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openImportModal(ImportType type) async {
     final result = await WidgetUtils.showFoodlyBottomSheet<Meal>(
       context: context,
-      builder: (_) => const ChefkochImportModal(),
+      builder: (_) => ImportModal(type: type),
     );
 
-    if (result != null) {
+    if (result != null && mounted) {
       final meal = ref.read(_$meal.notifier).state;
       _titleController.text = result.name;
       meal.name = result.name;
       meal.imageUrl = result.imageUrl;
-      _sourceController.text = result.source!;
-      _onSourceTextChange(result.source!);
+      _sourceController.text = result.source ?? '';
+      _onSourceTextChange(result.source ?? '');
       _durationController.text = (result.duration ?? '').toString();
       _kcalController.text = (result.kcal ?? '').toString();
-      _instructionsController.text = result.instructions!;
+      _instructionsController.text = result.instructions ?? '';
       meal.instructions = result.instructions;
       meal.ingredients = result.ingredients ?? [];
       meal.servings = result.servings < 1 ? 1 : result.servings;
