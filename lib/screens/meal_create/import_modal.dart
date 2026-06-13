@@ -123,12 +123,21 @@ class _ImportModalState extends ConsumerState<ImportModal>
               fontWeight: FontWeight.bold,
             ),
           ),
-          if (widget.type == ImportType.link)
-            IconButton(
-              onPressed: _showInfo,
-              icon: const Icon(EvaIcons.infoOutline),
-              color: theme.primaryColor,
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.type == ImportType.link)
+                IconButton(
+                  onPressed: _showInfo,
+                  icon: const Icon(EvaIcons.infoOutline),
+                  color: theme.primaryColor,
+                ),
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(EvaIcons.close),
+              ),
+            ],
+          ),
         ],
       ),
     );
