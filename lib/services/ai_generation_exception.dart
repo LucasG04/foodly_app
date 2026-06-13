@@ -1,6 +1,9 @@
 /// Thrown before any stream content is received when the server rejects the
 /// input as not food-related (HTTP 422), e.g. with code `NOT_FOOD_RELATED`.
 class AIRejectionException implements Exception {
+  /// Server code for input the model judged not to be a recipe.
+  static const String notFoodRelated = 'NOT_FOOD_RELATED';
+
   final String code;
 
   const AIRejectionException(this.code);

@@ -692,10 +692,10 @@ class _ImportModalState extends ConsumerState<ImportModal>
     if (!mounted) {
       return;
     }
-    final message =
-        error is AIRejectionException && error.code == 'NOT_FOOD_RELATED'
-            ? 'import_modal_error_not_food'.tr()
-            : 'import_modal_error_generation'.tr();
+    final message = error is AIRejectionException &&
+            error.code == AIRejectionException.notFoodRelated
+        ? 'import_modal_error_not_food'.tr()
+        : 'import_modal_error_generation'.tr();
     MainSnackbar(
       isError: true,
       message: message,
@@ -852,8 +852,11 @@ class _IngredientRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: kPadding / 4),
       child: Row(
         children: [
-          const Icon(EvaIcons.arrowRightOutline,
-              size: 16, color: kLightTextColor),
+          const Icon(
+            EvaIcons.arrowRightOutline,
+            size: 16,
+            color: kLightTextColor,
+          ),
           const SizedBox(width: kPadding / 2),
           Expanded(
             child: Text(

@@ -442,7 +442,7 @@ class LunixApiService {
     // --- Pre-stream error handling (no partial content yet) ---
     if (status == 422) {
       final body = await _collectBody(byteStream);
-      var code = 'NOT_FOOD_RELATED';
+      var code = AIRejectionException.notFoodRelated;
       try {
         final decoded = jsonDecode(body);
         if (decoded is Map && decoded['code'] is String) {
