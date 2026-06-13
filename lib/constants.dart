@@ -57,6 +57,10 @@ const kCardSubtitle = TextStyle(
   color: kLightTextColor,
 );
 
+/// Free-plan AI usage limits per weekly window
+const kFreeAiKcalLimit = 6;
+const kFreeAiTextLimit = 3;
+
 /// AppStore
 const kAppBundleId = '1590739803';
 

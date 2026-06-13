@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +12,7 @@ import '../../constants.dart';
 import '../../models/ingredient.dart';
 import '../../models/meal.dart';
 import '../../providers/state_providers.dart';
+import '../../services/ai_usage_service.dart';
 import '../../services/authentication_service.dart';
 import '../../services/in_app_purchase_service.dart';
 import '../../services/link_metadata_service.dart';
@@ -18,6 +20,7 @@ import '../../services/lunix_api_service.dart';
 import '../../services/meal_service.dart';
 import '../../services/rate_limit_exception.dart';
 import '../../services/storage_service.dart';
+import '../../utils/ai_usage_period.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
@@ -348,6 +351,34 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       builder: (context, ref, _) {
         final isSubscribed = ref.watch(InAppPurchaseService.$userIsSubscribed);
         final isAiLoading = ref.watch(_$isAiLoading);
+        final usage = ref.watch(aiUsageProvider).valueOrNull;
+        final canUse = usage?.canUseKcal(isSubscribed) ?? true;
+        final showBadge = !isSubscribed && usage != null;
+
+        Widget aiButton = IconButton(
+          onPressed: canUse ? _estimateKcal : _showAiQuotaExhausted,
+          icon: Icon(
+            Icons.auto_awesome,
+            color: canUse
+                ? Theme.of(context).colorScheme.primary
+                : Colors.grey,
+          ),
+          tooltip: showBadge
+              ? 'ai_usage_remaining'.tr(args: [usage.kcalRemaining.toString()])
+              : 'meal_create_kcal_ai_button'.tr(),
+        );
+        if (showBadge) {
+          aiButton = badges.Badge(
+            badgeStyle: const badges.BadgeStyle(badgeColor: kPremiumColor),
+            position: badges.BadgePosition.topEnd(top: -4, end: -2),
+            badgeContent: Text(
+              usage.kcalRemaining.toString(),
+              style: const TextStyle(color: kPrimaryColor, fontSize: 10),
+            ),
+            child: aiButton,
+          );
+        }
+
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),
           child: isAiLoading
@@ -359,20 +390,26 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                     child: SmallCircularProgressIndicator(),
                   ),
                 )
-              : IconButton(
+              : KeyedSubtree(
                   key: const ValueKey('ai'),
-                  onPressed: isSubscribed ? _estimateKcal : _openGetPremium,
-                  icon: Icon(
-                    Icons.auto_awesome,
-                    color: isSubscribed
-                        ? Theme.of(context).colorScheme.primary
-                        : Colors.grey,
-                  ),
-                  tooltip: 'meal_create_kcal_ai_button'.tr(),
+                  child: aiButton,
                 ),
         );
       },
     );
+  }
+
+  void _showAiQuotaExhausted() {
+    final resetDate = DateFormat.yMMMMd(context.locale.toLanguageTag())
+        .format(AiUsagePeriod.currentPeriodEnd());
+    MainSnackbar(
+      message: 'ai_usage_exhausted'.tr(args: [resetDate]),
+      isError: true,
+      action: TextButton(
+        onPressed: _openGetPremium,
+        child: Text('ai_usage_upgrade'.tr()),
+      ),
+    ).show(context);
   }
 
   Center _buildDivider() => Center(
@@ -569,6 +606,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
   }
 
   void _openImport() {
+    final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
+    final usage = ref.read(aiUsageProvider).valueOrNull;
+    final showTextBadge = !isSubscribed && usage != null;
     WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) => OptionsSheet(
@@ -581,9 +621,39 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
           OptionsSheetOptions(
             icon: EvaIcons.fileTextOutline,
             title: 'import_options_text'.tr(),
-            onTap: () => _openImportModal(ImportType.text),
+            trailing: showTextBadge ? _buildQuotaPill(usage.textRemaining) : null,
+            onTap: _onTapTextImport,
           ),
         ],
+      ),
+    );
+  }
+
+  void _onTapTextImport() {
+    final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
+    final usage = ref.read(aiUsageProvider).valueOrNull;
+    final canUse = usage?.canUseText(isSubscribed) ?? true;
+    if (!canUse) {
+      _showAiQuotaExhausted();
+      return;
+    }
+    _openImportModal(ImportType.text);
+  }
+
+  Widget _buildQuotaPill(int remaining) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: kPremiumColor,
+        borderRadius: BorderRadius.circular(kRadius),
+      ),
+      child: Text(
+        remaining.toString(),
+        style: const TextStyle(
+          color: kPrimaryColor,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
@@ -609,6 +679,16 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       meal.servings = result.servings < 1 ? 1 : result.servings;
       meal.tags = result.tags;
       ref.read(_$meal.notifier).state = Meal.fromMap(meal.id, meal.toMap());
+
+      // A text import that returned a meal means a successful AI generation —
+      // count it against the free quota (premium is unlimited).
+      if (type == ImportType.text) {
+        final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
+        final userId = ref.read(userProvider)?.id;
+        if (!isSubscribed && userId != null) {
+          await AiUsageService.incrementText(userId);
+        }
+      }
     }
   }
 
@@ -740,12 +820,20 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       if (!mounted) {
         return;
       }
+      // The AI call succeeded — count it against the free quota (premium is
+      // unlimited). Captured before the modal await so we never touch `ref`
+      // after the widget may have been disposed.
+      final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
+      final userId = ref.read(userProvider)?.id;
       final result = await WidgetUtils.showFoodlyBottomSheet<int>(
         context: context,
         builder: (_) => KcalEstimateModal(estimate: estimate),
       );
       if (result != null) {
         _kcalController.text = result.toString();
+      }
+      if (!isSubscribed && userId != null) {
+        await AiUsageService.incrementKcal(userId);
       }
     } on RateLimitException catch (e) {
       if (!mounted) {
