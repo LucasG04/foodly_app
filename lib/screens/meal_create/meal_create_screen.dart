@@ -425,27 +425,17 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       meal.ingredients = [];
       meal.tags = [];
       return meal;
-    } else if (widget.id.startsWith('https') &&
-        Uri.decodeComponent(widget.id).startsWith(kChefkochShareEndpoint)) {
+    } else if (widget.id.startsWith('https')) {
+      // Shared URL: open the import modal pre-filled, choosing the type by host.
       _isCreatingMeal = true;
-      final langCode = context.locale.languageCode;
-      final meal = await LunixApiService.getMealFromUrl(
-        Uri.decodeComponent(widget.id),
-        langCode,
-      );
-      if (meal != null) {
-        meal.imageUrl = meal.imageUrl!.replaceFirst('http:', 'https:');
-        _titleController.text = meal.name;
-        _sourceController.text = meal.source ?? '';
-        _onSourceTextChange(meal.source ?? '');
-        _durationController.text = (meal.duration ?? '').toString();
-        _kcalController.text = (meal.kcal ?? '').toString();
-        _instructionsController.text = meal.instructions ?? '';
-        meal.ingredients = meal.ingredients ?? [];
-        meal.tags = meal.tags ?? [];
-        _originalMeal = Meal.fromMap(meal.id, meal.toMap());
-        ref.read(_$meal.notifier).state = meal;
-      }
+      final url = Uri.decodeComponent(widget.id);
+      final type = BasicUtils.isValidInstagramUrl(url)
+          ? ImportType.instagram
+          : ImportType.link;
+      final meal = ref.read(_$meal.notifier).state;
+      meal.ingredients = [];
+      meal.tags = [];
+      BasicUtils.afterBuild(() => _startSharedUrlImport(type, url));
       return meal;
     } else {
       _isCreatingMeal = false;
@@ -677,10 +667,31 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     );
   }
 
-  void _openImportModal(ImportType type) async {
+  /// Opens the import modal for a shared URL, gating Instagram imports behind
+  /// the AI usage quota just like the in-app Instagram import button. Awaits the
+  /// first usage value: on the share flow this runs right after the screen opens,
+  /// before the streamed usage has arrived, so reading it synchronously would
+  /// see null and skip the gate.
+  Future<void> _startSharedUrlImport(ImportType type, String url) async {
+    if (type == ImportType.instagram) {
+      final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
+      final usage = await ref.read(aiUsageProvider.future);
+      if (!mounted) {
+        return;
+      }
+      final canUse = usage?.canUseInstagram(isSubscribed) ?? true;
+      if (!canUse) {
+        _showAiQuotaExhausted();
+        return;
+      }
+    }
+    _openImportModal(type, initialUrl: url);
+  }
+
+  void _openImportModal(ImportType type, {String? initialUrl}) async {
     final result = await WidgetUtils.showFoodlyBottomSheet<Meal>(
       context: context,
-      builder: (_) => ImportModal(type: type),
+      builder: (_) => ImportModal(type: type, initialUrl: initialUrl),
     );
 
     if (result != null && mounted) {

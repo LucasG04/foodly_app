@@ -40,7 +40,11 @@ enum _EnrichStep { polishing, sorting, image }
 class ImportModal extends ConsumerStatefulWidget {
   final ImportType type;
 
-  const ImportModal({required this.type, super.key});
+  /// When supplied, the input is pre-filled with this URL and the import is
+  /// started automatically once the modal has built (used for shared URLs).
+  final String? initialUrl;
+
+  const ImportModal({required this.type, this.initialUrl, super.key});
 
   @override
   ConsumerState<ImportModal> createState() => _ImportModalState();
@@ -87,10 +91,15 @@ class _ImportModalState extends ConsumerState<ImportModal>
 
   @override
   void initState() {
-    _controller = TextEditingController();
+    _controller = TextEditingController(text: widget.initialUrl ?? '');
     _errorText = null;
     _buttonState = ButtonState.normal;
     super.initState();
+
+    // Shared URL: start the import automatically once the modal has built.
+    if ((widget.initialUrl ?? '').isNotEmpty) {
+      BasicUtils.afterBuild(_importMeal);
+    }
   }
 
   @override
