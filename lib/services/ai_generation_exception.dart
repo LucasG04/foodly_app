@@ -1,15 +1,14 @@
+import '../models/meal_generation_event.dart';
+
 /// Thrown before any stream content is received when the server rejects the
 /// input as not food-related (HTTP 422), e.g. with code `NOT_FOOD_RELATED`.
 class AIRejectionException implements Exception {
-  /// Server code for input the model judged not to be a recipe.
-  static const String notFoodRelated = 'NOT_FOOD_RELATED';
-
-  final String code;
+  final MealGenerationErrorCode code;
 
   const AIRejectionException(this.code);
 
   @override
-  String toString() => 'AIRejectionException($code)';
+  String toString() => 'AIRejectionException(${code.wireValue})';
 }
 
 /// Generic failure before the stream starts (HTTP 400, other non-200, or a

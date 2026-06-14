@@ -79,6 +79,18 @@ void main() {
       expect(group.productGroup, 'Dairy');
     });
 
+    test('parses enrichment.group', () {
+      final event = MealGenerationEvent.fromJson(<String, dynamic>{
+        'type': 'enrichment.group',
+        'index': 0,
+        'group': 'Sauce',
+      });
+      expect(event, isA<GroupEvent>());
+      final e = event as GroupEvent;
+      expect(e.index, 0);
+      expect(e.group, 'Sauce');
+    });
+
     test('parses enrichment.image with url', () {
       final event = MealGenerationEvent.fromJson(<String, dynamic>{
         'type': 'enrichment.image',
@@ -102,19 +114,30 @@ void main() {
       expect(event, isA<DoneEvent>());
     });
 
-    test('parses error with code', () {
+    test('parses error with a known code', () {
+      final event = MealGenerationEvent.fromJson(<String, dynamic>{
+        'type': 'error',
+        'code': 'INSTAGRAM_FETCH_FAILED',
+      });
+      expect(event, isA<ErrorEvent>());
+      expect(
+        (event as ErrorEvent).code,
+        MealGenerationErrorCode.instagramFetchFailed,
+      );
+    });
+
+    test('maps an unrecognized error code to unknown', () {
       final event = MealGenerationEvent.fromJson(<String, dynamic>{
         'type': 'error',
         'code': 'SOME_CODE',
       });
-      expect(event, isA<ErrorEvent>());
-      expect((event as ErrorEvent).code, 'SOME_CODE');
+      expect((event as ErrorEvent).code, MealGenerationErrorCode.unknown);
     });
 
-    test('error defaults code to UNKNOWN when missing', () {
+    test('error defaults code to unknown when missing', () {
       final event =
           MealGenerationEvent.fromJson(<String, dynamic>{'type': 'error'});
-      expect((event as ErrorEvent).code, 'UNKNOWN');
+      expect((event as ErrorEvent).code, MealGenerationErrorCode.unknown);
     });
 
     test('maps unknown type to MealGenerationUnknownEvent (forward compat)', () {

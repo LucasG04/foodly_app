@@ -32,6 +32,9 @@ class AiUsageService {
   static Future<void> incrementText(String userId) =>
       _increment(userId, 'textUsed');
 
+  static Future<void> incrementInstagram(String userId) =>
+      _increment(userId, 'instagramUsed');
+
   static Future<void> _increment(String userId, String field) async {
     final docRef = _collection.doc(userId);
     final periodKey = AiUsagePeriod.currentPeriodKey();
@@ -43,6 +46,7 @@ class AiUsageService {
             'periodKey': periodKey,
             'kcalUsed': field == 'kcalUsed' ? 1 : 0,
             'textUsed': field == 'textUsed' ? 1 : 0,
+            'instagramUsed': field == 'instagramUsed' ? 1 : 0,
           });
         } else {
           tx.update(docRef, <String, dynamic>{

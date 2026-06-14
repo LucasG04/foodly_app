@@ -25,10 +25,17 @@ import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
-enum ImportType { link, text }
+enum ImportType { link, text, instagram }
 
-/// Phases of the streaming text-import build-up.
-enum _GenPhase { input, generating, enriching, done }
+/// Phases of the streaming import build-up. [scraping] only occurs for the
+/// Instagram import, while the post/reel is being fetched.
+enum _GenPhase { input, scraping, generating, enriching, done }
+
+/// Sub-steps within [_GenPhase.enriching], each surfaced with its own status
+/// copy. Derived from the enrichment events as they stream in. Ordered: the
+/// step only ever advances forward (enrichment events may interleave / arrive
+/// out of order, so a plain "latest event wins" would flicker the label).
+enum _EnrichStep { polishing, sorting, image }
 
 class ImportModal extends ConsumerStatefulWidget {
   final ImportType type;
@@ -47,6 +54,8 @@ class _ImportModalState extends ConsumerState<ImportModal>
 
   // Streaming build-up state (text import only).
   _GenPhase _phase = _GenPhase.input;
+  // Current sub-step while [_phase] is [_GenPhase.enriching]. Only advances.
+  _EnrichStep _enrichStep = _EnrichStep.polishing;
   // Set shortly after submit (once the fields have collapsed) so the button
   // morphs into the loader after the title/field leave, not at the same time.
   bool _buttonLoading = false;
@@ -92,6 +101,10 @@ class _ImportModalState extends ConsumerState<ImportModal>
     super.dispose();
   }
 
+  /// The text and Instagram imports both stream their result; the link import
+  /// is a one-shot request with a static layout.
+  bool get _isStreaming => widget.type != ImportType.link;
+
   @override
   Widget build(BuildContext context) {
     final width = mediaSize.width > 599 ? 580.0 : mediaSize.width * 0.8;
@@ -100,7 +113,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
       padding: EdgeInsets.symmetric(
         horizontal: (mediaSize.width - width) / 2,
       ),
-      child: widget.type == ImportType.link
+      child: !_isStreaming
           ? _buildInput()
           : AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
@@ -144,25 +157,39 @@ class _ImportModalState extends ConsumerState<ImportModal>
   }
 
   Widget _buildTextField() {
-    return widget.type == ImportType.link
-        ? MainTextField(
-            controller: _controller,
-            title: 'import_modal_link_title'.tr(),
-            placeholder:
-                'https://www.chefkoch.de/rezepte/2280941363879458/Brokkoli-Spaetzle-Pfanne.html',
-            errorText: _errorText,
-            onSubmit: _importMeal,
-            pasteFromClipboard: true,
-            pasteValidator: (text) => BasicUtils.isValidUri(text),
-            submitOnPaste: true,
-          )
-        : MainTextField(
-            controller: _controller,
-            title: 'import_modal_text_title'.tr(),
-            placeholder: 'import_modal_text_hint'.tr(),
-            errorText: _errorText,
-            isMultiline: true,
-          );
+    switch (widget.type) {
+      case ImportType.link:
+        return MainTextField(
+          controller: _controller,
+          title: 'import_modal_link_title'.tr(),
+          placeholder:
+              'https://www.chefkoch.de/rezepte/2280941363879458/Brokkoli-Spaetzle-Pfanne.html',
+          errorText: _errorText,
+          onSubmit: _importMeal,
+          pasteFromClipboard: true,
+          pasteValidator: (text) => BasicUtils.isValidUri(text),
+          submitOnPaste: true,
+        );
+      case ImportType.instagram:
+        return MainTextField(
+          controller: _controller,
+          title: 'import_modal_instagram_title'.tr(),
+          placeholder: 'instagram.com/reel/DVOxtiijAB-/',
+          errorText: _errorText,
+          onSubmit: _importMeal,
+          pasteFromClipboard: true,
+          pasteValidator: (text) => BasicUtils.isValidInstagramUrl(text),
+          submitOnPaste: true,
+        );
+      case ImportType.text:
+        return MainTextField(
+          controller: _controller,
+          title: 'import_modal_text_title'.tr(),
+          placeholder: 'import_modal_text_hint'.tr(),
+          errorText: _errorText,
+          isMultiline: true,
+        );
+    }
   }
 
   Widget _buildKeyboardSpacer() {
@@ -266,13 +293,39 @@ class _ImportModalState extends ConsumerState<ImportModal>
           const SizedBox(width: kPadding / 2),
           Flexible(
             child: Text(
-              'import_modal_generating'.tr(),
+              _loaderLabel(),
               style: const TextStyle(color: kLightTextColor),
             ),
           ),
         ],
       ),
     );
+  }
+
+  /// Pre-content loader label: while an Instagram post is being scraped we say
+  /// so explicitly; otherwise it's the generic "reading your recipe" copy.
+  String _loaderLabel() => _phase == _GenPhase.scraping
+      ? 'import_modal_scraping'.tr()
+      : 'import_modal_generating'.tr();
+
+  /// Status copy for the current enrichment sub-step.
+  String _enrichLabel() {
+    switch (_enrichStep) {
+      case _EnrichStep.sorting:
+        return 'import_modal_enriching_groups'.tr();
+      case _EnrichStep.image:
+        return 'import_modal_enriching_image'.tr();
+      case _EnrichStep.polishing:
+        return 'import_modal_enriching'.tr();
+    }
+  }
+
+  /// Advances the enrichment sub-step forward only — enrichment events can
+  /// interleave or arrive out of order, so the label must not jump backwards.
+  void _advanceEnrichStep(_EnrichStep step) {
+    if (step.index > _enrichStep.index) {
+      _enrichStep = step;
+    }
   }
 
   bool get _hasContent =>
@@ -500,8 +553,8 @@ class _ImportModalState extends ConsumerState<ImportModal>
     switch (_phase) {
       case _GenPhase.enriching:
         return _statusRow(
-          const ValueKey('enriching'),
-          'import_modal_enriching'.tr(),
+          ValueKey('enriching-${_enrichStep.name}'),
+          _enrichLabel(),
         );
       case _GenPhase.done:
         return Row(
@@ -524,6 +577,11 @@ class _ImportModalState extends ConsumerState<ImportModal>
               ),
             ),
           ],
+        );
+      case _GenPhase.scraping:
+        return _statusRow(
+          const ValueKey('scraping'),
+          'import_modal_scraping'.tr(),
         );
       case _GenPhase.generating:
       case _GenPhase.input:
@@ -550,7 +608,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
     if (widget.type == ImportType.link) {
       await _importFromLink();
     } else {
-      _importFromText();
+      _importStreaming();
     }
   }
 
@@ -588,16 +646,21 @@ class _ImportModalState extends ConsumerState<ImportModal>
     }
   }
 
-  void _importFromText() {
+  void _importStreaming() {
     if (_phase != _GenPhase.input) {
       return; // already submitting / streaming
     }
-    final text = _controller.text.trim();
+    final input = _controller.text.trim();
 
-    if (text.isEmpty) {
+    final isInstagram = widget.type == ImportType.instagram;
+    final isInvalid =
+        isInstagram ? !BasicUtils.isValidInstagramUrl(input) : input.isEmpty;
+    if (isInvalid) {
       setState(() {
         _buttonState = ButtonState.error;
-        _errorText = 'import_modal_error_no_text'.tr();
+        _errorText = isInstagram
+            ? 'import_modal_error_no_instagram'.tr()
+            : 'import_modal_error_no_text'.tr();
       });
       return;
     }
@@ -606,6 +669,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
     setState(() {
       _errorText = null;
       _phase = _GenPhase.generating; // collapses the title + field
+      _enrichStep = _EnrichStep.polishing;
       _partialWarning = false;
     });
 
@@ -617,7 +681,13 @@ class _ImportModalState extends ConsumerState<ImportModal>
     });
 
     final langCode = context.locale.languageCode;
-    LunixApiService.streamMealFromText(text, langCode)
+    LunixApiService.streamGeneratedMeal(
+      source: isInstagram
+          ? MealGenerationSource.instagram
+          : MealGenerationSource.text,
+      data: input,
+      langCode: langCode,
+    )
         .listen(
           _onEvent,
           onError: _onStreamSetupError,
@@ -648,22 +718,32 @@ class _ImportModalState extends ConsumerState<ImportModal>
           // append-only [_GenerationIngredientList] relies on this; only
           // enrichment (product group / image) is allowed out of order.
           _ingredients[index] = ingredient;
+        case PhaseEvent(value: 'scraping'):
+          _phase = _GenPhase.scraping;
         case PhaseEvent(value: 'enriching'):
           _phase = _GenPhase.enriching;
         case PhaseEvent():
           break;
+        case GroupEvent(:final index, :final group):
+          _advanceEnrichStep(_EnrichStep.sorting);
+          final existing = _ingredients[index];
+          if (existing != null) {
+            _ingredients[index] = existing.copyWith(group: group);
+          }
         case ProductGroupEvent(:final index, :final productGroup):
+          _advanceEnrichStep(_EnrichStep.sorting);
           final existing = _ingredients[index];
           if (existing != null) {
             _ingredients[index] = existing.copyWith(productGroup: productGroup);
           }
         case ImageEvent(:final imageUrl):
+          _advanceEnrichStep(_EnrichStep.image);
           _imageUrl = imageUrl;
           _imageResolved = true;
         case DoneEvent():
           _phase = _GenPhase.done;
           _schedulePop();
-        case ErrorEvent():
+        case ErrorEvent(:final code):
           if (_hasContent) {
             // Mid-stream error / premature close after partial content: keep
             // what we have, warn, and still hand it off.
@@ -683,7 +763,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
             _buttonState = ButtonState.error;
             MainSnackbar(
               isError: true,
-              message: 'import_modal_error_generation'.tr(),
+              message: _messageForErrorCode(code),
               isDismissible: true,
             ).show(context);
           }
@@ -701,9 +781,8 @@ class _ImportModalState extends ConsumerState<ImportModal>
     if (!mounted) {
       return;
     }
-    final message = error is AIRejectionException &&
-            error.code == AIRejectionException.notFoodRelated
-        ? 'import_modal_error_not_food'.tr()
+    final message = error is AIRejectionException
+        ? _messageForErrorCode(error.code)
         : 'import_modal_error_generation'.tr();
     MainSnackbar(
       isError: true,
@@ -715,6 +794,20 @@ class _ImportModalState extends ConsumerState<ImportModal>
       _buttonLoading = false;
       _buttonState = ButtonState.error;
     });
+  }
+
+  /// Friendly, code-specific copy for a terminal generation failure.
+  String _messageForErrorCode(MealGenerationErrorCode code) {
+    switch (code) {
+      case MealGenerationErrorCode.notFoodRelated:
+        return 'import_modal_error_not_food'.tr();
+      case MealGenerationErrorCode.instagramFetchFailed:
+        return 'import_modal_error_instagram_fetch'.tr();
+      case MealGenerationErrorCode.internal:
+      case MealGenerationErrorCode.streamInterrupted:
+      case MealGenerationErrorCode.unknown:
+        return 'import_modal_error_generation'.tr();
+    }
   }
 
   /// Closes the modal shortly after completion so the finished build-up is

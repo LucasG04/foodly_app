@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:keyboard_service/keyboard_service.dart';
+import 'package:simple_icons/simple_icons.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -359,9 +360,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
           onPressed: canUse ? _estimateKcal : _showAiQuotaExhausted,
           icon: Icon(
             Icons.auto_awesome,
-            color: canUse
-                ? Theme.of(context).colorScheme.primary
-                : Colors.grey,
+            color: canUse ? Theme.of(context).colorScheme.primary : Colors.grey,
           ),
           tooltip: showBadge
               ? 'ai_usage_remaining'.tr(args: [usage.kcalRemaining.toString()])
@@ -608,7 +607,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
   void _openImport() {
     final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
     final usage = ref.read(aiUsageProvider).valueOrNull;
-    final showTextBadge = !isSubscribed && usage != null;
+    final showQuotaBadges = !isSubscribed && usage != null;
     WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) => OptionsSheet(
@@ -621,8 +620,17 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
           OptionsSheetOptions(
             icon: EvaIcons.fileTextOutline,
             title: 'import_options_text'.tr(),
-            trailing: showTextBadge ? _buildQuotaPill(usage.textRemaining) : null,
+            trailing:
+                showQuotaBadges ? _buildQuotaPill(usage.textRemaining) : null,
             onTap: _onTapTextImport,
+          ),
+          OptionsSheetOptions(
+            icon: SimpleIcons.instagram,
+            title: 'import_options_instagram'.tr(),
+            trailing: showQuotaBadges
+                ? _buildQuotaPill(usage.instagramRemaining)
+                : null,
+            onTap: _onTapInstagramImport,
           ),
         ],
       ),
@@ -638,6 +646,17 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       return;
     }
     _openImportModal(ImportType.text);
+  }
+
+  void _onTapInstagramImport() {
+    final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
+    final usage = ref.read(aiUsageProvider).valueOrNull;
+    final canUse = usage?.canUseInstagram(isSubscribed) ?? true;
+    if (!canUse) {
+      _showAiQuotaExhausted();
+      return;
+    }
+    _openImportModal(ImportType.instagram);
   }
 
   Widget _buildQuotaPill(int remaining) {
@@ -680,13 +699,17 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       meal.tags = result.tags;
       ref.read(_$meal.notifier).state = Meal.fromMap(meal.id, meal.toMap());
 
-      // A text import that returned a meal means a successful AI generation —
-      // count it against the free quota (premium is unlimited).
-      if (type == ImportType.text) {
+      // A text/Instagram import that returned a meal means a successful AI
+      // generation — count it against the free quota (premium is unlimited).
+      if (type == ImportType.text || type == ImportType.instagram) {
         final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
         final userId = ref.read(userProvider)?.id;
         if (!isSubscribed && userId != null) {
-          await AiUsageService.incrementText(userId);
+          if (type == ImportType.instagram) {
+            await AiUsageService.incrementInstagram(userId);
+          } else {
+            await AiUsageService.incrementText(userId);
+          }
         }
       }
     }

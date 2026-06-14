@@ -23,7 +23,6 @@ import '../utils/env.dart';
 import 'ai_generation_exception.dart';
 import 'meal_service.dart';
 import 'rate_limit_exception.dart';
-import 'settings_service.dart';
 
 class LunixApiService {
   LunixApiService._();
@@ -40,11 +39,13 @@ class LunixApiService {
   );
 
   static Dio get dio => _dio;
-  static String get _lunixApiKey =>
-      SettingsService.useDevApi ? Env.lunixApiKeyDev : Env.lunixApiKey;
-  static String get apiEndpoint => SettingsService.useDevApi
-      ? 'https://lunix-api-dev.golenia.dev/foodly'
-      : 'https://lunix-api.golenia.dev/foodly';
+  static String get _lunixApiKey => '123';
+  static String get apiEndpoint => 'http://localhost:3001/foodly';
+  // static String get _lunixApiKey =>
+  //     SettingsService.useDevApi ? Env.lunixApiKeyDev : Env.lunixApiKey;
+  // static String get apiEndpoint => SettingsService.useDevApi
+  //     ? 'https://lunix-api-dev.golenia.dev/foodly'
+  //     : 'https://lunix-api.golenia.dev/foodly';
 
   static Future<bool> lunixApiAvailable() async {
     Response? response;
@@ -397,7 +398,8 @@ class LunixApiService {
     }
   }
 
-  /// Streams a meal generated from free [text] as a sequence of typed events
+  /// Streams a meal generated from [data] — either free recipe text or an
+  /// Instagram post/reel URL, per [source] — as a sequence of typed events
   /// (NDJSON). Fields, ingredients and enrichment (product groups, image)
   /// arrive incrementally; the stream is terminated by a [DoneEvent] or an
   /// [ErrorEvent].
@@ -410,18 +412,20 @@ class LunixApiService {
   /// Failures that occur after the stream started (a server `error` event or a
   /// premature close) are delivered as an [ErrorEvent] so partial content can
   /// be kept.
-  static Stream<MealGenerationEvent> streamMealFromText(
-    String text,
-    String langCode,
-  ) async* {
-    _log.finer('Call streamMealFromText()');
+  static Stream<MealGenerationEvent> streamGeneratedMeal({
+    required MealGenerationSource source,
+    required String data,
+    required String langCode,
+  }) async* {
+    _log.finer('Call streamGeneratedMeal()');
 
     final Response<ResponseBody> response;
     try {
       response = await _dio.post<ResponseBody>(
-        '$apiEndpoint/generate-meal-from-text',
+        '$apiEndpoint/generate-meal',
         data: <String, dynamic>{
-          'text': text,
+          'type': source.wireValue,
+          'data': data,
           'language': langCode,
         },
         options: Options(
@@ -432,7 +436,7 @@ class LunixApiService {
         ),
       );
     } on DioException catch (e) {
-      _log.severe('ERR in streamMealFromText (transport)', e);
+      _log.severe('ERR in streamGeneratedMeal (transport)', e);
       throw const ApiException('transport');
     }
 
@@ -442,11 +446,11 @@ class LunixApiService {
     // --- Pre-stream error handling (no partial content yet) ---
     if (status == 422) {
       final body = await _collectBody(byteStream);
-      var code = AIRejectionException.notFoodRelated;
+      var code = MealGenerationErrorCode.notFoodRelated;
       try {
         final decoded = jsonDecode(body);
         if (decoded is Map && decoded['code'] is String) {
-          code = decoded['code'] as String;
+          code = MealGenerationErrorCode.fromWire(decoded['code'] as String);
         }
       } catch (_) {
         // keep default code
@@ -491,14 +495,14 @@ class LunixApiService {
       _log.severe('ERR while reading meal stream', e);
       if (!sawTerminal) {
         // Premature close / read error: keep partial content, signal error.
-        yield const ErrorEvent(code: 'STREAM_INTERRUPTED');
+        yield const ErrorEvent(code: MealGenerationErrorCode.streamInterrupted);
       }
       return;
     }
 
     // Stream ended without a terminal event → premature close.
     if (!sawTerminal) {
-      yield const ErrorEvent(code: 'STREAM_INTERRUPTED');
+      yield const ErrorEvent(code: MealGenerationErrorCode.streamInterrupted);
     }
   }
 
