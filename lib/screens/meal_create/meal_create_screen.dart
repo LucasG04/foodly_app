@@ -1,16 +1,19 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:keyboard_service/keyboard_service.dart';
+import 'package:simple_icons/simple_icons.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
 import '../../models/ingredient.dart';
 import '../../models/meal.dart';
 import '../../providers/state_providers.dart';
+import '../../services/ai_usage_service.dart';
 import '../../services/authentication_service.dart';
 import '../../services/in_app_purchase_service.dart';
 import '../../services/link_metadata_service.dart';
@@ -18,6 +21,7 @@ import '../../services/lunix_api_service.dart';
 import '../../services/meal_service.dart';
 import '../../services/rate_limit_exception.dart';
 import '../../services/storage_service.dart';
+import '../../utils/ai_usage_period.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
@@ -29,13 +33,15 @@ import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/markdown_editor.dart';
 import '../../widgets/meal_tag.dart';
+import '../../widgets/options_modal/options_modal.dart';
+import '../../widgets/options_modal/options_modal_option.dart';
 import '../../widgets/progress_button.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import '../../widgets/small_number_input.dart';
 import '../../widgets/wrapped_image_picker/wrapped_image_picker.dart';
-import 'chefkoch_import_modal.dart';
 import 'edit_ingredients.dart';
 import 'edit_list_content_modal.dart';
+import 'import_modal.dart';
 import 'kcal_estimate_modal.dart';
 import 'save_changes_modal.dart';
 
@@ -142,7 +148,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                   EvaIcons.downloadOutline,
                   color: theme.textTheme.bodyLarge!.color,
                 ),
-                onPressed: () => _openChefkochImport(),
+                onPressed: () => _openImport(),
               ),
             ],
             onPopRejected: () {
@@ -346,6 +352,32 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       builder: (context, ref, _) {
         final isSubscribed = ref.watch(InAppPurchaseService.$userIsSubscribed);
         final isAiLoading = ref.watch(_$isAiLoading);
+        final usage = ref.watch(aiUsageProvider).valueOrNull;
+        final canUse = usage?.canUseKcal(isSubscribed) ?? true;
+        final showBadge = !isSubscribed && usage != null;
+
+        Widget aiButton = IconButton(
+          onPressed: canUse ? _estimateKcal : _showAiQuotaExhausted,
+          icon: Icon(
+            Icons.auto_awesome,
+            color: canUse ? Theme.of(context).colorScheme.primary : Colors.grey,
+          ),
+          tooltip: showBadge
+              ? 'ai_usage_remaining'.tr(args: [usage.kcalRemaining.toString()])
+              : 'meal_create_kcal_ai_button'.tr(),
+        );
+        if (showBadge) {
+          aiButton = badges.Badge(
+            badgeStyle: const badges.BadgeStyle(badgeColor: kPremiumColor),
+            position: badges.BadgePosition.topEnd(top: -4, end: -2),
+            badgeContent: Text(
+              usage.kcalRemaining.toString(),
+              style: const TextStyle(color: kPrimaryColor, fontSize: 10),
+            ),
+            child: aiButton,
+          );
+        }
+
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),
           child: isAiLoading
@@ -357,20 +389,26 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                     child: SmallCircularProgressIndicator(),
                   ),
                 )
-              : IconButton(
+              : KeyedSubtree(
                   key: const ValueKey('ai'),
-                  onPressed: isSubscribed ? _estimateKcal : _openGetPremium,
-                  icon: Icon(
-                    Icons.auto_awesome,
-                    color: isSubscribed
-                        ? Theme.of(context).colorScheme.primary
-                        : Colors.grey,
-                  ),
-                  tooltip: 'meal_create_kcal_ai_button'.tr(),
+                  child: aiButton,
                 ),
         );
       },
     );
+  }
+
+  void _showAiQuotaExhausted() {
+    final resetDate = DateFormat.yMMMMd(context.locale.toLanguageTag())
+        .format(AiUsagePeriod.currentPeriodEnd());
+    MainSnackbar(
+      message: 'ai_usage_exhausted'.tr(args: [resetDate]),
+      isError: true,
+      action: TextButton(
+        onPressed: _openGetPremium,
+        child: Text('ai_usage_upgrade'.tr()),
+      ),
+    ).show(context);
   }
 
   Center _buildDivider() => Center(
@@ -387,27 +425,17 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       meal.ingredients = [];
       meal.tags = [];
       return meal;
-    } else if (widget.id.startsWith('https') &&
-        Uri.decodeComponent(widget.id).startsWith(kChefkochShareEndpoint)) {
+    } else if (widget.id.startsWith('https')) {
+      // Shared URL: open the import modal pre-filled, choosing the type by host.
       _isCreatingMeal = true;
-      final langCode = context.locale.languageCode;
-      final meal = await LunixApiService.getMealFromUrl(
-        Uri.decodeComponent(widget.id),
-        langCode,
-      );
-      if (meal != null) {
-        meal.imageUrl = meal.imageUrl!.replaceFirst('http:', 'https:');
-        _titleController.text = meal.name;
-        _sourceController.text = meal.source ?? '';
-        _onSourceTextChange(meal.source ?? '');
-        _durationController.text = (meal.duration ?? '').toString();
-        _kcalController.text = (meal.kcal ?? '').toString();
-        _instructionsController.text = meal.instructions ?? '';
-        meal.ingredients = meal.ingredients ?? [];
-        meal.tags = meal.tags ?? [];
-        _originalMeal = Meal.fromMap(meal.id, meal.toMap());
-        ref.read(_$meal.notifier).state = meal;
-      }
+      final url = Uri.decodeComponent(widget.id);
+      final type = BasicUtils.isValidInstagramUrl(url)
+          ? ImportType.instagram
+          : ImportType.link;
+      final meal = ref.read(_$meal.notifier).state;
+      meal.ingredients = [];
+      meal.tags = [];
+      BasicUtils.afterBuild(() => _startSharedUrlImport(type, url));
       return meal;
     } else {
       _isCreatingMeal = false;
@@ -566,27 +594,135 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
             _originalMeal.ingredientGroupOrder ?? []);
   }
 
-  void _openChefkochImport() async {
+  void _openImport() {
+    final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
+    final usage = ref.read(aiUsageProvider).valueOrNull;
+    final showQuotaBadges = !isSubscribed && usage != null;
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => OptionsSheet(
+        options: [
+          OptionsSheetOptions(
+            icon: EvaIcons.link2Outline,
+            title: 'import_options_link'.tr(),
+            onTap: () => _openImportModal(ImportType.link),
+          ),
+          OptionsSheetOptions(
+            icon: EvaIcons.fileTextOutline,
+            title: 'import_options_text'.tr(),
+            trailing:
+                showQuotaBadges ? _buildQuotaPill(usage.textRemaining) : null,
+            onTap: _onTapTextImport,
+          ),
+          OptionsSheetOptions(
+            icon: SimpleIcons.instagram,
+            title: 'import_options_instagram'.tr(),
+            trailing: showQuotaBadges
+                ? _buildQuotaPill(usage.instagramRemaining)
+                : null,
+            onTap: _onTapInstagramImport,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _onTapTextImport() {
+    final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
+    final usage = ref.read(aiUsageProvider).valueOrNull;
+    final canUse = usage?.canUseText(isSubscribed) ?? true;
+    if (!canUse) {
+      _showAiQuotaExhausted();
+      return;
+    }
+    _openImportModal(ImportType.text);
+  }
+
+  void _onTapInstagramImport() {
+    final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
+    final usage = ref.read(aiUsageProvider).valueOrNull;
+    final canUse = usage?.canUseInstagram(isSubscribed) ?? true;
+    if (!canUse) {
+      _showAiQuotaExhausted();
+      return;
+    }
+    _openImportModal(ImportType.instagram);
+  }
+
+  Widget _buildQuotaPill(int remaining) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: kPremiumColor,
+        borderRadius: BorderRadius.circular(kRadius),
+      ),
+      child: Text(
+        remaining.toString(),
+        style: const TextStyle(
+          color: kPrimaryColor,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  /// Opens the import modal for a shared URL, gating Instagram imports behind
+  /// the AI usage quota just like the in-app Instagram import button. Awaits the
+  /// first usage value: on the share flow this runs right after the screen opens,
+  /// before the streamed usage has arrived, so reading it synchronously would
+  /// see null and skip the gate.
+  Future<void> _startSharedUrlImport(ImportType type, String url) async {
+    if (type == ImportType.instagram) {
+      final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
+      final usage = await ref.read(aiUsageProvider.future);
+      if (!mounted) {
+        return;
+      }
+      final canUse = usage?.canUseInstagram(isSubscribed) ?? true;
+      if (!canUse) {
+        _showAiQuotaExhausted();
+        return;
+      }
+    }
+    _openImportModal(type, initialUrl: url);
+  }
+
+  void _openImportModal(ImportType type, {String? initialUrl}) async {
     final result = await WidgetUtils.showFoodlyBottomSheet<Meal>(
       context: context,
-      builder: (_) => const ChefkochImportModal(),
+      builder: (_) => ImportModal(type: type, initialUrl: initialUrl),
     );
 
-    if (result != null) {
+    if (result != null && mounted) {
       final meal = ref.read(_$meal.notifier).state;
       _titleController.text = result.name;
       meal.name = result.name;
       meal.imageUrl = result.imageUrl;
-      _sourceController.text = result.source!;
-      _onSourceTextChange(result.source!);
+      _sourceController.text = result.source ?? '';
+      _onSourceTextChange(result.source ?? '');
       _durationController.text = (result.duration ?? '').toString();
       _kcalController.text = (result.kcal ?? '').toString();
-      _instructionsController.text = result.instructions!;
+      _instructionsController.text = result.instructions ?? '';
       meal.instructions = result.instructions;
       meal.ingredients = result.ingredients ?? [];
       meal.servings = result.servings < 1 ? 1 : result.servings;
       meal.tags = result.tags;
       ref.read(_$meal.notifier).state = Meal.fromMap(meal.id, meal.toMap());
+
+      // A text/Instagram import that returned a meal means a successful AI
+      // generation — count it against the free quota (premium is unlimited).
+      if (type == ImportType.text || type == ImportType.instagram) {
+        final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
+        final userId = ref.read(userProvider)?.id;
+        if (!isSubscribed && userId != null) {
+          if (type == ImportType.instagram) {
+            await AiUsageService.incrementInstagram(userId);
+          } else {
+            await AiUsageService.incrementText(userId);
+          }
+        }
+      }
     }
   }
 
@@ -718,12 +854,20 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       if (!mounted) {
         return;
       }
+      // The AI call succeeded — count it against the free quota (premium is
+      // unlimited). Captured before the modal await so we never touch `ref`
+      // after the widget may have been disposed.
+      final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
+      final userId = ref.read(userProvider)?.id;
       final result = await WidgetUtils.showFoodlyBottomSheet<int>(
         context: context,
         builder: (_) => KcalEstimateModal(estimate: estimate),
       );
       if (result != null) {
         _kcalController.text = result.toString();
+      }
+      if (!isSubscribed && userId != null) {
+        await AiUsageService.incrementKcal(userId);
       }
     } on RateLimitException catch (e) {
       if (!mounted) {

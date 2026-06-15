@@ -415,13 +415,8 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       return;
     }
 
-    if (sharedText.contains(kChefkochShareEndpoint)) {
-      final extractedLink = sharedText.contains(' ')
-          ? sharedText
-              .substring(sharedText.indexOf(kChefkochShareEndpoint))
-              .split(' ')[0]
-          : sharedText;
-
+    final extractedLink = BasicUtils.getUrlFromString(sharedText);
+    if (extractedLink != null && BasicUtils.isValidUri(extractedLink)) {
       _appRouter.navigate(
         MealCreateScreenRoute(id: Uri.encodeComponent(extractedLink)),
       );

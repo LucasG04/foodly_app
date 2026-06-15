@@ -14,11 +14,13 @@ import '../models/kcal_estimate.dart';
 import '../models/lunix_docx.dart';
 import '../models/lunix_image.dart';
 import '../models/meal.dart';
+import '../models/meal_generation_event.dart';
 import '../models/plan.dart';
 import '../models/plan_meal.dart';
 import '../models/upcoming_feature.dart';
 import '../utils/basic_utils.dart';
 import '../utils/env.dart';
+import 'ai_generation_exception.dart';
 import 'meal_service.dart';
 import 'rate_limit_exception.dart';
 import 'settings_service.dart';
@@ -393,6 +395,126 @@ class LunixApiService {
       _log.severe('ERR in getMealFromUrl with $url. API Request failed', e);
       return null;
     }
+  }
+
+  /// Streams a meal generated from [data] — either free recipe text or an
+  /// Instagram post/reel URL, per [source] — as a sequence of typed events
+  /// (NDJSON). Fields, ingredients and enrichment (product groups, image)
+  /// arrive incrementally; the stream is terminated by a [DoneEvent] or an
+  /// [ErrorEvent].
+  ///
+  /// Pre-stream failures surface as stream errors (this is an `async*` method,
+  /// so they reach the listener's `onError`, not a synchronous throw):
+  /// - [AIRejectionException] on HTTP 422 (e.g. `NOT_FOOD_RELATED`).
+  /// - [ApiException] on HTTP 400, other non-200, or a transport error.
+  ///
+  /// Failures that occur after the stream started (a server `error` event or a
+  /// premature close) are delivered as an [ErrorEvent] so partial content can
+  /// be kept.
+  static Stream<MealGenerationEvent> streamGeneratedMeal({
+    required MealGenerationSource source,
+    required String data,
+    required String langCode,
+  }) async* {
+    _log.finer('Call streamGeneratedMeal()');
+
+    final Response<ResponseBody> response;
+    try {
+      response = await _dio.post<ResponseBody>(
+        '$apiEndpoint/generate-meal',
+        data: <String, dynamic>{
+          'type': source.wireValue,
+          'data': data,
+          'language': langCode,
+        },
+        options: Options(
+          responseType: ResponseType.stream,
+          // Read 4xx bodies instead of throwing, so we can inspect 422/400.
+          validateStatus: (status) => status != null && status < 500,
+          headers: <String, dynamic>{'Accept': 'application/x-ndjson'},
+        ),
+      );
+    } on DioException catch (e) {
+      _log.severe('ERR in streamGeneratedMeal (transport)', e);
+      throw const ApiException('transport');
+    }
+
+    final status = response.statusCode ?? 0;
+    final byteStream = response.data!.stream;
+
+    // --- Pre-stream error handling (no partial content yet) ---
+    if (status == 422) {
+      final body = await _collectBody(byteStream);
+      var code = MealGenerationErrorCode.notFoodRelated;
+      try {
+        final decoded = jsonDecode(body);
+        if (decoded is Map && decoded['code'] is String) {
+          code = MealGenerationErrorCode.fromWire(decoded['code'] as String);
+        }
+      } catch (_) {
+        // keep default code
+      }
+      throw AIRejectionException(code);
+    }
+    if (status != 200) {
+      await _drain(byteStream);
+      throw ApiException('http_$status');
+    }
+
+    // --- Stream the NDJSON body ---
+    var sawTerminal = false; // a DoneEvent or ErrorEvent has been yielded
+    try {
+      final lines = byteStream
+          .cast<List<int>>()
+          .transform(utf8.decoder)
+          .transform(const LineSplitter());
+
+      await for (final line in lines) {
+        final trimmed = line.trim();
+        if (trimmed.isEmpty) {
+          continue;
+        }
+        final Map<String, dynamic> json;
+        try {
+          json = jsonDecode(trimmed) as Map<String, dynamic>;
+        } catch (e) {
+          _log.warning('Skipping malformed NDJSON line: $trimmed');
+          continue;
+        }
+        final event = MealGenerationEvent.fromJson(json);
+        if (event is DoneEvent || event is ErrorEvent) {
+          sawTerminal = true;
+        }
+        yield event;
+        if (sawTerminal) {
+          return; // nothing legal follows a terminal event
+        }
+      }
+    } catch (e) {
+      _log.severe('ERR while reading meal stream', e);
+      if (!sawTerminal) {
+        // Premature close / read error: keep partial content, signal error.
+        yield const ErrorEvent(code: MealGenerationErrorCode.streamInterrupted);
+      }
+      return;
+    }
+
+    // Stream ended without a terminal event → premature close.
+    if (!sawTerminal) {
+      yield const ErrorEvent(code: MealGenerationErrorCode.streamInterrupted);
+    }
+  }
+
+  static Future<String> _collectBody(Stream<List<int>> stream) async {
+    final chunks = await stream.toList();
+    return utf8.decode(
+      chunks.expand((chunk) => chunk).toList(),
+      allowMalformed: true,
+    );
+  }
+
+  static Future<void> _drain(Stream<List<int>> stream) async {
+    await stream.drain<void>();
   }
 
   static Future<List<String>> getSupportedImportSites() async {

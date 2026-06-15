@@ -52,6 +52,16 @@ class BasicUtils {
     return Uri.tryParse(uri)?.isAbsolute ?? false;
   }
 
+  static final RegExp _instagramPostExp = RegExp(
+    r'^https?:\/\/(www\.)?instagram\.com\/(p|reel|reels|tv)\/[\w-]+',
+    caseSensitive: false,
+  );
+
+  /// Whether [url] points at an Instagram post/reel that can be imported.
+  static bool isValidInstagramUrl(String url) {
+    return _instagramPostExp.hasMatch(url.trim());
+  }
+
   static List<DateTime> getPlanDateTimes(int hourDiffToUtc, {int amount = 8}) {
     final now = DateTime.now().toUtc().add(Duration(hours: hourDiffToUtc));
     final today = DateTime(now.year, now.month, now.day);
