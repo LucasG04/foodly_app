@@ -29,21 +29,19 @@ void main() {
   });
 
   group('isValidInstagramUrl', () {
-    test('accepts post, reel and tv URLs (with or without www/https)', () {
+    test('accepts various URLs', () {
       expect(
         BasicUtils.isValidInstagramUrl('https://www.instagram.com/p/Cxy123_-/'),
         isTrue,
       );
       expect(
-        BasicUtils.isValidInstagramUrl('https://instagram.com/reel/Cxy123/'),
+        BasicUtils.isValidInstagramUrl(
+            'https://instagram.com/reel/Cxy123?ig_sha=abc123'),
         isTrue,
       );
       expect(
-        BasicUtils.isValidInstagramUrl('http://www.instagram.com/reels/Abc9/'),
-        isTrue,
-      );
-      expect(
-        BasicUtils.isValidInstagramUrl('https://www.instagram.com/tv/Abc9'),
+        BasicUtils.isValidInstagramUrl(
+            'https://instagram.com/Cxy123?ig_sha=abc123'),
         isTrue,
       );
     });

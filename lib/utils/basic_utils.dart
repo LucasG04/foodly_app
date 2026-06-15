@@ -53,7 +53,7 @@ class BasicUtils {
   }
 
   static final RegExp _instagramPostExp = RegExp(
-    r'^https?:\/\/(www\.)?instagram\.com\/(p|reel|reels|tv)\/[\w-]+',
+    r'^https?:\/\/(www\.)?instagram\.com',
     caseSensitive: false,
   );
 
