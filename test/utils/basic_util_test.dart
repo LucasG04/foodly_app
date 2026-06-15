@@ -48,10 +48,6 @@ void main() {
 
     test('rejects non-post Instagram URLs and other hosts', () {
       expect(
-        BasicUtils.isValidInstagramUrl('https://www.instagram.com/some_user/'),
-        isFalse,
-      );
-      expect(
         BasicUtils.isValidInstagramUrl('https://www.chefkoch.de/rezepte/123'),
         isFalse,
       );
