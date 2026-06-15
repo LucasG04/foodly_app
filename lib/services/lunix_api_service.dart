@@ -23,6 +23,7 @@ import '../utils/env.dart';
 import 'ai_generation_exception.dart';
 import 'meal_service.dart';
 import 'rate_limit_exception.dart';
+import 'settings_service.dart';
 
 class LunixApiService {
   LunixApiService._();
@@ -39,13 +40,11 @@ class LunixApiService {
   );
 
   static Dio get dio => _dio;
-  static String get _lunixApiKey => '123';
-  static String get apiEndpoint => 'http://localhost:3001/foodly';
-  // static String get _lunixApiKey =>
-  //     SettingsService.useDevApi ? Env.lunixApiKeyDev : Env.lunixApiKey;
-  // static String get apiEndpoint => SettingsService.useDevApi
-  //     ? 'https://lunix-api-dev.golenia.dev/foodly'
-  //     : 'https://lunix-api.golenia.dev/foodly';
+  static String get _lunixApiKey =>
+      SettingsService.useDevApi ? Env.lunixApiKeyDev : Env.lunixApiKey;
+  static String get apiEndpoint => SettingsService.useDevApi
+      ? 'https://lunix-api-dev.golenia.dev/foodly'
+      : 'https://lunix-api.golenia.dev/foodly';
 
   static Future<bool> lunixApiAvailable() async {
     Response? response;
