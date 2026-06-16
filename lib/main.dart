@@ -214,7 +214,8 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
                 routerDelegate: _appRouter.delegate(
                   initialRoutes: [const HomeScreenRoute()],
                 ),
-                routeInformationParser: _DeepLinkGuardedParser(_appRouter.defaultRouteParser()),
+                routeInformationParser:
+                    _DeepLinkGuardedParser(_appRouter.defaultRouteParser()),
                 debugShowCheckedModeBanner: false,
                 themeMode: ThemeMode.light,
                 localizationsDelegates: [
@@ -417,9 +418,21 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
 
     final extractedLink = BasicUtils.getUrlFromString(sharedText);
     if (extractedLink != null && BasicUtils.isValidUri(extractedLink)) {
-      _appRouter.navigate(
-        MealCreateScreenRoute(id: Uri.encodeComponent(extractedLink)),
+      final importRoute = MealCreateScreenRoute(
+        id: Uri.encodeComponent(extractedLink),
+        navigateToDetailOnCreate: true,
       );
+      // On a cold start triggered by a share, the shared media can be delivered
+      // before auto_route has pushed its initial route. Navigating now would
+      // leave the import screen as the only entry in the stack — auto_route
+      // then skips seeding the home screen (it bails out once the stack has
+      // entries), so popping after the meal is saved has nowhere to return to.
+      // Seed the home screen underneath when the stack is still empty.
+      if (_appRouter.stackData.isEmpty) {
+        _appRouter.pushAll([const HomeScreenRoute(), importRoute]);
+      } else {
+        _appRouter.navigate(importRoute);
+      }
     }
   }
 
