@@ -845,6 +845,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
       instructions: _instructions,
       ingredients: _ingredients.values.toList(),
       imageUrl: _imageUrl ?? '',
+      source: widget.type != ImportType.text ? _controller.text.trim() : '',
     );
   }
 
