@@ -54,5 +54,12 @@ void main() {
       expect(BasicUtils.isValidInstagramUrl('just some recipe text'), isFalse);
       expect(BasicUtils.isValidInstagramUrl(''), isFalse);
     });
+
+    test('isValidUri', () {
+      expect(BasicUtils.isValidUri('https://www.example.com'), isTrue);
+      expect(BasicUtils.isValidUri('ftp://example.com/file.txt'), isTrue);
+      expect(BasicUtils.isValidUri('not: a url'), isFalse);
+      expect(BasicUtils.isValidUri('http:/invalid.com'), isFalse);
+    });
   });
 }

@@ -49,7 +49,8 @@ class BasicUtils {
   }
 
   static bool isValidUri(String uri) {
-    return Uri.tryParse(uri)?.isAbsolute ?? false;
+    final parsed = Uri.tryParse(uri);
+    return parsed != null && parsed.isAbsolute && parsed.host.isNotEmpty;
   }
 
   static final RegExp _instagramPostExp = RegExp(
