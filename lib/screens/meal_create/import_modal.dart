@@ -415,14 +415,23 @@ class _ImportModalState extends ConsumerState<ImportModal>
   }
 
   void _scrollToBottom() {
+    /// Below this distance (logical px) to the bottom we treat the list as
+    /// "already at the bottom" and skip re-animating
+    const double scrollSnapThreshold = 8;
+
     BasicUtils.afterBuild(() {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
+      if (!_scrollController.hasClients) {
+        return;
       }
+      final position = _scrollController.position;
+      if (position.maxScrollExtent - position.pixels <= scrollSnapThreshold) {
+        return;
+      }
+      _scrollController.animateTo(
+        position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     });
   }
 
