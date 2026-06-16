@@ -33,12 +33,18 @@ class LinkPreview extends StatefulWidget {
 
 class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
   Future<LinkMetadata?>? _metadataFuture;
-  bool _isPressed = false;
+  final ValueNotifier<bool> _isPressed = ValueNotifier<bool>(false);
 
   @override
   void initState() {
     super.initState();
     _initFuture(widget.link);
+  }
+
+  @override
+  void dispose() {
+    _isPressed.dispose();
+    super.dispose();
   }
 
   @override
@@ -94,26 +100,30 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
     required VoidCallback? onLongPress,
   }) {
     return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) => setState(() => _isPressed = false),
-      onTapCancel: () => setState(() => _isPressed = false),
-      onLongPressStart: (_) => setState(() => _isPressed = true),
-      onLongPressEnd: (_) => setState(() => _isPressed = false),
+      onTapDown: (_) => _isPressed.value = true,
+      onTapUp: (_) => _isPressed.value = false,
+      onTapCancel: () => _isPressed.value = false,
+      onLongPressStart: (_) => _isPressed.value = true,
+      onLongPressEnd: (_) => _isPressed.value = false,
       onTap: onTap,
       onLongPress: onLongPress == null
           ? null
           : () {
-              setState(() => _isPressed = false);
+              _isPressed.value = false;
               onLongPress();
             },
-      child: AnimatedScale(
-        scale: _isPressed ? 0.97 : 1.0,
-        duration: const Duration(milliseconds: 120),
-        curve: Curves.easeInOut,
-        child: AnimatedOpacity(
-          opacity: _isPressed ? 0.82 : 1.0,
+      child: ValueListenableBuilder<bool>(
+        valueListenable: _isPressed,
+        child: child,
+        builder: (context, isPressed, child) => AnimatedScale(
+          scale: isPressed ? 0.97 : 1.0,
           duration: const Duration(milliseconds: 120),
-          child: child,
+          curve: Curves.easeInOut,
+          child: AnimatedOpacity(
+            opacity: isPressed ? 0.82 : 1.0,
+            duration: const Duration(milliseconds: 120),
+            child: child,
+          ),
         ),
       ),
     );
