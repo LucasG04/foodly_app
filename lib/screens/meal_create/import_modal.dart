@@ -6,6 +6,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:keep_screen_on/keep_screen_on.dart';
 
 import '../../constants.dart';
 import '../../models/ingredient.dart';
@@ -104,6 +105,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
 
   @override
   void dispose() {
+    KeepScreenOn.turnOff();
     cancelSubscriptions();
     _controller.dispose();
     _scrollController.dispose();
@@ -645,6 +647,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
       _errorText = null;
       _buttonState = ButtonState.inProgress;
     });
+    KeepScreenOn.turnOn();
 
     try {
       final langCode = context.locale.languageCode;
@@ -690,6 +693,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
       _enrichStep = _EnrichStep.polishing;
       _partialWarning = false;
     });
+    KeepScreenOn.turnOn();
 
     // Once the fields have collapsed, morph the button into the loader.
     Future<void>.delayed(const Duration(milliseconds: 220)).then((_) {
@@ -776,6 +780,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
           } else {
             // Error before any content arrived: treat like a setup failure and
             // return to the input so the user can retry.
+            KeepScreenOn.turnOff();
             _phase = _GenPhase.input;
             _buttonLoading = false;
             _buttonState = ButtonState.error;
@@ -807,6 +812,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
       message: message,
       isDismissible: true,
     ).show(context);
+    KeepScreenOn.turnOff();
     setState(() {
       _phase = _GenPhase.input;
       _buttonLoading = false;
@@ -880,6 +886,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
       message: 'import_modal_error_not_found'.tr(),
       isDismissible: true,
     ).show(context);
+    KeepScreenOn.turnOff();
     setState(() {
       _buttonState = ButtonState.error;
     });
