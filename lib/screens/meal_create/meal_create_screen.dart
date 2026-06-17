@@ -232,6 +232,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                 MarkdownEditor(
                                   textEditingController:
                                       _instructionsController,
+                                  hintText:
+                                      'meal_create_instruction_placeholder'.tr(),
                                 ),
                                 _buildDivider(),
                                 Consumer(builder: (context, ref, _) {
