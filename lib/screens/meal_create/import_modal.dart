@@ -973,8 +973,6 @@ class _IngredientRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final amount =
         ConvertUtil.amountToString(ingredient.amount, ingredient.unit);
-    final hasGroup =
-        ingredient.productGroup != null && ingredient.productGroup!.isNotEmpty;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: kPadding / 4),
@@ -992,27 +990,6 @@ class _IngredientRow extends StatelessWidget {
                   ? (ingredient.name ?? '')
                   : '$amount ${ingredient.name ?? ''}',
             ),
-          ),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 250),
-            child: !hasGroup
-                ? const SizedBox.shrink()
-                : Container(
-                    key: ValueKey(ingredient.productGroup),
-                    margin: const EdgeInsets.only(left: kPadding / 2),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: kPadding / 2,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: kLightAccentColor,
-                      borderRadius: BorderRadius.circular(kRadius),
-                    ),
-                    child: Text(
-                      ingredient.productGroup!,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ),
           ),
         ],
       ),
