@@ -21,6 +21,7 @@ import 'package:share_handler/share_handler.dart';
 import 'app_router.gr.dart';
 import 'constants.dart';
 import 'models/foodly_user.dart';
+import 'models/plan.dart';
 import 'primary_colors.dart';
 import 'providers/data_provider.dart';
 import 'providers/state_providers.dart';
