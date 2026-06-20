@@ -28,6 +28,7 @@ import 'providers/state_providers.dart';
 import 'services/app_review_service.dart';
 import 'services/authentication_service.dart';
 import 'services/foodly_user_service.dart';
+import 'services/hive_migration_service.dart';
 import 'services/image_cache_manager.dart';
 import 'services/in_app_purchase_service.dart';
 import 'services/link_metadata_service.dart';
@@ -113,6 +114,11 @@ Future<void> initializeIsar() async {
     InAppPurchaseService.initialize(),
     ImageCacheManager.initialize(),
   ]);
+
+  // One-time readback of legacy Hive boxes into the now Isar-backed services.
+  // Must run after the services above are initialized; self-disables once the
+  // old Hive files are gone.
+  await HiveMigrationService.migrate();
 }
 
 class FoodlyApp extends ConsumerStatefulWidget {

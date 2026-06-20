@@ -47,7 +47,7 @@ class PlanService {
 
   static Future<void> _updatePlan(void Function(PlanData) update) async {
     await _isar.writeTxn(() async {
-      var plan = _isar.planDatas.where().findFirstSync() ?? PlanData();
+      final plan = await _isar.planDatas.where().findFirst() ?? PlanData();
       update(plan);
       await _isar.planDatas.put(plan);
     });
@@ -339,6 +339,14 @@ class PlanService {
     _log.finer('Call setLastLockedCheck');
     await _updatePlan((plan) {
       plan.lastLockedCheck = DateTime.now().millisecondsSinceEpoch;
+    });
+  }
+
+  /// Restores plan state from a previous storage backend. Only non-null values
+  /// are applied, so existing data is never overwritten with nulls.
+  static Future<void> restore({int? lastLockedCheck}) async {
+    await _updatePlan((plan) {
+      plan.lastLockedCheck = lastLockedCheck ?? plan.lastLockedCheck;
     });
   }
 }

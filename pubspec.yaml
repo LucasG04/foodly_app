@@ -20,6 +20,11 @@ dependencies:
   intl: ^0.20.2
   isar: ^3.1.0+1
   isar_flutter_libs: ^3.1.0+1
+  # Temporary: one-time readback migration of legacy Hive boxes into Isar.
+  # See lib/services/hive_migration_service.dart. Remove once all users have
+  # launched a build containing the migration.
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
   dio: ^5.8.0+1
   dio_cache_interceptor: ^3.5.1
   dio_cache_interceptor_file_store: ^1.2.0

@@ -18,15 +18,17 @@ class StorageService {
 
   static const String _storageMealImageFolder = 'meal-images/';
 
-  static Isar? _isar;
+  // Memoize the Future, not the resolved value, so concurrent first callers
+  // share a single Isar.open() instead of racing multiple opens.
+  static Future<Isar>? _isarFuture;
 
-  static Future<Isar> getIsar() async {
-    if (_isar != null) {
-      return _isar!;
-    }
+  static Future<Isar> getIsar() {
+    return _isarFuture ??= _openIsar();
+  }
 
+  static Future<Isar> _openIsar() async {
     final dir = await getApplicationDocumentsDirectory();
-    _isar = await Isar.open(
+    return Isar.open(
       [
         LinkMetadataSchema,
         SettingsDataSchema,
@@ -36,7 +38,6 @@ class StorageService {
       ],
       directory: dir.path,
     );
-    return _isar!;
   }
 
   static Future<Reference?> uploadFile(XFile? file) async {

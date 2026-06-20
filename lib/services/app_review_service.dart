@@ -31,14 +31,14 @@ class AppReviewService {
 
   static Future<void> _updateReview(void Function(AppReviewData) update) async {
     await _isar.writeTxn(() async {
-      var review = _isar.appReviewDatas.where().findFirstSync() ?? AppReviewData();
+      final review = await _isar.appReviewDatas.where().findFirst() ?? AppReviewData();
       update(review);
       await _isar.appReviewDatas.put(review);
     });
   }
 
   static Stream<bool> shouldRequestReview() async* {
-    await for (final _ in _isar.appReviewDatas.watchLazy()) {
+    await for (final _ in _isar.appReviewDatas.watchLazy(fireImmediately: true)) {
       final review = _getReview();
       if (review.hasRated ?? false) {
         yield false;
@@ -98,6 +98,24 @@ class AppReviewService {
   static Future<void> logMealCreated() async {
     await _updateReview((review) {
       review.mealCreated = (review.mealCreated ?? 0) + 1;
+    });
+  }
+
+  /// Restores review state from a previous storage backend. Only non-null
+  /// values are applied, so existing data is never overwritten with nulls.
+  static Future<void> restore({
+    int? planMeal,
+    int? groceryBought,
+    int? mealCreated,
+    DateTime? lastRequest,
+    bool? hasRated,
+  }) async {
+    await _updateReview((review) {
+      review.planMeal = planMeal ?? review.planMeal;
+      review.groceryBought = groceryBought ?? review.groceryBought;
+      review.mealCreated = mealCreated ?? review.mealCreated;
+      review.lastRequest = lastRequest ?? review.lastRequest;
+      review.hasRated = hasRated ?? review.hasRated;
     });
   }
 

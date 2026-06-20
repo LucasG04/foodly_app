@@ -45,9 +45,11 @@ class SettingsService {
     return _isar.settingsDatas.where().findFirstSync() ?? SettingsData();
   }
 
-  static Future<void> _updateSettings(void Function(SettingsData) update) async {
+  static Future<void> _updateSettings(
+      void Function(SettingsData) update) async {
     await _isar.writeTxn(() async {
-      var settings = _isar.settingsDatas.where().findFirstSync() ?? SettingsData();
+      final settings =
+          await _isar.settingsDatas.where().findFirst() ?? SettingsData();
       update(settings);
       await _isar.settingsDatas.put(settings);
     });
@@ -171,30 +173,59 @@ class SettingsService {
     });
   }
 
+  /// Restores settings from a previous storage backend. Only non-null values
+  /// are applied, so existing data is never overwritten with nulls.
+  static Future<void> restore({
+    bool? firstUsage,
+    bool? multipleMealsPerTime,
+    bool? showSuggestions,
+    bool? removeBoughtImmediately,
+    int? primaryColor,
+    int? shoppingListSort,
+    List<String>? productGroupOrder,
+    List<int>? activeMealTypes,
+    bool? useDevApi,
+  }) async {
+    await _updateSettings((settings) {
+      settings.firstUsage = firstUsage ?? settings.firstUsage;
+      settings.multipleMealsPerTime =
+          multipleMealsPerTime ?? settings.multipleMealsPerTime;
+      settings.showSuggestions = showSuggestions ?? settings.showSuggestions;
+      settings.removeBoughtImmediately =
+          removeBoughtImmediately ?? settings.removeBoughtImmediately;
+      settings.primaryColor = primaryColor ?? settings.primaryColor;
+      settings.shoppingListSort = shoppingListSort ?? settings.shoppingListSort;
+      settings.productGroupOrder =
+          productGroupOrder ?? settings.productGroupOrder;
+      settings.activeMealTypes = activeMealTypes ?? settings.activeMealTypes;
+      settings.useDevApi = useDevApi ?? settings.useDevApi;
+    });
+  }
+
   static Stream<void> streamShoppingListSort() {
-    return _isar.settingsDatas.watchLazy();
+    return _isar.settingsDatas.watchLazy(fireImmediately: true);
   }
 
   static Stream<void> streamMultipleMealsPerTime() {
-    return _isar.settingsDatas.watchLazy();
+    return _isar.settingsDatas.watchLazy(fireImmediately: true);
   }
 
   static Stream<List<MealType>> streamActiveMealTypes() {
-    return _isar.settingsDatas.watchLazy().map((_) {
+    return _isar.settingsDatas.watchLazy(fireImmediately: true).map((_) {
       final settings = _getSettings();
       return _convertToMealTypes(settings.activeMealTypes);
     });
   }
 
   static Stream<List<String>> streamProductGroupOrder() {
-    return _isar.settingsDatas.watchLazy().map((_) {
+    return _isar.settingsDatas.watchLazy(fireImmediately: true).map((_) {
       final settings = _getSettings();
       return settings.productGroupOrder ?? <String>[];
     });
   }
 
   static Stream<bool> streamUseDevApi() {
-    return _isar.settingsDatas.watchLazy().map((_) {
+    return _isar.settingsDatas.watchLazy(fireImmediately: true).map((_) {
       final settings = _getSettings();
       return settings.useDevApi ?? false;
     });

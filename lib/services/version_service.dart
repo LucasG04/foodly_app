@@ -32,7 +32,7 @@ class VersionService {
   static Future<void> _updateVersion(void Function(VersionData) update) async {
     await _isar.writeTxn(() async {
       final version =
-          _isar.versionDatas.where().findFirstSync() ?? VersionData();
+          await _isar.versionDatas.where().findFirst() ?? VersionData();
       update(version);
       await _isar.versionDatas.put(version);
     });
@@ -57,6 +57,19 @@ class VersionService {
   static Future<void> setLastCheckedForUpdate(DateTime? date) async {
     await _updateVersion((data) {
       data.lastCheckedForUpdate = date;
+    });
+  }
+
+  /// Restores version state from a previous storage backend. Only non-null
+  /// values are applied, so existing data is never overwritten with nulls.
+  static Future<void> restore({
+    String? lastCheckedVersion,
+    DateTime? lastCheckedForUpdate,
+  }) async {
+    await _updateVersion((data) {
+      data.lastCheckedVersion = lastCheckedVersion ?? data.lastCheckedVersion;
+      data.lastCheckedForUpdate =
+          lastCheckedForUpdate ?? data.lastCheckedForUpdate;
     });
   }
 }
