@@ -41,6 +41,13 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
     with AutomaticKeepAliveClientMixin, OfContextMixin {
   final _scrollController = ScrollController();
 
+  /// Delay before nudging the sticky headers after the "already bought"
+  /// [ExpansionTile] toggles. Fires partway through the tile's expand/collapse
+  /// animation (~200ms) rather than after it: this corrects the headers while
+  /// the scroll geometry is still settling, so they never paint at the stale
+  /// offset. Waiting for the full settle instead causes a visible layout shift.
+  static const _expansionNudgeDelay = Duration(milliseconds: 80);
+
   final shoppingListStreamProvider =
       StreamProvider.family<List<Grocery>, String>(
     (ref, shoppingListId) {
@@ -54,44 +61,49 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Consumer(
-      builder: (context, ref, _) {
-        final shoppingListId = ref.watch(shoppingListIdProvider);
-        final groceryGroups = ref.watch(dataGroceryGroupsProvider);
-        if (shoppingListId == null || groceryGroups == null) {
-          return _buildLoader();
-        }
+    return StreamBuilder(
+      stream: SettingsService.streamShoppingListSort(),
+      builder: (context, _) {
+        return StreamBuilder(
+          stream: SettingsService.streamProductGroupOrder(),
+          builder: (context, _) {
+            return Consumer(
+              builder: (context, ref, _) {
+                final shoppingListId = ref.watch(shoppingListIdProvider);
+                final groceryGroups = ref.watch(dataGroceryGroupsProvider);
+                if (shoppingListId == null || groceryGroups == null) {
+                  return _buildLoader();
+                }
 
-        final shoppingListAsyncValue =
-            ref.watch(shoppingListStreamProvider(shoppingListId));
+                final shoppingListAsyncValue =
+                    ref.watch(shoppingListStreamProvider(shoppingListId));
 
-        return shoppingListAsyncValue.when(
-          data: (data) {
-            final List<Grocery> todoItems =
-                data.where((e) => !e.bought).toList();
-            final List<Grocery> boughtItems =
-                data.where((e) => e.bought).toList();
-            boughtItems.sort(
-              (a, b) => b.lastBoughtEdited.compareTo(a.lastBoughtEdited),
-            );
+                return shoppingListAsyncValue.when(
+                  data: (data) {
+                    final List<Grocery> todoItems =
+                        data.where((e) => !e.bought).toList();
+                    final List<Grocery> boughtItems =
+                        data.where((e) => e.bought).toList();
+                    boughtItems.sort(
+                      (a, b) =>
+                          b.lastBoughtEdited.compareTo(a.lastBoughtEdited),
+                    );
 
-            BasicUtils.afterBuild(() {
-              // scroll one pixel up with _scrollController to avoid ui bug
-              if (_scrollController.hasClients) {
-                _scrollController.jumpTo(_scrollController.offset + 0.1);
-              }
-            });
+                    BasicUtils.afterBuild(_nudgeStickyHeaders);
 
-            return _buildShoppingList(
-              context,
-              todoItems,
-              boughtItems,
-              shoppingListId,
+                    return _buildShoppingList(
+                      context,
+                      todoItems,
+                      boughtItems,
+                      shoppingListId,
+                    );
+                  },
+                  loading: () => _buildLoader(),
+                  error: (error, stack) => _buildEmptyShoppingList(),
+                );
+              },
             );
           },
-          loading: () => _buildLoader(),
-          // TODO: add better error message
-          error: (error, stack) => _buildEmptyShoppingList(),
         );
       },
     );
@@ -112,44 +124,31 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
               context,
               smallMultiplier: 1,
             ),
-            child: StreamBuilder(
-                stream: SettingsService.streamShoppingListSort(),
-                builder: (context, _) {
-                  return StreamBuilder(
-                      stream: SettingsService.streamProductGroupOrder(),
-                      builder: (context, snapshot) {
-                        if (SettingsService.shoppingListSort ==
-                            ShoppingListSort.group) {
-                          var groceriesWithGroups =
-                              _groceriesToGroups(todoItems);
-                          groceriesWithGroups =
-                              _sortGroceriesWithGroups(groceriesWithGroups);
-                          return GroupedShoppingList(
-                            groups: groceriesWithGroups,
-                            pageScrollController: _scrollController,
-                            onEdit: (e) => _editGrocery(listId, e),
-                            onTap: (item) => _removeBoughtGrocery(
-                              listId,
-                              item,
-                              todoItems,
-                              boughtItems,
-                            ),
-                            onLongPress: _editGrocerySuggestion,
-                          );
-                        }
-                        return AnimatedShoppingList(
-                          groceries: todoItems,
-                          onEdit: (e) => _editGrocery(listId, e),
-                          onTap: (item) => _removeBoughtGrocery(
-                            listId,
-                            item,
-                            todoItems,
-                            boughtItems,
-                          ),
-                          onLongPress: _editGrocerySuggestion,
-                        );
-                      });
-                }),
+            child: SettingsService.shoppingListSort == ShoppingListSort.group
+                ? GroupedShoppingList(
+                    groups:
+                        _sortGroceriesWithGroups(_groceriesToGroups(todoItems)),
+                    pageScrollController: _scrollController,
+                    onEdit: (e) => _editGrocery(listId, e),
+                    onTap: (item) => _removeBoughtGrocery(
+                      listId,
+                      item,
+                      todoItems,
+                      boughtItems,
+                    ),
+                    onLongPress: _editGrocerySuggestion,
+                  )
+                : AnimatedShoppingList(
+                    groceries: todoItems,
+                    onEdit: (e) => _editGrocery(listId, e),
+                    onTap: (item) => _removeBoughtGrocery(
+                      listId,
+                      item,
+                      todoItems,
+                      boughtItems,
+                    ),
+                    onLongPress: _editGrocerySuggestion,
+                  ),
           ),
           const SizedBox(height: kPadding),
           if (boughtItems.isNotEmpty)
@@ -159,6 +158,19 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                 smallMultiplier: 1,
               ),
               child: ExpansionTile(
+                // Collapsing/expanding shrinks the scroll content, which can
+                // clamp the scroll offset and leave the grouped list's sticky
+                // headers with a stale pinned offset (header detaches from its
+                // item). The ExpansionTile's animation doesn't rebuild this
+                // widget, so the regular nudge in build() never fires — trigger
+                // it here once the animation has settled.
+                onExpansionChanged: (_) {
+                  Future.delayed(_expansionNudgeDelay, () {
+                    if (mounted) {
+                      _nudgeStickyHeaders();
+                    }
+                  });
+                },
                 title: Text(
                   'shopping_list_already_bought',
                   style: TextStyle(
@@ -202,9 +214,20 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                 ],
               ),
             ),
+          const SizedBox(height: kPadding * 2),
         ],
       ),
     );
+  }
+
+  /// Nudges the scroll position by a sub-pixel amount to force the grouped
+  /// list's [StickyHeader]s to recompute their pinned offset. They only relayout
+  /// on scroll-position changes, so without this they can keep a stale offset
+  /// after the surrounding content's size changes.
+  void _nudgeStickyHeaders() {
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(_scrollController.offset + 0.1);
+    }
   }
 
   Padding _buildPageTitle(List<Grocery> todoItems) {

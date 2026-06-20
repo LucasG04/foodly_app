@@ -15,17 +15,21 @@ import 'package:version/version.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
+import '../../models/foodly_change.dart';
+import '../../models/foodly_user.dart';
 import '../../providers/state_providers.dart';
 import '../../services/foodly_user_service.dart';
 import '../../services/in_app_purchase_service.dart';
+import '../../services/lunix_api_service.dart';
 import '../../services/plan_service.dart';
 import '../../services/settings_service.dart';
 import '../../services/version_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
+import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
+import '../../widgets/loading_screen.dart';
 import '../../widgets/new_version_modal.dart';
-import '../../widgets/small_circular_progress_indicator.dart';
 import 'home_screen_dialogs.dart';
 import 'plan_history_view.dart';
 import 'tab_navigation_view.dart';
@@ -43,17 +47,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
 
   @override
   void initState() {
-    _showAlerts();
     super.initState();
+    _showAlerts();
     ref
         .read(planHistoryPageChanged.notifier)
         .stream
         .listen((_) => _changePage())
         .canceledBy(this);
-
-    Future.delayed(const Duration(seconds: 1), () {
-      _checkPremiumGiftedStatusAndMessage();
-    });
   }
 
   @override
@@ -65,6 +65,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
   @override
   Widget build(BuildContext _) {
     return Consumer(builder: (context, ref, _) {
+      ref.listen<FoodlyUser?>(userProvider, (previous, next) {
+        if (previous == null && next != null) {
+          _checkPremiumGiftedStatusAndMessage();
+        }
+      });
+
       final initialUserLoading = ref.watch(initialUserLoadingProvider);
       final initialPlanLoading = ref.watch(initialPlanLoadingProvider);
       final user = ref.watch(userProvider);
@@ -78,9 +84,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
       } else if (!initialUserLoading && !initialPlanLoading && user != null) {
         return _buildNavigationView();
       } else {
-        return const Scaffold(
-          body: Center(child: SmallCircularProgressIndicator()),
-        );
+        return const LoadingScreen();
       }
     });
   }
@@ -118,19 +122,90 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
       return false;
     }
 
-    final Version currentVersion = Version.parse(packageInfo.version);
-    final Version lastCheckedVersion = Version.parse(lastCheckedVersionString);
+    Version currentVersion;
+    Version lastCheckedVersion;
+    try {
+      currentVersion = Version.parse(packageInfo.version);
+      lastCheckedVersion = Version.parse(lastCheckedVersionString);
+    } catch (e) {
+      _log.severe(
+        '_checkForNewFeaturesNotification() failed to parse versions: ${packageInfo.version} / $lastCheckedVersionString',
+        e,
+      );
+      return false;
+    }
 
     if (lastCheckedVersion >= currentVersion) {
       return false;
     }
 
-    if (!mounted) {
+    String deviceLanguageCode;
+    try {
+      deviceLanguageCode = context.locale.languageCode;
+    } catch (e) {
+      deviceLanguageCode = 'en';
+    }
+
+    final changes = await LunixApiService.getChanges(
+      lastCheckedVersion.toString(),
+      currentVersion.toString(),
+    );
+
+    if (changes.isEmpty || !mounted) {
       return false;
     }
-    NewVersionModal.open(context).then((_) {
-      unawaited(VersionService.setLastCheckedVersion(packageInfo.version));
-    });
+
+    final Map<String, List<FoodlyChange>> changesByVersion = {};
+    for (final change in changes) {
+      changesByVersion.putIfAbsent(change.version, () => []).add(change);
+    }
+
+    final versionGroups = changesByVersion.entries
+        .map((entry) {
+          final versionChanges = entry.value;
+          final emoji = versionChanges.first.emoji;
+
+          final notes = versionChanges.expand((c) {
+            final withVars = NewVersionModal.checkVersionNotesForVariables(
+              c.translations,
+            );
+            final translation = withVars.firstWhere(
+              (t) => t.language == deviceLanguageCode,
+              orElse: () => withVars.isNotEmpty
+                  ? withVars.first
+                  : ChangeTranslation(
+                      language: deviceLanguageCode,
+                      title: '',
+                      description: '',
+                    ),
+            );
+            if (translation.title.isEmpty) {
+              return <VersionNote>[];
+            }
+            return [
+              VersionNote(
+                title: translation.title,
+                description: translation.description,
+                emoji: c.emoji ?? emoji,
+              )
+            ];
+          }).toList();
+
+          return VersionGroup(version: entry.key, notes: notes);
+        })
+        .where((g) => g.notes.isNotEmpty)
+        .toList();
+
+    if (versionGroups.isEmpty || !mounted) {
+      return false;
+    }
+
+    // ignore: use_build_context_synchronously
+    await WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => NewVersionModal(versionGroups: versionGroups),
+    );
+    await VersionService.setLastCheckedVersion(packageInfo.version);
     return true;
   }
 
@@ -280,10 +355,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
   }
 
   void _showAlerts() async {
-    final newFeaturesShown = await _checkForNewFeaturesNotification();
-    if (newFeaturesShown) {
-      return;
-    }
+    await _checkForNewFeaturesNotification();
 
     if (_shouldCheckForUpdate()) {
       _checkForUpdate();

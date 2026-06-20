@@ -36,9 +36,9 @@ class BasicUtils {
     BuildContext context, {
     double smallMultiplier = 0.9,
   }) {
-    return MediaQuery.of(context).size.width > 599
+    return MediaQuery.sizeOf(context).width > 599
         ? 600.0
-        : MediaQuery.of(context).size.width * smallMultiplier;
+        : MediaQuery.sizeOf(context).width * smallMultiplier;
   }
 
   static String? getUrlFromString(String input) {
@@ -49,7 +49,18 @@ class BasicUtils {
   }
 
   static bool isValidUri(String uri) {
-    return Uri.tryParse(uri)?.isAbsolute ?? false;
+    final parsed = Uri.tryParse(uri);
+    return parsed != null && parsed.isAbsolute && parsed.host.isNotEmpty;
+  }
+
+  static final RegExp _instagramPostExp = RegExp(
+    r'^https?:\/\/(www\.)?instagram\.com',
+    caseSensitive: false,
+  );
+
+  /// Whether [url] points at an Instagram post/reel that can be imported.
+  static bool isValidInstagramUrl(String url) {
+    return _instagramPostExp.hasMatch(url.trim());
   }
 
   static List<DateTime> getPlanDateTimes(int hourDiffToUtc, {int amount = 8}) {

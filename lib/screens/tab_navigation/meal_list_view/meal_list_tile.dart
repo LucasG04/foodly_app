@@ -85,7 +85,7 @@ class MealListTile extends StatelessWidget {
     required BuildContext context,
     required Widget child,
   }) {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
     return Align(
       child: GestureDetector(
         onTap: () {

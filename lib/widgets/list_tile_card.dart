@@ -23,7 +23,7 @@ class ListTileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
     return Container(
       width: width > 599 ? 600 : width * 0.9,
       padding: const EdgeInsets.symmetric(vertical: 5.0),

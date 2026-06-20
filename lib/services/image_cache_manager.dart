@@ -19,6 +19,10 @@ class ImageCacheManager {
 
   static const int maxCacheSize = 50;
   static const Duration cacheExpiration = Duration(days: 7);
+  // Avoid frequent write-amplification when an image is accessed repeatedly.
+  static const Duration _touchInterval = Duration(minutes: 10);
+  // Small in-memory hot cache for fast re-entry while scrolling.
+  static const int _maxMemoryCacheSize = 120;
 
   static late final Store _store;
   static late final Box<CachedImage> _imageBox;
@@ -26,6 +30,12 @@ class ImageCacheManager {
   static const int _maxConcurrentRequests = 10;
   static int _currentRequests = 0;
   static final Queue<Completer<void>> _requestQueue = Queue<Completer<void>>();
+  // Access-ordered map used as a lightweight LRU layer.
+  static final LinkedHashMap<String, Uint8List> _memoryCache =
+      LinkedHashMap<String, Uint8List>();
+  // De-duplicate concurrent fetches for the same URL.
+  static final Map<String, Future<Uint8List?>> _inFlightRequests =
+      <String, Future<Uint8List?>>{};
 
   static Future<void> initialize() async {
     _store = await openStore();
@@ -36,11 +46,35 @@ class ImageCacheManager {
   /// Fetch an image from the network with concurrency limit,
   /// and store it in the cache. Returns the image bytes or `null` on error.
   static Future<Uint8List?> loadImage(String url) async {
+    // Fast path for recently used list images.
+    final memoryData = _getFromMemory(url);
+    if (memoryData != null) {
+      return memoryData;
+    }
+
     final cachedData = _get(url);
     if (cachedData != null) {
+      _putToMemory(url, cachedData);
       return cachedData;
     }
 
+    final inFlight = _inFlightRequests[url];
+    if (inFlight != null) {
+      // Reuse the active request instead of spawning duplicates.
+      return inFlight;
+    }
+
+    final future = _loadImageFromNetwork(url);
+    _inFlightRequests[url] = future;
+
+    try {
+      return await future;
+    } finally {
+      _inFlightRequests.remove(url);
+    }
+  }
+
+  static Future<Uint8List?> _loadImageFromNetwork(String url) async {
     await _acquireRequestSlot();
 
     String imageUrl = url;
@@ -63,7 +97,9 @@ class ImageCacheManager {
       if (response.statusCode == 200 &&
           response.data != null &&
           await _isValidImage(response.data)) {
-        _put(imageUrl, response.data);
+        // Keep the original lookup URL as cache key to maximize hit rate.
+        _put(url, response.data);
+        _putToMemory(url, response.data);
         return response.data;
       } else {
         _log.warning('Failed to load image: ${response.statusCode}');
@@ -85,11 +121,36 @@ class ImageCacheManager {
     query.close();
 
     if (cachedImage != null) {
-      cachedImage.lastAccessed = DateTime.now();
-      _imageBox.put(cachedImage);
+      final now = DateTime.now();
+      // Touch only periodically to reduce objectbox write pressure.
+      if (now.difference(cachedImage.lastAccessed) >= _touchInterval) {
+        cachedImage.lastAccessed = now;
+        _imageBox.put(cachedImage);
+      }
       return cachedImage.imageBytes;
     }
     return null;
+  }
+
+  static Uint8List? _getFromMemory(String url) {
+    final value = _memoryCache.remove(url);
+    if (value == null) {
+      return null;
+    }
+
+    // Move to end to keep LRU order.
+    _memoryCache[url] = value;
+    return value;
+  }
+
+  static void _putToMemory(String url, Uint8List data) {
+    _memoryCache.remove(url);
+    _memoryCache[url] = data;
+
+    if (_memoryCache.length > _maxMemoryCacheSize) {
+      // Evict oldest entry in access order.
+      _memoryCache.remove(_memoryCache.keys.first);
+    }
   }
 
   static void _put(String url, Uint8List imageBytes) {

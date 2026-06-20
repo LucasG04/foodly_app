@@ -27,4 +27,39 @@ void main() {
       expect(result[2].id, '3');
     });
   });
+
+  group('isValidInstagramUrl', () {
+    test('accepts various URLs', () {
+      expect(
+        BasicUtils.isValidInstagramUrl('https://www.instagram.com/p/Cxy123_-/'),
+        isTrue,
+      );
+      expect(
+        BasicUtils.isValidInstagramUrl(
+            'https://instagram.com/reel/Cxy123?ig_sha=abc123'),
+        isTrue,
+      );
+      expect(
+        BasicUtils.isValidInstagramUrl(
+            'https://instagram.com/Cxy123?ig_sha=abc123'),
+        isTrue,
+      );
+    });
+
+    test('rejects non-post Instagram URLs and other hosts', () {
+      expect(
+        BasicUtils.isValidInstagramUrl('https://www.chefkoch.de/rezepte/123'),
+        isFalse,
+      );
+      expect(BasicUtils.isValidInstagramUrl('just some recipe text'), isFalse);
+      expect(BasicUtils.isValidInstagramUrl(''), isFalse);
+    });
+
+    test('isValidUri', () {
+      expect(BasicUtils.isValidUri('https://www.example.com'), isTrue);
+      expect(BasicUtils.isValidUri('ftp://example.com/file.txt'), isTrue);
+      expect(BasicUtils.isValidUri('not: a url'), isFalse);
+      expect(BasicUtils.isValidUri('http:/invalid.com'), isFalse);
+    });
+  });
 }

@@ -37,10 +37,10 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal>
 
   @override
   Widget build(BuildContext context) {
-    final width = media.size.width > 700 ? 700.0 : media.size.width * 0.9;
+    final width = mediaSize.width > 700 ? 700.0 : mediaSize.width * 0.9;
 
     return SizedBox(
-      height: media.size.height * 0.8,
+      height: mediaSize.height * 0.8,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -50,7 +50,7 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal>
               width: double.infinity,
               color: theme.scaffoldBackgroundColor,
               padding: EdgeInsets.symmetric(
-                horizontal: (media.size.width - width) / 2,
+                horizontal: (mediaSize.width - width) / 2,
               ),
               child: SingleChildScrollView(
                 controller: _scrollController,
@@ -123,7 +123,7 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal>
         shadowColor: theme.primaryColor,
         child: Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: (media.size.width - width) / 2,
+            horizontal: (mediaSize.width - width) / 2,
             vertical: kPadding / 2,
           ),
           child: Row(

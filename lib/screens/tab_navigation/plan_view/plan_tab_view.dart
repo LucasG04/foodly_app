@@ -48,6 +48,10 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
     final livePlanMeals = ref.watch(planMealsStreamProvider);
     final plan = ref.read(planProvider);
 
+    ref.listen<AsyncValue<List<PlanMeal>>>(planMealsStreamProvider, (_, next) {
+      next.whenData(_archiveOldMeals);
+    });
+
     return plan != null
         ? SingleChildScrollView(
             child: AnimationLimiter(
@@ -91,9 +95,7 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
                   SizedBox(
                     width: BasicUtils.contentWidth(context),
                     child: livePlanMeals.when(
-                      data: (planMeals) => ListView(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
+                      data: (planMeals) => Column(
                         children: _getDaysByMeals(planMeals)
                             .map(
                               (e) => PlanDayCard(
@@ -137,60 +139,32 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
     );
   }
 
-  List<PlanDay> _getDaysByMeals(List<PlanMeal> meals) {
-    ref.read(planProvider)!.meals = meals;
-    return _updateMealsForDays(meals);
+  /// Builds the 8-day display list from the current stream snapshot.
+  List<PlanDay> _getDaysByMeals(List<PlanMeal> planMeals) {
+    final plan = ref.read(planProvider)!;
+    final now = DateTime.now().toUtc().add(Duration(hours: plan.hourDiffToUtc!));
+    final today = DateTime(now.year, now.month, now.day);
+    final currentMeals = planMeals.where((m) => !m.date.isBefore(today));
+    return List.generate(8, (i) {
+      final date = today.add(Duration(days: i));
+      return PlanDay(
+        date,
+        currentMeals.where((m) => DateUtils.isSameDay(m.date, date)).toList(),
+      );
+    });
   }
 
-  List<PlanDay> _updateMealsForDays(List<PlanMeal> planMeals) {
-    final Plan plan = ref.read(planProvider)!;
-    final List<PlanDay> days = [];
-    final List<PlanMeal> updatedMeals = [...planMeals];
-
-    final now =
-        DateTime.now().toUtc().add(Duration(hours: plan.hourDiffToUtc!));
+  /// Moves past meals into the plan history and deletes them from the active
+  /// plan. Runs as side effect via [ref.listen] on [planMealsStreamProvider].
+  void _archiveOldMeals(List<PlanMeal> planMeals) {
+    final plan = ref.read(planProvider)!;
+    final now = DateTime.now().toUtc().add(Duration(hours: plan.hourDiffToUtc!));
     final today = DateTime(now.year, now.month, now.day);
-
-    // remove old plan days and add to history
-    final oldMeals = planMeals.where((meal) => meal.date.isBefore(today));
+    final oldMeals = planMeals.where((m) => m.date.isBefore(today));
     for (final meal in oldMeals) {
       PlanService.addPlanMealToPlanHistory(plan.id!, meal);
       PlanService.deletePlanMealFromPlan(plan.id, meal.id);
     }
-    oldMeals.forEach(updatedMeals.remove);
-
-    // update plan days
-    for (var i = 0; i < 8; i++) {
-      final date = today.add(Duration(days: i));
-      days.add(
-        PlanDay(
-            date,
-            updatedMeals
-                .where((element) => DateUtils.isSameDay(element.date, date))
-                .toList()),
-      );
-    }
-
-    // apply updates to firebase collection if lists are not equal
-    if (!_arePlanMealListsEqual(planMeals, updatedMeals)) {
-      for (final meal in updatedMeals) {
-        PlanService.updatePlanMealFromPlan(plan.id, meal);
-      }
-    }
-
-    return days;
-  }
-
-  bool _arePlanMealListsEqual(List<PlanMeal> a, List<PlanMeal> b) {
-    if (a.length != b.length) {
-      return false;
-    }
-    for (var i = 0; i < a.length; i++) {
-      if (a[i].id != b[i].id) {
-        return false;
-      }
-    }
-    return true;
   }
 
   void _openDownloadModal(Plan plan) {

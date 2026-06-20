@@ -22,71 +22,87 @@ class PlanDayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
     final breakfastList = meals.where((e) => e.type == MealType.BREAKFAST);
     final lunchList = meals.where((e) => e.type == MealType.LUNCH);
     final dinnerList = meals.where((e) => e.type == MealType.DINNER);
 
-    return Container(
-      width: width > 599 ? 600 : width * 0.9,
-      padding: const EdgeInsets.symmetric(vertical: 15.0),
-      child: Card(
-        surfaceTintColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(kRadius),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(kPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      DateFormat('EEEE', context.locale.toLanguageTag())
-                          .format(date),
-                      style: kCardTitle,
-                    ),
-                    const SizedBox(width: kPadding / 2),
-                    Flexible(
-                      child: Text(
-                        DateFormat(
-                          'd. MMMM y',
-                          context.locale.toLanguageTag(),
-                        ).format(date),
-                        style: kCardSubtitle,
-                        textAlign: TextAlign.right,
+    return StreamBuilder<List<MealType>>(
+      initialData: SettingsService.activeMealTypes,
+      stream: SettingsService.streamActiveMealTypes(),
+      builder: (context, mealTypesSnapshot) {
+        final activeMealTypes =
+            mealTypesSnapshot.data ?? SettingsService.activeMealTypes;
+        return StreamBuilder<dynamic>(
+          stream: SettingsService.streamMultipleMealsPerTime(),
+          builder: (context, _) {
+            return Container(
+              width: width > 599 ? 600 : width * 0.9,
+              padding: const EdgeInsets.symmetric(vertical: 15.0),
+              child: Card(
+                surfaceTintColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(kRadius),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(kPadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              DateFormat('EEEE', context.locale.toLanguageTag())
+                                  .format(date),
+                              style: kCardTitle,
+                            ),
+                            const SizedBox(width: kPadding / 2),
+                            Flexible(
+                              child: Text(
+                                DateFormat(
+                                  'd. MMMM y',
+                                  context.locale.toLanguageTag(),
+                                ).format(date),
+                                style: kCardSubtitle,
+                                textAlign: TextAlign.right,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: kPadding),
+                      _buildMealView(
+                        title: 'plan_day_breakfast'.tr(),
+                        mealType: MealType.BREAKFAST,
+                        list: breakfastList,
+                        context: context,
+                        activeMealTypes: activeMealTypes,
+                      ),
+                      _buildMealView(
+                        title: 'plan_day_lunch'.tr(),
+                        mealType: MealType.LUNCH,
+                        list: lunchList,
+                        context: context,
+                        activeMealTypes: activeMealTypes,
+                      ),
+                      _buildMealView(
+                        title: 'plan_day_dinner'.tr(),
+                        mealType: MealType.DINNER,
+                        list: dinnerList,
+                        context: context,
+                        activeMealTypes: activeMealTypes,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: kPadding),
-              _buildMealView(
-                title: 'plan_day_breakfast'.tr(),
-                mealType: MealType.BREAKFAST,
-                list: breakfastList,
-                context: context,
-              ),
-              _buildMealView(
-                title: 'plan_day_lunch'.tr(),
-                mealType: MealType.LUNCH,
-                list: lunchList,
-                context: context,
-              ),
-              _buildMealView(
-                title: 'plan_day_dinner'.tr(),
-                mealType: MealType.DINNER,
-                list: dinnerList,
-                context: context,
-              ),
-            ],
-          ),
-        ),
-      ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -95,42 +111,35 @@ class PlanDayCard extends StatelessWidget {
     required MealType mealType,
     required Iterable<PlanMeal> list,
     required BuildContext context,
+    required List<MealType> activeMealTypes,
   }) {
-    return StreamBuilder<List<MealType>>(
-      initialData: SettingsService.activeMealTypes,
-      stream: SettingsService.streamActiveMealTypes(),
-      builder: (context, snapshot) {
-        final isActive = snapshot.data?.contains(mealType) ?? false;
-        if (!_showMealView(isActive, list.isEmpty)) {
-          return const SizedBox();
-        }
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildSubtitle(title),
-            ...list
-                .map(
-                  (e) => PlanDayMealTile(
-                    e,
-                    readonly: readonly,
-                    enableVoting: list.length > 1 && !readonly,
-                  ),
-                )
-                ,
-            _buildAddButton(
-              context,
-              mealType: mealType,
-              mealsAtTime: list.length,
-            ),
-            if (_shouldAddDivider(mealType))
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Divider(),
-              ),
-          ],
-        );
-      },
+    if (!_showMealView(activeMealTypes.contains(mealType), list.isEmpty)) {
+      return const SizedBox();
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildSubtitle(title),
+        ...list.map(
+          (e) => PlanDayMealTile(
+            e,
+            key: ValueKey(e.id),
+            readonly: readonly,
+            enableVoting: list.length > 1 && !readonly,
+          ),
+        ),
+        _buildAddButton(
+          context,
+          mealType: mealType,
+          mealsAtTime: list.length,
+        ),
+        if (_shouldAddDivider(mealType))
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Divider(),
+          ),
+      ],
     );
   }
 
@@ -149,45 +158,40 @@ class PlanDayCard extends StatelessWidget {
               ),
             );
     }
-    return StreamBuilder<dynamic>(
-      stream: SettingsService.streamMultipleMealsPerTime(),
-      builder: (context, _) {
-        return _showAddButton(context, mealsAtTime)
-            ? Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: OutlinedButton(
-                    onPressed: () => AutoRouter.of(context).push(
-                      MealSelectScreenRoute(date: date, mealType: mealType),
+    return _showAddButton(context, mealsAtTime)
+        ? Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: OutlinedButton(
+                onPressed: () => AutoRouter.of(context).push(
+                  MealSelectScreenRoute(date: date, mealType: mealType),
+                ),
+                style: ButtonStyle(
+                  padding: WidgetStateProperty.resolveWith(
+                    (_) => const EdgeInsets.all(15.0),
+                  ),
+                  side: WidgetStateProperty.resolveWith(
+                    (_) => const BorderSide(width: 0.0),
+                  ),
+                  foregroundColor: WidgetStateProperty.resolveWith(
+                    (_) => Theme.of(context).primaryColor,
+                  ),
+                  shape: WidgetStateProperty.resolveWith(
+                    (_) => RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(kRadius / 2),
                     ),
-                    style: ButtonStyle(
-                      padding: WidgetStateProperty.resolveWith(
-                        (_) => const EdgeInsets.all(15.0),
-                      ),
-                      side: WidgetStateProperty.resolveWith(
-                        (_) => const BorderSide(width: 0.0),
-                      ),
-                      foregroundColor: WidgetStateProperty.resolveWith(
-                        (_) => Theme.of(context).primaryColor,
-                      ),
-                      shape: WidgetStateProperty.resolveWith(
-                        (_) => RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(kRadius / 2),
-                        ),
-                      ),
-                    ),
-                    child: const Text(
-                      'add',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ).tr(),
                   ),
                 ),
-              )
-            : const SizedBox();
-      },
-    );
+                child: const Text(
+                  'add',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ).tr(),
+              ),
+            ),
+          )
+        : const SizedBox();
   }
 
   Widget _buildSubtitle(String text) {
@@ -213,6 +217,14 @@ class PlanDayCard extends StatelessWidget {
   }
 
   bool _shouldAddDivider(MealType mealType) {
+    if (readonly) {
+      final hasLunch = meals.any((e) => e.type == MealType.LUNCH);
+      final hasDinner = meals.any((e) => e.type == MealType.DINNER);
+      final forBreakfast = mealType == MealType.BREAKFAST &&
+          (hasLunch || hasDinner);
+      final forLunch = mealType == MealType.LUNCH && hasDinner;
+      return forBreakfast || forLunch;
+    }
     final currentTypes = SettingsService.activeMealTypes;
     final forBreakfast = mealType == MealType.BREAKFAST &&
         (currentTypes.contains(MealType.LUNCH) ||

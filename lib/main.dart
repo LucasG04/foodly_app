@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
@@ -41,14 +42,16 @@ import 'widgets/disposable_widget.dart';
 
 Future<void> _configureFirebase() async {
   await Firebase.initializeApp();
+}
+
+Future<void> _configureFirebaseSettings() async {
   if (foundation.kDebugMode) {
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
-    await FirebasePerformance.instance.setPerformanceCollectionEnabled(false);
+    await Future.wait([
+      FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false),
+      FirebasePerformance.instance.setPerformanceCollectionEnabled(false),
+    ]);
   } else {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-    await FirebaseAppCheck.instance.activate(
-      appleProvider: AppleProvider.appAttestWithDeviceCheckFallback,
-    );
     final packageInfo = await PackageInfo.fromPlatform();
     await Future.wait([
       FirebaseAnalytics.instance
@@ -56,6 +59,14 @@ Future<void> _configureFirebase() async {
       FirebaseCrashlytics.instance.setCustomKey('version', packageInfo.version),
       FirebaseCrashlytics.instance
           .setCustomKey('buildNumber', packageInfo.buildNumber),
+      FirebaseAppCheck.instance.activate(
+        providerApple: foundation.kDebugMode
+            ? const AppleDebugProvider()
+            : const AppleAppAttestWithDeviceCheckFallbackProvider(),
+        providerAndroid: foundation.kDebugMode
+            ? const AndroidDebugProvider()
+            : const AndroidPlayIntegrityProvider(),
+      ),
     ]);
   }
 }
@@ -64,9 +75,12 @@ void main() {
   runZonedGuarded<void>(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
-      await EasyLocalization.ensureInitialized();
       await _configureFirebase();
-      await initializeIsar();
+      await Future.wait([
+        EasyLocalization.ensureInitialized(),
+        _configureFirebaseSettings(),
+        initializeIsar(),
+      ]);
       runApp(
         Phoenix(
           child: ProviderScope(
@@ -121,6 +135,9 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   // ignore: cancel_subscriptions
   StreamSubscription<String?>? _uniLinkSub;
 
+  bool _initialDataLoadStarted = false;
+  String? _lastLoadedShoppingListPlanId;
+
   @override
   void initState() {
     _initializeLogger();
@@ -144,11 +161,25 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active ||
             snapshot.connectionState == ConnectionState.done) {
-          Future.wait([
-            _loadBaseData(),
-            _loadActivePlan(),
-            _loadActiveUser(),
-          ]).whenComplete(() => afterUserAndPlanLoaded());
+          if (snapshot.data == null) {
+            _initialDataLoadStarted = false;
+            _lastLoadedShoppingListPlanId = null;
+            BasicUtils.afterBuild(() {
+              ref.read(initialUserLoadingProvider.notifier).state = false;
+              ref.read(initialPlanLoadingProvider.notifier).state = false;
+            });
+          } else if (!_initialDataLoadStarted) {
+            _initialDataLoadStarted = true;
+            BasicUtils.afterBuild(() {
+              ref.read(initialUserLoadingProvider.notifier).state = true;
+              ref.read(initialPlanLoadingProvider.notifier).state = true;
+            });
+            Future.wait([
+              _loadBaseData(),
+              _loadActivePlan(),
+              _loadActiveUser(),
+            ]).whenComplete(() => afterUserAndPlanLoaded());
+          }
 
           return Consumer(
             builder: (context, ref, _) {
@@ -156,14 +187,20 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
               _log.finer('PlanProvider Update: ${plan?.id}');
 
               if (plan != null) {
-                _loadActiveShoppingList();
+                if (plan.id != _lastLoadedShoppingListPlanId) {
+                  _lastLoadedShoppingListPlanId = plan.id;
+                  _loadActiveShoppingList();
+                }
               } else {
                 ref.read(shoppingListIdProvider.notifier).state = null;
               }
 
               return MaterialApp.router(
-                routerDelegate: _appRouter.delegate(),
-                routeInformationParser: _appRouter.defaultRouteParser(),
+                routerDelegate: _appRouter.delegate(
+                  initialRoutes: [const HomeScreenRoute()],
+                ),
+                routeInformationParser:
+                    _DeepLinkGuardedParser(_appRouter.defaultRouteParser()),
                 debugShowCheckedModeBanner: false,
                 themeMode: ThemeMode.light,
                 localizationsDelegates: [
@@ -238,6 +275,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       final FoodlyUser? user =
           await FoodlyUserService.getUserById(firebaseUser.uid);
       if (user == null) {
+        refInitLoading.state = false;
         return;
       }
       refUserProvider.state = user;
@@ -282,6 +320,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       planId,
     );
     while (shoppingList == null) {
+      await Future.delayed(const Duration(milliseconds: 500));
       shoppingList = await ShoppingListService.getShoppingListByPlanId(
         planId,
       );
@@ -362,16 +401,23 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       return;
     }
 
-    if (sharedText.contains(kChefkochShareEndpoint)) {
-      final extractedLink = sharedText.contains(' ')
-          ? sharedText
-              .substring(sharedText.indexOf(kChefkochShareEndpoint))
-              .split(' ')[0]
-          : sharedText;
-
-      _appRouter.navigate(
-        MealCreateScreenRoute(id: Uri.encodeComponent(extractedLink)),
+    final extractedLink = BasicUtils.getUrlFromString(sharedText);
+    if (extractedLink != null && BasicUtils.isValidUri(extractedLink)) {
+      final importRoute = MealCreateScreenRoute(
+        id: Uri.encodeComponent(extractedLink),
+        navigateToDetailOnCreate: true,
       );
+      // On a cold start triggered by a share, the shared media can be delivered
+      // before auto_route has pushed its initial route. Navigating now would
+      // leave the import screen as the only entry in the stack — auto_route
+      // then skips seeding the home screen (it bails out once the stack has
+      // entries), so popping after the meal is saved has nowhere to return to.
+      // Seed the home screen underneath when the stack is still empty.
+      if (_appRouter.stackData.isEmpty) {
+        _appRouter.pushAll([const HomeScreenRoute(), importRoute]);
+      } else {
+        _appRouter.navigate(importRoute);
+      }
     }
   }
 
@@ -467,6 +513,26 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     }
 
     _appRouter.push(MealScreenRoute(id: mealId));
+  }
+}
+
+// Prevents auto_route from processing external deep link URLs (https://...) as
+// navigation targets. Deep links are handled by app_links instead.
+class _DeepLinkGuardedParser extends RouteInformationParser<UrlState> {
+  _DeepLinkGuardedParser(this._inner);
+  final RouteInformationParser<UrlState> _inner;
+
+  @override
+  Future<UrlState> parseRouteInformation(RouteInformation routeInformation) {
+    if (routeInformation.uri.hasScheme) {
+      return Future.value(UrlState(Uri(path: '/'), const []));
+    }
+    return _inner.parseRouteInformation(routeInformation);
+  }
+
+  @override
+  RouteInformation? restoreRouteInformation(UrlState configuration) {
+    return _inner.restoreRouteInformation(configuration);
   }
 }
 

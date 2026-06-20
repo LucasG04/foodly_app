@@ -19,12 +19,23 @@ class FoodlyNetworkImage extends StatefulWidget {
 }
 
 class _FoodlyNetworkImageState extends State<FoodlyNetworkImage> {
+  // Keep the request stable across rebuilds for the same URL.
   late Future<Uint8List?> _imageFuture;
 
   @override
   void initState() {
     super.initState();
     _imageFuture = ImageCacheManager.loadImage(widget.imageUrl);
+  }
+
+  @override
+  void didUpdateWidget(covariant FoodlyNetworkImage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Reload only when the URL actually changed.
+    if (oldWidget.imageUrl != widget.imageUrl) {
+      _imageFuture = ImageCacheManager.loadImage(widget.imageUrl);
+    }
   }
 
   @override

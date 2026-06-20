@@ -19,7 +19,7 @@ class PageCard extends StatelessWidget {
     return Container(
       height: height,
       padding: EdgeInsets.symmetric(
-        horizontal: (MediaQuery.of(context).size.width -
+        horizontal: (MediaQuery.sizeOf(context).width -
                 BasicUtils.contentWidth(context, smallMultiplier: 0.8)) /
             2,
       ),

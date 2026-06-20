@@ -133,6 +133,11 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                         description: 'get_premium_modal_2_description'.tr(),
                       ),
                       ListTileCard(
+                        iconData: Icons.auto_awesome,
+                        title: 'get_premium_modal_8_title'.tr(),
+                        description: 'get_premium_modal_8_description'.tr(),
+                      ),
+                      ListTileCard(
                         iconData: EvaIcons.activityOutline,
                         title: 'get_premium_modal_4_title'.tr(),
                         description: 'get_premium_modal_4_description'.tr(),
@@ -200,7 +205,7 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
   }
 
   Widget _buildPremiumDurationSelector(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
     return Consumer(
       builder: (context, ref, _) {
         final purchaseState = ref.watch(_$purchaseState);

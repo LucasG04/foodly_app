@@ -36,8 +36,8 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
         duration: const Duration(milliseconds: 250),
         child: _isLoading
             ? SizedBox(
-                height: MediaQuery.of(context).size.width * 0.35,
-                width: MediaQuery.of(context).size.width * 0.7,
+                height: MediaQuery.sizeOf(context).width * 0.35,
+                width: MediaQuery.sizeOf(context).width * 0.7,
                 child: const Center(child: SmallCircularProgressIndicator()),
               )
             : !_showWebPicker

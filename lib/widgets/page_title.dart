@@ -29,9 +29,9 @@ class PageTitle extends StatelessWidget {
       child: Center(
         child: SizedBox(
           height: 50.0,
-          width: MediaQuery.of(context).size.width > 599
+          width: MediaQuery.sizeOf(context).width > 599
               ? 600.0
-              : MediaQuery.of(context).size.width * 0.9,
+              : MediaQuery.sizeOf(context).width * 0.9,
           child: Row(
             children: [
               _buildTitle(),

@@ -44,7 +44,7 @@ class _MealListTitleState extends State<MealListTitle> with OfContextMixin {
       child: Center(
         child: SizedBox(
           height: 50.0,
-          width: media.size.width > 599 ? 600.0 : media.size.width * 0.9,
+          width: mediaSize.width > 599 ? 600.0 : mediaSize.width * 0.9,
           child: Row(
             children: [
               Expanded(

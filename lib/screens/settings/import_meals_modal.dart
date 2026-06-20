@@ -18,13 +18,13 @@ class ImportMealsModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width > 599
+    final width = MediaQuery.sizeOf(context).width > 599
         ? 580.0
-        : MediaQuery.of(context).size.width * 0.8;
+        : MediaQuery.sizeOf(context).width * 0.8;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (MediaQuery.of(context).size.width - width) / 2,
+        horizontal: (MediaQuery.sizeOf(context).width - width) / 2,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +77,7 @@ class ImportMealsModal extends StatelessWidget {
             },
           ),
           SizedBox(
-            height: kPadding * 2 + MediaQuery.of(context).viewInsets.bottom,
+            height: kPadding * 2 + MediaQuery.viewInsetsOf(context).bottom,
           ),
         ],
       ),

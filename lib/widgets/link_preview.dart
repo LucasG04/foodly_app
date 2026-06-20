@@ -1,4 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:clipboard/clipboard.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -6,8 +9,12 @@ import '../constants.dart';
 import '../models/link_metadata.dart';
 import '../services/link_metadata_service.dart';
 import '../utils/basic_utils.dart';
+import '../utils/main_snackbar.dart';
 import '../utils/of_context_mixin.dart';
+import '../utils/widget_utils.dart';
 import 'foodly_network_image.dart';
+import 'options_modal/options_modal.dart';
+import 'options_modal/options_modal_option.dart';
 import 'skeleton_container.dart';
 
 class LinkPreview extends StatefulWidget {
@@ -25,6 +32,37 @@ class LinkPreview extends StatefulWidget {
 }
 
 class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
+  Future<LinkMetadata?>? _metadataFuture;
+  final ValueNotifier<bool> _isPressed = ValueNotifier<bool>(false);
+
+  @override
+  void initState() {
+    super.initState();
+    _initFuture(widget.link);
+  }
+
+  @override
+  void dispose() {
+    _isPressed.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(LinkPreview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.link != widget.link) {
+      _initFuture(widget.link);
+    }
+  }
+
+  void _initFuture(String link) {
+    if (BasicUtils.isValidUri(link) && !LinkMetadataService.isCached(link)) {
+      _metadataFuture = LinkMetadataService.getFromApi(link);
+    } else {
+      _metadataFuture = null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!BasicUtils.isValidUri(widget.link)) {
@@ -39,7 +77,7 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
             ? _buildSmallCard(metadata)
             : _buildLargeCard(metadata)
         : FutureBuilder<LinkMetadata?>(
-            future: LinkMetadataService.getFromApi(widget.link),
+            future: _metadataFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return widget.isSmall
@@ -56,10 +94,48 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
           );
   }
 
-  Widget _buildLargeCard(LinkMetadata metadata) {
+  Widget _buildPressable({
+    required Widget child,
+    required VoidCallback? onTap,
+    required VoidCallback? onLongPress,
+  }) {
     return GestureDetector(
+      onTapDown: (_) => _isPressed.value = true,
+      onTapUp: (_) => _isPressed.value = false,
+      onTapCancel: () => _isPressed.value = false,
+      onLongPressStart: (_) => _isPressed.value = true,
+      onLongPressEnd: (_) => _isPressed.value = false,
+      onTap: onTap,
+      onLongPress: onLongPress == null
+          ? null
+          : () {
+              _isPressed.value = false;
+              onLongPress();
+            },
+      child: ValueListenableBuilder<bool>(
+        valueListenable: _isPressed,
+        child: child,
+        builder: (context, isPressed, child) => AnimatedScale(
+          scale: isPressed ? 0.97 : 1.0,
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeInOut,
+          child: AnimatedOpacity(
+            opacity: isPressed ? 0.82 : 1.0,
+            duration: const Duration(milliseconds: 120),
+            child: child,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLargeCard(LinkMetadata metadata) {
+    return _buildPressable(
       onTap: metadata.url != null
           ? () => launchUrl(Uri.parse(metadata.url!))
+          : () {},
+      onLongPress: metadata.url != null
+          ? () => _openLinkOptions(context, metadata.url!)
           : () {},
       child: Card(
         child: Column(
@@ -97,9 +173,12 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
 
   Widget _buildSmallCard(LinkMetadata metadata) {
     final height = _getSmallCardHeight();
-    return GestureDetector(
+    return _buildPressable(
       onTap: metadata.url != null
           ? () => launchUrl(Uri.parse(metadata.url!))
+          : () {},
+      onLongPress: metadata.url != null
+          ? () => _openLinkOptions(context, metadata.url!)
           : () {},
       child: Container(
         width: double.infinity,
@@ -163,7 +242,7 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
       child: Column(
         children: [
           SkeletonContainer(
-            width: media.size.width,
+            width: mediaSize.width,
             height: theme.textTheme.bodyLarge!.fontSize,
           ),
           Padding(
@@ -171,12 +250,12 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
             child: Column(
               children: [
                 SkeletonContainer(
-                  width: media.size.width * 0.5,
+                  width: mediaSize.width * 0.5,
                   height: _getLargeImageHeight(),
                 ),
                 const SizedBox(height: kPadding / 4),
                 SkeletonContainer(
-                  width: media.size.width,
+                  width: mediaSize.width,
                   height: theme.textTheme.bodyLarge!.fontSize! * 2,
                 ),
               ],
@@ -211,11 +290,11 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SkeletonContainer(
-                    width: media.size.width * 0.4,
+                    width: mediaSize.width * 0.4,
                     height: Theme.of(context).textTheme.bodyLarge!.fontSize,
                   ),
                   SkeletonContainer(
-                    width: media.size.width * 0.6,
+                    width: mediaSize.width * 0.6,
                     height:
                         Theme.of(context).textTheme.bodyLarge!.fontSize! * 2,
                   ),
@@ -228,7 +307,37 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
     );
   }
 
-  double _getLargeImageHeight() => media.size.height * 0.2;
+  double _getLargeImageHeight() => mediaSize.height * 0.2;
 
   double _getSmallCardHeight() => 75.0;
+
+  void _openLinkOptions(BuildContext context, String url) {
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => OptionsSheet(options: [
+        OptionsSheetOptions(
+          title: 'link_preview_options_open_link'.tr(),
+          icon: EvaIcons.externalLinkOutline,
+          onTap: () =>
+              launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+        ),
+        OptionsSheetOptions(
+          title: 'link_preview_options_copy_link'.tr(),
+          icon: EvaIcons.copyOutline,
+          onTap: () async {
+            await FlutterClipboard.copy(url);
+            if (!context.mounted) {
+              return;
+            }
+            MainSnackbar(
+              message: 'link_preview_options_copy_link_success'.tr(),
+              duration: 3,
+              isDismissible: true,
+              isCountdown: true,
+            ).show(context);
+          },
+        ),
+      ]),
+    );
+  }
 }

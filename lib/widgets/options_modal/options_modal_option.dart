@@ -7,12 +7,14 @@ class OptionsSheetOptions extends StatelessWidget {
   final String title;
   final Function() onTap;
   final Color? textColor;
+  final Widget? trailing;
 
   const OptionsSheetOptions({
     required this.icon,
     required this.title,
     required this.onTap,
     this.textColor,
+    this.trailing,
     super.key,
   });
 
@@ -41,13 +43,17 @@ class OptionsSheetOptions extends StatelessWidget {
               color: textColor ?? Theme.of(context).textTheme.bodyLarge?.color,
             ),
             const SizedBox(width: kPadding),
-            Flexible(
+            Expanded(
               child: Text(
                 title,
                 textAlign: TextAlign.start,
                 style: TextStyle(color: textColor),
               ),
             ),
+            if (trailing != null) ...[
+              const SizedBox(width: kPadding),
+              trailing!,
+            ],
           ],
         ),
       ),

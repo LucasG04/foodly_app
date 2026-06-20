@@ -26,6 +26,9 @@ ios/build
 .history
 .svn/
 hosting.*
+CLAUDE.md
+.superpowers/
+docs/
 
 # IntelliJ related
 *.iml

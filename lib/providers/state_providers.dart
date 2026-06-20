@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/ai_usage.dart';
 import '../models/foodly_user.dart';
 import '../models/plan.dart';
+import '../services/ai_usage_service.dart';
 
 /// Provides the active plan object.
 final planProvider = StateProvider<Plan?>((_) => null);
@@ -37,3 +39,13 @@ final hasConnectionProvider = StateProvider<bool>((_) => true);
 /// Whether the "keep on screen" notification should be shown.
 /// It shows once per app start, after the first "keep on screen" action
 final showKeepOnScreenNotification = StateProvider<bool>((_) => true);
+
+/// Provides the current free-plan AI usage for the active user, streamed live
+/// from Firestore. Null while no user is loaded.
+final aiUsageProvider = StreamProvider.autoDispose<AiUsage?>((ref) {
+  final userId = ref.watch(userProvider)?.id;
+  if (userId == null) {
+    return Stream<AiUsage?>.value(null);
+  }
+  return AiUsageService.streamUsage(userId);
+});

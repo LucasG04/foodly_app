@@ -34,11 +34,11 @@ class _EditGrocerySuggestionSheetState
   @override
   Widget build(BuildContext context) {
     final productGroups = ref.read(dataGroceryGroupsProvider) ?? [];
-    final width = media.size.width > 599 ? 580.0 : media.size.width * 0.9;
+    final width = mediaSize.width > 599 ? 580.0 : mediaSize.width * 0.9;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: (media.size.width - width) / 2,
+        horizontal: (mediaSize.width - width) / 2,
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -93,9 +93,9 @@ class _EditGrocerySuggestionSheetState
               }),
             ),
             SizedBox(
-              height: media.viewInsets.bottom == 0
+              height: mediaViewInsets.bottom == 0
                   ? kPadding * 2
-                  : media.viewInsets.bottom,
+                  : mediaViewInsets.bottom,
             ),
           ],
         ),

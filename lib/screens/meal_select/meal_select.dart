@@ -50,7 +50,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
   List<Meal> searchedMeals = [];
 
   double get _containerWidth {
-    final width = media.size.width * 0.9;
+    final width = mediaSize.width * 0.9;
     return width > 599 ? 600 : width;
   }
 
@@ -253,9 +253,9 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
   Widget _buildPaginatedMealList() {
     final planId = ref.read(planProvider)!.id!;
     return MealPagination(
-      loadNextMeals: (lastMealId) => MealService.getMealsPaginated(
+      loadNextMeals: (lastDoc) => MealService.getMealsPaginated(
         planId,
-        lastMealId: lastMealId,
+        lastDocument: lastDoc,
       ),
       buildMeal: (meal) => SelectMealTile(
         meal: meal,

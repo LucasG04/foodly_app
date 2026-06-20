@@ -83,7 +83,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   controller: _scrollController,
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: (media.size.width -
+                      horizontal: (mediaSize.width -
                               BasicUtils.contentWidth(context)) /
                           2,
                     ),
@@ -487,7 +487,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
 
   Widget _buildSection(List<Widget> widgets, BuildContext context) {
     return Container(
-      width: media.size.width * 0.9,
+      width: mediaSize.width * 0.9,
       margin: const EdgeInsets.only(bottom: kPadding),
       decoration: BoxDecoration(
         color: theme.dialogTheme.backgroundColor,

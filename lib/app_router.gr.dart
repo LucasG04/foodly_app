@@ -92,6 +92,7 @@ class AppRouter extends _i12.RootStackRouter {
         routeData: routeData,
         child: _i9.MealCreateScreen(
           id: args.id,
+          navigateToDetailOnCreate: args.navigateToDetailOnCreate,
           key: args.key,
         ),
       );
@@ -294,12 +295,14 @@ class MealCreateScreenRoute
     extends _i12.PageRouteInfo<MealCreateScreenRouteArgs> {
   MealCreateScreenRoute({
     required String id,
+    bool navigateToDetailOnCreate = false,
     _i13.Key? key,
   }) : super(
           MealCreateScreenRoute.name,
           path: '/meal-create/:id',
           args: MealCreateScreenRouteArgs(
             id: id,
+            navigateToDetailOnCreate: navigateToDetailOnCreate,
             key: key,
           ),
         );
@@ -310,16 +313,19 @@ class MealCreateScreenRoute
 class MealCreateScreenRouteArgs {
   const MealCreateScreenRouteArgs({
     required this.id,
+    this.navigateToDetailOnCreate = false,
     this.key,
   });
 
   final String id;
 
+  final bool navigateToDetailOnCreate;
+
   final _i13.Key? key;
 
   @override
   String toString() {
-    return 'MealCreateScreenRouteArgs{id: $id, key: $key}';
+    return 'MealCreateScreenRouteArgs{id: $id, navigateToDetailOnCreate: $navigateToDetailOnCreate, key: $key}';
   }
 }
 
