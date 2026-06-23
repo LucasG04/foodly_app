@@ -10,6 +10,7 @@ import 'package:simple_icons/simple_icons.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
+import '../../models/ai_usage.dart';
 import '../../models/ingredient.dart';
 import '../../models/meal.dart';
 import '../../providers/state_providers.dart';
@@ -233,7 +234,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                   textEditingController:
                                       _instructionsController,
                                   hintText:
-                                      'meal_create_instruction_placeholder'.tr(),
+                                      'meal_create_instruction_placeholder'
+                                          .tr(),
                                 ),
                                 _buildDivider(),
                                 Consumer(builder: (context, ref, _) {
@@ -677,7 +679,16 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
   Future<void> _startSharedUrlImport(ImportType type, String url) async {
     if (type == ImportType.instagram) {
       final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
-      final usage = await ref.read(aiUsageProvider.future);
+      AiUsage? usage;
+      try {
+        usage = await ref
+            .read(aiUsageProvider.future)
+            .timeout(const Duration(seconds: 5));
+      } catch (_) {
+        // On cold start the Firestore connection may not be ready yet,
+        // causing the stream to hang or error. Default to null so the
+        // canUse check below allows access.
+      }
       if (!mounted) {
         return;
       }

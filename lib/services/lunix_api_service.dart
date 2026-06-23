@@ -21,6 +21,7 @@ import '../models/upcoming_feature.dart';
 import '../utils/basic_utils.dart';
 import '../utils/env.dart';
 import 'ai_generation_exception.dart';
+import 'ai_quota_exceeded_exception.dart';
 import 'meal_service.dart';
 import 'rate_limit_exception.dart';
 import 'settings_service.dart';
@@ -455,6 +456,10 @@ class LunixApiService {
         // keep default code
       }
       throw AIRejectionException(code);
+    }
+    if (status == 429) {
+      await _drain(byteStream);
+      throw const AiQuotaExceededException();
     }
     if (status != 200) {
       await _drain(byteStream);
