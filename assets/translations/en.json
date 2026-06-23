@@ -136,6 +136,7 @@
   "meal_create_ingredients_title": "Ingredients",
   "meal_create_servings_title": "Servings",
   "meal_create_instruction_title": "Instruction",
+  "meal_create_instruction_placeholder": "## Preparation\n1. **Preheat** the oven to 200°C.\n2. Dice the onions and sauté until golden.\n\n## Tip\n- Serve warm with fresh bread.",
   "meal_create_source_title": "Source",
   "meal_create_source_placeholder": "Grandma or https://tasty.co/...",
   "meal_create_duration_title": "Duration (min)",

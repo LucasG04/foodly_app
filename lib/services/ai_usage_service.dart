@@ -14,7 +14,7 @@ class AiUsageService {
 
   static final _log = Logger('AiUsageService');
   static final CollectionReference<Map<String, dynamic>> _collection =
-      FirebaseFirestore.instance.collection('ai_usage');
+      FirebaseFirestore.instance.collection('aiUsage');
 
   /// Live usage for [userId], normalized to the current window.
   static Stream<AiUsage> streamUsage(String userId) {

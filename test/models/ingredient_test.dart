@@ -26,7 +26,8 @@ void main() {
       expect(ingredient.group, 'For the dough');
     });
 
-    test('fromMap defaults group to null when key is absent (backwards compat)', () {
+    test('fromMap defaults group to null when key is absent (backwards compat)',
+        () {
       final map = <String, dynamic>{
         'name': 'flour',
         'amount': 200.0,
@@ -77,7 +78,8 @@ void main() {
       expect(Ingredient.fromMap(map).sortKey, 3);
     });
 
-    test('fromMap defaults sortKey to null when key absent (backwards compat)', () {
+    test('fromMap defaults sortKey to null when key absent (backwards compat)',
+        () {
       final map = <String, dynamic>{
         'name': 'flour',
         'amount': 100.0,
@@ -108,7 +110,7 @@ void main() {
     test('always puts null group first', () {
       final ingredients = [
         Ingredient(name: 'a', group: 'Sauce'),
-        Ingredient(name: 'b', group: null),
+        Ingredient(name: 'b'),
       ];
       final groups = Ingredient.orderedGroupsSorted(ingredients, null);
       expect(groups.first, isNull);
@@ -129,8 +131,7 @@ void main() {
         Ingredient(name: 'a', group: 'Extra'),
         Ingredient(name: 'b', group: 'Sauce'),
       ];
-      final groups =
-          Ingredient.orderedGroupsSorted(ingredients, ['Sauce']);
+      final groups = Ingredient.orderedGroupsSorted(ingredients, ['Sauce']);
       expect(groups, [null, 'Sauce', 'Extra']);
     });
 
@@ -144,14 +145,15 @@ void main() {
     });
 
     test('omits groups with no ingredients', () {
-      final ingredients = [Ingredient(name: 'a', group: null)];
-      final groups =
-          Ingredient.orderedGroupsSorted(ingredients, ['Ghost']);
+      final ingredients = [Ingredient(name: 'a')];
+      final groups = Ingredient.orderedGroupsSorted(ingredients, ['Ghost']);
       // 'Ghost' is in groupOrder but no ingredient belongs to it
       expect(groups.contains('Ghost'), isFalse);
     });
 
-    test('inserts null group first even when all ingredients have a named group', () {
+    test(
+        'inserts null group first even when all ingredients have a named group',
+        () {
       final ingredients = [
         Ingredient(name: 'a', group: 'Sauce'),
         Ingredient(name: 'b', group: 'Spices'),

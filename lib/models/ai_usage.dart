@@ -14,7 +14,7 @@ class AiUsage {
     required this.instagramUsed,
   });
 
-  /// Builds usage from an `ai_usage` Firestore document. When the document is
+  /// Builds usage from an `aiUsage` Firestore document. When the document is
   /// missing or belongs to a past window ([currentPeriodKey] differs), counts
   /// are treated as zero so the fresh quota shows immediately at rollover.
   factory AiUsage.fromDoc(

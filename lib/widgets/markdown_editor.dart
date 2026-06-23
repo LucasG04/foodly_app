@@ -11,9 +11,11 @@ import '../utils/of_context_mixin.dart';
 
 class MarkdownEditor extends ConsumerStatefulWidget {
   final TextEditingController textEditingController;
+  final String? hintText;
 
   const MarkdownEditor({
     required this.textEditingController,
+    this.hintText,
     super.key,
   });
 
@@ -107,9 +109,9 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
                       maxLines: null,
                       onChanged: (data) =>
                           ref.read(_$currentText.notifier).state = data,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText:
+                        hintText: widget.hintText ??
                             '# Title\n## Subtitle\n- The quick brown fox jumps over the lazy dog\n- Lorem ipsum dolor sit amet, ...',
                       ),
                       cursorColor: theme.primaryColor,

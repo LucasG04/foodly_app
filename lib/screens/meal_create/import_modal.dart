@@ -14,13 +14,17 @@ import '../../models/meal.dart';
 import '../../models/meal_generation_event.dart';
 import '../../providers/data_provider.dart';
 import '../../services/ai_generation_exception.dart';
+import '../../services/ai_quota_exceeded_exception.dart';
 import '../../services/lunix_api_service.dart';
+import '../../utils/ai_usage_period.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/convert_util.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
+import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/foodly_network_image.dart';
+import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
@@ -804,14 +808,33 @@ class _ImportModalState extends ConsumerState<ImportModal>
     if (!mounted) {
       return;
     }
-    final message = error is AIRejectionException
-        ? _messageForErrorCode(error.code)
-        : 'import_modal_error_generation'.tr();
-    MainSnackbar(
-      isError: true,
-      message: message,
-      isDismissible: true,
-    ).show(context);
+    if (error is AIRejectionException) {
+      MainSnackbar(
+        isError: true,
+        message: _messageForErrorCode(error.code),
+        isDismissible: true,
+      ).show(context);
+    } else if (error is AiQuotaExceededException) {
+      final resetDate = DateFormat.yMMMMd(context.locale.toLanguageTag())
+          .format(AiUsagePeriod.currentPeriodEnd());
+      MainSnackbar(
+        message: 'ai_usage_exhausted'.tr(args: [resetDate]),
+        isError: true,
+        action: TextButton(
+          onPressed: () => WidgetUtils.showFoodlyBottomSheet<void>(
+            context: context,
+            builder: (_) => const GetPremiumModal(),
+          ),
+          child: Text('ai_usage_upgrade'.tr()),
+        ),
+      ).show(context);
+    } else {
+      MainSnackbar(
+        isError: true,
+        message: 'import_modal_error_generation'.tr(),
+        isDismissible: true,
+      ).show(context);
+    }
     KeepScreenOn.turnOff();
     setState(() {
       _phase = _GenPhase.input;
@@ -973,8 +996,6 @@ class _IngredientRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final amount =
         ConvertUtil.amountToString(ingredient.amount, ingredient.unit);
-    final hasGroup =
-        ingredient.productGroup != null && ingredient.productGroup!.isNotEmpty;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: kPadding / 4),
@@ -992,27 +1013,6 @@ class _IngredientRow extends StatelessWidget {
                   ? (ingredient.name ?? '')
                   : '$amount ${ingredient.name ?? ''}',
             ),
-          ),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 250),
-            child: !hasGroup
-                ? const SizedBox.shrink()
-                : Container(
-                    key: ValueKey(ingredient.productGroup),
-                    margin: const EdgeInsets.only(left: kPadding / 2),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: kPadding / 2,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: kLightAccentColor,
-                      borderRadius: BorderRadius.circular(kRadius),
-                    ),
-                    child: Text(
-                      ingredient.productGroup!,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ),
           ),
         ],
       ),

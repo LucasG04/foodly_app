@@ -136,6 +136,7 @@
   "meal_create_ingredients_title": "Zutaten",
   "meal_create_servings_title": "Portionen",
   "meal_create_instruction_title": "Anleitung",
+  "meal_create_instruction_placeholder": "## Zubereitung\n1. Ofen auf **200 °C** vorheizen.\n2. Zwiebeln würfeln und goldbraun anbraten.\n\n## Tipp\n- Warm mit frischem Brot servieren.",
   "meal_create_source_title": "Quelle",
   "meal_create_source_placeholder": "Oma o. https://chefkoch.de/...",
   "meal_create_duration_title": "Dauer (min)",
