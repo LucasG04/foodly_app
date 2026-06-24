@@ -13,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -22,7 +21,6 @@ import 'package:share_handler/share_handler.dart';
 import 'app_router.gr.dart';
 import 'constants.dart';
 import 'models/foodly_user.dart';
-import 'models/link_metadata.dart';
 import 'models/plan.dart';
 import 'primary_colors.dart';
 import 'providers/data_provider.dart';
@@ -30,6 +28,7 @@ import 'providers/state_providers.dart';
 import 'services/app_review_service.dart';
 import 'services/authentication_service.dart';
 import 'services/foodly_user_service.dart';
+import 'services/hive_migration_service.dart';
 import 'services/image_cache_manager.dart';
 import 'services/in_app_purchase_service.dart';
 import 'services/link_metadata_service.dart';
@@ -82,7 +81,7 @@ void main() {
       await Future.wait([
         EasyLocalization.ensureInitialized(),
         _configureFirebaseSettings(),
-        initializeHive(),
+        initializeIsar(),
       ]);
       runApp(
         Phoenix(
@@ -105,9 +104,7 @@ void main() {
   );
 }
 
-Future<void> initializeHive() async {
-  await Hive.initFlutter();
-  Hive.registerAdapter(LinkMetadataAdapter());
+Future<void> initializeIsar() async {
   await Future.wait<dynamic>([
     SettingsService.initialize(),
     LinkMetadataService.initialize(),
@@ -118,15 +115,10 @@ Future<void> initializeHive() async {
     ImageCacheManager.initialize(),
   ]);
 
-  // clean up old boxes
-  try {
-    Hive.deleteBoxFromDisk('imageCache');
-    Hive.deleteBoxFromDisk('imageCache2');
-    Hive.deleteBoxFromDisk('imageCache3');
-  } catch (e) {
-    // ignore: avoid_print
-    print('Error while cleaning up old boxes: $e');
-  }
+  // One-time readback of legacy Hive boxes into the now Isar-backed services.
+  // Must run after the services above are initialized; self-disables once the
+  // old Hive files are gone.
+  await HiveMigrationService.migrate();
 }
 
 class FoodlyApp extends ConsumerStatefulWidget {

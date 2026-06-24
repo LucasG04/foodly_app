@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
@@ -117,7 +118,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
     );
 
     if (lastCheckedVersionString == null) {
-      VersionService.lastCheckedVersion = packageInfo.version;
+      await VersionService.setLastCheckedVersion(packageInfo.version);
       return false;
     }
 
@@ -204,7 +205,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
       context: context,
       builder: (_) => NewVersionModal(versionGroups: versionGroups),
     );
-    VersionService.lastCheckedVersion = packageInfo.version;
+    await VersionService.setLastCheckedVersion(packageInfo.version);
     return true;
   }
 
@@ -212,7 +213,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
     if (!_shouldCheckForUpdate()) {
       return;
     }
-    VersionService.lastCheckedForUpdate = DateTime.now();
+    await VersionService.setLastCheckedForUpdate(DateTime.now());
 
     if (Platform.isAndroid) {
       _checkForUpdateAndroid();

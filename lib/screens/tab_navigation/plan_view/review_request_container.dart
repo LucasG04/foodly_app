@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
@@ -101,7 +102,7 @@ class _ReviewRequestContainerState extends ConsumerState<ReviewRequestContainer>
   Widget _buildDiscardButton(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        AppReviewService.discardRequest();
+        unawaited(AppReviewService.discardRequest());
       },
       child: SizedBox(
         width: (Theme.of(context).iconTheme.size ?? 24) + 10,
@@ -143,7 +144,7 @@ class _ReviewRequestContainerState extends ConsumerState<ReviewRequestContainer>
             TextButton.icon(
               onPressed: () {
                 AutoRouter.of(context).push(const FeedbackScreenRoute());
-                AppReviewService.discardRequest();
+                unawaited(AppReviewService.discardRequest());
               },
               label: const Text('plan_rate_feedback').tr(),
               icon: const Icon(EvaIcons.paperPlaneOutline),
