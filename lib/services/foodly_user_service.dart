@@ -69,6 +69,11 @@ class FoodlyUserService {
     }
   }
 
+  static Future<void> setIsPremium(String userId, bool isPremium) {
+    log.finer('Call setIsPremium with UserId: $userId | isPremium: $isPremium');
+    return _firestore.doc(userId).update(<String, bool>{'isPremium': isPremium});
+  }
+
   static Future<void> resetPremiumGifted(String userId) async {
     log.finer('Call resetPremiumGifted');
     final user = await getUserById(userId);
