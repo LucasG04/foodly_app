@@ -816,7 +816,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
       ).show(context);
     } else if (error is AiQuotaExceededException) {
       final resetDate = DateFormat.yMMMMd(context.locale.toLanguageTag())
-          .format(AiUsagePeriod.currentPeriodEnd());
+          .format(AiUsagePeriod.currentPeriodEnd().toLocal());
       MainSnackbar(
         message: 'ai_usage_exhausted'.tr(args: [resetDate]),
         isError: true,

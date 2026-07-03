@@ -4,14 +4,19 @@
 /// a plain date keeps the bucket flexible (the granularity can change later)
 /// and human-readable. The reset moment is the following Monday and is always
 /// derived from the clock — never persisted.
+///
+/// All computation happens in UTC to match the backend, which fixes the
+/// window to UTC Monday.
 class AiUsagePeriod {
   AiUsagePeriod._();
 
-  /// Monday 00:00 of the week containing [now] (defaults to `DateTime.now()`).
+  /// UTC Monday 00:00 of the week containing [now] (defaults to
+  /// `DateTime.now()`).
   static DateTime periodStart([DateTime? now]) {
-    final date = now ?? DateTime.now();
-    return DateTime(date.year, date.month, date.day)
-        .subtract(Duration(days: date.weekday - DateTime.monday));
+    final date = (now ?? DateTime.now()).toUtc();
+    final daysSinceMonday = (date.weekday - DateTime.monday) % 7;
+    return DateTime.utc(date.year, date.month, date.day)
+        .subtract(Duration(days: daysSinceMonday));
   }
 
   /// Stable key for the current window, e.g. `2026-06-08`.
