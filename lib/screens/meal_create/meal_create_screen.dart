@@ -14,6 +14,7 @@ import '../../models/ai_usage.dart';
 import '../../models/ingredient.dart';
 import '../../models/meal.dart';
 import '../../providers/state_providers.dart';
+import '../../services/ai_quota_exceeded_exception.dart';
 import '../../services/authentication_service.dart';
 import '../../services/in_app_purchase_service.dart';
 import '../../services/link_metadata_service.dart';
@@ -859,6 +860,11 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       if (result != null) {
         _kcalController.text = result.toString();
       }
+    } on AiQuotaExceededException {
+      if (!mounted) {
+        return;
+      }
+      _showAiQuotaExhausted();
     } on RateLimitException catch (e) {
       if (!mounted) {
         return;

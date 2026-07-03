@@ -614,13 +614,17 @@ class LunixApiService {
           'ingredients': meal.ingredients?.map((i) => i.toMap()).toList() ?? [],
           'language': language,
           'mealId': meal.id,
+          'userId': AuthenticationService.currentUser?.uid ?? '',
         },
       );
       return KcalEstimate.fromMap(response.data!);
     } on DioException catch (e) {
       if (e.response?.statusCode == 429) {
-        final seconds =
-            (e.response?.data as Map?)?['retryAfterSeconds'] as int? ?? 60;
+        final body = e.response?.data as Map?;
+        if (body?['code'] == 'QUOTA_EXCEEDED') {
+          throw const AiQuotaExceededException();
+        }
+        final seconds = body?['retryAfterSeconds'] as int? ?? 60;
         throw RateLimitException(retryAfterSeconds: seconds);
       }
       _log.severe('ERR in estimateKcal', e);
