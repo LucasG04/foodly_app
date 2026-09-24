@@ -6,6 +6,8 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:logging/logging.dart' as app_logger;
 
 import '../../constants.dart';
+import '../../models/image_credit.dart';
+import '../../models/lunix_image.dart';
 import '../../providers/state_providers.dart';
 import '../../services/link_metadata_service.dart';
 import '../../services/lunix_api_service.dart';
@@ -17,7 +19,7 @@ import '../small_circular_progress_indicator.dart';
 import '../user_information.dart';
 
 class WebImagePicker extends ConsumerStatefulWidget {
-  final Function(String) onPick;
+  final Function(String url, ImageCredit? credit) onPick;
   final Function() onClose;
 
   const WebImagePicker({
@@ -38,7 +40,7 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
   final Key _animationLimiterKey = UniqueKey();
 
   int _imagePage = 0;
-  List<String> _images = [];
+  List<LunixImage> _images = [];
   bool _isLoading = false;
   bool _isLoadingMore = false;
   bool _noResults = false;
@@ -182,7 +184,7 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
           children: _images
               .asMap()
               .map(
-                (int index, String url) => MapEntry(
+                (int index, LunixImage image) => MapEntry(
                   index,
                   AnimationConfiguration.staggeredGrid(
                     position: index,
@@ -190,7 +192,7 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
                     columnCount: 3,
                     child: ScaleAnimation(
                       child: FadeInAnimation(
-                        child: _buildImage(url),
+                        child: _buildImage(image),
                       ),
                     ),
                   ),
@@ -214,11 +216,11 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
     ];
   }
 
-  Widget _buildImage(String url) {
-    url = url.replaceFirst('http://', 'https://');
+  Widget _buildImage(LunixImage image) {
+    final url = image.url.replaceFirst('http://', 'https://');
     return _buildImageContainer(
       child: InkWell(
-        onTap: () => _selectImage(url),
+        onTap: () => widget.onPick(url, image.credit),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(kRadius),
           child: FoodlyNetworkImage(url),
@@ -284,7 +286,8 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
     }
 
     if (imageFromUrl != null) {
-      widget.onPick(imageFromUrl);
+      // og:image scrape: no attribution available.
+      widget.onPick(imageFromUrl, null);
       return;
     }
 
@@ -303,7 +306,7 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
         return;
       }
       setState(() {
-        _images = response.images.map((e) => e.url).toList();
+        _images = response.images;
         _noResults = _images.isEmpty;
       });
     } catch (e) {
@@ -365,12 +368,8 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
     }
 
     setState(() {
-      _images.addAll(response.images.map((e) => e.url));
+      _images.addAll(response.images);
       _isLoadingMore = false;
     });
-  }
-
-  void _selectImage(String url) {
-    widget.onPick(url);
   }
 }

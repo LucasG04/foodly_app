@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:keep_screen_on/keep_screen_on.dart';
 
 import '../../constants.dart';
+import '../../models/image_credit.dart';
 import '../../models/ingredient.dart';
 import '../../models/meal.dart';
 import '../../models/meal_generation_event.dart';
@@ -78,6 +79,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
   final SplayTreeMap<int, Ingredient> _ingredients =
       SplayTreeMap<int, Ingredient>();
   String? _imageUrl;
+  ImageCredit? _imageCredit;
   bool _imageResolved = false;
   bool _partialWarning = false;
   bool _popScheduled = false;
@@ -762,9 +764,10 @@ class _ImportModalState extends ConsumerState<ImportModal>
           if (existing != null) {
             _ingredients[index] = existing.copyWith(productGroup: productGroup);
           }
-        case ImageEvent(:final imageUrl):
+        case ImageEvent(:final imageUrl, :final imageCredit):
           _advanceEnrichStep(_EnrichStep.image);
           _imageUrl = imageUrl;
+          _imageCredit = imageCredit;
           _imageResolved = true;
         case DoneEvent():
           _phase = _GenPhase.done;
@@ -883,6 +886,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
       instructions: _instructions,
       ingredients: _ingredients.values.toList(),
       imageUrl: _imageUrl ?? '',
+      imageCredit: _imageCredit,
       source: widget.type != ImportType.text ? _controller.text.trim() : '',
     );
   }
