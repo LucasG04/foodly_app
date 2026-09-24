@@ -7,10 +7,15 @@ import 'package:logging/logging.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../constants.dart';
+import '../../models/image_credit.dart';
 import '../../services/storage_service.dart';
 import '../../utils/main_snackbar.dart';
 import '../small_circular_progress_indicator.dart';
 import 'web_image_picker.dart';
+
+/// Result of [SelectPickerDialog]: a storage file name or an absolute URL,
+/// plus attribution when the image came from a stock photo search.
+typedef PickedImage = ({String image, ImageCredit? credit});
 
 class SelectPickerDialog extends StatefulWidget {
   const SelectPickerDialog({super.key});
@@ -123,7 +128,8 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
       if (!mounted) {
         return;
       }
-      Navigator.pop(context, storedRef.name);
+      Navigator.pop<PickedImage>(
+          context, (image: storedRef.name, credit: null));
     } catch (e) {
       _log.severe('ERR: StorageService.uploadFile', e);
       if (!mounted) {
@@ -136,10 +142,10 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
     }
   }
 
-  void _setWebImageUrl(String url) {
+  void _setWebImageUrl(String url, ImageCredit? credit) {
     final parsedUri = Uri.tryParse(url);
     if (parsedUri != null && parsedUri.isAbsolute) {
-      Navigator.pop(context, url);
+      Navigator.pop<PickedImage>(context, (image: url, credit: credit));
     }
   }
 

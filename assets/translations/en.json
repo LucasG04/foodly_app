@@ -252,6 +252,7 @@
   "markdown_preview": "preview",
   "image_picker_dialog_camera": "camera",
   "image_picker_dialog_gallery": "gallery",
+  "image_credit_photo_by": "Photo by {}",
   "image_picker_dialog_web": "web",
   "image_picker_dialog_camera_access_denied": "You have denied access to your camera. Please allow access in the settings.",
   "image_picker_dialog_photo_access_denied": "You have denied access to your photos. Please allow access in the settings.",
