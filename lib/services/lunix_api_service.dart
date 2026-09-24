@@ -13,6 +13,7 @@ import '../models/grocery_group.dart';
 import '../models/kcal_estimate.dart';
 import '../models/lunix_docx.dart';
 import '../models/lunix_image.dart';
+import '../models/mcp_token.dart';
 import '../models/meal.dart';
 import '../models/meal_generation_event.dart';
 import '../models/plan.dart';
@@ -47,6 +48,14 @@ class LunixApiService {
   static String get apiEndpoint => SettingsService.useDevApi
       ? 'https://lunix-api-dev.golenia.dev/foodly'
       : 'https://lunix-api.golenia.dev/foodly';
+  static String get mcpEndpoint => '$apiEndpoint/mcp';
+
+  static Future<Options> _firebaseAuthOptions() async => Options(
+        headers: <String, dynamic>{
+          'x-firebase-token':
+              await AuthenticationService.currentUser!.getIdToken(),
+        },
+      );
 
   static Future<bool> lunixApiAvailable() async {
     Response? response;
@@ -624,6 +633,60 @@ class LunixApiService {
         throw RateLimitException(retryAfterSeconds: seconds);
       }
       _log.severe('ERR in estimateKcal', e);
+      rethrow;
+    }
+  }
+
+  /// Returns the new plaintext token. Replaces any existing one. Throws on
+  /// failure.
+  static Future<McpToken> createMcpToken() async {
+    _log.finer('Call createMcpToken()');
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        '$apiEndpoint/mcp-token',
+        options: await _firebaseAuthOptions(),
+      );
+      return McpToken(
+        token: response.data!['token'] as String,
+        createdAt: DateTime.fromMillisecondsSinceEpoch(
+          (response.data!['createdAt'] as num).toInt(),
+        ),
+      );
+    } catch (e) {
+      _log.severe('ERR in createMcpToken', e);
+      rethrow;
+    }
+  }
+
+  /// Null if the user has no token. Throws on failure.
+  static Future<DateTime?> getMcpTokenCreatedAt() async {
+    _log.finer('Call getMcpTokenCreatedAt()');
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        '$apiEndpoint/mcp-token',
+        options: await _firebaseAuthOptions(),
+      );
+      final data = response.data!;
+      return data['exists'] == true
+          ? DateTime.fromMillisecondsSinceEpoch(
+              (data['createdAt'] as num).toInt(),
+            )
+          : null;
+    } catch (e) {
+      _log.severe('ERR in getMcpTokenCreatedAt', e);
+      rethrow;
+    }
+  }
+
+  static Future<void> deleteMcpToken() async {
+    _log.finer('Call deleteMcpToken()');
+    try {
+      await _dio.delete<void>(
+        '$apiEndpoint/mcp-token',
+        options: await _firebaseAuthOptions(),
+      );
+    } catch (e) {
+      _log.severe('ERR in deleteMcpToken', e);
       rethrow;
     }
   }

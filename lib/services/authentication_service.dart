@@ -9,6 +9,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../utils/firebase_auth_providers.dart';
 import 'foodly_user_service.dart';
 import 'in_app_purchase_service.dart';
+import 'lunix_api_service.dart';
 
 class AuthenticationService {
   AuthenticationService._();
@@ -66,6 +67,15 @@ class AuthenticationService {
     _log.finer('Call deleteAccount');
     if (_auth.currentUser == null) {
       return;
+    }
+    // Revoke first, while the ID token is still valid. Best effort: must never
+    // block the deletion.
+    try {
+      // Dio has no timeouts; cap it so an offline revoke can't stall deletion.
+      await LunixApiService.deleteMcpToken()
+          .timeout(const Duration(seconds: 5));
+    } catch (e) {
+      _log.severe('ERR! deleteAccount at deleteMcpToken', e);
     }
     try {
       FoodlyUserService.deleteUserById(_auth.currentUser!.uid);

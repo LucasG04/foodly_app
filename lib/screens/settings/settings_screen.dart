@@ -38,6 +38,7 @@ import 'help_slides/help_slide_share_import.dart';
 import 'import_meals_modal.dart';
 import 'settings_alerts.dart';
 import 'settings_change_primary_color_modal.dart';
+import 'settings_mcp_token_modal.dart';
 import 'settings_reauthenticate_modal.dart';
 import 'settings_tile.dart';
 
@@ -352,6 +353,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                         ], context),
                         _buildSectionTitle('settings_section_account'.tr()),
                         _buildSection([
+                          SettingsTile(
+                            onTap: () => WidgetUtils.showFoodlyBottomSheet(
+                              context: context,
+                              scrollable: true,
+                              // Drag-to-dismiss bypasses PopScope, which keeps
+                              // the freshly created token from being closed.
+                              enableDrag: false,
+                              builder: (_) => const SettingsMcpTokenModal(),
+                            ),
+                            leadingIcon: EvaIcons.code,
+                            text: 'settings_section_account_mcp'.tr(),
+                            trailing:
+                                const Icon(EvaIcons.arrowIosForwardOutline),
+                          ),
                           SettingsTile(
                             onTap: () async {
                               await AuthenticationService.resetPassword(

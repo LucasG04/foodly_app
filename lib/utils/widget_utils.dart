@@ -17,11 +17,13 @@ class WidgetUtils {
     required Widget Function(BuildContext) builder,
     bool scrollable = false,
     bool unfocus = true,
+    bool enableDrag = true,
   }) async {
     if (!context.mounted) {
       return Future.value();
     }
     final result = await showBarModalBottomSheet<T>(
+      enableDrag: enableDrag,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(10.0),
