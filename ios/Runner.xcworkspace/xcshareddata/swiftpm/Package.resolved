@@ -23,17 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/firebase-ios-sdk",
       "state" : {
-        "revision" : "8c29ca981990a32e626c8617544fa65d22b1834f",
-        "version" : "12.19.2"
-      }
-    },
-    {
-      "identity" : "flutterfire",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/firebase/flutterfire",
-      "state" : {
-        "revision" : "05731e3fb091093546db363e379bff166f7286a3",
-        "version" : "4.4.0-firebase-core-swift"
+        "revision" : "27eaab3918e0bf78711cf1abf240577176326432",
+        "version" : "12.19.0"
       }
     },
     {
@@ -142,6 +133,15 @@
       "state" : {
         "revision" : "4faa17c4a290954fbdbf8f8a6bf0f58e48a8256c",
         "version" : "5.90.2"
+      }
+    },
+    {
+      "identity" : "recaptcha-enterprise-mobile-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/GoogleCloudPlatform/recaptcha-enterprise-mobile-sdk.git",
+      "state" : {
+        "revision" : "85588690041e63784be7bcb4b631c32565127ba2",
+        "version" : "18.9.1"
       }
     }
   ],

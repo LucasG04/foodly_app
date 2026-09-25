@@ -64,15 +64,14 @@ dependencies:
   objectbox_flutter_libs: ^4.1.0
 
   # Firebase
-  # If updating any version, check the firebase sdk version in "/ios/Podfile"
-  cloud_firestore: ^6.1.2
-  firebase_analytics: ^12.1.2
-  firebase_app_check: ^0.4.1+4
-  firebase_auth: ^6.1.4
-  firebase_core: ^4.3.0
-  firebase_crashlytics: ^5.0.7
-  firebase_storage: ^13.0.6
-  firebase_performance: ^0.11.1+4
+  cloud_firestore: ^6.10.0
+  firebase_analytics: ^12.6.0
+  firebase_app_check: ^0.4.8
+  firebase_auth: ^6.7.0
+  firebase_core: ^4.15.0
+  firebase_crashlytics: ^5.4.0
+  firebase_storage: ^13.6.0
+  firebase_performance: ^0.11.6
 
   # Widgets
   flutter_snake_navigationbar: ^0.6.1
