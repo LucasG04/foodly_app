@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/ai_usage.dart';
 import '../models/foodly_user.dart';
 import '../models/plan.dart';
 import '../services/ai_usage_service.dart';
+import '../services/lunix_api_service.dart';
 
 /// Provides the active plan object.
 final planProvider = StateProvider<Plan?>((_) => null);
@@ -40,12 +43,30 @@ final hasConnectionProvider = StateProvider<bool>((_) => true);
 /// It shows once per app start, after the first "keep on screen" action
 final showKeepOnScreenNotification = StateProvider<bool>((_) => true);
 
-/// Provides the current free-plan AI usage for the active user, streamed live
-/// from Firestore. Null while no user is loaded.
-final aiUsageProvider = StreamProvider.autoDispose<AiUsage?>((ref) {
-  final userId = ref.watch(userProvider)?.id;
-  if (userId == null) {
-    return Stream<AiUsage?>.value(null);
+/// Free-plan AI limits from the backend. Cached once fetched; a failed fetch
+/// silently retries every 10s while anything is listening.
+final aiLimitsProvider = FutureProvider.autoDispose<AiLimits>((ref) async {
+  try {
+    final limits = await LunixApiService.getAiLimits();
+    ref.keepAlive();
+    return limits;
+  } catch (_) {
+    final retry = Timer(const Duration(seconds: 10), ref.invalidateSelf);
+    ref.onDispose(retry.cancel);
+    rethrow;
   }
-  return AiUsageService.streamUsage(userId);
+});
+
+/// Provides the current free-plan AI usage for the active user, streamed live
+/// from Firestore. Null while no user is loaded; errors if the limits can't be
+/// fetched (the UI then allows the action and the backend enforces the quota).
+final aiUsageProvider = StreamProvider.autoDispose<AiUsage?>((ref) async* {
+  // Watch everything before the async gap (see Riverpod autoDispose caveat).
+  final userId = ref.watch(userProvider)?.id;
+  final limits = ref.watch(aiLimitsProvider.future);
+  if (userId == null) {
+    yield null;
+    return;
+  }
+  yield* AiUsageService.streamUsage(userId, await limits);
 });

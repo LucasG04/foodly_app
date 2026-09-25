@@ -14,11 +14,12 @@ class AiUsageService {
       FirebaseFirestore.instance.collection('aiUsage');
 
   /// Live usage for [userId], normalized to the current window.
-  static Stream<AiUsage> streamUsage(String userId) {
+  static Stream<AiUsage> streamUsage(String userId, AiLimits limits) {
     return _collection.doc(userId).snapshots().map(
           (snap) => AiUsage.fromDoc(
             snap.data(),
             currentPeriodKey: AiUsagePeriod.currentPeriodKey(),
+            limits: limits,
           ),
         );
   }

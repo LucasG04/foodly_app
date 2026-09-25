@@ -7,6 +7,7 @@ import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../constants.dart';
+import '../models/ai_usage.dart';
 import '../models/foodly_change.dart';
 import '../models/grocery.dart';
 import '../models/grocery_group.dart';
@@ -304,6 +305,13 @@ class LunixApiService {
     return data;
   }
 
+  static Future<AiLimits> getAiLimits() async {
+    _log.finer('Call getAiLimits()');
+    final response =
+        await _dio.get<Map<String, dynamic>>('$apiEndpoint/ai-limits');
+    return AiLimits.fromMap(response.data!);
+  }
+
   static Future<List<GroceryGroup>> getGroceryGroups(String langCode) async {
     _log.finer('Call getGroceryGroups()');
     Response? response;
@@ -437,13 +445,16 @@ class LunixApiService {
           'type': source.wireValue,
           'data': data,
           'language': langCode,
-          'userId': AuthenticationService.currentUser?.uid ?? '',
         },
         options: Options(
           responseType: ResponseType.stream,
           // Read 4xx bodies instead of throwing, so we can inspect 422/400.
           validateStatus: (status) => status != null && status < 500,
-          headers: <String, dynamic>{'Accept': 'application/x-ndjson'},
+          headers: <String, dynamic>{
+            'Accept': 'application/x-ndjson',
+            'x-firebase-token':
+                await AuthenticationService.currentUser!.getIdToken(),
+          },
         ),
       );
     } on DioException catch (e) {
@@ -623,8 +634,8 @@ class LunixApiService {
           'ingredients': meal.ingredients?.map((i) => i.toMap()).toList() ?? [],
           'language': language,
           'mealId': meal.id,
-          'userId': AuthenticationService.currentUser?.uid ?? '',
         },
+        options: await _firebaseAuthOptions(),
       );
       return KcalEstimate.fromMap(response.data!);
     } on DioException catch (e) {

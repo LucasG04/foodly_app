@@ -9,6 +9,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../providers/state_providers.dart';
 import '../utils/env.dart';
+import 'authentication_service.dart';
 import 'foodly_user_service.dart';
 
 final _userIsSubscribedProvider = StateProvider<bool>((_) => false);
@@ -107,7 +108,11 @@ class InAppPurchaseService {
 
   static Future<void> _syncIsPremium(bool isSubscribed) async {
     final user = _ref?.read(userProvider);
-    if (user == null || user.id == null) {
+    // Skip when signed out meanwhile: a late anonymous RevenueCat result must
+    // not overwrite the previous user's isPremium.
+    if (user == null ||
+        user.id == null ||
+        AuthenticationService.currentUser?.uid != user.id) {
       return;
     }
     if ((user.isPremium ?? false) == isSubscribed) {
