@@ -6,6 +6,3 @@
 
 ### Further improvements
 - ...
-
-### Checklist
-- [ ] Flutter version checked/upgraded
