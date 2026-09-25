@@ -9,6 +9,15 @@ rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
+// Some plugins (in_app_update, keep_screen_on, objectbox_flutter_libs, …) pin an
+// old compileSdk that fails AGP's AAR metadata check. Force the app's value.
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android.compileSdkVersion 36
+        }
+    }
+}
 subprojects {
     project.evaluationDependsOn(':app')
 }

@@ -7,7 +7,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
+import '../providers/state_providers.dart';
 import '../utils/env.dart';
+import 'authentication_service.dart';
+import 'foodly_user_service.dart';
 
 final _userIsSubscribedProvider = StateProvider<bool>((_) => false);
 
@@ -95,8 +98,29 @@ class InAppPurchaseService {
   static Future<void> fetchUserSubscription() async {
     try {
       final customerInfo = await Purchases.getCustomerInfo();
-      _ref?.read($userIsSubscribed.notifier).state =
-          _customerIsSubscribed(customerInfo);
+      final isSubscribed = _customerIsSubscribed(customerInfo);
+      _ref?.read($userIsSubscribed.notifier).state = isSubscribed;
+      await _syncIsPremium(isSubscribed);
+    } catch (e) {
+      _log.severe(e);
+    }
+  }
+
+  static Future<void> _syncIsPremium(bool isSubscribed) async {
+    final user = _ref?.read(userProvider);
+    // Skip when signed out meanwhile: a late anonymous RevenueCat result must
+    // not overwrite the previous user's isPremium.
+    if (user == null ||
+        user.id == null ||
+        AuthenticationService.currentUser?.uid != user.id) {
+      return;
+    }
+    if ((user.isPremium ?? false) == isSubscribed) {
+      return;
+    }
+    try {
+      await FoodlyUserService.setIsPremium(user.id!, isSubscribed);
+      user.isPremium = isSubscribed;
     } catch (e) {
       _log.severe(e);
     }

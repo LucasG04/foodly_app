@@ -257,7 +257,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
           duration: const Duration(milliseconds: 300),
           transitionBuilder: (child, animation) => SizeTransition(
             sizeFactor: animation,
-            axisAlignment: -1.0,
+            alignment: AlignmentDirectional.topStart,
             child: FadeTransition(opacity: animation, child: child),
           ),
           child: _phase == _GenPhase.input
@@ -819,7 +819,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
       ).show(context);
     } else if (error is AiQuotaExceededException) {
       final resetDate = DateFormat.yMMMMd(context.locale.toLanguageTag())
-          .format(AiUsagePeriod.currentPeriodEnd());
+          .format(AiUsagePeriod.currentPeriodEnd().toLocal());
       MainSnackbar(
         message: 'ai_usage_exhausted'.tr(args: [resetDate]),
         isError: true,

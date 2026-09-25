@@ -48,6 +48,7 @@ platform :ios do
       configuration: "Release",
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
+      cloned_source_packages_path: "../build/ios/SourcePackages",
       export_method: "app-store",
       export_options: {
         provisioningProfiles: { 

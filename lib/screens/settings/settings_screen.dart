@@ -253,7 +253,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           Builder(
                             builder: (BuildContext ctx) => SettingsTile(
                               onTap: () =>
-                                  _shareCode(plan.code!, plan.locked, ctx),
+                                  _shareCode(plan, ctx),
                               leadingIcon: EvaIcons.shareOutline,
                               text: 'settings_section_plan_share'
                                   .tr(args: [plan.code!]),
@@ -538,17 +538,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     await SettingsService.setShoppingListSort(sort);
   }
 
-  void _shareCode(String code, bool? isPlanLocked, BuildContext ctx) async {
-    if (isPlanLocked != null && isPlanLocked) {
+  void _shareCode(Plan plan, BuildContext ctx) async {
+    if (plan.locked ?? false) {
       MainSnackbar(
         message: 'settings_share_plan_locked'.tr(),
         infinite: true,
       ).show(ctx);
       return;
     }
+    final code = plan.code!;
+    final joinUrl = Uri.parse('$kAppWebBaseUrl/join/$code').replace(
+      queryParameters: {
+        if (plan.name?.isNotEmpty ?? false) 'name': plan.name,
+        'lang': context.locale.languageCode,
+      },
+    );
     final box = ctx.findRenderObject() as RenderBox?;
     final params = ShareParams(
-      text: 'settings_share_msg'.tr(args: [kAppName, code, kAppDownloadUrl]),
+      text: 'settings_share_msg'.tr(args: [kAppName, code, '$joinUrl']),
       subject: 'settings_share_msg_short'.tr(args: [kAppName, code]),
       sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
     );

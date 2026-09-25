@@ -91,7 +91,7 @@ class _ReorderProductGroupsScreenState
                                   ),
                                 );
                               },
-                              onReorder: (oldIndex, newIndex) =>
+                              onReorderItem: (oldIndex, newIndex) =>
                                   _updateProductGroupsOrder(
                                 oldIndex,
                                 newIndex,
@@ -120,9 +120,6 @@ class _ReorderProductGroupsScreenState
       order.addAll(productGroups
           .map((e) => e.id)
           .where((element) => !order.contains(element)));
-    }
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
     }
     final item = order.removeAt(oldIndex);
     order.insert(newIndex, item);

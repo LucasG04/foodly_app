@@ -8,7 +8,6 @@ import 'models/shopping_list_sort.dart';
 final kAppName = Platform.isIOS || Platform.isMacOS ? 'Foodster' : 'Foodly';
 const kPlaceholderSymbol = 'p--';
 const kChefkochShareEndpoint = 'https://www.chefkoch.de/rezepte';
-const kAppDownloadUrl = 'https://lunix.golenia.dev';
 final kAppPrivacyUrl = Platform.isIOS || Platform.isMacOS
     ? 'https://lunix.golenia.dev/privacy/foodster.html'
     : 'https://lunix.golenia.dev/privacy/foodly.html';
@@ -56,11 +55,6 @@ const kCardSubtitle = TextStyle(
   fontWeight: FontWeight.w500,
   color: kLightTextColor,
 );
-
-/// Free-plan AI usage limits per weekly window
-const kFreeAiKcalLimit = 6;
-const kFreeAiTextLimit = 3;
-const kFreeAiInstagramLimit = 3;
 
 /// AppStore
 const kAppBundleId = '1590739803';
