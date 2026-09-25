@@ -8,7 +8,6 @@ import 'models/shopping_list_sort.dart';
 final kAppName = Platform.isIOS || Platform.isMacOS ? 'Foodster' : 'Foodly';
 const kPlaceholderSymbol = 'p--';
 const kChefkochShareEndpoint = 'https://www.chefkoch.de/rezepte';
-const kAppDownloadUrl = 'https://lunix.golenia.dev';
 final kAppPrivacyUrl = Platform.isIOS || Platform.isMacOS
     ? 'https://lunix.golenia.dev/privacy/foodster.html'
     : 'https://lunix.golenia.dev/privacy/foodly.html';

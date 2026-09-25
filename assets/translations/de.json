@@ -66,7 +66,7 @@
   "settings_privacy": "Datenschutz",
   "settings_terms_of_use": "Nutzungsbedingungen",
   "settings_share_msg_short": "Tritt meinem Essensplan bei {} mit dem Code \"{}\" bei.",
-  "settings_share_msg": "Tritt meinem Essensplan bei {} mit dem Code \"{}\" bei.\nDownload für iOS und Android: {}",
+  "settings_share_msg": "Tritt meinem Essensplan bei {} mit dem Code \"{}\" bei.\nHier beitreten: {}",
   "settings_import_title": "GERICHTE IMPORTIEREN",
   "settings_import_one_plan_msg": "Du warst bis jetzt nur in einem Plan. Daher kannst du noch keine Gerichte von einem anderen Plan importieren.",
   "settings_help_share_one_title": "Rezepte importieren.",
