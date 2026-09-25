@@ -1,3 +1,4 @@
+import 'image_credit.dart';
 import 'ingredient.dart';
 
 class Meal {
@@ -10,6 +11,7 @@ class Meal {
   List<Ingredient>? ingredients;
   List<String>? tags;
   String? imageUrl;
+  ImageCredit? imageCredit;
   String? planId;
   String? createdBy;
   bool? isPublic;
@@ -27,6 +29,7 @@ class Meal {
     this.ingredients,
     this.tags,
     this.imageUrl,
+    this.imageCredit,
     this.planId,
     this.createdBy,
     this.isPublic,
@@ -45,6 +48,7 @@ class Meal {
       'ingredients': ingredients?.map((x) => x.toMap()).toList(),
       'tags': tags,
       'imageUrl': imageUrl ?? '',
+      'imageCredit': imageCredit?.toMap(),
       'planId': planId,
       'createdBy': createdBy,
       'isPublic': isPublic ?? false,
@@ -62,6 +66,7 @@ class Meal {
       source: map['source'] as String?,
       instructions: map['instructions'] as String?,
       imageUrl: (map['imageUrl'] as String?) ?? '',
+      imageCredit: ImageCredit.tryParse(map['imageCredit']),
       duration: int.tryParse(map['duration'].toString()) ?? 0,
       servings: int.tryParse(map['servings'].toString()) ?? 1,
       ingredients: List<Ingredient>.from(

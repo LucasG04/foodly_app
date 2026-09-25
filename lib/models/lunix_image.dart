@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_dynamic_calls
 
+import 'image_credit.dart';
+
 class LunixImageResponse {
   int page;
   int size;
@@ -27,11 +29,13 @@ class LunixImage {
   String url;
   int width;
   int height;
+  ImageCredit? credit;
 
   LunixImage({
     required this.url,
     required this.width,
     required this.height,
+    this.credit,
   });
 
   factory LunixImage.fromMap(Map<String, dynamic> map) {
@@ -39,6 +43,7 @@ class LunixImage {
       url: map['url'] as String? ?? '',
       width: map['width'] as int? ?? 0,
       height: map['height'] as int? ?? 0,
+      credit: ImageCredit.tryParse(map['credit']),
     );
   }
 }

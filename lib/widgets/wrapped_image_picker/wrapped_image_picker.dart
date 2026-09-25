@@ -3,6 +3,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
+import '../../models/image_credit.dart';
 import '../../screens/meal/border_icon.dart';
 import '../../services/storage_service.dart';
 import '../../utils/basic_utils.dart';
@@ -11,7 +12,7 @@ import '../foodly_network_image.dart';
 import 'select_picker_dialog.dart';
 
 class WrappedImagePicker extends StatefulWidget {
-  final Function(String) onPick;
+  final Function(String image, ImageCredit? credit) onPick;
   final Function()? onRemove;
   final Function()? onOpen;
   final double edgeLength;
@@ -110,12 +111,13 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
     if (widget.onOpen != null) {
       widget.onOpen!();
     }
-    final String? result = await WidgetUtils.showFoodlyBottomSheet<String?>(
+    final picked = await WidgetUtils.showFoodlyBottomSheet<PickedImage?>(
       context: context,
       builder: (_) => const SelectPickerDialog(),
     );
 
-    if (result != null) {
+    if (picked != null) {
+      final result = picked.image;
       if (BasicUtils.isStorageMealImage(result)) {
         final storageUrl = await StorageService.getMealImageUrl(result);
         if (storageUrl == null) {
@@ -124,12 +126,12 @@ class _WrappedImagePickerState extends State<WrappedImagePicker> {
         setState(() {
           _imageUrl = storageUrl;
         });
-        widget.onPick(result);
+        widget.onPick(result, null);
       } else if (Uri.tryParse(result)!.isAbsolute) {
         setState(() {
           _imageUrl = result;
         });
-        widget.onPick(result);
+        widget.onPick(result, picked.credit);
       }
     }
   }

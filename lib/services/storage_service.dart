@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -41,6 +42,36 @@ class StorageService {
     final uploadResult = await uploadTask;
 
     return uploadResult.ref;
+  }
+
+  /// Downloads an external image and stores a copy in [_storageMealImageFolder],
+  /// so meals don't hotlink third-party URLs.
+  static Future<Reference?> uploadFromUrl(String url) async {
+    _log.finer('Call uploadFromUrl with $url');
+    final response = await Dio().get<List<int>>(
+      url,
+      options: Options(responseType: ResponseType.bytes),
+    );
+    final data = response.data;
+    if (data == null || data.isEmpty) {
+      return null;
+    }
+    final bytes = Uint8List.fromList(data);
+    final upload = kIsWeb
+        ? bytes
+        : await FlutterImageCompress.compressWithList(
+            bytes,
+            quality: 85,
+            format: CompressFormat.webp,
+          );
+
+    final String fileName = DateTime.now().microsecondsSinceEpoch.toString();
+    final result = await FirebaseStorage.instance
+        .ref()
+        .child(_storageMealImageFolder)
+        .child('$fileName.webp')
+        .putData(upload);
+    return result.ref;
   }
 
   static Future<String?> getMealImageUrl(String? fileName) async {

@@ -1,3 +1,4 @@
+import 'image_credit.dart';
 import 'ingredient.dart';
 
 /// The kind of input sent to the streaming `generate-meal` endpoint. The
@@ -70,7 +71,10 @@ sealed class MealGenerationEvent {
           productGroup: json['productGroup'] as String,
         );
       case 'enrichment.image':
-        return ImageEvent(imageUrl: json['imageUrl'] as String?);
+        return ImageEvent(
+          imageUrl: json['imageUrl'] as String?,
+          imageCredit: ImageCredit.tryParse(json['imageCredit']),
+        );
       case 'done':
         return const DoneEvent();
       case 'error':
@@ -131,8 +135,9 @@ class ProductGroupEvent extends MealGenerationEvent {
 /// The resolved title image. [imageUrl] may be null when none was found.
 class ImageEvent extends MealGenerationEvent {
   final String? imageUrl;
+  final ImageCredit? imageCredit;
 
-  const ImageEvent({required this.imageUrl});
+  const ImageEvent({required this.imageUrl, this.imageCredit});
 }
 
 /// Terminal success.

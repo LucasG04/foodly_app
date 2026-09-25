@@ -6,11 +6,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:keyboard_service/keyboard_service.dart';
+import 'package:logging/logging.dart';
 import 'package:simple_icons/simple_icons.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
 import '../../models/ai_usage.dart';
+import '../../models/image_credit.dart';
 import '../../models/ingredient.dart';
 import '../../models/meal.dart';
 import '../../providers/state_providers.dart';
@@ -28,6 +30,7 @@ import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/get_premium_modal.dart';
+import '../../widgets/image_credit_chip.dart';
 import '../../widgets/link_preview.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/main_button.dart';
@@ -83,6 +86,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
   final _$isAiLoading = AutoDisposeStateProvider<bool>((_) => false);
   final _$sourceLinkMetadata = AutoDisposeStateProvider<String?>((_) => null);
   final _$updatedImage = AutoDisposeStateProvider<String?>((_) => null);
+  final _$updatedImageCredit =
+      AutoDisposeStateProvider<ImageCredit?>((_) => null);
   late final AutoDisposeStateProvider<Meal> _$meal;
 
   Meal _originalMeal = Meal(name: '');
@@ -241,14 +246,36 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                 Consumer(builder: (context, ref, _) {
                                   final mealImageUrl = ref
                                       .watch(_$meal.select((m) => m.imageUrl));
+                                  final mealImageCredit = ref.watch(
+                                      _$meal.select((m) => m.imageCredit));
                                   final updatedImageUrl =
                                       ref.watch(_$updatedImage);
-                                  return WrappedImagePicker(
-                                    key: ValueKey(
-                                        updatedImageUrl ?? mealImageUrl),
-                                    imageUrl: updatedImageUrl ?? mealImageUrl,
-                                    onPick: _pickNewImage,
-                                    onOpen: _onOpenImagePicker,
+                                  final updatedImageCredit =
+                                      ref.watch(_$updatedImageCredit);
+                                  final credit = updatedImageUrl != null
+                                      ? updatedImageCredit
+                                      : mealImageCredit;
+                                  return Stack(
+                                    children: [
+                                      WrappedImagePicker(
+                                        key: ValueKey(
+                                            updatedImageUrl ?? mealImageUrl),
+                                        imageUrl:
+                                            updatedImageUrl ?? mealImageUrl,
+                                        onPick: _pickNewImage,
+                                        onOpen: _onOpenImagePicker,
+                                      ),
+                                      if (credit != null)
+                                        Positioned(
+                                          right: kPadding / 4,
+                                          bottom: kPadding / 4,
+                                          left: kPadding / 4,
+                                          child: Align(
+                                            alignment: Alignment.bottomRight,
+                                            child: ImageCreditChip(credit),
+                                          ),
+                                        ),
+                                    ],
                                   );
                                 }),
                                 _buildDivider(),
@@ -484,7 +511,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     }
   }
 
-  void _pickNewImage(String imageUrl) {
+  void _pickNewImage(String imageUrl, ImageCredit? credit) {
     final meal = ref.read(_$meal.notifier).state;
     final updatedImage = ref.read(_$updatedImage.notifier).state;
     if (meal.imageUrl != updatedImage &&
@@ -493,13 +520,14 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     }
 
     ref.read(_$updatedImage.notifier).state = imageUrl;
+    ref.read(_$updatedImageCredit.notifier).state = credit;
     _updatedImageUrl = imageUrl;
   }
 
   Future<bool> _saveMeal() async {
     ref.read(_$buttonState.notifier).state = ButtonState.inProgress;
 
-    final updatedImage = ref.read(_$updatedImage.notifier).state;
+    var updatedImage = ref.read(_$updatedImage.notifier).state;
     final meal = ref.read(_$meal.notifier).state;
     meal.name = _titleController.text;
     meal.source = _sourceController.text;
@@ -528,14 +556,19 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
           (await LinkMetadataService.get(meal.source!))?.image;
       if (_imageIsValid(imageOfSource)) {
         meal.imageUrl = imageOfSource;
+        meal.imageCredit = null;
       }
     } else if (_imageIsValid(updatedImage)) {
+      if (!BasicUtils.isStorageMealImage(updatedImage)) {
+        updatedImage = await _copyToStorage(updatedImage!);
+      }
       final shouldRemoveCurrent = meal.imageUrl != updatedImage &&
           BasicUtils.isStorageMealImage(meal.imageUrl);
       if (shouldRemoveCurrent) {
         StorageService.removeFile(meal.imageUrl);
       }
       meal.imageUrl = updatedImage;
+      meal.imageCredit = ref.read(_$updatedImageCredit);
     }
 
     try {
@@ -577,6 +610,24 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
 
   bool _formIsValid() {
     return _titleController.text.isNotEmpty;
+  }
+
+  /// Re-hosts an external image in Firebase Storage instead of hotlinking it.
+  /// Falls back to the original URL if the download/upload fails.
+  Future<String> _copyToStorage(String url) async {
+    try {
+      final storedRef = await StorageService.uploadFromUrl(url);
+      if (storedRef == null) {
+        return url;
+      }
+      // Track it so an unsaved upload is cleaned up on dispose.
+      ref.read(_$updatedImage.notifier).state = storedRef.name;
+      _updatedImageUrl = storedRef.name;
+      return storedRef.name;
+    } catch (e) {
+      Logger('MealCreateScreen').warning('Could not copy $url to storage', e);
+      return url;
+    }
   }
 
   bool _imageIsValid(String? image) {
@@ -711,7 +762,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       final meal = ref.read(_$meal.notifier).state;
       _titleController.text = result.name;
       meal.name = result.name;
-      meal.imageUrl = result.imageUrl;
+      if (_imageIsValid(result.imageUrl)) {
+        _pickNewImage(result.imageUrl!, result.imageCredit);
+      }
       _sourceController.text = result.source ?? '';
       _onSourceTextChange(result.source ?? '');
       _durationController.text = (result.duration ?? '').toString();

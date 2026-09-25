@@ -27,6 +27,7 @@ import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/foodly_network_image.dart';
 import '../../widgets/get_premium_modal.dart';
+import '../../widgets/image_credit_chip.dart';
 import '../../widgets/link_preview.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/options_modal/options_modal.dart';
@@ -112,11 +113,22 @@ class _MealScreenState extends ConsumerState<MealScreen>
                     titlePadding: EdgeInsets.zero,
                     background: Stack(
                       children: [
-                        if (meal.imageUrl != null && meal.imageUrl!.isNotEmpty)
+                        if (meal.imageUrl != null &&
+                            meal.imageUrl!.isNotEmpty) ...[
                           Positioned.fill(
                             child: FoodlyNetworkImage(meal.imageUrl!),
-                          )
-                        else
+                          ),
+                          if (meal.imageCredit != null)
+                            Positioned(
+                              right: kPadding / 4,
+                              bottom: kPadding / 4,
+                              left: kPadding / 4,
+                              child: Align(
+                                alignment: Alignment.bottomRight,
+                                child: ImageCreditChip(meal.imageCredit),
+                              ),
+                            ),
+                        ] else
                           Positioned.fill(
                             child: Image.asset(
                               'assets/images/food_fallback.png',
