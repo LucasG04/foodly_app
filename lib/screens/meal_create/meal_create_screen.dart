@@ -16,7 +16,7 @@ import '../../models/image_credit.dart';
 import '../../models/ingredient.dart';
 import '../../models/meal.dart';
 import '../../providers/state_providers.dart';
-import '../../services/ai_usage_service.dart';
+import '../../services/ai_quota_exceeded_exception.dart';
 import '../../services/authentication_service.dart';
 import '../../services/in_app_purchase_service.dart';
 import '../../services/link_metadata_service.dart';
@@ -431,7 +431,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
 
   void _showAiQuotaExhausted() {
     final resetDate = DateFormat.yMMMMd(context.locale.toLanguageTag())
-        .format(AiUsagePeriod.currentPeriodEnd());
+        .format(AiUsagePeriod.currentPeriodEnd().toLocal());
     MainSnackbar(
       message: 'ai_usage_exhausted'.tr(args: [resetDate]),
       isError: true,
@@ -775,20 +775,6 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       meal.servings = result.servings < 1 ? 1 : result.servings;
       meal.tags = result.tags;
       ref.read(_$meal.notifier).state = Meal.fromMap(meal.id, meal.toMap());
-
-      // A text/Instagram import that returned a meal means a successful AI
-      // generation — count it against the free quota (premium is unlimited).
-      if (type == ImportType.text || type == ImportType.instagram) {
-        final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
-        final userId = ref.read(userProvider)?.id;
-        if (!isSubscribed && userId != null) {
-          if (type == ImportType.instagram) {
-            await AiUsageService.incrementInstagram(userId);
-          } else {
-            await AiUsageService.incrementText(userId);
-          }
-        }
-      }
     }
   }
 
@@ -920,11 +906,6 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       if (!mounted) {
         return;
       }
-      // The AI call succeeded — count it against the free quota (premium is
-      // unlimited). Captured before the modal await so we never touch `ref`
-      // after the widget may have been disposed.
-      final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
-      final userId = ref.read(userProvider)?.id;
       final result = await WidgetUtils.showFoodlyBottomSheet<int>(
         context: context,
         builder: (_) => KcalEstimateModal(estimate: estimate),
@@ -932,9 +913,11 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       if (result != null) {
         _kcalController.text = result.toString();
       }
-      if (!isSubscribed && userId != null) {
-        await AiUsageService.incrementKcal(userId);
+    } on AiQuotaExceededException {
+      if (!mounted) {
+        return;
       }
+      _showAiQuotaExhausted();
     } on RateLimitException catch (e) {
       if (!mounted) {
         return;
