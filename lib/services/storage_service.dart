@@ -87,7 +87,7 @@ class StorageService {
         .child(fileName);
 
     try {
-      return ref.getDownloadURL();
+      return await ref.getDownloadURL();
     } catch (e) {
       _log.severe('Could not get download url for $fileName', e);
       return null;

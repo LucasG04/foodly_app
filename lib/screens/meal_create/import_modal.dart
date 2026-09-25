@@ -257,7 +257,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
           duration: const Duration(milliseconds: 300),
           transitionBuilder: (child, animation) => SizeTransition(
             sizeFactor: animation,
-            axisAlignment: -1.0,
+            alignment: AlignmentDirectional.topStart,
             child: FadeTransition(opacity: animation, child: child),
           ),
           child: _phase == _GenPhase.input

@@ -21,10 +21,10 @@ packages:
     dependency: "direct main"
     description:
       name: adaptive_dialog
-      sha256: b04fb01be3223f0a9efb110159fef4e1cc1f0beaa5660938595dbedf37e1bfd6
+      sha256: b087695fc9e3b603f4481c4178448db54d5fb2497d3e929fbc2037556fb8cdbd
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.2"
+    version: "2.8.3"
   analyzer:
     dependency: transitive
     description:
@@ -370,6 +370,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
+  cupertino_ui:
+    dependency: transitive
+    description:
+      name: cupertino_ui
+      sha256: c23816577a1280cff409e989541767887011f8f1d8c1863a794ed308af46f2a9
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.1"
   custom_rating_bar:
     dependency: "direct main"
     description:
@@ -438,10 +446,10 @@ packages:
     dependency: transitive
     description:
       name: dynamic_color
-      sha256: eae98052fa6e2826bdac3dd2e921c6ce2903be15c6b7f8b6d8a5d49b5086298d
+      sha256: "869b3bce0100eb519768ecd71c0111f0b5ea679f5f62e1f59c49d80067e730c5"
       url: "https://pub.dev"
     source: hosted
-    version: "1.7.0"
+    version: "2.1.0"
   easy_localization:
     dependency: "direct main"
     description:
@@ -494,10 +502,10 @@ packages:
     dependency: "direct main"
     description:
       name: eva_icons_flutter
-      sha256: "6d48a10b93590ab83eb092bee5adacdeb14f3d83f527a4b9e4092c363d56e2a8"
+      sha256: d87ed92f8ec1cd4b6a3100c34a644e201758900a3bc64f4bf3e0f39ec297093c
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0"
+    version: "4.0.0"
   fake_async:
     dependency: transitive
     description:
@@ -879,10 +887,10 @@ packages:
     dependency: "direct main"
     description:
       name: font_awesome_flutter
-      sha256: "27af5982e6c510dec1ba038eff634fa284676ee84e3fd807225c80c4ad869177"
+      sha256: "09dcde8ab90ffae1a7d65ff2ef96fc62a17ad9d0ce7c127b317ded676b0d5935"
       url: "https://pub.dev"
     source: hosted
-    version: "10.10.0"
+    version: "11.0.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -1113,10 +1121,10 @@ packages:
     dependency: "direct main"
     description:
       name: intl
-      sha256: "3df61194eb431efc39c4ceba583b95633a403f46c9fd341e550ce0bfa50e9aa5"
+      sha256: "1ca20c894b1717686a2319b8548763d812bc0aabdac580420a44c5178c57a867"
       url: "https://pub.dev"
     source: hosted
-    version: "0.20.2"
+    version: "0.20.3"
   io:
     dependency: transitive
     description:
@@ -1241,10 +1249,10 @@ packages:
     dependency: transitive
     description:
       name: matcher
-      sha256: dc0b7dc7651697ea4ff3e69ef44b0407ea32c487a39fff6a4004fa585e901861
+      sha256: "31bd099b47c10cd1aeb55146a2d46ce0277630ecef3f7dae54ad7873f36696cd"
       url: "https://pub.dev"
     source: hosted
-    version: "0.12.19"
+    version: "0.12.20"
   material_color_utilities:
     dependency: transitive
     description:
@@ -1253,14 +1261,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.13.0"
+  material_ui:
+    dependency: transitive
+    description:
+      name: material_ui
+      sha256: "134ab2f0843545c4e661e4ba2753fe1bcf0753cb690d5a9ee4870638a40411e9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.0"
   meta:
     dependency: transitive
     description:
       name: meta
-      sha256: "23f08335362185a5ea2ad3a4e597f1375e78bce8a040df5c600c8d3552ef2394"
+      sha256: "307249ce4ff29d58a18e97f6345f539382eb9c9c29ecda628900f31de0443dd9"
       url: "https://pub.dev"
     source: hosted
-    version: "1.17.0"
+    version: "1.19.0"
   metadata_fetch:
     dependency: "direct main"
     description:
@@ -1824,10 +1840,10 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: "8161c84903fd860b26bfdefb7963b3f0b68fee7adea0f59ef805ecca346f0c7a"
+      sha256: "2a122cbe059f8b610d3a5415f42e255b6c17b1f21eee1d960f31080237fb4f11"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.10"
+    version: "0.7.12"
   timing:
     dependency: transitive
     description:
@@ -1848,34 +1864,34 @@ packages:
     dependency: "direct main"
     description:
       name: update_available
-      sha256: ec8ad35f2328a9a72ac8cefb89082f16faacd61dbaa2c598020760af03f35b01
+      sha256: b4498602a57d3e6164d1fe15cd72feaace8b300b12a04efdb5886f471ed14bb5
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.0"
+    version: "3.3.0"
   update_available_android:
     dependency: transitive
     description:
       name: update_available_android
-      sha256: bed2467c0280f53ba1a1137cf8d6c5de11a700686155f80c026396d61044239c
+      sha256: e6e132c79777c4792f6097e6bb62dfb8526608b5a98531db263898169b18050c
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.0"
+    version: "3.3.0+1"
   update_available_ios:
     dependency: transitive
     description:
       name: update_available_ios
-      sha256: "42657c47f612f2c17637e04caca0418e2b97e28ff30ef15046eadb9db038d114"
+      sha256: "29c0fa22592b806c4e6fe7580b2b52319f5d0bacf76b98ebdea0d2fc4b130830"
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0"
+    version: "3.1.1"
   update_available_platform_interface:
     dependency: transitive
     description:
       name: update_available_platform_interface
-      sha256: d80a3383e4ce47568165b0d3cd22c4a17ed6c8d8d82d30c3a105985e3405f241
+      sha256: "587b049759e3210feaf4401f506d1dd8bcf6d60a3629dca66e6f72f8d6efd485"
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.0"
+    version: "4.1.1"
   url_launcher:
     dependency: "direct main"
     description:
@@ -1952,10 +1968,10 @@ packages:
     dependency: transitive
     description:
       name: vector_math
-      sha256: d530bd74fea330e6e364cda7a85019c434070188383e1cd8d9777ee586914c5b
+      sha256: "92b9910f66ed1057fd4da7b040ae7c74cafacf885bdc81be496928d5049b032d"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.0"
+    version: "2.4.3"
   version:
     dependency: "direct main"
     description:
@@ -2045,5 +2061,5 @@ packages:
     source: hosted
     version: "3.1.3"
 sdks:
-  dart: ">=3.11.0 <4.0.0"
-  flutter: ">=3.41.0"
+  dart: ">=3.13.0 <4.0.0"
+  flutter: ">=3.47.0"

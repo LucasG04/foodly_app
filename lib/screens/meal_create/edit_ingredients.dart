@@ -96,7 +96,7 @@ class _EditIngredientsState extends State<EditIngredients> {
           itemCount: groups.length,
           itemBuilder: (context, outerIndex) =>
               _buildGroupSection(context, groups[outerIndex], outerIndex),
-          onReorder: _onGroupReorder,
+          onReorderItem: _onGroupReorder,
           proxyDecorator: (child, index, animation) => Material(
             elevation: 6,
             borderRadius: BorderRadius.circular(kRadius),
@@ -165,7 +165,7 @@ class _EditIngredientsState extends State<EditIngredients> {
             index,
             key: ObjectKey(groupIngredients[index]),
           ),
-          onReorder: (oldIndex, newIndex) =>
+          onReorderItem: (oldIndex, newIndex) =>
               _onIngredientReorder(group, oldIndex, newIndex),
         ),
         Center(
@@ -221,9 +221,6 @@ class _EditIngredientsState extends State<EditIngredients> {
   }
 
   void _onIngredientReorder(String? group, int oldIndex, int newIndex) {
-    if (oldIndex < newIndex) {
-      newIndex--;
-    }
     final groupIngredients = _ingredients
         .where((i) => i.group == group)
         .toList()
@@ -252,9 +249,6 @@ class _EditIngredientsState extends State<EditIngredients> {
     // Named groups cannot be moved before the null group.
     if (oldIndex == 0) {
       return;
-    }
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
     }
     if (newIndex == 0) {
       newIndex = 1; // clamp: cannot go before null group

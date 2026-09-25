@@ -18,7 +18,7 @@ flutter test --plain-name 'some test name'                 # single test
 
 - Build runner generates `lib/app_router.gr.dart` (auto_route), `lib/utils/env.g.dart` (envied), `lib/objectbox.g.dart` (ObjectBox), `*.g.dart` Hive adapters. Never hand-edit these.
 - `lib/utils/env.dart` reads `.env` at build time (obfuscated): `LUNIX_API_KEY`, `LUNIX_API_KEY_DEV`, `REVENUECAT_APPLE_KEY`, `REVENUECAT_GOOGLE_KEY`, `LUNIX_AUTH_USERNAME`, `LUNIX_AUTH_PASSWORD`. Missing `.env` breaks codegen.
-- CI pins Flutter `3.41.2`.
+- CI pins Flutter `3.47.5` (Java 17 in CI; Gradle 9.3.1 also builds with Android Studio's Java 25).
 
 ## Architecture
 
@@ -33,7 +33,8 @@ flutter test --plain-name 'some test name'                 # single test
 ## Conventions
 
 - Strict lints in `analysis_options.yaml`: relative imports, single quotes, `prefer_final_locals`, `avoid_print`, etc.
-- Firebase plugin upgrades: also check the Firebase SDK version in `ios/Podfile` (PR checklist).
+- iOS: FlutterFire plugins resolve via Swift Package Manager (Flutter default). Don't re-add the precompiled `FirebaseFirestore` pod to `ios/Podfile` (duplicate symbols).
+- Android: `android/build.gradle` forces `compileSdkVersion 36` on plugin subprojects because some plugins pin an old one that fails AGP's AAR metadata check.
 
 ## Release
 
