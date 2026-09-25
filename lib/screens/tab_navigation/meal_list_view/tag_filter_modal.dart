@@ -7,9 +7,16 @@ import '../../../providers/state_providers.dart';
 import '../../../services/lunix_api_service.dart';
 import '../../../utils/of_context_mixin.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
+import '../../../widgets/tag_chip.dart';
 
 class TagFilterModal extends ConsumerStatefulWidget {
   const TagFilterModal({super.key});
+
+  /// Returns a new list with [tag] added or removed; never mutates [tags].
+  static List<String> toggleTag(List<String> tags, String tag) =>
+      tags.contains(tag)
+          ? tags.where((t) => t != tag).toList()
+          : [...tags, tag];
 
   @override
   _TagFilterModalState createState() => _TagFilterModalState();
@@ -75,17 +82,21 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal>
                             return Wrap(
                               runSpacing: kPadding / 2,
                               spacing: kPadding / 2,
-                              children: tags.map(
-                                (String tagText) {
-                                  final bool isSelected =
-                                      selectedTags.contains(tagText);
-                                  return _buildFilterChip(
-                                    tagText,
-                                    isSelected,
-                                    selectedTags,
-                                  );
-                                },
-                              ).toList(),
+                              children: [
+                                for (final tagText in tags)
+                                  TagChip(
+                                    label: tagText,
+                                    selected: selectedTags.contains(tagText),
+                                    onTap: () {
+                                      final filter = ref
+                                          .read(mealTagFilterProvider.notifier);
+                                      filter.state = TagFilterModal.toggleTag(
+                                        selectedTags,
+                                        tagText,
+                                      );
+                                    },
+                                  ),
+                              ],
                             );
                           });
                         }),
@@ -149,35 +160,6 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal>
         ),
       );
     });
-  }
-
-  FilterChip _buildFilterChip(
-      String tagText, bool isSelected, List<String> selectedTags) {
-    return FilterChip(
-      label: Text(
-        tagText,
-        style: TextStyle(
-          color: isSelected ? Colors.white : Colors.black,
-        ),
-      ),
-      backgroundColor:
-          isSelected ? theme.primaryColor : theme.scaffoldBackgroundColor,
-      selected: isSelected,
-      selectedColor: theme.primaryColor,
-      selectedShadowColor: theme.primaryColor.withValues(alpha: 0.3),
-      onSelected: (selected) {
-        if (selected) {
-          ref.read(mealTagFilterProvider.notifier).state = [
-            ...selectedTags,
-            tagText
-          ];
-        } else {
-          ref.read(mealTagFilterProvider.notifier).state = [];
-          selectedTags.remove(tagText);
-          ref.read(mealTagFilterProvider.notifier).state = selectedTags;
-        }
-      },
-    );
   }
 
   void _scrollListener() {

@@ -652,6 +652,40 @@ class LunixApiService {
     }
   }
 
+  /// AI tag suggestions for [meal] out of [candidates]. `null` on any error.
+  static Future<List<String>?> suggestMealTags(
+    Meal meal,
+    List<String> candidates,
+  ) async {
+    _log.finer('Call suggestMealTags() for meal: ${meal.name}');
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        '$apiEndpoint/meal-tag-suggestions',
+        data: <String, dynamic>{
+          'meal': <String, dynamic>{
+            'name': meal.name,
+            'ingredients': meal.ingredients
+                    ?.map((i) => i.name)
+                    .whereType<String>()
+                    .where((n) => n.trim().isNotEmpty)
+                    .take(100)
+                    .toList() ??
+                <String>[],
+            'instructions': meal.instructions,
+            'duration': meal.duration,
+          },
+          'candidates': candidates,
+        },
+      );
+      return List<String>.from(
+        (response.data?['tags'] as List<dynamic>?) ?? <dynamic>[],
+      );
+    } catch (e) {
+      _log.severe('ERR in suggestMealTags', e);
+      return null;
+    }
+  }
+
   /// Returns the new plaintext token. Replaces any existing one. Throws on
   /// failure.
   static Future<McpToken> createMcpToken() async {

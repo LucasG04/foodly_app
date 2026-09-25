@@ -28,6 +28,7 @@ import '../../utils/ai_usage_period.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
+import '../../utils/tag_candidates.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/image_credit_chip.dart';
@@ -44,9 +45,9 @@ import '../../widgets/small_circular_progress_indicator.dart';
 import '../../widgets/small_number_input.dart';
 import '../../widgets/wrapped_image_picker/wrapped_image_picker.dart';
 import 'edit_ingredients.dart';
-import 'edit_list_content_modal.dart';
 import 'import_modal.dart';
 import 'kcal_estimate_modal.dart';
+import 'meal_tag_edit_modal.dart';
 import 'save_changes_modal.dart';
 
 class MealCreateScreen extends ConsumerStatefulWidget {
@@ -92,6 +93,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
 
   Meal _originalMeal = Meal(name: '');
   List<String>? _existingMealTags;
+  final _tagSuggestionCache = TagSuggestionCache();
 
   /// Holds the value of _$updatedImage, so it can be used in dispose
   String _updatedImageUrl = '';
@@ -790,17 +792,37 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     }
     final result = await WidgetUtils.showFoodlyBottomSheet<List<String>>(
       context: context,
-      builder: (_) => EditListContentModal(
-        title: 'meal_create_tags_title'.tr(),
+      builder: (_) => MealTagEditModal(
         selectedContent: ref.read(_$meal.notifier).state.tags ?? [],
         allContent: allTags,
-        textFieldInfo: 'meal_create_edit_tags_info'.tr(),
+        suggestions: _getTagSuggestions(allTags),
       ),
     );
 
     if (result != null) {
       _changeMealValue((meal) => meal.tags = result);
     }
+  }
+
+  /// Uses the live form values; the meal state only gets them on save.
+  Future<List<String>>? _getTagSuggestions(List<String> planTags) {
+    final baseMeal = ref.read(_$meal);
+    final mealForApi = Meal.fromMap(baseMeal.id, baseMeal.toMap())
+      ..name = _titleController.text
+      ..instructions = _instructionsController.text
+      ..duration = int.tryParse(_durationController.text.trim());
+    final candidates = buildTagCandidates(
+      planTags,
+      'meal_tag_starter_set'.tr().split(','),
+    );
+    return _tagSuggestionCache.get(
+      name: mealForApi.name,
+      ingredients: [...?mealForApi.ingredients?.map((i) => i.name ?? '')],
+      instructions: mealForApi.instructions,
+      duration: mealForApi.duration,
+      candidates: candidates,
+      fetch: () => LunixApiService.suggestMealTags(mealForApi, candidates),
+    );
   }
 
   List<String> _getMissingTagsInExisting() {
