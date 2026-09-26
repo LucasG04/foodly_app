@@ -135,7 +135,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                       todoItems,
                       boughtItems,
                     ),
-                    onLongPress: _editGrocerySuggestion,
+                    onLongPress: (g) => _editGrocerySuggestion(listId, g),
                   )
                 : AnimatedShoppingList(
                     groceries: todoItems,
@@ -146,7 +146,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                       todoItems,
                       boughtItems,
                     ),
-                    onLongPress: _editGrocerySuggestion,
+                    onLongPress: (g) => _editGrocerySuggestion(listId, g),
                   ),
           ),
           const SizedBox(height: kPadding),
@@ -187,7 +187,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                         item,
                       );
                     },
-                    onLongPress: _editGrocerySuggestion,
+                    onLongPress: (g) => _editGrocerySuggestion(listId, g),
                   ),
                   Center(
                     child: TextButton(
@@ -510,7 +510,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
     );
   }
 
-  void _editGrocerySuggestion(Grocery grocery) {
+  void _editGrocerySuggestion(String listId, Grocery grocery) {
     final user = ref.read(userProvider);
     if (!PermissionUtils.allowedToModerate(user)) {
       return;
@@ -518,7 +518,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
     WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) {
-        return EditGrocerySuggestionSheet(grocery: grocery);
+        return EditGrocerySuggestionSheet(grocery: grocery, listId: listId);
       },
     );
   }

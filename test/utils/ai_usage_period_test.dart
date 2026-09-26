@@ -69,5 +69,27 @@ void main() {
       );
       expect(AiUsagePeriod.currentPeriodKey(nonUtcNow), '2026-06-08');
     });
+
+    group('daysUntilReset', () {
+      // Reset for the week of 2026-06-08 is 2026-06-15 00:00 UTC. Cases are
+      // anchored on its local date so they hold in any host timezone.
+      final reset = DateTime.utc(2026, 6, 15).toLocal();
+
+      test('noon on the local day before the reset is 1 (tomorrow)', () {
+        // Less than 24h may remain, so this checks calendar days, not hours.
+        final now = DateTime(reset.year, reset.month, reset.day - 1, 12);
+        expect(AiUsagePeriod.daysUntilReset(now), 1);
+      });
+
+      test('counts local calendar days earlier in the week', () {
+        final now = DateTime(reset.year, reset.month, reset.day - 6, 12);
+        expect(AiUsagePeriod.daysUntilReset(now), 6);
+      });
+
+      test('accepts a UTC now', () {
+        final now = DateTime(reset.year, reset.month, reset.day - 3, 12);
+        expect(AiUsagePeriod.daysUntilReset(now.toUtc()), 3);
+      });
+    });
   });
 }

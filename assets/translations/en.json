@@ -151,7 +151,11 @@
   "meal_create_kcal_ai_rate_limit": "Whoa, you're quick! Please give me a breather and try again in {} minutes.",
   "meal_create_kcal_ai_missing_input": "To estimate kcal, please enter at least a name and one ingredient — the more, the better.",
   "ai_usage_remaining": "{} free AI calls left",
-  "ai_usage_exhausted": "You've used all your free AI calls. They reset on {}.",
+  "ai_usage_exhausted": {
+    "zero": "You've used all your free AI calls. They reset today ({date}).",
+    "one": "You've used all your free AI calls. They reset tomorrow ({date}).",
+    "other": "You've used all your free AI calls. They reset in {} days ({date})."
+  },
   "ai_usage_upgrade": "Upgrade",
   "meal_create_tags_title": "Categories",
   "meal_create_error_unknown": "An error has occurred. Check your internet connection or try again later.",
@@ -351,6 +355,7 @@
   "premium_gifted_msg_title": "Plus for free!",
   "premium_gifted_msg_message": "Thanks to your feedback, {} has been improved. As a thank you, you get Plus for {} month(s) for free.",
   "edit_grocery_suggestion_group": "Product group",
+  "edit_grocery_suggestion_error": "Could not update the product group. Please try again.",
   "link_preview_options_open_link": "Open in external browser",
   "link_preview_options_copy_link": "Copy link",
   "link_preview_options_copy_link_success": "Link copied to clipboard",

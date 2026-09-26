@@ -8,14 +8,18 @@ import '../../../models/grocery_group.dart';
 import '../../../providers/data_provider.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/lunix_api_service.dart';
+import '../../../services/shopping_list_service.dart';
+import '../../../utils/main_snackbar.dart';
 import '../../../utils/of_context_mixin.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/progress_button.dart';
 
 class EditGrocerySuggestionSheet extends ConsumerStatefulWidget {
   final Grocery grocery;
+  final String listId;
   const EditGrocerySuggestionSheet({
     required this.grocery,
+    required this.listId,
     super.key,
   });
 
@@ -111,11 +115,17 @@ class _EditGrocerySuggestionSheetState
     ref.read(_$buttonState.notifier).state = ButtonState.inProgress;
     try {
       final nextGrocery = widget.grocery.copyWith(group: selectedGroup.id);
+      final langCode = context.locale.languageCode;
       await LunixApiService.editGrocerySuggestion(
         oldGrocery: widget.grocery,
         grocery: nextGrocery,
-        langCode: context.locale.languageCode,
+        langCode: langCode,
         userId: ref.read(userProvider)?.id ?? '',
+      );
+      await ShoppingListService.updateGrocery(
+        widget.listId,
+        nextGrocery,
+        langCode,
       );
       ref.read(_$buttonState.notifier).state = ButtonState.normal;
       if (!mounted) {
@@ -124,6 +134,13 @@ class _EditGrocerySuggestionSheetState
       Navigator.of(context).pop();
     } catch (e) {
       ref.read(_$buttonState.notifier).state = ButtonState.normal;
+      if (!mounted) {
+        return;
+      }
+      MainSnackbar(
+        message: 'edit_grocery_suggestion_error'.tr(),
+        isError: true,
+      ).show(context);
     }
   }
 }

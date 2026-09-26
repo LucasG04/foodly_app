@@ -151,7 +151,11 @@
   "meal_create_kcal_ai_rate_limit": "Wow, du bist ja schnell! Gib mir eine Pause und versuche es in {} Minuten erneut.",
   "meal_create_kcal_ai_missing_input": "Für die kcal-Schätzung wird mindestens ein Name und eine Zutat benötigt – je mehr, desto besser.",
   "ai_usage_remaining": "Noch {} Aufrufe übrig",
-  "ai_usage_exhausted": "Du hast alle Aufrufe verbraucht. Sie werden am {} zurückgesetzt.",
+  "ai_usage_exhausted": {
+    "zero": "Du hast alle Aufrufe verbraucht. Sie werden heute ({date}) zurückgesetzt.",
+    "one": "Du hast alle Aufrufe verbraucht. Sie werden morgen ({date}) zurückgesetzt.",
+    "other": "Du hast alle Aufrufe verbraucht. Sie werden in {} Tagen ({date}) zurückgesetzt."
+  },
   "ai_usage_upgrade": "Upgrade",
   "meal_create_tags_title": "Kategorien",
   "meal_create_error_unknown": "Es ist ein Fehler aufgetreten. Prüfe deine Internetverbindung oder versuche es später erneut.",
@@ -351,6 +355,7 @@
   "premium_gifted_msg_title": "Plus geschenkt!",
   "premium_gifted_msg_message": "Durch dein Feedback konnte {} verbessert werden. Als Dankeschön bekommst du Plus für {} Monat(e) geschenkt.",
   "edit_grocery_suggestion_group": "Produktgruppe",
+  "edit_grocery_suggestion_error": "Die Produktgruppe konnte nicht geändert werden. Bitte versuche es erneut.",
   "link_preview_options_open_link": "In externem Browser öffnen",
   "link_preview_options_copy_link": "Link kopieren",
   "link_preview_options_copy_link_success": "Link in die Zwischenablage kopiert",

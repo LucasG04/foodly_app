@@ -12,6 +12,7 @@ import '../services/in_app_purchase_service.dart';
 import 'disposable_widget.dart';
 import 'list_tile_card.dart';
 import 'main_button.dart';
+import 'scroll_shadow_layout.dart';
 import 'small_circular_progress_indicator.dart';
 
 class GetPremiumModal extends ConsumerStatefulWidget {
@@ -24,8 +25,6 @@ class GetPremiumModal extends ConsumerStatefulWidget {
 class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
     with DisposableWidget {
   final _log = Logger('GetPremiumModal');
-  late final ScrollController _scrollController;
-  late final AutoDisposeStateProvider<bool> _$titleShowShadow;
   late final AutoDisposeStateProvider<_PurchaseState> _$purchaseState;
   late final AutoDisposeStateProvider<int> _$selectedPremiumDuration;
 
@@ -36,15 +35,12 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
 
   @override
   void initState() {
-    _$titleShowShadow = AutoDisposeStateProvider((_) => false);
     _$purchaseState = AutoDisposeStateProvider(
       (ref) => ref.read(InAppPurchaseService.$userIsSubscribed)
           ? _PurchaseState.purchased
           : _PurchaseState.none,
     );
     _$selectedPremiumDuration = AutoDisposeStateProvider((_) => 1);
-    _scrollController = ScrollController();
-    _scrollController.addListener(_handleTitleShadowState);
     super.initState();
 
     _getAdditionalProductInfo();
@@ -52,7 +48,6 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
 
   @override
   void dispose() {
-    _scrollController.dispose();
     cancelSubscriptions();
     super.dispose();
   }
@@ -61,112 +56,94 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Consumer(
-          builder: (context, ref, child) {
-            final showShadow = ref.watch(_$titleShowShadow);
-            return Container(
+        Expanded(
+          child: ScrollShadowLayout(
+            header: Container(
               padding: const EdgeInsets.all(kPadding / 2),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                boxShadow: showShadow
-                    ? [
-                        BoxShadow(
-                          offset: const Offset(0, 1),
-                          blurRadius: 1,
-                          color: Theme.of(context)
-                              .primaryColor
-                              .withValues(alpha: 0.16),
-                        )
-                      ]
-                    : [],
-              ),
-              child: child,
-            );
-          },
-          child: Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: kPadding / 2),
-                  child: Text(
-                    'get_premium_modal_title'.tr().toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+              color: Theme.of(context).dialogTheme.backgroundColor,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: kPadding / 2),
+                      child: Text(
+                        'get_premium_modal_title'.tr().toUpperCase(),
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  IconButton(
+                    icon: const Icon(EvaIcons.close),
+                    onPressed: _close,
+                  ),
+                ],
               ),
-              IconButton(
-                icon: const Icon(EvaIcons.close),
-                onPressed: _close,
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: kPadding),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ListTileCard(
-                        iconData: EvaIcons.loaderOutline,
-                        title: 'get_premium_modal_1_title'.tr(),
-                        description: 'get_premium_modal_1_description'.tr(),
-                      ),
-                      ListTileCard(
-                        iconData: Icons.sort_rounded,
-                        title: 'get_premium_modal_5_title'.tr(),
-                        description: 'get_premium_modal_5_description'.tr(),
-                      ),
-                      ListTileCard(
-                        iconData: EvaIcons.trendingUpOutline,
-                        title: 'get_premium_modal_2_title'.tr(),
-                        description: 'get_premium_modal_2_description'.tr(),
-                      ),
-                      ListTileCard(
-                        iconData: Icons.auto_awesome,
-                        title: 'get_premium_modal_8_title'.tr(),
-                        description: 'get_premium_modal_8_description'.tr(),
-                      ),
-                      ListTileCard(
-                        iconData: EvaIcons.activityOutline,
-                        title: 'get_premium_modal_4_title'.tr(),
-                        description: 'get_premium_modal_4_description'.tr(),
-                      ),
-                      ListTileCard(
-                        iconData: EvaIcons.colorPaletteOutline,
-                        title: 'get_premium_modal_6_title'.tr(),
-                        description: 'get_premium_modal_6_description'
-                            .tr(args: [kAppName]),
-                      ),
-                      if (Platform.isIOS || Platform.isMacOS)
+            ),
+            body: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: kPadding),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         ListTileCard(
-                          iconData: Icons.diversity_3_rounded,
-                          title: 'get_premium_modal_7_title'.tr(),
-                          description: 'get_premium_modal_7_description'
+                          iconData: EvaIcons.loaderOutline,
+                          title: 'get_premium_modal_1_title'.tr(),
+                          description: 'get_premium_modal_1_description'.tr(),
+                        ),
+                        ListTileCard(
+                          iconData: Icons.sort_rounded,
+                          title: 'get_premium_modal_5_title'.tr(),
+                          description: 'get_premium_modal_5_description'.tr(),
+                        ),
+                        ListTileCard(
+                          iconData: EvaIcons.trendingUpOutline,
+                          title: 'get_premium_modal_2_title'.tr(),
+                          description: 'get_premium_modal_2_description'.tr(),
+                        ),
+                        ListTileCard(
+                          iconData: Icons.auto_awesome,
+                          title: 'get_premium_modal_8_title'.tr(),
+                          description: 'get_premium_modal_8_description'.tr(),
+                        ),
+                        ListTileCard(
+                          iconData: EvaIcons.activityOutline,
+                          title: 'get_premium_modal_4_title'.tr(),
+                          description: 'get_premium_modal_4_description'.tr(),
+                        ),
+                        ListTileCard(
+                          iconData: EvaIcons.colorPaletteOutline,
+                          title: 'get_premium_modal_6_title'.tr(),
+                          description: 'get_premium_modal_6_description'
                               .tr(args: [kAppName]),
                         ),
-                      ListTileCard(
-                        iconData: _getSupportAppIcon(),
-                        iconColor: Colors.red,
-                        title: 'get_premium_modal_3_title'.tr(
-                          args: [kAppName],
+                        if (Platform.isIOS || Platform.isMacOS)
+                          ListTileCard(
+                            iconData: Icons.diversity_3_rounded,
+                            title: 'get_premium_modal_7_title'.tr(),
+                            description: 'get_premium_modal_7_description'
+                                .tr(args: [kAppName]),
+                          ),
+                        ListTileCard(
+                          iconData: _getSupportAppIcon(),
+                          iconColor: Colors.red,
+                          title: 'get_premium_modal_3_title'.tr(
+                            args: [kAppName],
+                          ),
+                          description: 'get_premium_modal_3_description'.tr(),
                         ),
-                        description: 'get_premium_modal_3_description'.tr(),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -285,15 +262,6 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
       return;
     }
     Navigator.pop(context);
-  }
-
-  void _handleTitleShadowState() {
-    final showShadow = ref.read(_$titleShowShadow);
-    if (_scrollController.offset > 0 && !showShadow) {
-      ref.read(_$titleShowShadow.notifier).state = true;
-    } else if (_scrollController.offset <= 0 && showShadow) {
-      ref.read(_$titleShowShadow.notifier).state = false;
-    }
   }
 
   void _getAdditionalProductInfo() {
