@@ -30,4 +30,13 @@ class AiUsagePeriod {
   /// Start of the next window — the reset moment — for the week containing [now].
   static DateTime currentPeriodEnd([DateTime? now]) =>
       periodStart(now).add(const Duration(days: 7));
+
+  /// Local calendar days from [now] until the reset (0 = today, 1 = tomorrow).
+  static int daysUntilReset([DateTime? now]) {
+    final local = (now ?? DateTime.now()).toLocal();
+    final reset = currentPeriodEnd(now).toLocal();
+    return DateTime.utc(reset.year, reset.month, reset.day)
+        .difference(DateTime.utc(local.year, local.month, local.day))
+        .inDays;
+  }
 }

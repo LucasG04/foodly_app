@@ -432,10 +432,14 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
   }
 
   void _showAiQuotaExhausted() {
-    final resetDate = DateFormat.yMMMMd(context.locale.toLanguageTag())
-        .format(AiUsagePeriod.currentPeriodEnd().toLocal());
     MainSnackbar(
-      message: 'ai_usage_exhausted'.tr(args: [resetDate]),
+      message: 'ai_usage_exhausted'.plural(
+        AiUsagePeriod.daysUntilReset(),
+        namedArgs: {
+          'date': DateFormat.Md(context.locale.toLanguageTag())
+              .format(AiUsagePeriod.currentPeriodEnd().toLocal()),
+        },
+      ),
       isError: true,
       action: TextButton(
         onPressed: _openGetPremium,

@@ -818,10 +818,14 @@ class _ImportModalState extends ConsumerState<ImportModal>
         isDismissible: true,
       ).show(context);
     } else if (error is AiQuotaExceededException) {
-      final resetDate = DateFormat.yMMMMd(context.locale.toLanguageTag())
-          .format(AiUsagePeriod.currentPeriodEnd().toLocal());
       MainSnackbar(
-        message: 'ai_usage_exhausted'.tr(args: [resetDate]),
+        message: 'ai_usage_exhausted'.plural(
+          AiUsagePeriod.daysUntilReset(),
+          namedArgs: {
+            'date': DateFormat.Md(context.locale.toLanguageTag())
+                .format(AiUsagePeriod.currentPeriodEnd().toLocal()),
+          },
+        ),
         isError: true,
         action: TextButton(
           onPressed: () => WidgetUtils.showFoodlyBottomSheet<void>(
