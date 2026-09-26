@@ -19,6 +19,9 @@ class SelectPlanModal extends StatefulWidget {
 }
 
 class _SelectPlanModalState extends State<SelectPlanModal> {
+  // Roughly two plan tiles, so the sheet keeps its height once plans load.
+  static const _placeholderHeight = 150.0;
+
   late final Future<List<Plan>?> _plansFuture;
 
   @override
@@ -41,8 +44,10 @@ class _SelectPlanModalState extends State<SelectPlanModal> {
     final width = size.width > 599 ? 580.0 : size.width * 0.8;
 
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: (size.width - width) / 2,
+      padding: EdgeInsets.only(
+        left: (size.width - width) / 2,
+        right: (size.width - width) / 2,
+        bottom: kPadding + MediaQuery.paddingOf(context).bottom,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,14 +58,18 @@ class _SelectPlanModalState extends State<SelectPlanModal> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                AutoSizeText(
-                  'modal_select_plan_title'.tr().toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: AutoSizeText(
+                    'modal_select_plan_title'.tr().toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 IconButton(
+                  padding: EdgeInsets.zero,
+                  alignment: Alignment.centerRight,
                   icon: const Icon(EvaIcons.close),
                   onPressed: () => Navigator.maybePop(context),
                 ),
@@ -71,13 +80,13 @@ class _SelectPlanModalState extends State<SelectPlanModal> {
             future: _plansFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return SizedBox(
-                  height: size.height * 0.3,
-                  child: const Center(child: SmallCircularProgressIndicator()),
+                return const SizedBox(
+                  height: _placeholderHeight,
+                  child: Center(child: SmallCircularProgressIndicator()),
                 );
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return SizedBox(
-                  height: size.height * 0.3,
+                  height: _placeholderHeight,
                   child: Center(
                     child: Text(
                       'modal_select_plan_no_plan'.tr(),
@@ -87,18 +96,23 @@ class _SelectPlanModalState extends State<SelectPlanModal> {
                 );
               }
 
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: snapshot.data!
-                    .map(
-                      (plan) => ListTile(
-                        title: Text(plan.name!),
-                        subtitle: Text(plan.code!),
-                        onTap: () => Navigator.pop(context, plan),
-                        trailing: const Icon(Icons.arrow_forward_ios_rounded),
-                      ),
-                    )
-                    .toList(),
+              return ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: size.height * 0.6),
+                child: ListView(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  children: snapshot.data!
+                      .map(
+                        (plan) => ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(plan.name!),
+                          subtitle: Text(plan.code!),
+                          onTap: () => Navigator.pop(context, plan),
+                          trailing: const Icon(Icons.arrow_forward_ios_rounded),
+                        ),
+                      )
+                      .toList(),
+                ),
               );
             },
           ),
