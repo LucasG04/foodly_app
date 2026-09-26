@@ -596,6 +596,7 @@ class LunixApiService {
       );
     } catch (e) {
       _log.severe('ERR in editGrocerySuggestion. API Request failed', e);
+      rethrow;
     }
   }
 

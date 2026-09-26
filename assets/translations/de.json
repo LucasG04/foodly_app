@@ -351,6 +351,7 @@
   "premium_gifted_msg_title": "Plus geschenkt!",
   "premium_gifted_msg_message": "Durch dein Feedback konnte {} verbessert werden. Als Dankeschön bekommst du Plus für {} Monat(e) geschenkt.",
   "edit_grocery_suggestion_group": "Produktgruppe",
+  "edit_grocery_suggestion_error": "Die Produktgruppe konnte nicht geändert werden. Bitte versuche es erneut.",
   "link_preview_options_open_link": "In externem Browser öffnen",
   "link_preview_options_copy_link": "Link kopieren",
   "link_preview_options_copy_link_success": "Link in die Zwischenablage kopiert",

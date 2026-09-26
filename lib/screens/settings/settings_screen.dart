@@ -84,9 +84,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   controller: _scrollController,
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: (mediaSize.width -
-                              BasicUtils.contentWidth(context)) /
-                          2,
+                      horizontal:
+                          (mediaSize.width - BasicUtils.contentWidth(context)) /
+                              2,
                     ),
                     child: Column(
                       children: [
@@ -252,8 +252,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           ),
                           Builder(
                             builder: (BuildContext ctx) => SettingsTile(
-                              onTap: () =>
-                                  _shareCode(plan, ctx),
+                              onTap: () => _shareCode(plan, ctx),
                               leadingIcon: EvaIcons.shareOutline,
                               text: 'settings_section_plan_share'
                                   .tr(args: [plan.code!]),
@@ -353,20 +352,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                         ], context),
                         _buildSectionTitle('settings_section_account'.tr()),
                         _buildSection([
-                          SettingsTile(
-                            onTap: () => WidgetUtils.showFoodlyBottomSheet(
-                              context: context,
-                              scrollable: true,
-                              // Drag-to-dismiss bypasses PopScope, which keeps
-                              // the freshly created token from being closed.
-                              enableDrag: false,
-                              builder: (_) => const SettingsMcpTokenModal(),
+                          if (PermissionUtils.allowedToModerate(foodlyUser))
+                            SettingsTile(
+                              onTap: () => WidgetUtils.showFoodlyBottomSheet(
+                                context: context,
+                                scrollable: true,
+                                // Drag-to-dismiss bypasses PopScope, which keeps
+                                // the freshly created token from being closed.
+                                enableDrag: false,
+                                builder: (_) => const SettingsMcpTokenModal(),
+                              ),
+                              leadingIcon: EvaIcons.code,
+                              text: 'settings_section_account_mcp'.tr(),
+                              trailing:
+                                  const Icon(EvaIcons.arrowIosForwardOutline),
                             ),
-                            leadingIcon: EvaIcons.code,
-                            text: 'settings_section_account_mcp'.tr(),
-                            trailing:
-                                const Icon(EvaIcons.arrowIosForwardOutline),
-                          ),
                           SettingsTile(
                             onTap: () async {
                               await AuthenticationService.resetPassword(
