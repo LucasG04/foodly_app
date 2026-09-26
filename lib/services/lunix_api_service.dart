@@ -185,6 +185,7 @@ class LunixApiService {
           'page': page,
           'hl': langCode,
         },
+        options: await _firebaseAuthOptions(),
       );
     } catch (e) {
       _log.severe('ERR in searchImages. Response is null', e);
