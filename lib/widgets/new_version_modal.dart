@@ -1,13 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../constants.dart';
 import '../models/foodly_change.dart';
 import 'main_button.dart';
+import 'scroll_shadow_layout.dart';
 
-class NewVersionModal extends ConsumerStatefulWidget {
+class NewVersionModal extends StatefulWidget {
   final List<VersionGroup> versionGroups;
 
   const NewVersionModal({
@@ -16,7 +16,7 @@ class NewVersionModal extends ConsumerStatefulWidget {
   });
 
   @override
-  _NewVersionModalState createState() => _NewVersionModalState();
+  State<NewVersionModal> createState() => _NewVersionModalState();
 
   static List<ChangeTranslation> checkVersionNotesForVariables(
       List<ChangeTranslation> translations) {
@@ -35,106 +35,66 @@ class NewVersionModal extends ConsumerStatefulWidget {
   }
 }
 
-class _NewVersionModalState extends ConsumerState<NewVersionModal> {
-  late final ScrollController _scrollController;
-  late final AutoDisposeStateProvider<bool> _$titleShowShadow;
-
-  @override
-  void initState() {
-    _$titleShowShadow = AutoDisposeStateProvider((_) => false);
-    _scrollController = ScrollController();
-    _scrollController.addListener(_handleTitleShadowState);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
+class _NewVersionModalState extends State<NewVersionModal> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Consumer(
-          builder: (context, ref, child) {
-            final showShadow = ref.watch(_$titleShowShadow);
-            return Container(
-              padding: const EdgeInsets.all(kPadding / 2),
-              decoration: BoxDecoration(
-                color: Theme.of(context).dialogTheme.backgroundColor,
-                boxShadow: showShadow
-                    ? [
-                        const BoxShadow(
-                          offset: Offset(0, 1),
-                          blurRadius: 1,
-                          color: Color.fromRGBO(0, 0, 0, .16),
-                        )
-                      ]
-                    : [],
-              ),
-              child: child,
-            );
-          },
-          child: Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: kPadding / 2),
-                  child: Text(
-                    'new_version_modal_title'.tr().toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+    return ScrollShadowLayout(
+      header: Container(
+        padding: const EdgeInsets.all(kPadding / 2),
+        color: Theme.of(context).dialogTheme.backgroundColor,
+        child: Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(left: kPadding / 2),
+                child: Text(
+                  'new_version_modal_title'.tr().toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              IconButton(
-                icon: const Icon(EvaIcons.close),
-                onPressed: _close,
+            ),
+            IconButton(
+              icon: const Icon(EvaIcons.close),
+              onPressed: _close,
+            ),
+          ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.sizeOf(context).height * 0.8,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: kPadding),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ...widget.versionGroups.map(
+                      (g) => _buildVersionSection(g),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: kPadding),
+                child: MainButton(
+                  onTap: _close,
+                  text: 'new_version_modal_continue'.tr(),
+                ),
               ),
             ],
           ),
         ),
-        Expanded(
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: Container(
-              constraints: BoxConstraints(
-                minHeight: MediaQuery.sizeOf(context).height * 0.8,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: kPadding),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ...widget.versionGroups.map(
-                          (g) => _buildVersionSection(g),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: kPadding),
-                    child: MainButton(
-                      onTap: _close,
-                      text: 'new_version_modal_continue'.tr(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -221,15 +181,6 @@ class _NewVersionModalState extends ConsumerState<NewVersionModal> {
 
   void _close() {
     Navigator.pop(context);
-  }
-
-  void _handleTitleShadowState() {
-    final showShadow = ref.read(_$titleShowShadow);
-    if (_scrollController.offset > 0 && !showShadow) {
-      ref.read(_$titleShowShadow.notifier).state = true;
-    } else if (_scrollController.offset <= 0 && showShadow) {
-      ref.read(_$titleShowShadow.notifier).state = false;
-    }
   }
 }
 
