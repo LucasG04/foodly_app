@@ -378,6 +378,11 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
 			);
 			outputFileListPaths = (
 			);
@@ -385,7 +390,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols\" --build-phase --validate -ai \"1:1073670913430:ios:5117c23c8e12b3a959f1b7\"\n\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols\" --build-phase -ai \"1:1073670913430:ios:5117c23c8e12b3a959f1b7\"\n";
+			shellScript = "[ \"$SKIP_CRASHLYTICS_UPLOAD\" = \"YES\" ] && exit 0\nUPLOAD=\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols\"\n# fastlane gym clones packages via cloned_source_packages_path, not into DerivedData\n[ -x \"$UPLOAD\" ] || UPLOAD=\"${SRCROOT}/../build/ios/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols\"\n\"$UPLOAD\" --build-phase --validate -ai \"1:1073670913430:ios:5117c23c8e12b3a959f1b7\"\n\"$UPLOAD\" --build-phase -ai \"1:1073670913430:ios:5117c23c8e12b3a959f1b7\"\n";
 		};
 		BD8B6FA213F242A9C7916402 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
