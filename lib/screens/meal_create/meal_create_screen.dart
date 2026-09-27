@@ -47,6 +47,7 @@ import '../../widgets/wrapped_image_picker/wrapped_image_picker.dart';
 import 'edit_ingredients.dart';
 import 'import_modal.dart';
 import 'kcal_estimate_modal.dart';
+import 'meal_assistant_sheet.dart';
 import 'meal_tag_edit_modal.dart';
 import 'save_changes_modal.dart';
 
@@ -66,6 +67,8 @@ class MealCreateScreen extends ConsumerStatefulWidget {
 
 class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     with OfContextMixin {
+  static const _maxServings = 30;
+
   bool _mealSaved = false;
   bool _isFirstCall = true;
   final ScrollController _scrollController = ScrollController();
@@ -163,6 +166,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
               AutoRouter.of(context).push(const HomeScreenRoute());
             },
           ),
+          floatingActionButton: _buildAssistantButton(),
           body: Consumer(
             builder: (context, ref, _) {
               final isLoading = ref.watch(_$isLoading);
@@ -224,7 +228,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                         onChanged: (value) => _changeMealValue(
                                             (meal) => meal.servings = value),
                                         minValue: 1,
-                                        maxValue: 30,
+                                        maxValue: _maxServings,
                                       );
                                     }),
                                   ],
@@ -367,6 +371,12 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                     );
                                   }),
                                 ),
+                                // Room to scroll the save button above the FAB.
+                                SizedBox(
+                                  height: kFloatingActionButtonMargin +
+                                      56 +
+                                      MediaQuery.viewPaddingOf(context).bottom,
+                                ),
                               ],
                             ),
                           ),
@@ -427,6 +437,43 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                   child: aiButton,
                 ),
         );
+      },
+    );
+  }
+
+  Widget _buildAssistantButton() {
+    return Consumer(
+      builder: (context, ref, _) {
+        // Hidden while the meal loads (it would send an empty form) and while
+        // typing, so it never covers the focused field. Reading the insets here
+        // keeps keyboard animations from rebuilding the whole form.
+        if (ref.watch(_$isLoading) ||
+            MediaQuery.viewInsetsOf(context).bottom > 0) {
+          return const SizedBox.shrink();
+        }
+        final isSubscribed = ref.watch(InAppPurchaseService.$userIsSubscribed);
+        final usage = ref.watch(aiUsageProvider).valueOrNull;
+        final canUse = usage?.canUseText(isSubscribed) ?? true;
+        final showBadge = !isSubscribed && usage != null;
+
+        final Widget button = FloatingActionButton(
+          heroTag: null,
+          backgroundColor: canUse ? theme.primaryColor : Colors.grey,
+          tooltip: 'meal_assistant_title'.tr(),
+          onPressed: canUse ? _openAssistant : _showAiQuotaExhausted,
+          child: const Icon(Icons.auto_awesome, color: Colors.white),
+        );
+        return showBadge
+            ? badges.Badge(
+                badgeStyle: const badges.BadgeStyle(badgeColor: kPremiumColor),
+                position: badges.BadgePosition.topEnd(top: -4, end: -2),
+                badgeContent: Text(
+                  usage.textRemaining.toString(),
+                  style: const TextStyle(color: kPrimaryColor, fontSize: 10),
+                ),
+                child: button,
+              )
+            : button;
       },
     );
   }
@@ -669,13 +716,6 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
             onTap: () => _openImportModal(ImportType.link),
           ),
           OptionsSheetOptions(
-            icon: EvaIcons.fileTextOutline,
-            title: 'import_options_text'.tr(),
-            trailing:
-                showQuotaBadges ? _buildQuotaPill(usage.textRemaining) : null,
-            onTap: _onTapTextImport,
-          ),
-          OptionsSheetOptions(
             icon: SimpleIcons.instagram,
             title: 'import_options_instagram'.tr(),
             trailing: showQuotaBadges
@@ -686,17 +726,6 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         ],
       ),
     );
-  }
-
-  void _onTapTextImport() {
-    final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
-    final usage = ref.read(aiUsageProvider).valueOrNull;
-    final canUse = usage?.canUseText(isSubscribed) ?? true;
-    if (!canUse) {
-      _showAiQuotaExhausted();
-      return;
-    }
-    _openImportModal(ImportType.text);
   }
 
   void _onTapInstagramImport() {
@@ -783,6 +812,72 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       ref.read(_$meal.notifier).state = Meal.fromMap(meal.id, meal.toMap());
     }
   }
+
+  /// Sends the live form as the meal to edit, or nothing while it is empty.
+  void _openAssistant() async {
+    final baseMeal = ref.read(_$meal);
+    final formMeal = Meal.fromMap(baseMeal.id, baseMeal.toMap())
+      ..name = _titleController.text.trim()
+      ..instructions = _instructionsController.text.trim()
+      ..duration = int.tryParse(_durationController.text.trim());
+    final isEmpty = formMeal.name.isEmpty &&
+        (formMeal.ingredients?.isEmpty ?? true) &&
+        formMeal.instructions!.isEmpty;
+    if (!isEmpty && !_fitsAssistant(formMeal)) {
+      MainSnackbar(
+        message: 'meal_assistant_error_too_long'.tr(),
+        isError: true,
+      ).show(context);
+      return;
+    }
+
+    final assistantResult =
+        await WidgetUtils.showFoodlyBottomSheet<MealAssistantResult>(
+      context: context,
+      builder: (_) =>
+          MealAssistantSheet(currentMeal: isEmpty ? null : formMeal),
+    );
+    if (assistantResult == null || !mounted) {
+      return;
+    }
+    final (meal: result, :partial) = assistantResult;
+    if (partial) {
+      MainSnackbar(
+        message: 'import_modal_partial_warning'.tr(),
+        isError: true,
+        isDismissible: true,
+      ).show(context);
+    }
+
+    // Source, kcal and tags stay; the photo only fills an empty slot.
+    _titleController.text = result.name;
+    _durationController.text = (result.duration ?? '').toString();
+    _instructionsController.text = result.instructions ?? '';
+    final hasImage = _imageIsValid(ref.read(_$updatedImage)) ||
+        _imageIsValid(ref.read(_$meal).imageUrl);
+    if (!hasImage && _imageIsValid(result.imageUrl)) {
+      _pickNewImage(result.imageUrl!, result.imageCredit);
+    }
+    _changeMealValue((meal) {
+      meal.name = result.name;
+      meal.instructions = result.instructions;
+      meal.ingredients = result.ingredients ?? [];
+      meal.servings = result.servings.clamp(1, _maxServings);
+    });
+  }
+
+  /// Mirrors the API's limits for the meal sent to the assistant, so an
+  /// oversized meal gets a clear message instead of a generic error.
+  bool _fitsAssistant(Meal meal) =>
+      meal.name.length <= 200 &&
+      (meal.instructions?.length ?? 0) <= 10000 &&
+      (meal.ingredients?.length ?? 0) <= 100 &&
+      (meal.ingredients ?? []).every(
+        (i) =>
+            (i.name?.length ?? 0) <= 200 &&
+            (i.unit?.length ?? 0) <= 50 &&
+            (i.group?.length ?? 0) <= 100,
+      );
 
   void _openMealTagEdit() async {
     _existingMealTags ??=
