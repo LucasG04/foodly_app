@@ -12,6 +12,10 @@ class MainTextField extends ConsumerStatefulWidget {
   final String? title;
   final String? placeholder;
   final bool isMultiline;
+
+  /// With [isMultiline], grows from this many lines up to 5 instead of a
+  /// fixed 5-line height.
+  final int? minLines;
   final TextInputAction textInputAction;
   final TextInputType keyboardType;
   final void Function()? onSubmit;
@@ -19,6 +23,7 @@ class MainTextField extends ConsumerStatefulWidget {
   final bool isDense;
   final bool obscureText;
   final bool autofocus;
+  final bool readOnly;
   final TextAlign textAlign;
   final Widget? suffix;
   final String? errorText;
@@ -37,6 +42,7 @@ class MainTextField extends ConsumerStatefulWidget {
     this.title,
     this.placeholder,
     this.isMultiline = false,
+    this.minLines,
     this.textInputAction = TextInputAction.done,
     this.keyboardType = TextInputType.text,
     this.onSubmit,
@@ -44,6 +50,7 @@ class MainTextField extends ConsumerStatefulWidget {
     this.isDense = true,
     this.obscureText = false,
     this.autofocus = false,
+    this.readOnly = false,
     this.textAlign = TextAlign.start,
     this.suffix,
     this.errorText,
@@ -124,6 +131,7 @@ class _MainTextFieldState extends ConsumerState<MainTextField>
       child: TextFormField(
         controller: widget.controller,
         autofocus: widget.autofocus,
+        readOnly: widget.readOnly,
         focusNode: _focusNode,
         autofillHints: widget.autofillHints,
         textCapitalization:
@@ -196,6 +204,7 @@ class _MainTextFieldState extends ConsumerState<MainTextField>
         keyboardType:
             widget.isMultiline ? TextInputType.multiline : widget.keyboardType,
         textInputAction: widget.textInputAction,
+        minLines: widget.isMultiline ? widget.minLines : null,
         maxLines: widget.isMultiline ? 5 : 1,
         onEditingComplete: () {
           if (widget.textInputAction == TextInputAction.next) {

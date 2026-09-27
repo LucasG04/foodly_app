@@ -11,6 +11,7 @@ import '../models/ai_usage.dart';
 import '../models/foodly_change.dart';
 import '../models/grocery.dart';
 import '../models/grocery_group.dart';
+import '../models/ingredient.dart';
 import '../models/kcal_estimate.dart';
 import '../models/lunix_docx.dart';
 import '../models/lunix_image.dart';
@@ -417,7 +418,8 @@ class LunixApiService {
     }
   }
 
-  /// Streams a meal generated from [data] — either free recipe text or an
+  /// Streams a meal generated from [data] — either free text (a recipe, a dish
+  /// idea or, with [currentMeal], a change request) or an
   /// Instagram post/reel URL, per [source] — as a sequence of typed events
   /// (NDJSON). Fields, ingredients and enrichment (product groups, image)
   /// arrive incrementally; the stream is terminated by a [DoneEvent] or an
@@ -431,10 +433,14 @@ class LunixApiService {
   /// Failures that occur after the stream started (a server `error` event or a
   /// premature close) are delivered as an [ErrorEvent] so partial content can
   /// be kept.
+  ///
+  /// With [currentMeal] (text only), [data] is a change request and the stream
+  /// carries the full edited meal.
   static Stream<MealGenerationEvent> streamGeneratedMeal({
     required MealGenerationSource source,
     required String data,
     required String langCode,
+    Meal? currentMeal,
   }) async* {
     _log.finer('Call streamGeneratedMeal()');
 
@@ -446,6 +452,22 @@ class LunixApiService {
           'type': source.wireValue,
           'data': data,
           'language': langCode,
+          if (currentMeal != null)
+            'meal': <String, dynamic>{
+              'name': currentMeal.name,
+              'servings': currentMeal.servings,
+              'duration': currentMeal.duration,
+              'ingredients': [
+                for (final i in currentMeal.ingredients ?? <Ingredient>[])
+                  <String, dynamic>{
+                    'name': i.name ?? '',
+                    'amount': i.amount,
+                    'unit': (i.unit ?? '').isEmpty ? null : i.unit,
+                    'group': i.group,
+                  },
+              ],
+              'instructions': currentMeal.instructions,
+            },
         },
         options: Options(
           responseType: ResponseType.stream,

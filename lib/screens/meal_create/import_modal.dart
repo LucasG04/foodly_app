@@ -31,7 +31,7 @@ import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
-enum ImportType { link, text, instagram }
+enum ImportType { link, instagram }
 
 /// Phases of the streaming import build-up. [scraping] only occurs for the
 /// Instagram import, while the post/reel is being fetched.
@@ -62,7 +62,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
   String? _errorText;
   ButtonState? _buttonState;
 
-  // Streaming build-up state (text import only).
+  // Streaming build-up state (Instagram import only).
   _GenPhase _phase = _GenPhase.input;
   // Current sub-step while [_phase] is [_GenPhase.enriching]. Only advances.
   _EnrichStep _enrichStep = _EnrichStep.polishing;
@@ -118,9 +118,9 @@ class _ImportModalState extends ConsumerState<ImportModal>
     super.dispose();
   }
 
-  /// The text and Instagram imports both stream their result; the link import
-  /// is a one-shot request with a static layout.
-  bool get _isStreaming => widget.type != ImportType.link;
+  /// The Instagram import streams its result; the link import is a one-shot
+  /// request with a static layout.
+  bool get _isStreaming => widget.type == ImportType.instagram;
 
   @override
   Widget build(BuildContext context) {
@@ -198,14 +198,6 @@ class _ImportModalState extends ConsumerState<ImportModal>
           pasteValidator: (text) => BasicUtils.isValidInstagramUrl(text),
           submitOnPaste: true,
         );
-      case ImportType.text:
-        return MainTextField(
-          controller: _controller,
-          title: 'import_modal_text_title'.tr(),
-          placeholder: 'import_modal_text_hint'.tr(),
-          errorText: _errorText,
-          isMultiline: true,
-        );
     }
   }
 
@@ -244,7 +236,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
     );
   }
 
-  /// Text-import input that morphs into a loader: the title and field collapse
+  /// Streaming-import input that morphs into a loader: the title and field collapse
   /// and fade away first, then the submit button transitions into a centered
   /// spinner + status text occupying the button's footprint.
   Widget _buildTextInputState() {
@@ -679,15 +671,10 @@ class _ImportModalState extends ConsumerState<ImportModal>
     }
     final input = _controller.text.trim();
 
-    final isInstagram = widget.type == ImportType.instagram;
-    final isInvalid =
-        isInstagram ? !BasicUtils.isValidInstagramUrl(input) : input.isEmpty;
-    if (isInvalid) {
+    if (!BasicUtils.isValidInstagramUrl(input)) {
       setState(() {
         _buttonState = ButtonState.error;
-        _errorText = isInstagram
-            ? 'import_modal_error_no_instagram'.tr()
-            : 'import_modal_error_no_text'.tr();
+        _errorText = 'import_modal_error_no_instagram'.tr();
       });
       return;
     }
@@ -710,9 +697,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
 
     final langCode = context.locale.languageCode;
     LunixApiService.streamGeneratedMeal(
-      source: isInstagram
-          ? MealGenerationSource.instagram
-          : MealGenerationSource.text,
+      source: MealGenerationSource.instagram,
       data: input,
       langCode: langCode,
     )
@@ -891,7 +876,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
       ingredients: _ingredients.values.toList(),
       imageUrl: _imageUrl ?? '',
       imageCredit: _imageCredit,
-      source: widget.type != ImportType.text ? _controller.text.trim() : '',
+      source: _controller.text.trim(),
     );
   }
 
