@@ -458,7 +458,9 @@ class _MealListViewState extends ConsumerState<MealListView>
     ref.read(_$isSearching.notifier).state = false;
     ref.read(mealTagFilterProvider.notifier).state = [];
     _lastMealDoc = null;
-    setState(() { _searchGeneration++; });
+    setState(() {
+      _searchGeneration++;
+    });
     await _loadNextMeals(ref);
     if (!mounted) {
       return;
@@ -471,9 +473,32 @@ class _MealListViewState extends ConsumerState<MealListView>
     BasicUtils.afterBuild(
       () => stream
           .where((mealId) => mealId != null)
-          .listen((_) => _refreshMeals())
+          .listen((mealId) => _onMealChanged(mealId!))
           .canceledBy(this),
     );
+  }
+
+  /// Patches a loaded meal in place; unknown ids (created/imported meals) need a full refresh
+  Future<void> _onMealChanged(String mealId) async {
+    final isLoaded = ref.read(_$loadedMeals).any((m) => m.id == mealId);
+    if (!isLoaded) {
+      _refreshMeals();
+      return;
+    }
+
+    final meal = await MealService.getMealById(mealId);
+    if (!mounted) {
+      return;
+    }
+
+    List<Meal> patch(List<Meal> meals) => [
+          for (final m in meals)
+            if (m.id != mealId) m else if (meal != null) meal,
+        ];
+    ref.read(_$loadedMeals.notifier).update(patch);
+    ref.read(_$filteredMeals.notifier).update(patch);
+    // Tags may have changed; refetch the grouped list on next build.
+    setState(() => _tagSearchFuture = null);
   }
 }
 
