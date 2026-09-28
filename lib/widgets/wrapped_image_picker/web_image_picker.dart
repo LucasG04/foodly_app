@@ -9,7 +9,6 @@ import '../../constants.dart';
 import '../../models/image_credit.dart';
 import '../../models/lunix_image.dart';
 import '../../providers/state_providers.dart';
-import '../../services/link_metadata_service.dart';
 import '../../services/lunix_api_service.dart';
 import '../../utils/basic_utils.dart';
 import '../foodly_network_image.dart';
@@ -36,10 +35,13 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
   final _log = app_logger.Logger('LogRecordService');
 
   final TextEditingController _inputController = TextEditingController();
-  final bool _showLinkError = false;
   final Key _animationLimiterKey = UniqueKey();
 
   int _imagePage = 0;
+  bool _hasMore = false;
+  // Bumped by every new search or query edit; async results from an older
+  // request are dropped so they can't land under a different query.
+  int _requestId = 0;
   List<LunixImage> _images = [];
   bool _isLoading = false;
   bool _isLoadingMore = false;
@@ -98,21 +100,6 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
                   ],
                 ),
                 const SizedBox(height: kPadding / 2),
-                if (_showLinkError)
-                  Row(
-                    children: [
-                      Icon(
-                        EvaIcons.alertCircleOutline,
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                      const SizedBox(height: kPadding / 2),
-                      Expanded(
-                        child: const Text(
-                          'image_link_picker_input_error',
-                        ).tr(),
-                      ),
-                    ],
-                  ),
                 if (_isLoading) _buildLoadingGrid(),
                 if (!_isLoading && _images.isNotEmpty) ..._buildContent(),
                 if (!_isLoading && _images.isEmpty && _noResults)
@@ -202,7 +189,7 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
               .toList(),
         ),
       ),
-      if (_images.isNotEmpty) ...[
+      if (_images.isNotEmpty && _hasMore) ...[
         Center(
           child: _isLoadingMore && _images.isNotEmpty
               ? const SmallCircularProgressIndicator()
@@ -261,114 +248,117 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
   }
 
   void _clearResults() {
-    if (_images.isNotEmpty || _noResults) {
-      setState(() {
-        _images = [];
-        _noResults = false;
-      });
+    if (_images.isEmpty && !_noResults && !_isLoading && !_isLoadingMore) {
+      return;
     }
+    _requestId++;
+    setState(() {
+      _images = [];
+      _noResults = false;
+      _isLoading = false;
+      _isLoadingMore = false;
+      _imagePage = 0;
+      _hasMore = false;
+    });
   }
 
   Future<void> _search() async {
-    setState(() {
-      _isLoading = true;
-      _noResults = false;
-      _images = [];
-    });
+    final requestId = ++_requestId;
     final String search = _inputController.text.trim();
-    String? imageFromUrl;
     final language = BasicUtils.getActiveLanguage(context);
 
-    try {
-      imageFromUrl = await _getImageFromUrl(search);
-    } catch (e) {
-      _log.severe('ERR: _getImageFromUrl with $search');
-    }
-
-    if (imageFromUrl != null) {
-      // og:image scrape: no attribution available.
-      widget.onPick(imageFromUrl, null);
+    final cache = ref.read(webImagePickerCacheProvider);
+    final isCached =
+        cache != null && cache.query == search && cache.language == language;
+    setState(() {
+      _isLoading = !isCached;
+      _isLoadingMore = false;
+      _noResults = false;
+      _images = isCached ? List.of(cache.images) : [];
+      _imagePage = isCached ? cache.page : 0;
+      _hasMore = isCached && cache.hasMore;
+    });
+    if (isCached) {
       return;
     }
 
+    LunixImageResponse? response;
     try {
-      final response = await LunixApiService.searchImages(
+      response = await LunixApiService.searchImages(
         search,
         _imagePage,
         language,
       );
-
-      if (response == null) {
-        throw Exception('API Response is null');
-      }
-
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _images = response.images;
-        _noResults = _images.isEmpty;
-      });
     } catch (e) {
       _log.severe('ERR: searchImages with $search', e);
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _noResults = true;
-      });
     }
-    if (!mounted) {
+    if (!mounted || requestId != _requestId) {
       return;
     }
+
     setState(() {
+      _images = response?.images ?? [];
+      _hasMore = response?.hasMore ?? false;
+      _noResults = _images.isEmpty;
       _isLoading = false;
     });
-  }
-
-  Future<String?> _getImageFromUrl(String url) async {
-    final bool isUrl =
-        Uri.tryParse(url) != null && Uri.tryParse(url)!.isAbsolute;
-    if (!isUrl) {
-      return null;
+    if (_images.isNotEmpty) {
+      ref.read(webImagePickerCacheProvider.notifier).state = (
+        query: search,
+        language: language,
+        page: _imagePage,
+        hasMore: _hasMore,
+        images: List.of(_images),
+      );
     }
-
-    final urlMetadata = await LinkMetadataService.getFromApi(url);
-
-    return urlMetadata != null &&
-            urlMetadata.image != null &&
-            urlMetadata.image!.isNotEmpty
-        ? urlMetadata.image
-        : null;
   }
 
   Future<void> _loadMoreImages() async {
+    final requestId = _requestId;
     setState(() {
       _isLoadingMore = true;
     });
 
     final String search = _inputController.text.trim();
-    _imagePage++;
+    final language = BasicUtils.getActiveLanguage(context);
+    // Read before the await: `ref` is unusable once the picker is closed.
+    final cache = ref.read(webImagePickerCacheProvider.notifier);
+    final loadedImages = List.of(_images);
+    // Only advance on success so a failed request can be retried.
+    final nextPage = _imagePage + 1;
 
-    final response = await LunixApiService.searchImages(
-      search,
-      _imagePage,
-      BasicUtils.getActiveLanguage(context),
-    );
-
-    if (!mounted) {
-      return;
+    LunixImageResponse? response;
+    try {
+      response = await LunixApiService.searchImages(
+        search,
+        nextPage,
+        language,
+      );
+    } catch (e) {
+      _log.severe('ERR: loadMoreImages with $search', e);
     }
 
-    if (response == null) {
-      setState(() {
-        _isLoadingMore = false;
-      });
+    // Cache even if the picker closed or the query changed meanwhile, so a
+    // paid page isn't fetched (and billed) again.
+    if (response != null) {
+      cache.state = (
+        query: search,
+        language: language,
+        page: nextPage,
+        hasMore: response.hasMore,
+        images: [...loadedImages, ...response.images],
+      );
+    }
+    if (!mounted || requestId != _requestId) {
       return;
     }
 
     setState(() {
-      _images.addAll(response.images);
+      if (response != null) {
+        _images.addAll(response.images);
+        _imagePage = nextPage;
+        _hasMore = response.hasMore;
+      }
       _isLoadingMore = false;
     });
   }
