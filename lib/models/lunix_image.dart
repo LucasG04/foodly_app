@@ -5,11 +5,13 @@ import 'image_credit.dart';
 class LunixImageResponse {
   int page;
   int size;
+  bool hasMore;
   List<LunixImage> images;
 
   LunixImageResponse({
     required this.page,
     required this.size,
+    required this.hasMore,
     required this.images,
   });
 
@@ -17,6 +19,8 @@ class LunixImageResponse {
     return LunixImageResponse(
       page: map['page'] as int? ?? 0,
       size: map['size'] as int? ?? 0,
+      // Older API versions don't send it and page without a limit.
+      hasMore: map['hasMore'] as bool? ?? true,
       images: List<LunixImage>.from((map['data'] as List<dynamic>)
               .map<LunixImage>(
                   (dynamic x) => LunixImage.fromMap(x as Map<String, dynamic>)))

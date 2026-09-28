@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/ai_usage.dart';
 import '../models/foodly_user.dart';
+import '../models/lunix_image.dart';
 import '../models/plan.dart';
 import '../services/ai_usage_service.dart';
 import '../services/lunix_api_service.dart';
@@ -31,6 +32,18 @@ final lastChangedMealProvider = StateProvider<String?>((_) => null);
 
 /// Provides the current initial search for the WebImagePicker
 final initSearchWebImagePickerProvider = StateProvider<String>((_) => '');
+
+/// Last WebImagePicker results, so searching the same query again (e.g. after
+/// reopening the picker) shows them and their loaded pages without new API
+/// calls, which would re-bill the paid image source.
+final webImagePickerCacheProvider = StateProvider<
+    ({
+      String query,
+      String language,
+      int page,
+      bool hasMore,
+      List<LunixImage> images,
+    })?>((_) => null);
 
 /// Provides the last time the page index of the pagehistory/home page
 /// controller has been changed
