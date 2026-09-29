@@ -20,7 +20,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.1"
+          ruby-version: "3.3"
           bundler-cache: true
           working-directory: ios
       - name: Install Flutter
@@ -41,7 +41,7 @@ jobs:
         env:
           GOOGLE_SERVICES_IOS: ${{ secrets.GOOGLE_SERVICES_IOS }}
       - name: Run Flutter build runner
-        run: flutter pub run build_runner build --delete-conflicting-outputs
+        run: dart run build_runner build --delete-conflicting-outputs
       - name: Test
         run: flutter test
       - name: Set version to version in commit
@@ -54,12 +54,9 @@ jobs:
           path: build/ios/SourcePackages
           key: ${{ runner.os }}-spm-${{ hashFiles('ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: ${{ runner.os }}-spm-
-      - name: Build app
-        timeout-minutes: 40
-        run: flutter build ios --release --no-codesign
-        env:
-          # dSYMs are uploaded by the fastlane archive
-          FLUTTER_XCODE_SKIP_CRASHLYTICS_UPLOAD: "YES"
+      - name: Configure iOS project
+        # gym archives the app, so only generate the Xcode config and pods here
+        run: flutter build ios --release --config-only
       - name: Deploy iOS Beta to TestFlight via Fastlane
         uses: maierj/fastlane-action@v3.1.0
         with:
@@ -74,9 +71,6 @@ jobs:
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: "${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}"
           MATCH_PASSWORD: "${{ secrets.MATCH_PASSWORD }}"
           GIT_AUTHORIZATION: "${{ secrets.GIT_AUTHORIZATION }}"
-          PROVISIONING_PROFILE_SPECIFIER: "${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}"
-          FASTLANE_PASSWORD: "${{ secrets.TEMP_KEYCHAIN_PASSWORD }}"
-          TEMP_KEYCHAIN_USER: "${{ secrets.TEMP_KEYCHAIN_USER }}"
           FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: "120"
           FASTLANE_XCODEBUILD_SETTINGS_RETRIES: "4"
   deploy_android:
@@ -93,7 +87,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.1"
+          ruby-version: "3.3"
           bundler-cache: true
           working-directory: android
       - name: Setup Flutter
@@ -111,7 +105,7 @@ jobs:
         env:
           ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.ANDROID_KEYS_SECRET_PASSPHRASE }}
       - name: Run Flutter build runner
-        run: flutter pub run build_runner build --delete-conflicting-outputs
+        run: dart run build_runner build --delete-conflicting-outputs
       - name: Test
         run: flutter test
       - name: Set version to version in commit

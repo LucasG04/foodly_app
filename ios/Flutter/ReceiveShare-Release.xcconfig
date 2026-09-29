@@ -1,0 +1,2 @@
+#include? "Pods/Target Support Files/Pods-ReceiveShare/Pods-ReceiveShare.release.xcconfig"
+#include "Generated.xcconfig"
