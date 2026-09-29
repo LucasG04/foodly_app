@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:logging/logging.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../constants.dart';
@@ -42,7 +43,19 @@ class LunixApiService {
             'Basic ${base64Encode(utf8.encode('${Env.lunixAuthUsername}:${Env.lunixAuthPassword}'))}'
       },
     ),
-  );
+  )..interceptors.add(
+      InterceptorsWrapper(
+        // Lets lunix-api gate features by app version (`appVersionAtLeast`).
+        onRequest: (options, handler) async {
+          try {
+            options.headers['x-app-version'] =
+                (await PackageInfo.fromPlatform()).version;
+          } finally {
+            handler.next(options);
+          }
+        },
+      ),
+    );
 
   static Dio get dio => _dio;
   static String get _lunixApiKey =>
@@ -700,6 +713,7 @@ class LunixApiService {
           },
           'candidates': candidates,
         },
+        options: await _firebaseAuthOptions(),
       );
       return List<String>.from(
         (response.data?['tags'] as List<dynamic>?) ?? <dynamic>[],
