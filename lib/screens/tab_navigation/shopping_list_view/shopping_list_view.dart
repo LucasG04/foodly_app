@@ -16,6 +16,7 @@ import '../../../providers/state_providers.dart';
 import '../../../services/app_review_service.dart';
 import '../../../services/settings_service.dart';
 import '../../../services/shopping_list_service.dart';
+import '../../../utils/analytics.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/convert_util.dart';
 import '../../../utils/main_snackbar.dart';
@@ -191,9 +192,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                   ),
                   Center(
                     child: TextButton(
-                      onPressed: () {
-                        ShoppingListService.deleteAllBoughtGrocery(listId);
-                      },
+                      onPressed: () => _clearBought(listId),
                       style: ButtonStyle(
                         shadowColor: WidgetStateProperty.all<Color>(
                           theme.colorScheme.error,
@@ -334,6 +333,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
               updatedGrocery,
               BasicUtils.getActiveLanguage(context),
             );
+            logEvent(AnalyticsEvent.groceryAdd, {'source': 'manual'});
           } else {
             updatedGrocery.id = grocery.id;
             await ShoppingListService.updateGrocery(
@@ -397,6 +397,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
   void _removeBoughtGrocery(String listId, Grocery grocery, List<Grocery> items,
       List<Grocery> boughtItems) {
     AppReviewService.logGroceryBought(items.isEmpty);
+    logEvent(AnalyticsEvent.groceryBought);
     if (!SettingsService.removeBoughtImmediately) {
       ShoppingListService.groceryToggleBought(
         listId,
@@ -462,7 +463,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
         ),
         CupertinoDialogAction(
           onPressed: () {
-            ShoppingListService.deleteAllBoughtGrocery(listId);
+            _clearBought(listId);
             Navigator.of(context).pop();
           },
           isDefaultAction: true,
@@ -502,12 +503,17 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
             style: TextStyle(color: theme.primaryColor),
           ),
           onPressed: () {
-            ShoppingListService.deleteAllBoughtGrocery(listId);
+            _clearBought(listId);
             Navigator.of(context).pop();
           },
         ),
       ],
     );
+  }
+
+  void _clearBought(String listId) {
+    ShoppingListService.deleteAllBoughtGrocery(listId);
+    logEvent(AnalyticsEvent.boughtCleared);
   }
 
   void _editGrocerySuggestion(String listId, Grocery grocery) {

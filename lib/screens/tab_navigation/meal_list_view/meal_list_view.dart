@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:concentric_transition/concentric_transition.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +11,7 @@ import '../../../models/meal.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/lunix_api_service.dart';
 import '../../../services/meal_service.dart';
+import '../../../utils/analytics.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/debouncer.dart';
 import '../../../utils/of_context_mixin.dart';
@@ -395,10 +395,7 @@ class _MealListViewState extends ConsumerState<MealListView>
     ref.read(_$filteredMeals.notifier).state = filteredMeals;
     ref.read(_$isSearching.notifier).state = true;
     ref.read(_$isLoading.notifier).state = false;
-    FirebaseAnalytics.instance.logEvent(
-      name: 'search_meal_list',
-      parameters: {'query': query},
-    );
+    logEvent(AnalyticsEvent.searchMealList, {'query': query});
   }
 
   void _scrollListener() {

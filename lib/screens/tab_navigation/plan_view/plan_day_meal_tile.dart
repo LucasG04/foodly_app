@@ -13,6 +13,7 @@ import '../../../providers/state_providers.dart';
 import '../../../services/authentication_service.dart';
 import '../../../services/meal_service.dart';
 import '../../../services/plan_service.dart';
+import '../../../utils/analytics.dart';
 import '../../../utils/widget_utils.dart';
 import '../../../widgets/add_to_shopping_list_modal.dart';
 import '../../../widgets/foodly_network_image.dart';
@@ -232,6 +233,7 @@ class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
 
     ref.read(_$voteIsLoading.notifier).state = true;
     await PlanService.voteForPlanMeal(planId, widget.planMeal, userId);
+    logEvent(AnalyticsEvent.mealVote);
     ref.read(_$voteIsLoading.notifier).state = false;
   }
 

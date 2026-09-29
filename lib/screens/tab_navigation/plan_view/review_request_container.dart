@@ -11,6 +11,7 @@ import 'package:in_app_review/in_app_review.dart';
 import '../../../app_router.gr.dart';
 import '../../../constants.dart';
 import '../../../services/app_review_service.dart';
+import '../../../utils/analytics.dart';
 import '../../../utils/main_snackbar.dart';
 
 class ReviewRequestContainer extends ConsumerStatefulWidget {
@@ -32,6 +33,7 @@ class _ReviewRequestContainerState extends ConsumerState<ReviewRequestContainer>
       vsync: this,
       duration: const Duration(seconds: 10),
     )..repeat();
+    logEvent(AnalyticsEvent.reviewPromptShown);
   }
 
   @override
@@ -101,6 +103,7 @@ class _ReviewRequestContainerState extends ConsumerState<ReviewRequestContainer>
   Widget _buildDiscardButton(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        _logResult('dismiss');
         AppReviewService.discardRequest();
       },
       child: SizedBox(
@@ -142,6 +145,7 @@ class _ReviewRequestContainerState extends ConsumerState<ReviewRequestContainer>
           children: [
             TextButton.icon(
               onPressed: () {
+                _logResult('feedback');
                 AutoRouter.of(context).push(const FeedbackScreenRoute());
                 AppReviewService.discardRequest();
               },
@@ -151,6 +155,7 @@ class _ReviewRequestContainerState extends ConsumerState<ReviewRequestContainer>
             if (ref.watch(_ratingProvider) >= 4)
               TextButton.icon(
                 onPressed: () {
+                  _logResult('store');
                   AppReviewService.requestReview();
                   MainSnackbar(
                     message: 'feedback_thanks'.tr(args: ['🎉🎉']),
@@ -169,5 +174,12 @@ class _ReviewRequestContainerState extends ConsumerState<ReviewRequestContainer>
         duration: const Duration(milliseconds: 500),
       ),
     );
+  }
+
+  void _logResult(String action) {
+    logEvent(AnalyticsEvent.reviewPromptResult, {
+      'action': action,
+      'rating': ref.read(_ratingProvider).toString(),
+    });
   }
 }

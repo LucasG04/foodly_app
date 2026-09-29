@@ -15,6 +15,7 @@ import '../../services/ai_generation_exception.dart';
 import '../../services/ai_quota_exceeded_exception.dart';
 import '../../services/lunix_api_service.dart';
 import '../../utils/ai_usage_period.dart';
+import '../../utils/analytics.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/widget_utils.dart';
@@ -301,6 +302,7 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
       return;
     }
     if (error is AiQuotaExceededException) {
+      logEvent(AnalyticsEvent.aiQuotaExceededShown, {'feature': 'assistant'});
       MainSnackbar(
         message: 'ai_usage_exhausted'.plural(
           AiUsagePeriod.daysUntilReset(),

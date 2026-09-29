@@ -4,7 +4,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,6 +19,7 @@ import '../../providers/state_providers.dart';
 import '../../services/authentication_service.dart';
 import '../../services/foodly_user_service.dart';
 import '../../services/plan_service.dart';
+import '../../utils/analytics.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/firebase_auth_providers.dart';
 import '../../utils/widget_utils.dart';
@@ -341,6 +341,9 @@ class _LoginViewState extends ConsumerState<LoginView> {
       plan = widget.isCreatingPlan!
           ? await PlanService.createPlan(widget.plan!.name)
           : await PlanService.getPlanById(widget.plan!.id);
+      if (widget.isCreatingPlan! && plan != null) {
+        logEvent(AnalyticsEvent.planCreate);
+      }
     }
 
     if (plan != null && !plan.users!.contains(userId)) {
@@ -354,6 +357,9 @@ class _LoginViewState extends ConsumerState<LoginView> {
       plan.users!.add(userId);
       plan.lastUserJoined = DateTime.now();
       await PlanService.updatePlan(plan);
+      if (widget.isCreatingPlan != true) {
+        logEvent(AnalyticsEvent.planJoin);
+      }
     }
 
     FoodlyUser foodlyUser;
@@ -374,9 +380,9 @@ class _LoginViewState extends ConsumerState<LoginView> {
       return;
     }
     if (_isRegistering) {
-      FirebaseAnalytics.instance.logSignUp(signUpMethod: platform);
+      logEvent(AnalyticsEvent.signUp, {'method': platform});
     } else {
-      FirebaseAnalytics.instance.logLogin(loginMethod: platform);
+      logEvent(AnalyticsEvent.login, {'method': platform});
     }
     ref.read(planProvider.notifier).state = plan;
     ref.read(userProvider.notifier).state = foodlyUser;

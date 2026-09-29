@@ -10,6 +10,7 @@ import '../../models/grocery.dart';
 import '../../models/ingredient.dart';
 import '../../providers/state_providers.dart';
 import '../../services/shopping_list_service.dart';
+import '../../utils/analytics.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/widget_utils.dart';
@@ -47,6 +48,7 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView>
                 setState(() {
                   _currentIndex = value;
                 });
+                _logTabView(value);
               }
             },
             children: const [ShoppingListView(), PlanTabView(), MealListView()],
@@ -81,6 +83,9 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView>
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 1,
         onTap: (value) async {
+          if (value != _currentIndex) {
+            _logTabView(value);
+          }
           setState(() {
             _currentIndex = value;
             _navbarAnimating = true;
@@ -111,6 +116,11 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView>
     );
   }
 
+  void _logTabView(int index) {
+    const tabs = ['shopping', 'plan', 'meals'];
+    logEvent(AnalyticsEvent.tabView, {'tab': tabs[index]});
+  }
+
   bool _showActionButton() {
     if (!_pageController.hasClients) {
       return false;
@@ -133,6 +143,7 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView>
             grocery,
             BasicUtils.getActiveLanguage(context),
           );
+          logEvent(AnalyticsEvent.groceryAdd, {'source': 'manual'});
         },
       ),
     );

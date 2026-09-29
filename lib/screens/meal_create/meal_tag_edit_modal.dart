@@ -3,6 +3,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
+import '../../utils/analytics.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/tag_candidates.dart';
 import '../../widgets/main_text_field.dart';
@@ -112,7 +113,7 @@ class _MealTagEditModalState extends State<MealTagEditModal>
               suggestions: widget.suggestions,
               hidden: _query.isNotEmpty,
               selected: _selected,
-              onToggle: _toggle,
+              onToggle: _onSuggestionTap,
               semanticsLabel: 'meal_tag_ai_suggestions_semantics'.tr(),
             ),
             const SizedBox(height: kPadding / 2),
@@ -232,6 +233,13 @@ class _MealTagEditModalState extends State<MealTagEditModal>
       }
       _selected.add(existing);
     });
+  }
+
+  void _onSuggestionTap(String tag) {
+    if (!_isSelected(tag)) {
+      logEvent(AnalyticsEvent.aiTagSuggestionApplied);
+    }
+    _toggle(tag);
   }
 
   void _onCloudTap(String tag) {

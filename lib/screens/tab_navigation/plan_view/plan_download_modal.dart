@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 
@@ -9,6 +8,7 @@ import '../../../models/plan.dart';
 import '../../../models/plan_meal.dart';
 import '../../../services/lunix_api_service.dart';
 import '../../../services/settings_service.dart';
+import '../../../utils/analytics.dart';
 import '../../../utils/main_snackbar.dart';
 import '../../../utils/of_context_mixin.dart';
 import '../../../widgets/main_button.dart';
@@ -244,15 +244,12 @@ class _PlanDownloadModalState extends State<PlanDownloadModal>
   }
 
   void _logAnalyticsEvent() {
-    FirebaseAnalytics.instance.logEvent(
-      name: 'plan_download',
-      parameters: {
-        'excludeToday': _excludeToday.toString(),
-        'vertical': _portraitFormat.toString(),
-        'includeBreakfast': _includeBreakfast.toString(),
-        'type': _getValueForDocType(_docType),
-      },
-    );
+    logEvent(AnalyticsEvent.planDownload, {
+      'excludeToday': _excludeToday.toString(),
+      'vertical': _portraitFormat.toString(),
+      'includeBreakfast': _includeBreakfast.toString(),
+      'type': _getValueForDocType(_docType),
+    });
   }
 }
 

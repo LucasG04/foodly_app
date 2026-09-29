@@ -25,6 +25,7 @@ import '../../services/meal_service.dart';
 import '../../services/rate_limit_exception.dart';
 import '../../services/storage_service.dart';
 import '../../utils/ai_usage_period.dart';
+import '../../utils/analytics.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
@@ -77,6 +78,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
   final String _generateKcalIdForApiOnCreate = UniqueKey().toString();
 
   late bool _isCreatingMeal;
+
+  /// How the new meal was filled, for analytics.
+  String _mealSource = 'manual';
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _durationController = TextEditingController();
@@ -400,7 +404,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         final showBadge = !isSubscribed && usage != null;
 
         Widget aiButton = IconButton(
-          onPressed: canUse ? _estimateKcal : _showAiQuotaExhausted,
+          onPressed:
+              canUse ? _estimateKcal : () => _showAiQuotaExhausted('kcal'),
           icon: Icon(
             Icons.auto_awesome,
             color: canUse ? Theme.of(context).colorScheme.primary : Colors.grey,
@@ -460,7 +465,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
           heroTag: null,
           backgroundColor: canUse ? theme.primaryColor : Colors.grey,
           tooltip: 'meal_assistant_title'.tr(),
-          onPressed: canUse ? _openAssistant : _showAiQuotaExhausted,
+          onPressed: canUse
+              ? _openAssistant
+              : () => _showAiQuotaExhausted('assistant'),
           child: const Icon(Icons.auto_awesome, color: Colors.white),
         );
         return showBadge
@@ -478,7 +485,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     );
   }
 
-  void _showAiQuotaExhausted() {
+  void _showAiQuotaExhausted(String feature) {
+    logEvent(AnalyticsEvent.aiQuotaExceededShown, {'feature': feature});
     MainSnackbar(
       message: 'ai_usage_exhausted'.plural(
         AiUsagePeriod.daysUntilReset(),
@@ -630,6 +638,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
           : await MealService.updateMeal(meal);
       ref.read(_$buttonState.notifier).state = ButtonState.normal;
       _mealSaved = true;
+      if (_isCreatingMeal) {
+        logEvent(AnalyticsEvent.mealCreate, {'source': _mealSource});
+      }
       if (!mounted) {
         return false;
       }
@@ -733,7 +744,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     final usage = ref.read(aiUsageProvider).valueOrNull;
     final canUse = usage?.canUseInstagram(isSubscribed) ?? true;
     if (!canUse) {
-      _showAiQuotaExhausted();
+      _showAiQuotaExhausted('instagram');
       return;
     }
     _openImportModal(ImportType.instagram);
@@ -780,7 +791,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       }
       final canUse = usage?.canUseInstagram(isSubscribed) ?? true;
       if (!canUse) {
-        _showAiQuotaExhausted();
+        _showAiQuotaExhausted('instagram');
         return;
       }
     }
@@ -794,6 +805,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     );
 
     if (result != null && mounted) {
+      _mealSource = initialUrl == null ? type.name : 'share_${type.name}';
       final meal = ref.read(_$meal.notifier).state;
       _titleController.text = result.name;
       meal.name = result.name;
@@ -837,8 +849,15 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       builder: (_) =>
           MealAssistantSheet(currentMeal: isEmpty ? null : formMeal),
     );
+    logEvent(AnalyticsEvent.mealAssistant, {
+      'applied': (assistantResult != null).toString(),
+      'mode': isEmpty ? 'create' : 'edit',
+    });
     if (assistantResult == null || !mounted) {
       return;
+    }
+    if (isEmpty) {
+      _mealSource = 'assistant';
     }
     final (meal: result, :partial) = assistantResult;
     if (partial) {
@@ -1031,6 +1050,10 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         context: context,
         builder: (_) => KcalEstimateModal(estimate: estimate),
       );
+      logEvent(
+        AnalyticsEvent.kcalEstimate,
+        {'applied': (result != null).toString()},
+      );
       if (result != null) {
         _kcalController.text = result.toString();
       }
@@ -1038,7 +1061,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       if (!mounted) {
         return;
       }
-      _showAiQuotaExhausted();
+      _showAiQuotaExhausted('kcal');
     } on RateLimitException catch (e) {
       if (!mounted) {
         return;
