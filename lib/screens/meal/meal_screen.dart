@@ -19,6 +19,7 @@ import '../../services/in_app_purchase_service.dart';
 import '../../services/meal_service.dart';
 import '../../services/meal_stat_service.dart';
 import '../../services/plan_service.dart';
+import '../../utils/analytics.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/convert_util.dart';
 import '../../utils/main_snackbar.dart';
@@ -795,6 +796,7 @@ class _MealScreenState extends ConsumerState<MealScreen>
     MealService.createMeal(meal).then((value) {
       ref.read(_$importButtonState.notifier).state = ButtonState.normal;
       if (value != null && value.id != null) {
+        logEvent(AnalyticsEvent.mealCreate, {'source': 'copy'});
         BasicUtils.emitMealsChanged(ref, value.id!);
         if (mounted) {
           AutoRouter.of(context).popAndPush(MealScreenRoute(id: value.id!));

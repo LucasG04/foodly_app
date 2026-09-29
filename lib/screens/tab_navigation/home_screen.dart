@@ -23,6 +23,7 @@ import '../../services/lunix_api_service.dart';
 import '../../services/plan_service.dart';
 import '../../services/settings_service.dart';
 import '../../services/version_service.dart';
+import '../../utils/analytics.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/widget_utils.dart';
@@ -100,6 +101,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
   void _changePage() {
     if (!_pageController.hasClients || _pageController.page == null) {
       return;
+    }
+    if (_pageController.page != 0) {
+      logEvent(AnalyticsEvent.tabView, {'tab': 'history'});
     }
     _pageController.animateToPage(
       _pageController.page == 0 ? 1 : 0,
@@ -333,6 +337,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
     void onLock() {
       Navigator.of(context).pop();
       PlanService.lockPlan(ref.read(planProvider)!.id!);
+      logEvent(AnalyticsEvent.planLock);
     }
 
     void onDismiss() => Navigator.of(context).pop();

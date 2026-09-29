@@ -41,6 +41,7 @@ import 'services/plan_service.dart';
 import 'services/settings_service.dart';
 import 'services/shopping_list_service.dart';
 import 'services/version_service.dart';
+import 'utils/analytics.dart';
 import 'utils/basic_utils.dart';
 import 'utils/convert_util.dart';
 import 'utils/env.dart';
@@ -77,12 +78,8 @@ Future<void> _configureFirebaseSettings() async {
   }
 }
 
-// Grafana Faro (RUM, HTTP traces into lunix-api, logs). Release builds only, like Crashlytics.
-final bool _faroEnabled =
-    !foundation.kDebugMode && Env.faroCollectorUrl.isNotEmpty;
-
 Future<void> _runApp(Widget app) async {
-  if (!_faroEnabled) {
+  if (!faroEnabled) {
     runApp(app);
     return;
   }
@@ -246,6 +243,12 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
               return MaterialApp.router(
                 routerDelegate: _appRouter.delegate(
                   initialRoutes: [const HomeScreenRoute()],
+                  navigatorObservers: () => [
+                    FirebaseAnalyticsObserver(
+                      analytics: FirebaseAnalytics.instance,
+                    ),
+                    if (faroEnabled) FaroNavigationObserver(),
+                  ],
                 ),
                 routeInformationParser:
                     _DeepLinkGuardedParser(_appRouter.defaultRouteParser()),
@@ -420,7 +423,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
           reason: ConvertUtil.errorDescriptionToString(record.error),
         );
       }).canceledBy(this);
-      if (_faroEnabled) {
+      if (faroEnabled) {
         Logger.root.onRecord
             .where((record) => record.level >= Level.WARNING)
             .listen((record) {

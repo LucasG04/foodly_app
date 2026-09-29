@@ -18,6 +18,7 @@ import '../../services/ai_generation_exception.dart';
 import '../../services/ai_quota_exceeded_exception.dart';
 import '../../services/lunix_api_service.dart';
 import '../../utils/ai_usage_period.dart';
+import '../../utils/analytics.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/convert_util.dart';
 import '../../utils/main_snackbar.dart';
@@ -803,6 +804,10 @@ class _ImportModalState extends ConsumerState<ImportModal>
         isDismissible: true,
       ).show(context);
     } else if (error is AiQuotaExceededException) {
+      logEvent(
+        AnalyticsEvent.aiQuotaExceededShown,
+        {'feature': widget.type.name},
+      );
       MainSnackbar(
         message: 'ai_usage_exhausted'.plural(
           AiUsagePeriod.daysUntilReset(),

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +10,7 @@ import 'package:flutter/services.dart';
 import '../../constants.dart';
 import '../../models/mcp_token.dart';
 import '../../services/lunix_api_service.dart';
+import '../../utils/analytics.dart';
 import '../../utils/main_snackbar.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/progress_button.dart';
@@ -80,8 +80,10 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
     setState(() => _running = _Action.create);
     try {
       final token = await LunixApiService.createMcpToken();
-      FirebaseAnalytics.instance.logEvent(
-        name: regenerate ? 'mcp_token_regenerate' : 'mcp_token_create',
+      logEvent(
+        regenerate
+            ? AnalyticsEvent.mcpTokenRegenerate
+            : AnalyticsEvent.mcpTokenCreate,
       );
       if (!mounted) {
         return;
@@ -111,7 +113,7 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
     setState(() => _running = _Action.delete);
     try {
       await LunixApiService.deleteMcpToken();
-      FirebaseAnalytics.instance.logEvent(name: 'mcp_token_delete');
+      logEvent(AnalyticsEvent.mcpTokenDelete);
       if (!mounted) {
         return;
       }

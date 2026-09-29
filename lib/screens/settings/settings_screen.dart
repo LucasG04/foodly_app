@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:concentric_transition/page_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
@@ -26,6 +25,7 @@ import '../../models/plan.dart';
 import '../../models/shopping_list_sort.dart';
 import '../../services/foodly_user_service.dart';
 import '../../services/in_app_purchase_service.dart';
+import '../../utils/analytics.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/permission_utils.dart';
 import '../../widgets/get_premium_modal.dart';
@@ -560,7 +560,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
     );
     await SharePlus.instance.share(params);
-    FirebaseAnalytics.instance.logEvent(name: 'share_code');
+    logEvent(AnalyticsEvent.shareCode);
   }
 
   Future<void> _changePlanCode(Plan plan) async {
@@ -599,6 +599,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     if (!leavePlan) {
       return;
     }
+    logEvent(AnalyticsEvent.leavePlan);
 
     final String userId = AuthenticationService.currentUser!.uid;
     Future.wait([
@@ -648,7 +649,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       }
     }
     BasicUtils.clearAllProvider(ref);
-    FirebaseAnalytics.instance.logEvent(name: 'delete_account');
+    logEvent(AnalyticsEvent.deleteAccount);
   }
 
   Future<void> _reauthenticateUserAndDelete() async {

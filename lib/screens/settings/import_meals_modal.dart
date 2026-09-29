@@ -10,6 +10,7 @@ import '../../../services/meal_service.dart';
 import '../../../services/plan_service.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
+import '../../utils/analytics.dart';
 
 class ImportMealsModal extends StatelessWidget {
   final List<String?> planIds;
@@ -129,6 +130,10 @@ class _CopyPlanMealsTileState extends ConsumerState<CopyPlanMealsTile> {
 
     final copiedMeals = await MealService.getAllMeals(widget.plan.id!);
     await MealService.addMeals(currentPlanId, copiedMeals);
+    logEvent(
+      AnalyticsEvent.mealsImport,
+      {'count': copiedMeals.length.toString()},
+    );
 
     if (!mounted) {
       return;

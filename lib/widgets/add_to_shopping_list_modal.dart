@@ -11,6 +11,7 @@ import '../models/meal.dart';
 import '../providers/state_providers.dart';
 import '../services/meal_service.dart';
 import '../services/shopping_list_service.dart';
+import '../utils/analytics.dart';
 import '../utils/basic_utils.dart';
 import '../utils/convert_util.dart';
 import '../utils/of_context_mixin.dart';
@@ -247,6 +248,10 @@ class _AddToShoppingListModalState extends ConsumerState<AddToShoppingListModal>
       shoppingListId!,
       groceries,
       BasicUtils.getActiveLanguage(context),
+    );
+    logEvent(
+      AnalyticsEvent.groceryAdd,
+      {'source': 'from_meal', 'count': groceries.length.toString()},
     );
 
     ref.read(_$buttonState.notifier).state = ButtonState.normal;

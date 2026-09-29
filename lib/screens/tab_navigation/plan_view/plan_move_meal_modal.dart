@@ -8,6 +8,7 @@ import '../../../models/plan_meal.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/plan_service.dart';
 import '../../../services/settings_service.dart';
+import '../../../utils/analytics.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/of_context_mixin.dart';
 import '../../../widgets/main_button.dart';
@@ -184,11 +185,13 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
         ref.read(planProvider)!.id,
         widget.planMeal!,
       );
+      logEvent(AnalyticsEvent.planMealMove);
     } else {
       await PlanService.addPlanMealToPlan(
         ref.read(planProvider)!.id!,
         newPlanMeal!,
       );
+      logEvent(AnalyticsEvent.addMealToPlan, {'source': 'meal_screen'});
     }
     if (!mounted) {
       return;

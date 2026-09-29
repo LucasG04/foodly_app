@@ -9,6 +9,7 @@ import 'package:logging/logging.dart';
 
 import '../constants.dart';
 import '../services/in_app_purchase_service.dart';
+import '../utils/analytics.dart';
 import 'disposable_widget.dart';
 import 'list_tile_card.dart';
 import 'main_button.dart';
@@ -43,6 +44,9 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
     _$selectedPremiumDuration = AutoDisposeStateProvider((_) => 1);
     super.initState();
 
+    if (!ref.read(InAppPurchaseService.$userIsSubscribed)) {
+      logEvent(AnalyticsEvent.paywallView);
+    }
     _getAdditionalProductInfo();
   }
 
@@ -289,6 +293,7 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
   Future<void> _restorePurchase() async {
     ref.read(_$purchaseState.notifier).state = _PurchaseState.pending;
     final success = await InAppPurchaseService.restore();
+    logEvent(AnalyticsEvent.purchaseRestore, {'success': success.toString()});
     if (mounted) {
       await _handlePurchase(success);
     }
@@ -299,7 +304,13 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
     final index = ref.read(_$selectedPremiumDuration);
     final products = InAppPurchaseService.products;
     if (products.isNotEmpty) {
+      final product = products[index].identifier;
+      logEvent(AnalyticsEvent.purchaseStart, {'product': product});
       final success = await InAppPurchaseService.buy(products[index]);
+      logEvent(
+        AnalyticsEvent.purchaseResult,
+        {'product': product, 'success': success.toString()},
+      );
       if (mounted) {
         await _handlePurchase(success);
       }

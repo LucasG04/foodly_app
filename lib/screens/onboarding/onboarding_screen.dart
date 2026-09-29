@@ -9,6 +9,7 @@ import '../../constants.dart';
 import '../../models/page_data.dart';
 import '../../services/authentication_service.dart';
 import '../../services/settings_service.dart';
+import '../../utils/analytics.dart';
 import '../../widgets/page_card.dart';
 import '../authentication/authentication_screen.dart';
 import 'onboarding_keys.dart';
@@ -87,6 +88,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _finishOnboarding(BuildContext context) async {
+    logEvent(
+      AnalyticsEvent.onboardingComplete,
+      {'firstUsage': SettingsService.isFirstUsage.toString()},
+    );
     if (SettingsService.isFirstUsage) {
       SettingsService.setFirstUsageFalse();
     }

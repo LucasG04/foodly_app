@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -17,6 +16,7 @@ import '../../services/meal_service.dart';
 import '../../services/meal_stat_service.dart';
 import '../../services/plan_service.dart';
 import '../../services/settings_service.dart';
+import '../../utils/analytics.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/widget_utils.dart';
@@ -349,10 +349,10 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
         return;
       }
       ref.read(_$isSearching.notifier).state = false;
-      FirebaseAnalytics.instance.logEvent(
-        name: 'search_meal_select',
-        parameters: {'query': query},
-      );
+      logEvent(AnalyticsEvent.searchMealSelect, {
+        'query_length': '${query.length}',
+        'has_results': '${searchedMeals.isNotEmpty}',
+      });
     } else {
       searchedMeals = [];
       ref.read(_$isSearching.notifier).state = false;
@@ -405,12 +405,10 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
   }
 
   void _logAnalyticsEvent(bool isPlaceholder) {
-    FirebaseAnalytics.instance.logEvent(
-      name: 'add_meal_to_plan',
-      parameters: {
-        'isPlaceholder': isPlaceholder.toString(),
-      },
-    );
+    logEvent(AnalyticsEvent.addMealToPlan, {
+      'isPlaceholder': isPlaceholder.toString(),
+      'source': 'meal_select',
+    });
   }
 
   Future<List<Meal>> _searchMeal(WidgetRef ref, String query) {
