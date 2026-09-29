@@ -349,7 +349,10 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
         return;
       }
       ref.read(_$isSearching.notifier).state = false;
-      logEvent(AnalyticsEvent.searchMealSelect, {'query': query});
+      logEvent(AnalyticsEvent.searchMealSelect, {
+        'query_length': '${query.length}',
+        'has_results': '${searchedMeals.isNotEmpty}',
+      });
     } else {
       searchedMeals = [];
       ref.read(_$isSearching.notifier).state = false;

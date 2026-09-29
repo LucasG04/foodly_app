@@ -395,7 +395,10 @@ class _MealListViewState extends ConsumerState<MealListView>
     ref.read(_$filteredMeals.notifier).state = filteredMeals;
     ref.read(_$isSearching.notifier).state = true;
     ref.read(_$isLoading.notifier).state = false;
-    logEvent(AnalyticsEvent.searchMealList, {'query': query});
+    logEvent(AnalyticsEvent.searchMealList, {
+      'query_length': '${query.length}',
+      'has_results': '${filteredMeals.isNotEmpty}',
+    });
   }
 
   void _scrollListener() {
