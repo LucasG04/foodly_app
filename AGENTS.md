@@ -17,7 +17,7 @@ flutter test --plain-name 'some test name'                 # single test
 ```
 
 - Build runner generates `lib/app_router.gr.dart` (auto_route), `lib/utils/env.g.dart` (envied), `lib/objectbox.g.dart` (ObjectBox), `*.g.dart` Hive adapters. Never hand-edit these.
-- `lib/utils/env.dart` reads `.env` at build time (obfuscated): `LUNIX_API_KEY`, `LUNIX_API_KEY_DEV`, `REVENUECAT_APPLE_KEY`, `REVENUECAT_GOOGLE_KEY`, `LUNIX_AUTH_USERNAME`, `LUNIX_AUTH_PASSWORD`. Missing `.env` breaks codegen.
+- `lib/utils/env.dart` reads `.env` at build time (obfuscated): `LUNIX_API_KEY`, `LUNIX_API_KEY_DEV`, `REVENUECAT_APPLE_KEY`, `REVENUECAT_GOOGLE_KEY`, `LUNIX_AUTH_USERNAME`, `LUNIX_AUTH_PASSWORD`, optional `FARO_COLLECTOR_URL`. Missing `.env` breaks codegen.
 - CI pins Flutter `3.47.5` (Java 17 in CI; Gradle 9.3.1 also builds with Android Studio's Java 25).
 
 ## Architecture
@@ -28,6 +28,7 @@ flutter test --plain-name 'some test name'                 # single test
 - **Routing**: auto_route v5 in `lib/app_router.dart`; regenerate after edits.
 - **Local storage**: Hive boxes (settings, plan, link metadata, versions); ObjectBox only for the image cache (`models/cached_image.dart`, `services/image_cache_manager.dart`). Hive can't move to `hive_ce` because of an envied issue (see `pubspec.yaml`).
 - **lunix-api** (`services/lunix_api_service.dart`): Dio with `x-api-key` + Basic auth; user-scoped calls add `x-firebase-token`. `SettingsService.useDevApi` switches to `lunix-api-dev.golenia.dev`. AI features (meal generation, kcal estimates) go through here; quota/rate limits surface as `AiQuotaExceededException` / `RateLimitException`.
+- **Observability**: Grafana Faro (`faro`) in release builds when `FARO_COLLECTOR_URL` is set (`main.dart` `_runApp`): RUM, Dart errors, `>= WARNING` logs, and `FaroHttpOverrides` traces dart:io/Dio requests with `traceparent` into lunix-api. Crashlytics stays (native crashes); Faro must start after Crashlytics sets `FlutterError.onError` (it chains it).
 - **Premium**: RevenueCat (`in_app_purchase_service.dart`), synced to `users/{id}.isPremium`.
 
 ## Conventions

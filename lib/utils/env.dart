@@ -23,4 +23,8 @@ abstract class Env {
 
   @EnviedField(varName: 'LUNIX_AUTH_PASSWORD', obfuscate: true)
   static final String lunixAuthPassword = _Env.lunixAuthPassword;
+
+  /// Grafana Faro collector URL. Empty = Faro disabled.
+  @EnviedField(varName: 'FARO_COLLECTOR_URL', obfuscate: true, defaultValue: '')
+  static final String faroCollectorUrl = _Env.faroCollectorUrl;
 }
