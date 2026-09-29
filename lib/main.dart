@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:app_links/app_links.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:faro/faro.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -41,6 +43,7 @@ import 'services/shopping_list_service.dart';
 import 'services/version_service.dart';
 import 'utils/basic_utils.dart';
 import 'utils/convert_util.dart';
+import 'utils/env.dart';
 import 'widgets/disposable_widget.dart';
 
 Future<void> _configureFirebase() async {
@@ -74,6 +77,36 @@ Future<void> _configureFirebaseSettings() async {
   }
 }
 
+// Grafana Faro (RUM, HTTP traces into lunix-api, logs). Release builds only, like Crashlytics.
+final bool _faroEnabled =
+    !foundation.kDebugMode && Env.faroCollectorUrl.isNotEmpty;
+
+Future<void> _runApp(Widget app) async {
+  if (!_faroEnabled) {
+    runApp(app);
+    return;
+  }
+  // Traces dart:io requests (incl. Dio) and adds `traceparent` for lunix-api.
+  HttpOverrides.global = FaroHttpOverrides(HttpOverrides.current);
+  // Called after _configureFirebaseSettings so Faro chains Crashlytics' FlutterError.onError.
+  await Faro().runApp(
+    optionsConfiguration: FaroConfig(
+      appName: 'foodly-app',
+      appEnv: 'production',
+      // Grafana Cloud authenticates via the key at the end of the collector URL.
+      apiKey: Uri.parse(Env.faroCollectorUrl).pathSegments.last,
+      collectorUrl: Env.faroCollectorUrl,
+      // internet_connection_checker polls these every few seconds
+      ignoreUrls: [
+        RegExp(
+          r'dummyapi\.online|jsonplaceholder\.typicode\.com|fakestoreapi\.com',
+        ),
+      ],
+    ),
+    appRunner: () => runApp(app),
+  );
+}
+
 void main() {
   runZonedGuarded<void>(
     () async {
@@ -84,7 +117,7 @@ void main() {
         _configureFirebaseSettings(),
         initializeHive(),
       ]);
-      runApp(
+      await _runApp(
         Phoenix(
           child: ProviderScope(
             child: EasyLocalization(
@@ -287,6 +320,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     if (firebaseUser != null) {
       FirebaseCrashlytics.instance.setUserIdentifier(firebaseUser.uid);
       FirebaseCrashlytics.instance.setCustomKey('userId', firebaseUser.uid);
+      Faro().setUser(FaroUser(id: firebaseUser.uid));
       final FoodlyUser? user =
           await FoodlyUserService.getUserById(firebaseUser.uid);
       if (user == null) {
@@ -299,6 +333,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       _checkUserSubsription();
     } else {
       FirebaseCrashlytics.instance.setUserIdentifier('');
+      Faro().setUser(const FaroUser.cleared());
       BasicUtils.afterBuild(
         () => refUserProvider.state = null,
       );
@@ -385,6 +420,23 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
           reason: ConvertUtil.errorDescriptionToString(record.error),
         );
       }).canceledBy(this);
+      if (_faroEnabled) {
+        Logger.root.onRecord
+            .where((record) => record.level >= Level.WARNING)
+            .listen((record) {
+          Faro().pushLog(
+            '${record.loggerName}: ${record.message}',
+            level:
+                record.level >= Level.SEVERE ? LogLevel.error : LogLevel.warn,
+            context: record.error == null
+                ? null
+                : {
+                    'error':
+                        ConvertUtil.errorDescriptionToString(record.error),
+                  },
+          );
+        }).canceledBy(this);
+      }
     }
   }
 

@@ -62,6 +62,7 @@ dependencies:
   keep_screen_on: ^4.0.0
   objectbox: ^4.1.0
   objectbox_flutter_libs: ^4.1.0
+  faro: ^0.17.0
 
   # Firebase
   cloud_firestore: ^6.10.0
