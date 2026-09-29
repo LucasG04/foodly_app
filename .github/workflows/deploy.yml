@@ -77,6 +77,8 @@ jobs:
           PROVISIONING_PROFILE_SPECIFIER: "${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}"
           FASTLANE_PASSWORD: "${{ secrets.TEMP_KEYCHAIN_PASSWORD }}"
           TEMP_KEYCHAIN_USER: "${{ secrets.TEMP_KEYCHAIN_USER }}"
+          FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: "120"
+          FASTLANE_XCODEBUILD_SETTINGS_RETRIES: "4"
   deploy_android:
     name: Android deployment Internal
     runs-on: ubuntu-latest
