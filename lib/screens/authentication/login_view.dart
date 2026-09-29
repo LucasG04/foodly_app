@@ -429,6 +429,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
           top: Radius.circular(10.0),
         ),
       ),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       context: context,
       isScrollControlled: true,
       builder: (_) => SelectPlanModal(userId),
