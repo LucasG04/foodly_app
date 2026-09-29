@@ -34,7 +34,11 @@ class _MealTagEditModalState extends State<MealTagEditModal>
     with OfContextMixin {
   // Copies: the caller's list must stay untouched until Done.
   late final List<String> _selected = [...widget.selectedContent];
-  late final List<String> _all = [...widget.allContent];
+  // One entry per tag identity; the meal's own spelling wins over case variants.
+  late final List<String> _all = _dedupe([
+    ...widget.selectedContent,
+    ...widget.allContent,
+  ]);
 
   final _queryController = TextEditingController();
   final _contentKey = GlobalKey();
@@ -194,6 +198,14 @@ class _MealTagEditModalState extends State<MealTagEditModal>
   }
 
   static bool _same(String a, String b) => normalizeTag(a) == normalizeTag(b);
+
+  static List<String> _dedupe(List<String> tags) {
+    final seen = <String>{};
+    return [
+      for (final t in tags)
+        if (seen.add(normalizeTag(t))) t
+    ];
+  }
 
   /// Selected tags first, then unselected; each alphabetical (umlauts as
   /// their base letter, so "Äpfel" sorts under A).

@@ -56,6 +56,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
   late FocusNode _passwordFocusNode;
+  String _lastPassword = '';
 
   String? _emailErrorText;
   String? _passwordErrorText;
@@ -167,6 +168,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   errorText: _passwordErrorText,
                   focusNode: _passwordFocusNode,
                   onSubmit: _authWithEmail,
+                  onChange: _onPasswordChanged,
                   autofillHints: _isRegistering
                       ? [AutofillHints.newPassword]
                       : [AutofillHints.password],
@@ -275,6 +277,26 @@ class _LoginViewState extends ConsumerState<LoginView> {
       return false;
     }
     return true;
+  }
+
+  /// Password managers fill fields without a submit action, so
+  /// `onEditingComplete` never fires. Treat an empty → full jump as autofill.
+  void _onPasswordChanged(String value) {
+    final isAutofill = _lastPassword.isEmpty && value.length > 1;
+    _lastPassword = value;
+    if (!isAutofill || _isRegistering) {
+      return;
+    }
+    // Email may be filled in the same platform message; check after the frame.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted ||
+          _emailController.text.isEmpty ||
+          _buttonState == ButtonState.inProgress) {
+        return;
+      }
+      FocusScope.of(context).unfocus();
+      _authWithEmail();
+    });
   }
 
   Future<void> _authWithEmail() async {
@@ -429,6 +451,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
           top: Radius.circular(10.0),
         ),
       ),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       context: context,
       isScrollControlled: true,
       builder: (_) => SelectPlanModal(userId),
