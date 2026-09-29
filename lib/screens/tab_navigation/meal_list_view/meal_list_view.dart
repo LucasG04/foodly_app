@@ -48,6 +48,8 @@ class _MealListViewState extends ConsumerState<MealListView>
   String? _lastTagPlanId;
   // Monotonic token to drop stale async search results.
   int _searchRequestToken = 0;
+  // A search owns the loading flag until it applies or is cancelled.
+  bool _searchLoading = false;
   // Bumped on refresh to force MealListTitle to reconstruct (resets search UI).
   int _searchGeneration = 0;
 
@@ -94,6 +96,9 @@ class _MealListViewState extends ConsumerState<MealListView>
               onSearch: (query) {
                 if (query.length > 2) {
                   _searchDebouncer.run(() => _searchMeal(query));
+                } else {
+                  // Too short to search: show the full list again.
+                  _closeSearch();
                 }
               },
               onSearchClose: _closeSearch,
@@ -343,8 +348,13 @@ class _MealListViewState extends ConsumerState<MealListView>
   }
 
   void _closeSearch() {
-    // Invalidate pending search calls before closing search mode.
+    // Invalidate pending and in-flight search calls before closing search mode.
+    _searchDebouncer.dispose();
     _searchRequestToken++;
+    if (_searchLoading) {
+      _searchLoading = false;
+      ref.read(_$isLoading.notifier).state = false;
+    }
     ref.read(_$isSearching.notifier).state = false;
   }
 
@@ -380,6 +390,7 @@ class _MealListViewState extends ConsumerState<MealListView>
     // Each new request invalidates older ones.
     final requestToken = ++_searchRequestToken;
 
+    _searchLoading = true;
     ref.read(_$isLoading.notifier).state = true;
     ref.read(mealTagFilterProvider.notifier).state = [];
     final filteredMeals = await LunixApiService.searchMeals(
@@ -394,6 +405,7 @@ class _MealListViewState extends ConsumerState<MealListView>
 
     ref.read(_$filteredMeals.notifier).state = filteredMeals;
     ref.read(_$isSearching.notifier).state = true;
+    _searchLoading = false;
     ref.read(_$isLoading.notifier).state = false;
     logEvent(AnalyticsEvent.searchMealList, {
       'query_length': '${query.length}',
@@ -449,7 +461,9 @@ class _MealListViewState extends ConsumerState<MealListView>
 
   void _refreshMeals() async {
     // Prevent in-flight search results from applying after refresh.
+    _searchDebouncer.dispose();
     _searchRequestToken++;
+    _searchLoading = false;
     final refIsLoading = ref.read(_$isLoading.notifier);
     refIsLoading.state = true;
     ref.read(_$loadedMeals.notifier).state = [];
