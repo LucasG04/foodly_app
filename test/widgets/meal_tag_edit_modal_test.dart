@@ -50,6 +50,12 @@ void main() {
     expect(cloudOrder(tester), ['birne', 'Zucker', 'Äpfel', 'Schnell', 'Vegan']);
   });
 
+  testWidgets('case variants show once, in the selected spelling', (tester) async {
+    await pump(tester, selected: ['vegan'], all: ['Vegan', 'vegan', 'VEGAN', 'Schnell']);
+    expect(cloudOrder(tester), ['vegan', 'Schnell']);
+    expect(isSelected(tester, 'vegan'), isTrue);
+  });
+
   testWidgets('does not mutate caller list before Done', (tester) async {
     final callerTags = <String>['Vegan'];
     await pump(tester, selected: callerTags);
