@@ -3,45 +3,17 @@ default_platform(:ios)
 DEVELOPER_APP_ID = ENV["DEVELOPER_APP_ID"]
 DEVELOPER_APP_IDENTIFIER = ENV["DEVELOPER_APP_IDENTIFIER"]
 APP_STORE_CONNECT_TEAM_ID = ENV["APP_STORE_CONNECT_TEAM_ID"]
-PROVISIONING_PROFILE_SPECIFIER = ENV["PROVISIONING_PROFILE_SPECIFIER"]
-TEMP_KEYCHAIN_USER = ENV["TEMP_KEYCHAIN_USER"]
-TEMP_KEYCHAIN_PASSWORD = ENV["FASTLANE_PASSWORD"]
 DEVELOPER_APP_IDENTIFIER_RECEIVE_SHARE = "dev.golenia.foodly.ReceiveShare"
-PROVISIONING_PROFILE_SPECIFIER_RECEIVE_SHARE = "match AppStore dev.golenia.foodly.ReceiveShare"
-
-def delete_temp_keychain(name)
-  delete_keychain(
-    name: name
-  ) if File.exist? File.expand_path("~/Library/Keychains/#{name}-db")
-end
-
-def create_temp_keychain(name, password)
-  create_keychain(
-    name: name,
-    password: password,
-    unlock: false,
-    timeout: 0
-  )
-end
-
-def ensure_temp_keychain(name, password)
-  delete_temp_keychain(name)
-  create_temp_keychain(name, password)
-end
 
 platform :ios do
   lane :closed_beta do
-    keychain_name = TEMP_KEYCHAIN_USER
-    keychain_password = TEMP_KEYCHAIN_PASSWORD
-    ensure_temp_keychain(keychain_name, keychain_password)
+    setup_ci
 
     match(
       type: 'appstore',
       app_identifier: ["#{DEVELOPER_APP_IDENTIFIER}", "#{DEVELOPER_APP_IDENTIFIER_RECEIVE_SHARE}"],
       git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
-      readonly: true,
-      keychain_name: keychain_name,
-      keychain_password: keychain_password 
+      readonly: true
     )
 
     gym(
@@ -49,13 +21,7 @@ platform :ios do
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
       cloned_source_packages_path: "../build/ios/SourcePackages",
-      export_method: "app-store",
-      export_options: {
-        provisioningProfiles: { 
-            DEVELOPER_APP_ID => PROVISIONING_PROFILE_SPECIFIER,
-            DEVELOPER_APP_IDENTIFIER_RECEIVE_SHARE => PROVISIONING_PROFILE_SPECIFIER_RECEIVE_SHARE,
-        }
-      }
+      export_method: "app-store"
     )
 
     pilot(
@@ -68,7 +34,5 @@ platform :ios do
       ipa: "./Runner.ipa",
       itc_provider: "#{APP_STORE_CONNECT_TEAM_ID}"
     )
-
-    delete_temp_keychain(keychain_name)
   end
 end
