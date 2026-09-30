@@ -117,44 +117,46 @@ class _EditGrocerySuggestionSheetState
     ref.read(_$buttonState.notifier).state = ButtonState.inProgress;
     final nextGrocery = widget.grocery.copyWith(group: selectedGroup.id);
     final langCode = context.locale.languageCode;
-    var suggestionSaved = true;
-    try {
-      await LunixApiService.editGrocerySuggestion(
-        oldGrocery: widget.grocery,
-        grocery: nextGrocery,
-        langCode: langCode,
-        userId: ref.read(userProvider)?.id ?? '',
-      );
-    } catch (_) {
-      suggestionSaved = false;
-    }
+    // Independent of the list update, so both requests run in parallel.
+    final suggestionSaved = LunixApiService.editGrocerySuggestion(
+      oldGrocery: widget.grocery,
+      grocery: nextGrocery,
+      langCode: langCode,
+      userId: ref.read(userProvider)?.id ?? '',
+    ).then((_) => true, onError: (Object _) => false);
     try {
       await ShoppingListService.updateGrocery(
         widget.listId,
         nextGrocery,
         langCode,
       );
-      ref.read(_$buttonState.notifier).state = ButtonState.normal;
-      if (!mounted) {
-        return;
-      }
-      final navigator = Navigator.of(context)..pop();
-      if (!suggestionSaved) {
-        // Flushbar is a route, so show it after the sheet is popped.
-        MainSnackbar(
-          message: 'edit_grocery_suggestion_list_only'.tr(),
-          isError: true,
-        ).show(navigator.context);
-      }
     } catch (e) {
-      ref.read(_$buttonState.notifier).state = ButtonState.normal;
       if (!mounted) {
         return;
       }
+      ref.read(_$buttonState.notifier).state = ButtonState.normal;
       MainSnackbar(
         message: 'edit_grocery_suggestion_error'.tr(),
         isError: true,
       ).show(context);
+      return;
+    }
+    final saved = await suggestionSaved;
+    if (!mounted) {
+      return;
+    }
+    ref.read(_$buttonState.notifier).state = ButtonState.normal;
+    final navigator = Navigator.of(context);
+    // The sheet may already be dismissed and animating out.
+    if (ModalRoute.of(context)?.isCurrent ?? false) {
+      navigator.pop();
+    }
+    if (!saved) {
+      // Flushbar is a route, so show it after the sheet is popped.
+      MainSnackbar(
+        message: 'edit_grocery_suggestion_list_only'.tr(),
+        isError: true,
+      ).show(navigator.context);
     }
   }
 }
