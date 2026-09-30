@@ -1,10 +1,15 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:convert';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:keep_screen_on/keep_screen_on.dart';
+import 'package:logging/logging.dart';
 
 import '../../constants.dart';
 import '../../models/image_credit.dart';
@@ -17,18 +22,28 @@ import '../../services/lunix_api_service.dart';
 import '../../services/rate_limit_exception.dart';
 import '../../utils/ai_usage_period.dart';
 import '../../utils/analytics.dart';
+import '../../utils/image_access.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_text_field.dart';
+import '../../widgets/small_circular_progress_indicator.dart';
+
+/// Longest side the picker returns. With the 1024 px short side from
+/// compression, the worst case (a tall 1024×2560 screenshot) stays around
+/// 1 MB, under the API's 2 MB body limit.
+const _kMaxImageSide = 2560.0;
+
+/// The API cuts a photo's note to this many characters.
+const _kMaxNoteLength = 1000;
 
 /// What the sheet pops with. [partial] marks a new meal whose stream broke off.
 typedef MealAssistantResult = ({Meal meal, bool partial});
 
-/// Creates a meal from a prompt or pasted recipe, or edits [currentMeal] by a
-/// change request. Pops with a [MealAssistantResult] once the stream is done.
+/// Creates a meal from a prompt, pasted recipe or photo, or edits [currentMeal]
+/// by a change request. Pops with a [MealAssistantResult] once the stream is done.
 class MealAssistantSheet extends StatefulWidget {
   /// The live form state; null when the form is still empty (create).
   final Meal? currentMeal;
@@ -41,10 +56,17 @@ class MealAssistantSheet extends StatefulWidget {
 
 class _MealAssistantSheetState extends State<MealAssistantSheet>
     with OfContextMixin, DisposableWidget {
+  final _log = Logger('MealAssistantSheet');
   final _controller = TextEditingController();
 
-  /// The submitted request; non-null while generating.
-  String? _request;
+  /// True while a request runs.
+  bool _sending = false;
+
+  /// The attached photo (compressed); sent with the next request.
+  Uint8List? _image;
+
+  /// True while a picked photo is compressed; sending waits for it.
+  bool _compressing = false;
   bool _enriching = false;
   bool _done = false;
 
@@ -71,7 +93,7 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
 
   @override
   Widget build(BuildContext context) {
-    final width = mediaSize.width > 599 ? 580.0 : mediaSize.width * 0.8;
+    final width = mediaSize.width > 599 ? 580.0 : mediaSize.width * 0.9;
     // Above the keyboard when open, otherwise just clear the home indicator.
     final bottom = mediaViewInsets.bottom > 0
         ? mediaViewInsets.bottom + kPadding / 2
@@ -90,12 +112,13 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildTitleRow(),
+          if (!_isEdit) _buildPhotoRow(),
           _buildInput(),
           AnimatedSize(
             duration: const Duration(milliseconds: 250),
             curve: Curves.easeOut,
             alignment: Alignment.topCenter,
-            child: _request == null
+            child: !_sending
                 ? const SizedBox(width: double.infinity)
                 : _buildStatus(),
           ),
@@ -127,40 +150,176 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: _controller,
       builder: (context, value, _) {
-        final canSend = value.text.trim().isNotEmpty;
-        return MainTextField(
+        final text = value.text.trim();
+        final noteTooLong = _image != null && text.length > _kMaxNoteLength;
+        final canSend = !_compressing &&
+            !noteTooLong &&
+            (text.isNotEmpty || _image != null);
+        final String placeholder;
+        if (_isEdit) {
+          placeholder = 'meal_assistant_hint_edit'.tr();
+        } else if (_image != null) {
+          placeholder = 'meal_assistant_hint_image'.tr();
+        } else {
+          placeholder = 'meal_assistant_hint_create'.tr();
+        }
+        final field = MainTextField(
           controller: _controller,
-          placeholder: _isEdit
-              ? 'meal_assistant_hint_edit'.tr()
-              : 'meal_assistant_hint_create'.tr(),
+          placeholder: placeholder,
           isMultiline: true,
           minLines: 1,
           autofocus: true,
           textInputAction: TextInputAction.newline,
           textCapitalization: TextCapitalization.sentences,
           // Stays on screen with the request while the assistant works.
-          readOnly: _request != null,
+          readOnly: _sending,
+          // Counter once a photo's note nears the limit.
+          maxLength: _image != null && text.length > _kMaxNoteLength * 0.8
+              ? _kMaxNoteLength
+              : null,
+          // Any tap outside (camera, send, preview) closes the keyboard. The
+          // default unfocus also clears the focus history, so neither the
+          // closing menu nor the returning photo picker refocuses the field.
+          onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
           // Slides away on send so the field takes the full width.
-          suffix: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 250),
-            transitionBuilder: (child, animation) => SizeTransition(
-              sizeFactor: animation,
-              axis: Axis.horizontal,
-              child: FadeTransition(opacity: animation, child: child),
+          suffix: _slideAwayOnSend(
+            IconButton(
+              onPressed: canSend ? _send : null,
+              tooltip: 'meal_assistant_send'.tr(),
+              style: _edgeIconStyle(Alignment.centerRight),
+              icon: Icon(
+                EvaIcons.paperPlaneOutline,
+                color: canSend ? theme.primaryColor : Colors.grey,
+              ),
             ),
-            child: _request != null
-                ? const SizedBox.shrink()
-                : IconButton(
-                    onPressed: canSend ? () => _send(_controller.text) : null,
-                    tooltip: 'meal_assistant_send'.tr(),
-                    icon: Icon(
-                      EvaIcons.paperPlaneOutline,
-                      color: canSend ? theme.primaryColor : Colors.grey,
-                    ),
-                  ),
           ),
         );
+        if (_isEdit) {
+          return field; // the API reads photos for new meals only
+        }
+        return Row(
+          children: [
+            _slideAwayOnSend(_buildImageButton()),
+            Expanded(child: field),
+          ],
+        );
       },
+    );
+  }
+
+  /// [child], sliding away horizontally once a request is sent.
+  Widget _slideAwayOnSend(Widget child) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 250),
+      transitionBuilder: (child, animation) => SizeTransition(
+        sizeFactor: animation,
+        axis: Axis.horizontal,
+        child: FadeTransition(opacity: animation, child: child),
+      ),
+      child: _sending ? const SizedBox.shrink() : child,
+    );
+  }
+
+  /// Icon flush with the sheet edge ([alignment]), 12 px from the field; keeps
+  /// a 36×48 tap target.
+  static ButtonStyle _edgeIconStyle(Alignment alignment) =>
+      IconButton.styleFrom(
+        padding: EdgeInsets.zero,
+        minimumSize: const Size(36, 48),
+        alignment: alignment,
+      );
+
+  /// The attached photo's preview (or a loader while compressing) above the
+  /// field; empty without one.
+  Widget _buildPhotoRow() {
+    final Widget child;
+    if (_compressing) {
+      child = _buildCompressing();
+    } else if (_image != null) {
+      child = _buildPreview();
+    } else {
+      child = const SizedBox(width: double.infinity);
+    }
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+      alignment: Alignment.topCenter,
+      child: child,
+    );
+  }
+
+  /// Stands in for the preview while a picked photo is compressed.
+  Widget _buildCompressing() {
+    return Container(
+      height: 120,
+      margin: const EdgeInsets.only(bottom: kPadding / 2),
+      decoration: BoxDecoration(
+        color: kGreyBackgroundColor,
+        borderRadius: BorderRadius.circular(kRadius * 3),
+      ),
+      child: const Center(child: SmallCircularProgressIndicator()),
+    );
+  }
+
+  /// Camera icon left of the field; picking a photo attaches (or replaces) it.
+  Widget _buildImageButton() {
+    return PopupMenuButton<ImageSource>(
+      tooltip: 'meal_assistant_image'.tr(),
+      style: _edgeIconStyle(Alignment.centerLeft),
+      enabled: !_compressing,
+      onSelected: _pickImage,
+      icon: Icon(EvaIcons.cameraOutline, color: theme.primaryColor),
+      itemBuilder: (_) => [
+        PopupMenuItem(
+          value: ImageSource.camera,
+          child: Text('meal_assistant_image_camera'.tr()),
+        ),
+        PopupMenuItem(
+          value: ImageSource.gallery,
+          child: Text('meal_assistant_image_gallery'.tr()),
+        ),
+      ],
+    );
+  }
+
+  /// The attached photo in its own aspect ratio, like a chat app's attachment
+  /// preview. The sheet grows to fit, up to 40 % of the height above the
+  /// keyboard.
+  Widget _buildPreview() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: kPadding / 2),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: (mediaSize.height - mediaViewInsets.bottom) * 0.4,
+          ),
+          // Sized by the image; the button sits on its corner.
+          child: Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(kRadius * 3),
+                child: Image.memory(_image!),
+              ),
+              if (!_sending)
+                Positioned(
+                  top: kPadding / 2,
+                  right: kPadding / 2,
+                  child: IconButton.filled(
+                    onPressed: () => setState(() => _image = null),
+                    tooltip: 'meal_assistant_image_remove'.tr(),
+                    visualDensity: VisualDensity.compact,
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.black54,
+                      foregroundColor: Colors.white,
+                      shape: const CircleBorder(),
+                    ),
+                    icon: const Icon(EvaIcons.close),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -214,18 +373,91 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
         : 'meal_assistant_status_writing'.tr();
   }
 
-  void _send(String text) {
-    final request = text.trim();
-    if (request.isEmpty || _request != null) {
+  /// Sends the attached photo (the text is an optional note), else the text.
+  void _send() {
+    final text = _controller.text.trim();
+    if (_sending || _compressing || (text.isEmpty && _image == null)) {
       return;
     }
+    if (_image != null) {
+      _start(
+        MealGenerationSource.image,
+        'data:image/jpeg;base64,${base64Encode(_image!)}',
+        note: text.isEmpty ? null : text,
+      );
+    } else {
+      _start(MealGenerationSource.text, text);
+    }
+  }
+
+  /// Picks and compresses a photo the way [StorageService.uploadFile] does
+  /// (from the file on native, from bytes on web), showing a loader in the
+  /// preview slot meanwhile. A failed pick keeps the previous photo.
+  Future<void> _pickImage(ImageSource source) async {
+    final XFile? file;
+    try {
+      file = await ImagePicker().pickImage(
+        source: source,
+        maxWidth: _kMaxImageSide,
+        maxHeight: _kMaxImageSide,
+      );
+    } catch (e) {
+      if (ImageAccess.isDenied(e)) {
+        if (mounted) {
+          await ImageAccess.request(context, source);
+        }
+        return;
+      }
+      _log.severe('pickImage failed', e);
+      _showError('meal_assistant_error_image'.tr());
+      return;
+    }
+    if (file == null || !mounted) {
+      return; // cancelled
+    }
+
+    setState(() => _compressing = true);
+    Uint8List? image;
+    try {
+      // Short side 1024 px, JPEG q80: a 4:3 photo becomes 1365×1024 (~0.15–0.5
+      // MB), a long recipe screenshot stays readable.
+      image = kIsWeb
+          ? await FlutterImageCompress.compressWithList(
+              await file.readAsBytes(),
+              minWidth: 1024,
+              minHeight: 1024,
+              quality: 80,
+            )
+          : await FlutterImageCompress.compressWithFile(
+              file.path,
+              minWidth: 1024,
+              minHeight: 1024,
+              quality: 80,
+            );
+    } catch (e) {
+      _log.severe('Compressing the image failed', e);
+    }
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _compressing = false;
+      _image = image ?? _image;
+    });
+    if (image == null) {
+      _showError('meal_assistant_error_image'.tr());
+    }
+  }
+
+  void _start(MealGenerationSource source, String data, {String? note}) {
     FocusScope.of(context).unfocus();
-    setState(() => _request = request);
+    setState(() => _sending = true);
     KeepScreenOn.turnOn();
 
     LunixApiService.streamGeneratedMeal(
-      source: MealGenerationSource.text,
-      data: request,
+      source: source,
+      data: data,
+      note: note,
       langCode: context.locale.languageCode,
       currentMeal: widget.currentMeal,
     )
@@ -333,10 +565,10 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
     setState(_backToInput);
   }
 
-  /// The request stays in the field so the user can adjust and resend it.
+  /// The request and photo stay so the user can adjust and resend them.
   void _backToInput() {
     KeepScreenOn.turnOff();
-    _request = null;
+    _sending = false;
     _enriching = false;
     _name = null;
     _servings = null;
@@ -347,12 +579,19 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
     _imageCredit = null;
   }
 
-  String _messageFor(MealGenerationErrorCode code) =>
-      code == MealGenerationErrorCode.notFoodRelated
-          ? 'meal_assistant_error_not_food'.tr()
-          : 'import_modal_error_generation'.tr();
+  String _messageFor(MealGenerationErrorCode code) {
+    if (code != MealGenerationErrorCode.notFoodRelated) {
+      return 'import_modal_error_generation'.tr();
+    }
+    return _image != null
+        ? 'meal_assistant_error_not_food_image'.tr()
+        : 'meal_assistant_error_not_food'.tr();
+  }
 
   void _showError(String message) {
+    if (!mounted) {
+      return;
+    }
     MainSnackbar(message: message, isError: true, isDismissible: true)
         .show(context);
   }

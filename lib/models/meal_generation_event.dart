@@ -5,7 +5,8 @@ import 'ingredient.dart';
 /// [wireValue] is the `type` field of the request body.
 enum MealGenerationSource {
   text('text'),
-  instagram('instagram');
+  instagram('instagram'),
+  image('image');
 
   const MealGenerationSource(this.wireValue);
 

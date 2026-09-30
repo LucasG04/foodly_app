@@ -1,6 +1,7 @@
 import 'package:clipboard/clipboard.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../constants.dart';
@@ -36,6 +37,14 @@ class MainTextField extends ConsumerStatefulWidget {
   final bool Function(String)? pasteValidator;
   final bool submitOnPaste;
 
+  /// Pointer down outside the field; null keeps Flutter's default (touch taps
+  /// outside don't unfocus).
+  final TapRegionCallback? onTapOutside;
+
+  /// Shows a character counter (red when over); doesn't block typing, so the
+  /// caller decides what an over-long value means.
+  final int? maxLength;
+
   const MainTextField({
     required this.controller,
     this.focusNode,
@@ -62,6 +71,8 @@ class MainTextField extends ConsumerStatefulWidget {
     this.pasteFromClipboard = false,
     this.pasteValidator,
     this.submitOnPaste = false,
+    this.onTapOutside,
+    this.maxLength,
     super.key,
   }) : assert(
             (obscureText && !pasteFromClipboard) ||
@@ -133,6 +144,9 @@ class _MainTextFieldState extends ConsumerState<MainTextField>
         autofocus: widget.autofocus,
         readOnly: widget.readOnly,
         focusNode: _focusNode,
+        onTapOutside: widget.onTapOutside,
+        maxLength: widget.maxLength,
+        maxLengthEnforcement: MaxLengthEnforcement.none,
         autofillHints: widget.autofillHints,
         textCapitalization:
             widget.textCapitalization ?? TextCapitalization.none,

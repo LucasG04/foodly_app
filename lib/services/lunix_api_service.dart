@@ -463,12 +463,14 @@ class LunixApiService {
   /// be kept.
   ///
   /// With [currentMeal] (text only), [data] is a change request and the stream
-  /// carries the full edited meal.
+  /// carries the full edited meal. [note] (image only) is the user's text next
+  /// to the photo.
   static Stream<MealGenerationEvent> streamGeneratedMeal({
     required MealGenerationSource source,
     required String data,
     required String langCode,
     Meal? currentMeal,
+    String? note,
   }) async* {
     _log.finer('Call streamGeneratedMeal()');
 
@@ -480,6 +482,7 @@ class LunixApiService {
           'type': source.wireValue,
           'data': data,
           'language': langCode,
+          if (note != null) 'note': note,
           if (currentMeal != null)
             'meal': <String, dynamic>{
               'name': currentMeal.name,

@@ -1,14 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logging/logging.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../../constants.dart';
 import '../../models/image_credit.dart';
 import '../../services/storage_service.dart';
+import '../../utils/image_access.dart';
 import '../../utils/main_snackbar.dart';
 import '../small_circular_progress_indicator.dart';
 import 'web_image_picker.dart';
@@ -27,8 +26,6 @@ class SelectPickerDialog extends StatefulWidget {
 class _SelectPickerDialogState extends State<SelectPickerDialog> {
   final Logger _log = Logger('SelectPickerDialog');
   final ImagePicker _imagePicker = ImagePicker();
-  final _kPhotoAccessDeniedKey = 'photo_access_denied';
-  final _kCameraAccessDeniedKey = 'camera_access_denied';
 
   bool _isLoading = false;
   bool _showWebPicker = false;
@@ -105,9 +102,10 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
         return;
       }
     } catch (e) {
-      if (e is PlatformException &&
-          [_kCameraAccessDeniedKey, _kPhotoAccessDeniedKey].contains(e.code)) {
-        _checkPermission(source);
+      if (ImageAccess.isDenied(e)) {
+        if (mounted) {
+          ImageAccess.request(context, source);
+        }
         return;
       }
       _log.severe('Error getImage', e);
@@ -147,26 +145,6 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
     if (parsedUri != null && parsedUri.isAbsolute) {
       Navigator.pop<PickedImage>(context, (image: url, credit: credit));
     }
-  }
-
-  Future<void> _checkPermission(ImageSource source) async {
-    final status = await (source == ImageSource.camera
-        ? Permission.camera.request()
-        : Permission.photos.request());
-
-    if (_permissionStatusIsInvalid(status)) {
-      _showErrorSnackBar(
-        (source == ImageSource.camera
-                ? 'image_picker_dialog_camera_access_denied'
-                : 'image_picker_dialog_photo_access_denied')
-            .tr(),
-      );
-    }
-  }
-
-  bool _permissionStatusIsInvalid(PermissionStatus status) {
-    return status == PermissionStatus.denied ||
-        status == PermissionStatus.permanentlyDenied;
   }
 
   void _showErrorSnackBar(String message) {

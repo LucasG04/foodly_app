@@ -75,9 +75,9 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>To use pictures from your own device for pictures of dishes in the cookbook.</string>
+	<string>To take pictures of dishes for the cookbook, and to create recipes from photos with the assistant.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>To use pictures from your own device for pictures of dishes in the cookbook.</string>
+	<string>To use pictures from your device for dishes in the cookbook, and to create recipes from photos with the assistant.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
