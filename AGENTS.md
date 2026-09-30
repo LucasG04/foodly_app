@@ -37,6 +37,15 @@ flutter test --plain-name 'some test name'                 # single test
 - iOS: FlutterFire plugins resolve via Swift Package Manager (Flutter default). Don't re-add the precompiled `FirebaseFirestore` pod to `ios/Podfile` (duplicate symbols).
 - Android: `android/build.gradle` forces `compileSdkVersion 36` on plugin subprojects because some plugins pin an old one that fails AGP's AAR metadata check.
 
+## UI: picking values
+
+No `DropdownButton`/`PopupMenuButton`. Pick by context; the current choice is always visible in the primary color (`theme.primaryColor`, user-selectable):
+
+- **Actions** (e.g. camera vs. gallery): `OptionsSheet` of `OptionsSheetOptions` with icons (`lib/widgets/options_modal/`), shown via `WidgetUtils.showFoodlyBottomSheet`.
+- **A setting's value** (language, sort, export type): `SettingsTile(value: currentLabel, onTap: …)` shows the value + chevron; the tap opens an `OptionsSheet` with `selected: true` on the current option (tint + checkmark). Only for short lists; each row is ~80 px, so ~5 options max.
+- **Single or multi choice inside a form sheet**, free-length labels (grocery group, tags): wrapping `TagChip` cloud, `Wrap(spacing/runSpacing: kPadding / 2)`. No horizontal-scrolling chip rows.
+- **Ordered, fixed-count values** (days, meal types): grid of equal two-line tiles (small label/icon over a bold value), 4 per row, or one row when there are ≤ 3 options. Sized by content (not fixed aspect ratio). Selected tile filled with primary color + white text, others the 6 % text-color fill of `OptionsSheetOptions`; wrap in `Semantics(selected: …)`. Several grids in one sheet each get a small section label (600 weight, 60 % text color) and `kPadding` between them. Reference: `_buildTileGrid` / `_buildTile` in `plan_move_meal_modal.dart`.
+
 ## Release
 
 Push to `master` deploys (iOS → TestFlight, Android → Play internal via fastlane). Version comes from the **commit message**, which must start with the version, e.g. `1.2.3 - New Release` (`.github/scripts/update_version*.sh`). PRs target `master` and run analyze + test; `dev` is the integration branch.

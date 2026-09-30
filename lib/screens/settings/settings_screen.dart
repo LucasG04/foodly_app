@@ -30,6 +30,8 @@ import '../../utils/of_context_mixin.dart';
 import '../../utils/permission_utils.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
+import '../../widgets/options_modal/options_modal.dart';
+import '../../widgets/options_modal/options_modal_option.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import '../onboarding/onboarding_screen.dart';
 import 'change_meal_types_modal.dart';
@@ -95,25 +97,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           SettingsTile(
                             leadingIcon: EvaIcons.globe2Outline,
                             text: 'settings_section_general_language'.tr(),
-                            trailing: DropdownButton<Locale>(
-                              value: context.locale,
-                              dropdownColor: theme.scaffoldBackgroundColor,
-                              items: context.supportedLocales
-                                  .map((locale) => DropdownMenuItem<Locale>(
-                                        value: locale,
-                                        child: Text(
-                                          LocaleNames.of(context)!
-                                              .nameOf(locale.languageCode)!,
-                                        ),
-                                      ))
-                                  .toList(),
-                              onChanged: (Locale? locale) async {
-                                await context.setLocale(locale!);
-                                if (context.mounted) {
-                                  Phoenix.rebirth(context);
-                                }
-                              },
-                            ),
+                            value: _localeName(context.locale),
+                            onTap: _openLanguagePicker,
                           ),
                           WidgetUtils.userIsSubscribed(
                             ref: ref,
@@ -467,36 +452,62 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   Widget _buildShoppingListSortTile() {
     return WidgetUtils.userIsSubscribed(
       ref: ref,
-      child: SettingsTile(
-        leadingIcon: Icons.sort_rounded,
-        text: 'settings_section_customization_shoppinglist_sort'.tr(),
-        trailing: StreamBuilder(
-            stream: SettingsService.streamShoppingListSort(),
-            builder: (context, _) {
-              final sortObject = shoppingListSorts.firstWhere(
-                (element) => element.value == SettingsService.shoppingListSort,
-                orElse: () => shoppingListSorts.first,
-              );
-              return DropdownButton<_ShoppingListSortValue>(
-                value: sortObject,
-                dropdownColor: theme.scaffoldBackgroundColor,
-                items: shoppingListSorts
-                    .map((sort) => DropdownMenuItem<_ShoppingListSortValue>(
-                          value: sort,
-                          child: Text(
-                            sort.label,
-                          ),
-                        ))
-                    .toList(),
-                onChanged: (_ShoppingListSortValue? sort) async {
-                  if (sort != null &&
-                      sort.value.index != sortObject.value.index) {
-                    await _updateShoppingListSort(sort.value);
-                  }
-                },
-              );
-            }),
+      child: StreamBuilder(
+        stream: SettingsService.streamShoppingListSort(),
+        builder: (context, _) {
+          final current = SettingsService.shoppingListSort;
+          return SettingsTile(
+            leadingIcon: Icons.sort_rounded,
+            text: 'settings_section_customization_shoppinglist_sort'.tr(),
+            value: shoppingListSorts
+                .firstWhere(
+                  (sort) => sort.value == current,
+                  orElse: () => shoppingListSorts.first,
+                )
+                .label,
+            onTap: () => WidgetUtils.showFoodlyBottomSheet<void>(
+              context: context,
+              builder: (_) => OptionsSheet(options: [
+                for (final sort in shoppingListSorts)
+                  OptionsSheetOptions(
+                    title: sort.label,
+                    selected: sort.value == current,
+                    onTap: () async {
+                      if (sort.value != current) {
+                        await _updateShoppingListSort(sort.value);
+                      }
+                    },
+                  ),
+              ]),
+            ),
+          );
+        },
       ),
+    );
+  }
+
+  String _localeName(Locale locale) =>
+      LocaleNames.of(context)!.nameOf(locale.languageCode)!;
+
+  void _openLanguagePicker() {
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => OptionsSheet(options: [
+        for (final locale in context.supportedLocales)
+          OptionsSheetOptions(
+            title: _localeName(locale),
+            selected: locale == context.locale,
+            onTap: () async {
+              if (locale == context.locale) {
+                return;
+              }
+              await context.setLocale(locale);
+              if (mounted) {
+                Phoenix.rebirth(context);
+              }
+            },
+          ),
+      ]),
     );
   }
 

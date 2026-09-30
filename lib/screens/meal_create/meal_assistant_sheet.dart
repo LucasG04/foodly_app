@@ -29,6 +29,8 @@ import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_text_field.dart';
+import '../../widgets/options_modal/options_modal.dart';
+import '../../widgets/options_modal/options_modal_option.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
 /// Longest side the picker returns. With the 1024 px short side from
@@ -264,22 +266,29 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
 
   /// Camera icon left of the field; picking a photo attaches (or replaces) it.
   Widget _buildImageButton() {
-    return PopupMenuButton<ImageSource>(
+    return IconButton(
       tooltip: 'meal_assistant_image'.tr(),
       style: _edgeIconStyle(Alignment.centerLeft),
-      enabled: !_compressing,
-      onSelected: _pickImage,
+      onPressed: _compressing ? null : _openImageSourceSheet,
       icon: Icon(EvaIcons.cameraOutline, color: theme.primaryColor),
-      itemBuilder: (_) => [
-        PopupMenuItem(
-          value: ImageSource.camera,
-          child: Text('meal_assistant_image_camera'.tr()),
+    );
+  }
+
+  void _openImageSourceSheet() {
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => OptionsSheet(options: [
+        OptionsSheetOptions(
+          title: 'meal_assistant_image_camera'.tr(),
+          icon: EvaIcons.cameraOutline,
+          onTap: () => _pickImage(ImageSource.camera),
         ),
-        PopupMenuItem(
-          value: ImageSource.gallery,
-          child: Text('meal_assistant_image_gallery'.tr()),
+        OptionsSheetOptions(
+          title: 'meal_assistant_image_gallery'.tr(),
+          icon: EvaIcons.imageOutline,
+          onTap: () => _pickImage(ImageSource.gallery),
         ),
-      ],
+      ]),
     );
   }
 
