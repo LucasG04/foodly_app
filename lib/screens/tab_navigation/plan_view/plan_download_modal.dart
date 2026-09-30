@@ -11,7 +11,10 @@ import '../../../services/settings_service.dart';
 import '../../../utils/analytics.dart';
 import '../../../utils/main_snackbar.dart';
 import '../../../utils/of_context_mixin.dart';
+import '../../../utils/widget_utils.dart';
 import '../../../widgets/main_button.dart';
+import '../../../widgets/options_modal/options_modal.dart';
+import '../../../widgets/options_modal/options_modal_option.dart';
 import '../../../widgets/progress_button.dart';
 import '../../settings/settings_tile.dart';
 
@@ -105,16 +108,20 @@ class _PlanDownloadModalState extends State<PlanDownloadModal>
             ),
           SettingsTile(
             text: 'plan_download_modal_type'.tr(),
-            trailing: DropdownButton<_PlanDocType>(
-              value: _docType,
-              dropdownColor: theme.scaffoldBackgroundColor,
-              items: _PlanDocType.values
-                  .map((type) => DropdownMenuItem<_PlanDocType>(
-                        value: type,
-                        child: Text(_getTextForDocType(type)).tr(),
-                      ))
-                  .toList(),
-              onChanged: _docTypeChange,
+            value: _getTextForDocType(_docType).tr(),
+            onTap: () => WidgetUtils.showFoodlyBottomSheet<void>(
+              context: context,
+              builder: (_) => OptionsSheet(options: [
+                for (final type in _PlanDocType.values)
+                  OptionsSheetOptions(
+                    title: _getTextForDocType(type).tr(),
+                    icon: type == _PlanDocType.color
+                        ? EvaIcons.colorPaletteOutline
+                        : EvaIcons.fileTextOutline,
+                    selected: type == _docType,
+                    onTap: () => _docTypeChange(type),
+                  ),
+              ]),
             ),
           ),
           Padding(
@@ -185,9 +192,12 @@ class _PlanDownloadModalState extends State<PlanDownloadModal>
     });
   }
 
-  void _docTypeChange(_PlanDocType? value) {
+  void _docTypeChange(_PlanDocType value) {
+    if (!mounted) {
+      return;
+    }
     setState(() {
-      _docType = value ?? _PlanDocType.color;
+      _docType = value;
     });
   }
 

@@ -82,47 +82,57 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
             ),
           ),
           const SizedBox(height: kPadding),
-          DropdownButton(
-            value: _selectedDate,
-            dropdownColor: theme.scaffoldBackgroundColor,
-            items: _dropdownValues
-                .map(
-                  (date) => DropdownMenuItem(
-                    value: date,
-                    child: Text(getDropdownLabelByDate(date)),
+          _buildSectionLabel('plan_move_day'.tr()),
+          _buildTileGrid([
+            for (final (i, date) in _dropdownValues.indexed)
+              _buildTile(
+                selected: date == _selectedDate,
+                onTap: () => _changeDate(date),
+                builder: (color) => [
+                  Text(
+                    i == 0
+                        ? 'plan_move_today'.tr()
+                        : DateFormat.E(context.locale.toLanguageTag())
+                            .format(date),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: color, fontSize: 13),
                   ),
-                )
-                .toList(),
-            onChanged: _changeDate,
-            isExpanded: true,
-          ),
-          const SizedBox(height: kPadding / 2),
-          RadioGroup<MealType>(
-            groupValue: _selectedMealType,
-            onChanged: _changeMealType,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (_showMealTile(MealType.BREAKFAST))
-                  RadioListTile(
-                    title: const Text('plan_move_breakfast').tr(),
-                    value: MealType.BREAKFAST,
-                    activeColor: theme.primaryColor,
+                  Text(
+                    '${date.day}',
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                if (_showMealTile(MealType.LUNCH))
-                  RadioListTile(
-                    title: const Text('plan_move_lunch').tr(),
-                    value: MealType.LUNCH,
-                    activeColor: theme.primaryColor,
-                  ),
-                if (_showMealTile(MealType.DINNER))
-                  RadioListTile(
-                    title: const Text('plan_move_dinner').tr(),
-                    value: MealType.DINNER,
-                    activeColor: theme.primaryColor,
-                  ),
-              ],
-            ),
+                ],
+              ),
+          ]),
+          const SizedBox(height: kPadding),
+          _buildSectionLabel('plan_move_meal'.tr()),
+          _buildTileGrid(
+            [
+              for (final (type, icon, label) in _mealTypes)
+                _buildTile(
+                  selected: type == _selectedMealType,
+                  onTap: () => _changeMealType(type),
+                  builder: (color) => [
+                    Icon(icon, color: color),
+                    Text(
+                      label.tr(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: color,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+            // All active meal types share one row.
+            columns: _mealTypes.length,
           ),
           const SizedBox(height: kPadding),
           Center(
@@ -157,8 +167,81 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
     });
   }
 
-  String getDropdownLabelByDate(DateTime date) {
-    return '${DateFormat('EEEE', context.locale.toLanguageTag()).format(date)} - ${DateFormat('d. MMMM y', context.locale.toLanguageTag()).format(date)}';
+  /// The active meal types with their icon and label key.
+  List<(MealType, IconData, String)> get _mealTypes => [
+        (
+          MealType.BREAKFAST,
+          Icons.free_breakfast_outlined,
+          'plan_move_breakfast',
+        ),
+        (MealType.LUNCH, Icons.lunch_dining_outlined, 'plan_move_lunch'),
+        (MealType.DINNER, Icons.dinner_dining_outlined, 'plan_move_dinner'),
+      ].where((m) => _showMealTile(m.$1)).toList();
+
+  Widget _buildSectionLabel(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: kPadding / 2),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: theme.textTheme.bodyLarge?.color?.withValues(alpha: 0.6),
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  /// Equal-width tiles, [columns] per row.
+  Widget _buildTileGrid(List<Widget> tiles, {int columns = 4}) {
+    return Column(
+      children: [
+        for (var row = 0; row < tiles.length; row += columns)
+          Padding(
+            padding: EdgeInsets.only(top: row == 0 ? 0 : kPadding / 2),
+            child: Row(
+              children: [
+                for (var i = row; i < row + columns; i++) ...[
+                  if (i > row) const SizedBox(width: kPadding / 2),
+                  Expanded(
+                    child: i < tiles.length ? tiles[i] : const SizedBox(),
+                  ),
+                ],
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  /// A choice tile, filled with the primary color when [selected]. [builder]
+  /// gets the matching content color.
+  Widget _buildTile({
+    required bool selected,
+    required VoidCallback onTap,
+    required List<Widget> Function(Color color) builder,
+  }) {
+    final textColor = theme.textTheme.bodyLarge?.color ?? Colors.black;
+    return Semantics(
+      selected: selected,
+      child: Material(
+        color:
+            selected ? theme.primaryColor : textColor.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(kRadius),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(kRadius),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: kPadding / 2,
+              horizontal: kPadding / 4,
+            ),
+            child: Column(
+              children: builder(selected ? Colors.white : textColor),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   List<DateTime> getDropdownValues() {

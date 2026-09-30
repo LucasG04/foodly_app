@@ -13,6 +13,7 @@ import '../../../utils/main_snackbar.dart';
 import '../../../utils/of_context_mixin.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/progress_button.dart';
+import '../../../widgets/tag_chip.dart';
 
 class EditGrocerySuggestionSheet extends ConsumerStatefulWidget {
   final Grocery grocery;
@@ -32,8 +33,15 @@ class _EditGrocerySuggestionSheetState
     extends ConsumerState<EditGrocerySuggestionSheet> with OfContextMixin {
   final AutoDisposeStateProvider<ButtonState> _$buttonState =
       AutoDisposeStateProvider((_) => ButtonState.normal);
-  final AutoDisposeStateProvider<GroceryGroup?> _$selectedGroup =
-      AutoDisposeStateProvider((_) => null);
+
+  /// Starts on the grocery's current group.
+  late final AutoDisposeStateProvider<GroceryGroup?> _$selectedGroup =
+      AutoDisposeStateProvider(
+    (ref) => ref
+        .read(dataGroceryGroupsProvider)
+        ?.where((group) => group.id == widget.grocery.group)
+        .firstOrNull,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -56,35 +64,25 @@ class _EditGrocerySuggestionSheetState
                 fontWeight: FontWeight.w600,
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(
-                  width: width * 0.4,
-                  child: Text('edit_grocery_suggestion_group'.tr()),
-                ),
-                SizedBox(
-                  width: width * 0.5,
-                  child: Consumer(builder: (context, ref, _) {
-                    final selectedGroup = ref.watch(_$selectedGroup);
-                    return DropdownButton<GroceryGroup>(
-                      value: selectedGroup,
-                      dropdownColor: theme.scaffoldBackgroundColor,
-                      items: productGroups
-                          .map((group) => DropdownMenuItem<GroceryGroup>(
-                                value: group,
-                                child: Text(group.name),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        ref.read(_$selectedGroup.notifier).state = value;
-                      },
-                      isExpanded: true,
-                    );
-                  }),
-                ),
-              ],
-            ),
+            const SizedBox(height: kPadding),
+            Text('edit_grocery_suggestion_group'.tr()),
+            const SizedBox(height: kPadding / 2),
+            Consumer(builder: (context, ref, _) {
+              final selectedGroup = ref.watch(_$selectedGroup);
+              return Wrap(
+                spacing: kPadding / 2,
+                runSpacing: kPadding / 2,
+                children: [
+                  for (final group in productGroups)
+                    TagChip(
+                      label: group.name,
+                      selected: group.id == selectedGroup?.id,
+                      onTap: () =>
+                          ref.read(_$selectedGroup.notifier).state = group,
+                    ),
+                ],
+              );
+            }),
             const SizedBox(height: kPadding * 2),
             Center(
               child: Consumer(builder: (_, ref, __) {
@@ -112,35 +110,53 @@ class _EditGrocerySuggestionSheetState
     if (selectedGroup == null) {
       return;
     }
+    if (selectedGroup.id == widget.grocery.group) {
+      Navigator.of(context).pop();
+      return;
+    }
     ref.read(_$buttonState.notifier).state = ButtonState.inProgress;
+    final nextGrocery = widget.grocery.copyWith(group: selectedGroup.id);
+    final langCode = context.locale.languageCode;
+    // Independent of the list update, so both requests run in parallel.
+    final suggestionSaved = LunixApiService.editGrocerySuggestion(
+      oldGrocery: widget.grocery,
+      grocery: nextGrocery,
+      langCode: langCode,
+      userId: ref.read(userProvider)?.id ?? '',
+    ).then((_) => true, onError: (Object _) => false);
     try {
-      final nextGrocery = widget.grocery.copyWith(group: selectedGroup.id);
-      final langCode = context.locale.languageCode;
-      await LunixApiService.editGrocerySuggestion(
-        oldGrocery: widget.grocery,
-        grocery: nextGrocery,
-        langCode: langCode,
-        userId: ref.read(userProvider)?.id ?? '',
-      );
       await ShoppingListService.updateGrocery(
         widget.listId,
         nextGrocery,
         langCode,
       );
-      ref.read(_$buttonState.notifier).state = ButtonState.normal;
-      if (!mounted) {
-        return;
-      }
-      Navigator.of(context).pop();
     } catch (e) {
-      ref.read(_$buttonState.notifier).state = ButtonState.normal;
       if (!mounted) {
         return;
       }
+      ref.read(_$buttonState.notifier).state = ButtonState.normal;
       MainSnackbar(
         message: 'edit_grocery_suggestion_error'.tr(),
         isError: true,
       ).show(context);
+      return;
+    }
+    final saved = await suggestionSaved;
+    if (!mounted) {
+      return;
+    }
+    ref.read(_$buttonState.notifier).state = ButtonState.normal;
+    final navigator = Navigator.of(context);
+    // The sheet may already be dismissed and animating out.
+    if (ModalRoute.of(context)?.isCurrent ?? false) {
+      navigator.pop();
+    }
+    if (!saved) {
+      // Flushbar is a route, so show it after the sheet is popped.
+      MainSnackbar(
+        message: 'edit_grocery_suggestion_list_only'.tr(),
+        isError: true,
+      ).show(navigator.context);
     }
   }
 }

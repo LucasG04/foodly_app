@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
 import '../../../constants.dart';
@@ -7,6 +8,10 @@ class SettingsTile extends StatefulWidget {
   final String text;
   final IconData? leadingIcon;
   final Widget? trailing;
+
+  /// The current choice of a picker tile, shown in the primary color with a
+  /// chevron. Ignored when [trailing] is set.
+  final String? value;
   final void Function()? onTap;
   final Color? colorIcon;
   final Color? colorText;
@@ -16,6 +21,7 @@ class SettingsTile extends StatefulWidget {
     required this.text,
     this.leadingIcon,
     this.trailing,
+    this.value,
     this.onTap,
     this.colorIcon,
     this.colorText,
@@ -106,10 +112,30 @@ class _SettingsTileState extends State<SettingsTile>
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            widget.trailing ?? const SizedBox(),
+            widget.trailing ??
+                (widget.value != null ? _buildValue() : const SizedBox()),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildValue() {
+    final color = Theme.of(context).primaryColor;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(width: kPadding / 2),
+        Text(
+          widget.value!,
+          style: TextStyle(color: color, fontWeight: FontWeight.w600),
+        ),
+        Icon(
+          EvaIcons.arrowIosForwardOutline,
+          color: widget.colorText,
+          size: 20,
+        ),
+      ],
     );
   }
 }

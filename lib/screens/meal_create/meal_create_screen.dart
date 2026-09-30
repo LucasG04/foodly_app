@@ -849,6 +849,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     logEvent(AnalyticsEvent.mealAssistant, {
       'applied': (assistantResult != null).toString(),
       'mode': isEmpty ? 'create' : 'edit',
+      if (assistantResult != null)
+        'input': assistantResult.fromPhoto ? 'photo' : 'text',
     });
     if (assistantResult == null || !mounted) {
       return;
@@ -856,7 +858,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     if (isEmpty) {
       _mealSource = 'assistant';
     }
-    final (meal: result, :partial) = assistantResult;
+    final (meal: result, :partial, fromPhoto: _) = assistantResult;
     if (partial) {
       MainSnackbar(
         message: 'import_modal_partial_warning'.tr(),

@@ -29,6 +29,8 @@ import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_text_field.dart';
+import '../../widgets/options_modal/options_modal.dart';
+import '../../widgets/options_modal/options_modal_option.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
 /// Longest side the picker returns. With the 1024 px short side from
@@ -39,8 +41,9 @@ const _kMaxImageSide = 2560.0;
 /// The API cuts a photo's note to this many characters.
 const _kMaxNoteLength = 1000;
 
-/// What the sheet pops with. [partial] marks a new meal whose stream broke off.
-typedef MealAssistantResult = ({Meal meal, bool partial});
+/// What the sheet pops with. [partial] marks a new meal whose stream broke off;
+/// [fromPhoto] a meal generated from a photo.
+typedef MealAssistantResult = ({Meal meal, bool partial, bool fromPhoto});
 
 /// Creates a meal from a prompt, pasted recipe or photo, or edits [currentMeal]
 /// by a change request. Pops with a [MealAssistantResult] once the stream is done.
@@ -263,22 +266,29 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
 
   /// Camera icon left of the field; picking a photo attaches (or replaces) it.
   Widget _buildImageButton() {
-    return PopupMenuButton<ImageSource>(
+    return IconButton(
       tooltip: 'meal_assistant_image'.tr(),
       style: _edgeIconStyle(Alignment.centerLeft),
-      enabled: !_compressing,
-      onSelected: _pickImage,
+      onPressed: _compressing ? null : _openImageSourceSheet,
       icon: Icon(EvaIcons.cameraOutline, color: theme.primaryColor),
-      itemBuilder: (_) => [
-        PopupMenuItem(
-          value: ImageSource.camera,
-          child: Text('meal_assistant_image_camera'.tr()),
+    );
+  }
+
+  void _openImageSourceSheet() {
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => OptionsSheet(options: [
+        OptionsSheetOptions(
+          title: 'meal_assistant_image_camera'.tr(),
+          icon: EvaIcons.cameraOutline,
+          onTap: () => _pickImage(ImageSource.camera),
         ),
-        PopupMenuItem(
-          value: ImageSource.gallery,
-          child: Text('meal_assistant_image_gallery'.tr()),
+        OptionsSheetOptions(
+          title: 'meal_assistant_image_gallery'.tr(),
+          icon: EvaIcons.imageOutline,
+          onTap: () => _pickImage(ImageSource.gallery),
         ),
-      ],
+      ]),
     );
   }
 
@@ -519,7 +529,10 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
   void _onStreamError(MealGenerationErrorCode code) {
     if (_hasContent && !_isEdit) {
       KeepScreenOn.turnOff();
-      Navigator.pop(context, (meal: _assembleMeal(), partial: true));
+      Navigator.pop(
+        context,
+        (meal: _assembleMeal(), partial: true, fromPhoto: _image != null),
+      );
       return;
     }
     _showError(
@@ -607,7 +620,10 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
       if (!mounted) {
         return;
       }
-      Navigator.pop(context, (meal: _assembleMeal(), partial: false));
+      Navigator.pop(
+        context,
+        (meal: _assembleMeal(), partial: false, fromPhoto: _image != null),
+      );
     });
   }
 

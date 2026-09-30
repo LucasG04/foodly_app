@@ -140,6 +140,7 @@ class _NewVersionModalState extends State<NewVersionModal> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (note.emoji != null) ...[
                       Text(
@@ -153,10 +154,12 @@ class _NewVersionModalState extends State<NewVersionModal> {
                       ),
                       const SizedBox(width: kPadding / 4),
                     ],
-                    Text(
-                      note.title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: Text(
+                        note.title,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
