@@ -74,9 +74,6 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
   bool _isFirstCall = true;
   final ScrollController _scrollController = ScrollController();
 
-  /// ID for API rate limitng on kcal estimation for creating
-  final String _generateKcalIdForApiOnCreate = UniqueKey().toString();
-
   late bool _isCreatingMeal;
 
   /// How the new meal was filled, for analytics.
@@ -1041,7 +1038,6 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       final lang = context.locale.languageCode;
       final mealForApi = Meal.fromMap(baseMeal.id, baseMeal.toMap());
       mealForApi.name = _titleController.text;
-      mealForApi.id ??= _generateKcalIdForApiOnCreate;
       final estimate = await LunixApiService.estimateKcal(mealForApi, lang);
       if (!mounted) {
         return;
@@ -1066,10 +1062,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       if (!mounted) {
         return;
       }
-      final minutes = (e.retryAfterSeconds / 60).ceil();
       MainSnackbar(
-        message:
-            'meal_create_kcal_ai_rate_limit'.tr(args: [minutes.toString()]),
+        message: e.message,
         isError: true,
       ).show(context);
     } catch (_) {

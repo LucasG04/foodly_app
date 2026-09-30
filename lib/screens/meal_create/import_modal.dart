@@ -17,6 +17,7 @@ import '../../providers/data_provider.dart';
 import '../../services/ai_generation_exception.dart';
 import '../../services/ai_quota_exceeded_exception.dart';
 import '../../services/lunix_api_service.dart';
+import '../../services/rate_limit_exception.dart';
 import '../../utils/ai_usage_period.dart';
 import '../../utils/analytics.dart';
 import '../../utils/basic_utils.dart';
@@ -824,6 +825,12 @@ class _ImportModalState extends ConsumerState<ImportModal>
           ),
           child: Text('ai_usage_upgrade'.tr()),
         ),
+      ).show(context);
+    } else if (error is RateLimitException) {
+      MainSnackbar(
+        isError: true,
+        message: error.message,
+        isDismissible: true,
       ).show(context);
     } else {
       MainSnackbar(

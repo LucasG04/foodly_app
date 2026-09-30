@@ -148,7 +148,16 @@
   "meal_create_kcal_ai_recommended": "Recommended",
   "meal_create_kcal_ai_max": "Max",
   "meal_create_kcal_ai_apply": "Apply",
-  "meal_create_kcal_ai_rate_limit": "Whoa, you're quick! Please give me a breather and try again in {} minutes.",
+  "ai_rate_limit": "Whoa, you're quick! Please give me a breather and try again in {}.",
+  "ai_rate_limit_hours": {
+    "one": "1 hour",
+    "other": "{} hours"
+  },
+  "ai_rate_limit_minutes": {
+    "one": "1 minute",
+    "other": "{} minutes"
+  },
+  "ai_rate_limit_hours_minutes": "{} and {}",
   "meal_create_kcal_ai_missing_input": "To estimate kcal, please enter at least a name and one ingredient — the more, the better.",
   "ai_usage_remaining": "{} free AI calls left",
   "ai_usage_exhausted": {

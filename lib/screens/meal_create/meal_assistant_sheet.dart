@@ -14,6 +14,7 @@ import '../../models/meal_generation_event.dart';
 import '../../services/ai_generation_exception.dart';
 import '../../services/ai_quota_exceeded_exception.dart';
 import '../../services/lunix_api_service.dart';
+import '../../services/rate_limit_exception.dart';
 import '../../utils/ai_usage_period.dart';
 import '../../utils/analytics.dart';
 import '../../utils/main_snackbar.dart';
@@ -320,6 +321,8 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
           child: Text('ai_usage_upgrade'.tr()),
         ),
       ).show(context);
+    } else if (error is RateLimitException) {
+      _showError(error.message);
     } else {
       _showError(
         error is AIRejectionException
