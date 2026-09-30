@@ -148,7 +148,16 @@
   "meal_create_kcal_ai_recommended": "Empfohlen",
   "meal_create_kcal_ai_max": "Max",
   "meal_create_kcal_ai_apply": "Übernehmen",
-  "meal_create_kcal_ai_rate_limit": "Wow, du bist ja schnell! Gib mir eine Pause und versuche es in {} Minuten erneut.",
+  "ai_rate_limit": "Wow, du bist ja schnell! Gib mir eine Pause und versuche es in {} erneut.",
+  "ai_rate_limit_hours": {
+    "one": "einer Stunde",
+    "other": "{} Stunden"
+  },
+  "ai_rate_limit_minutes": {
+    "one": "einer Minute",
+    "other": "{} Minuten"
+  },
+  "ai_rate_limit_hours_minutes": "{} und {}",
   "meal_create_kcal_ai_missing_input": "Für die kcal-Schätzung wird mindestens ein Name und eine Zutat benötigt – je mehr, desto besser.",
   "ai_usage_remaining": "Noch {} Aufrufe übrig",
   "ai_usage_exhausted": {

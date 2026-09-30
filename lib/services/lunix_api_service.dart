@@ -50,14 +50,29 @@ class LunixApiService {
           try {
             options.headers['x-app-version'] =
                 (await PackageInfo.fromPlatform()).version;
-          } finally {
-            handler.next(options);
+          } catch (_) {
+            // Send without the header.
           }
+          handler.next(options);
         },
       ),
     );
 
   static Dio get dio => _dio;
+
+  /// Only an explicit `QUOTA_EXCEEDED` is the weekly quota (paywall); any
+  /// other 429 (abuse guard, proxy, unknown body) asks the user to retry.
+  static Exception _tooManyRequests(Object? body) {
+    final map = body is Map ? body : const <String, dynamic>{};
+    if (map['code'] == 'QUOTA_EXCEEDED') {
+      return const AiQuotaExceededException();
+    }
+    final seconds = map['retryAfterSeconds'];
+    return RateLimitException(
+      retryAfterSeconds: seconds is num ? seconds.ceil() : 60,
+    );
+  }
+
   static String get _lunixApiKey =>
       SettingsService.useDevApi ? Env.lunixApiKeyDev : Env.lunixApiKey;
   static String get apiEndpoint => SettingsService.useDevApi
@@ -516,8 +531,13 @@ class LunixApiService {
       throw AIRejectionException(code);
     }
     if (status == 429) {
-      await _drain(byteStream);
-      throw const AiQuotaExceededException();
+      Object? body;
+      try {
+        body = jsonDecode(await _collectBody(byteStream));
+      } catch (_) {
+        // Not JSON: treated as a retryable rate limit.
+      }
+      throw _tooManyRequests(body);
     }
     if (status != 200) {
       await _drain(byteStream);
@@ -660,7 +680,7 @@ class LunixApiService {
   }
 
   static Future<KcalEstimate> estimateKcal(Meal meal, String language) async {
-    _log.finer('Call estimateKcal() for meal: ${meal.id}');
+    _log.finer('Call estimateKcal() for meal: ${meal.name}');
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         '$apiEndpoint/meal-kcal-estimate',
@@ -670,19 +690,13 @@ class LunixApiService {
           'instructions': meal.instructions ?? '',
           'ingredients': meal.ingredients?.map((i) => i.toMap()).toList() ?? [],
           'language': language,
-          'mealId': meal.id,
         },
         options: await _firebaseAuthOptions(),
       );
       return KcalEstimate.fromMap(response.data!);
     } on DioException catch (e) {
       if (e.response?.statusCode == 429) {
-        final body = e.response?.data as Map?;
-        if (body?['code'] == 'QUOTA_EXCEEDED') {
-          throw const AiQuotaExceededException();
-        }
-        final seconds = body?['retryAfterSeconds'] as int? ?? 60;
-        throw RateLimitException(retryAfterSeconds: seconds);
+        throw _tooManyRequests(e.response?.data);
       }
       _log.severe('ERR in estimateKcal', e);
       rethrow;
