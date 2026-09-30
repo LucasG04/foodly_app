@@ -363,6 +363,7 @@
   "premium_gifted_msg_message": "Thanks to your feedback, {} has been improved. As a thank you, you get Plus for {} month(s) for free.",
   "edit_grocery_suggestion_group": "Product group",
   "edit_grocery_suggestion_error": "Could not update the product group. Please try again.",
+  "edit_grocery_suggestion_list_only": "The group was changed in your list, but the suggestion could not be saved.",
   "link_preview_options_open_link": "Open in external browser",
   "link_preview_options_copy_link": "Copy link",
   "link_preview_options_copy_link_success": "Link copied to clipboard",

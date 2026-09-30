@@ -115,15 +115,20 @@ class _EditGrocerySuggestionSheetState
       return;
     }
     ref.read(_$buttonState.notifier).state = ButtonState.inProgress;
+    final nextGrocery = widget.grocery.copyWith(group: selectedGroup.id);
+    final langCode = context.locale.languageCode;
+    var suggestionSaved = true;
     try {
-      final nextGrocery = widget.grocery.copyWith(group: selectedGroup.id);
-      final langCode = context.locale.languageCode;
       await LunixApiService.editGrocerySuggestion(
         oldGrocery: widget.grocery,
         grocery: nextGrocery,
         langCode: langCode,
         userId: ref.read(userProvider)?.id ?? '',
       );
+    } catch (_) {
+      suggestionSaved = false;
+    }
+    try {
       await ShoppingListService.updateGrocery(
         widget.listId,
         nextGrocery,
@@ -133,7 +138,14 @@ class _EditGrocerySuggestionSheetState
       if (!mounted) {
         return;
       }
-      Navigator.of(context).pop();
+      final navigator = Navigator.of(context)..pop();
+      if (!suggestionSaved) {
+        // Flushbar is a route, so show it after the sheet is popped.
+        MainSnackbar(
+          message: 'edit_grocery_suggestion_list_only'.tr(),
+          isError: true,
+        ).show(navigator.context);
+      }
     } catch (e) {
       ref.read(_$buttonState.notifier).state = ButtonState.normal;
       if (!mounted) {
