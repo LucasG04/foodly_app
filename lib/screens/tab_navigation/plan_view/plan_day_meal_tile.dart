@@ -241,7 +241,13 @@ class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
     WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) => OptionsSheet(options: [
-        if (!widget.planMeal.meal.startsWith(kPlaceholderSymbol))
+        if (widget.planMeal.meal.startsWith(kPlaceholderSymbol))
+          OptionsSheetOptions(
+            title: 'plan_day_tile_edit'.tr(),
+            icon: EvaIcons.edit2Outline,
+            onTap: _editPlaceholder,
+          )
+        else
           OptionsSheetOptions(
             title: 'plan_ingredients_to_list'.tr(),
             icon: EvaIcons.fileAddOutline,

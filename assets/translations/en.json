@@ -104,6 +104,7 @@
   "plan_day_lunch": "lunch",
   "plan_day_dinner": "evening",
   "plan_day_tile_remove": "Remove",
+  "plan_day_tile_edit": "Edit",
   "plan_rate_title": "Are you enjoying {}?",
   "plan_rate_feedback": "Send feedback",
   "plan_rate_review": "Rate in the {} Store",
