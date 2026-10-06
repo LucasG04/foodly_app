@@ -47,7 +47,7 @@ class _SelectPlanModalState extends State<SelectPlanModal> {
       padding: EdgeInsets.only(
         left: (size.width - width) / 2,
         right: (size.width - width) / 2,
-        bottom: kPadding + MediaQuery.paddingOf(context).bottom,
+        bottom: kPadding / 2 + MediaQuery.paddingOf(context).bottom,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

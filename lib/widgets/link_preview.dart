@@ -318,8 +318,10 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
         OptionsSheetOptions(
           title: context.tr('link_preview_options_open_link'),
           icon: EvaIcons.externalLinkOutline,
-          onTap: () =>
-              launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+          onTap: () => launchUrl(
+            Uri.parse(url),
+            mode: LaunchMode.externalApplication,
+          ),
         ),
         OptionsSheetOptions(
           title: context.tr('link_preview_options_copy_link'),

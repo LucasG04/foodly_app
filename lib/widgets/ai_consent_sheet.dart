@@ -119,10 +119,7 @@ class AiConsentSheet extends StatelessWidget {
               ),
               Center(
                 child: TextButton(
-                  onPressed: () => launchUrl(
-                    Uri.parse(kAppPrivacyUrl),
-                    mode: LaunchMode.externalApplication,
-                  ),
+                  onPressed: () => launchUrl(Uri.parse(kAppPrivacyUrl)),
                   child: Text(
                     context.tr('ai_consent_privacy'),
                     style: TextStyle(color: mutedColor),
