@@ -93,11 +93,8 @@ class BasicUtils {
     List<GroceryGroup> groups,
     List<String> sort,
   ) {
-    final List<GroceryGroup> sorted = [];
-    for (final id in sort) {
-      final group = groups.firstWhere((element) => element.id == id);
-      sorted.add(group);
-    }
+    // Saved ids can be stale (group removed or groups not loaded), so skip them.
+    final sorted = [for (final id in sort) ...groups.where((g) => g.id == id)];
     final List<GroceryGroup> unSorted =
         groups.where((element) => !sort.contains(element.id)).toList();
     return [...sorted, ...unSorted];

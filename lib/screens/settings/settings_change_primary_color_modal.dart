@@ -2,7 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../constants.dart';
@@ -49,8 +48,8 @@ class _SettingsChangePrimaryColorModalState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   AutoSizeText(
-                    'settings_section_customization_change_color'
-                        .tr()
+                    context
+                        .tr('settings_section_customization_change_color')
                         .toUpperCase(),
                     style: const TextStyle(
                       fontSize: 20,
@@ -115,8 +114,5 @@ class _SettingsChangePrimaryColorModalState
   void _changeColor(Color color) async {
     ref.read(_$selected.notifier).state = color;
     await SettingsService.setPrimaryColor(color);
-    if (mounted) {
-      Phoenix.rebirth(context);
-    }
   }
 }

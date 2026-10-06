@@ -117,8 +117,9 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal>
               return MainTextField(
                 controller: _nameController,
                 focusNode: _nameFocusNode,
-                title: 'edit_grocery_modal_ctrl_name_title'.tr(),
-                placeholder: 'edit_grocery_modal_ctrl_name_placeholder'.tr(),
+                title: context.tr('edit_grocery_modal_ctrl_name_title'),
+                placeholder:
+                    context.tr('edit_grocery_modal_ctrl_name_placeholder'),
                 errorText: _errorText,
                 textInputAction: TextInputAction.next,
                 onSubmit: () => _amountFocusNode.requestFocus(),
@@ -136,7 +137,7 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal>
                   child: MainTextField(
                     controller: _amountController,
                     focusNode: _amountFocusNode,
-                    title: 'edit_grocery_modal_ctrl_amount_title'.tr(),
+                    title: context.tr('edit_grocery_modal_ctrl_amount_title'),
                     placeholder: '1',
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
@@ -150,9 +151,9 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal>
                   child: MainTextField(
                     controller: _unitController,
                     focusNode: _unitFocusNode,
-                    title: 'edit_grocery_modal_ctrl_unit_title'.tr(),
+                    title: context.tr('edit_grocery_modal_ctrl_unit_title'),
                     placeholder:
-                        'edit_grocery_modal_ctrl_unit_placeholder'.tr(),
+                        context.tr('edit_grocery_modal_ctrl_unit_placeholder'),
                     onSubmit: _saveGrocery,
                   ),
                 ),
@@ -162,7 +163,7 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal>
             Center(
               child: Consumer(builder: (_, ref, __) {
                 return MainButton(
-                  text: 'save'.tr(),
+                  text: context.tr('save'),
                   isProgress: true,
                   buttonState: ref.watch(_$buttonState),
                   onTap: _saveGrocery,
@@ -203,7 +204,7 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal>
       ref.read(_$buttonState.notifier).state = ButtonState.normal;
       Navigator.of(context).pop(widget.ingredient);
     } else {
-      _errorText = 'edit_grocery_modal_error'.tr();
+      _errorText = context.tr('edit_grocery_modal_error');
       ref.read(_$buttonState.notifier).state = ButtonState.error;
     }
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -12,10 +13,12 @@ class SettingsService {
   SettingsService._();
 
   static late Box _settingsBox;
+  static late ValueListenable<Box> _primaryColorListenable;
   static WidgetRef? _ref;
 
   static Future initialize() async {
     _settingsBox = await Hive.openBox<dynamic>('settings');
+    _primaryColorListenable = _settingsBox.listenable(keys: ['primaryColor']);
   }
 
   // ignore: use_setters_to_change_properties
@@ -117,6 +120,9 @@ class SettingsService {
   static Future<void> setUseDevApi(bool value) async {
     await _settingsBox.put('useDevApi', value);
   }
+
+  static ValueListenable<Box> get primaryColorListenable =>
+      _primaryColorListenable;
 
   static Stream<BoxEvent> streamShoppingListSort() {
     return _settingsBox.watch(key: 'shoppingListSort');

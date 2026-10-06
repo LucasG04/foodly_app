@@ -241,9 +241,15 @@ class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
     WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) => OptionsSheet(options: [
-        if (!widget.planMeal.meal.startsWith(kPlaceholderSymbol))
+        if (widget.planMeal.meal.startsWith(kPlaceholderSymbol))
           OptionsSheetOptions(
-            title: 'plan_ingredients_to_list'.tr(),
+            title: context.tr('plan_day_tile_edit'),
+            icon: EvaIcons.edit2Outline,
+            onTap: _editPlaceholder,
+          )
+        else
+          OptionsSheetOptions(
+            title: context.tr('plan_ingredients_to_list'),
             icon: EvaIcons.fileAddOutline,
             onTap: () async {
               WidgetUtils.showFoodlyBottomSheet<void>(
@@ -256,12 +262,12 @@ class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
             },
           ),
         OptionsSheetOptions(
-          title: 'plan_move_move'.tr(),
+          title: context.tr('plan_move_move'),
           icon: EvaIcons.moveOutline,
           onTap: () => _openMoveModal(),
         ),
         OptionsSheetOptions(
-          title: 'plan_day_tile_remove'.tr(),
+          title: context.tr('plan_day_tile_remove'),
           icon: EvaIcons.minusCircleOutline,
           onTap: () => PlanService.deletePlanMealFromPlan(
             planId,

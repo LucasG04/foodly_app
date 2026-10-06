@@ -47,9 +47,7 @@ class _EditIngredientsState extends State<EditIngredients> {
     final groups = ingredients.map((i) => i.group).toSet();
     final result = List<Ingredient>.from(ingredients);
     for (final group in groups) {
-      final groupItems = result
-          .where((i) => i.group == group)
-          .toList()
+      final groupItems = result.where((i) => i.group == group).toList()
         ..sort((a, b) => (a.sortKey ?? 9999).compareTo(b.sortKey ?? 9999));
       for (var i = 0; i < groupItems.length; i++) {
         if (groupItems[i].sortKey == null) {
@@ -124,7 +122,7 @@ class _EditIngredientsState extends State<EditIngredients> {
         Center(
           child: TextButton.icon(
             icon: const Icon(EvaIcons.plusCircleOutline),
-            label: Text('ingredient_group_add_button'.tr()),
+            label: Text(context.tr('ingredient_group_add_button')),
             onPressed: () => _addGroup(context),
           ),
         ),
@@ -313,16 +311,16 @@ class _EditIngredientsState extends State<EditIngredients> {
 
     final nameResult = await showTextInputDialog(
       context: context,
-      title: 'ingredient_group_add_dialog_title'.tr(),
-      cancelLabel: 'meal_select_placeholder_dialog_cancel'.tr(),
+      title: context.tr('ingredient_group_add_dialog_title'),
+      cancelLabel: context.tr('meal_select_placeholder_dialog_cancel'),
       textFields: [
         DialogTextField(
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'ingredient_group_name_required'.tr();
+              return context.tr('ingredient_group_name_required');
             }
             if (existingNamesLowered.contains(value.trim().toLowerCase())) {
-              return 'ingredient_group_name_duplicate'.tr();
+              return context.tr('ingredient_group_name_duplicate');
             }
             return null;
           },
@@ -349,17 +347,17 @@ class _EditIngredientsState extends State<EditIngredients> {
 
     final nameResult = await showTextInputDialog(
       context: context,
-      title: 'ingredient_group_rename_dialog_title'.tr(),
-      cancelLabel: 'meal_select_placeholder_dialog_cancel'.tr(),
+      title: context.tr('ingredient_group_rename_dialog_title'),
+      cancelLabel: context.tr('meal_select_placeholder_dialog_cancel'),
       textFields: [
         DialogTextField(
           initialText: oldName,
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'ingredient_group_name_required'.tr();
+              return context.tr('ingredient_group_name_required');
             }
             if (existingNamesLowered.contains(value.trim().toLowerCase())) {
-              return 'ingredient_group_name_duplicate'.tr();
+              return context.tr('ingredient_group_name_duplicate');
             }
             return null;
           },
@@ -395,9 +393,9 @@ class _EditIngredientsState extends State<EditIngredients> {
   Future<void> _deleteGroup(BuildContext context, String groupName) async {
     final confirm = await showOkCancelAlertDialog(
       context: context,
-      title: 'ingredient_group_delete_dialog_title'.tr(),
-      message: 'ingredient_group_delete_dialog_message'.tr(),
-      okLabel: 'delete'.tr(),
+      title: context.tr('ingredient_group_delete_dialog_title'),
+      message: context.tr('ingredient_group_delete_dialog_message'),
+      okLabel: context.tr('delete'),
       isDestructiveAction: true,
     );
 

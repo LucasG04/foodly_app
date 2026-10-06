@@ -9,11 +9,11 @@ final kAppName = Platform.isIOS || Platform.isMacOS ? 'Foodster' : 'Foodly';
 const kPlaceholderSymbol = 'p--';
 const kChefkochShareEndpoint = 'https://www.chefkoch.de/rezepte';
 final kAppPrivacyUrl = Platform.isIOS || Platform.isMacOS
-    ? 'https://lunix.golenia.dev/privacy/foodster.html'
-    : 'https://lunix.golenia.dev/privacy/foodly.html';
+    ? '$kAppWebBaseUrl/privacy/foodster'
+    : '$kAppWebBaseUrl/privacy/foodly';
 final kAppTermsOfUseUrl = Platform.isIOS || Platform.isMacOS
-    ? 'https://lunix.golenia.dev/eula/foodster.html'
-    : 'https://lunix.golenia.dev/eula/foodly.html';
+    ? '$kAppWebBaseUrl/eula/foodster'
+    : '$kAppWebBaseUrl/eula/foodly';
 const kAppWebBaseUrl = 'https://foodly.golenia.dev';
 
 /// Styling

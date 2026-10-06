@@ -42,7 +42,7 @@ class _UpcomingFeaturesScreenState
 
     return Scaffold(
       appBar: MainAppBar(
-        text: 'upcoming_features_title'.tr(),
+        text: context.tr('upcoming_features_title'),
         scrollController: _scrollController,
       ),
       body: SingleChildScrollView(

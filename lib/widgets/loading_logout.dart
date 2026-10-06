@@ -29,16 +29,16 @@ class _LoadingLogoutState extends State<LoadingLogout> {
                   const SizedBox(height: kPadding),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: kPadding),
-                    child: const Text(
-                      'help_loading_logout',
+                    child: Text(
+                      context.tr('help_loading_logout'),
                       textAlign: TextAlign.center,
-                    ).tr(),
+                    ),
                   ),
                   const SizedBox(height: kPadding / 2),
                   TextButton(
                     onPressed: () => AuthenticationService.signOut(),
                     child: Text(
-                      'settings_section_account_logout'.tr(),
+                      context.tr('settings_section_account_logout'),
                       style: TextStyle(color: Theme.of(context).primaryColor),
                     ),
                   ),
@@ -46,7 +46,7 @@ class _LoadingLogoutState extends State<LoadingLogout> {
                     onPressed: _sendSupportMail,
                     icon: const Icon(EvaIcons.paperPlaneOutline),
                     label: Text(
-                      'help_loading_logout_mail'.tr(),
+                      context.tr('help_loading_logout_mail'),
                       style: TextStyle(color: Theme.of(context).primaryColor),
                     ),
                   ),

@@ -73,8 +73,8 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
                   children: <Widget>[
                     Icon(EvaIcons.editOutline, color: textColor),
                     const SizedBox(width: 8.0),
-                    Text('markdown_edit', style: TextStyle(color: textColor))
-                        .tr(),
+                    Text(context.tr('markdown_edit'),
+                        style: TextStyle(color: textColor)),
                   ],
                 ),
               ),
@@ -85,8 +85,8 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
                   children: <Widget>[
                     Icon(EvaIcons.eyeOutline, color: textColor),
                     const SizedBox(width: 8.0),
-                    Text('markdown_preview', style: TextStyle(color: textColor))
-                        .tr(),
+                    Text(context.tr('markdown_preview'),
+                        style: TextStyle(color: textColor)),
                   ],
                 ),
               )
@@ -157,7 +157,7 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
                   children: [
                     Flexible(
                       child: AutoSizeText(
-                        'markdown_format_text'.tr(),
+                        context.tr('markdown_format_text'),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

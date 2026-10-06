@@ -49,7 +49,9 @@ class _ChangePlanNameModalState extends ConsumerState<ChangePlanNameModal> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'settings_section_plan_change_name'.tr().toUpperCase(),
+                    context
+                        .tr('settings_section_plan_change_name')
+                        .toUpperCase(),
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -65,15 +67,16 @@ class _ChangePlanNameModalState extends ConsumerState<ChangePlanNameModal> {
             controller: _textEditingController,
             errorText: _nameValid
                 ? null
-                : 'settings_section_plan_change_name_error'.tr(),
-            placeholder: 'settings_section_plan_change_name_placeholder'.tr(),
+                : context.tr('settings_section_plan_change_name_error'),
+            placeholder:
+                context.tr('settings_section_plan_change_name_placeholder'),
             onSubmit: _save,
             textInputAction: TextInputAction.go,
           ),
           const SizedBox(height: kPadding),
           Center(
             child: MainButton(
-              text: 'save'.tr(),
+              text: context.tr('save'),
               onTap: _save,
               isProgress: true,
               buttonState: _buttonState,

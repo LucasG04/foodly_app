@@ -64,13 +64,13 @@ class WidgetUtils {
           initialText: initialText,
           validator: required
               ? (value) => value!.isEmpty
-                  ? 'meal_select_placeholder_dialog_placeholder'.tr()
+                  ? context.tr('meal_select_placeholder_dialog_placeholder')
                   : null
               : null,
         ),
       ],
-      title: 'meal_select_placeholder_dialog_title'.tr(),
-      cancelLabel: 'meal_select_placeholder_dialog_cancel'.tr(),
+      title: context.tr('meal_select_placeholder_dialog_title'),
+      cancelLabel: context.tr('meal_select_placeholder_dialog_cancel'),
     );
 
     return result?.first;

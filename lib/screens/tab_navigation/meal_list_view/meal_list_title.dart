@@ -126,7 +126,7 @@ class _MealListTitleState extends State<MealListTitle> with OfContextMixin {
     return SizedBox(
       width: double.infinity,
       child: AutoSizeText(
-        'meal_list_title'.tr(),
+        context.tr('meal_list_title'),
         style: const TextStyle(
           fontSize: 32.0,
           fontWeight: FontWeight.w700,
@@ -148,7 +148,7 @@ class _MealListTitleState extends State<MealListTitle> with OfContextMixin {
         fontFamily: 'Poppins',
       ),
       decoration: InputDecoration(
-        hintText: '${'meal_list_search'.tr()}...',
+        hintText: '${context.tr('meal_list_search')}...',
         enabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: theme.primaryColor),
         ),

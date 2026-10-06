@@ -18,13 +18,10 @@ import '../../services/ai_generation_exception.dart';
 import '../../services/ai_quota_exceeded_exception.dart';
 import '../../services/lunix_api_service.dart';
 import '../../services/rate_limit_exception.dart';
-import '../../utils/ai_usage_period.dart';
-import '../../utils/analytics.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/convert_util.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
-import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/foodly_network_image.dart';
 import '../../widgets/get_premium_modal.dart';
@@ -149,7 +146,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'import_modal_title'.tr().toUpperCase(),
+            context.tr('import_modal_title').toUpperCase(),
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -180,7 +177,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
       case ImportType.link:
         return MainTextField(
           controller: _controller,
-          title: 'import_modal_link_title'.tr(),
+          title: context.tr('import_modal_link_title'),
           placeholder:
               'https://www.chefkoch.de/rezepte/2280941363879458/Brokkoli-Spaetzle-Pfanne.html',
           errorText: _errorText,
@@ -192,7 +189,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
       case ImportType.instagram:
         return MainTextField(
           controller: _controller,
-          title: 'import_modal_instagram_title'.tr(),
+          title: context.tr('import_modal_instagram_title'),
           placeholder: 'instagram.com/reel/DVOxtiijAB-/',
           errorText: _errorText,
           onSubmit: _importMeal,
@@ -227,7 +224,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
         _buildKeyboardSpacer(),
         Center(
           child: MainButton(
-            text: 'import_modal_import'.tr(),
+            text: context.tr('import_modal_import'),
             onTap: _importMeal,
             isProgress: true,
             buttonState: _buttonState,
@@ -279,7 +276,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
             child: _buttonLoading
                 ? _buildButtonLoader()
                 : MainButton(
-                    text: 'import_modal_import'.tr(),
+                    text: context.tr('import_modal_import'),
                     onTap: _importMeal,
                     isProgress: true,
                     buttonState: _buttonState,
@@ -316,18 +313,18 @@ class _ImportModalState extends ConsumerState<ImportModal>
   /// Pre-content loader label: while an Instagram post is being scraped we say
   /// so explicitly; otherwise it's the generic "reading your recipe" copy.
   String _loaderLabel() => _phase == _GenPhase.scraping
-      ? 'import_modal_scraping'.tr()
-      : 'import_modal_generating'.tr();
+      ? context.tr('import_modal_scraping')
+      : context.tr('import_modal_generating');
 
   /// Status copy for the current enrichment sub-step.
   String _enrichLabel() {
     switch (_enrichStep) {
       case _EnrichStep.sorting:
-        return 'import_modal_enriching_groups'.tr();
+        return context.tr('import_modal_enriching_groups');
       case _EnrichStep.image:
-        return 'import_modal_enriching_image'.tr();
+        return context.tr('import_modal_enriching_image');
       case _EnrichStep.polishing:
-        return 'import_modal_enriching'.tr();
+        return context.tr('import_modal_enriching');
     }
   }
 
@@ -525,7 +522,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'meal_create_ingredients_title'.tr(),
+            context.tr('meal_create_ingredients_title'),
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: kPadding / 2),
@@ -548,7 +545,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'meal_create_instruction_title'.tr(),
+                    context.tr('meal_create_instruction_title'),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: kPadding / 2),
@@ -591,7 +588,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
             Flexible(
               child: Text(
                 _partialWarning
-                    ? 'import_modal_partial_warning'.tr()
+                    ? context.tr('import_modal_partial_warning')
                     : _name ?? '',
                 style: const TextStyle(color: kLightTextColor),
               ),
@@ -601,13 +598,13 @@ class _ImportModalState extends ConsumerState<ImportModal>
       case _GenPhase.scraping:
         return _statusRow(
           const ValueKey('scraping'),
-          'import_modal_scraping'.tr(),
+          context.tr('import_modal_scraping'),
         );
       case _GenPhase.generating:
       case _GenPhase.input:
         return _statusRow(
           const ValueKey('generating'),
-          'import_modal_generating'.tr(),
+          context.tr('import_modal_generating'),
         );
     }
   }
@@ -638,7 +635,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
     if (link == null || link.isEmpty || !BasicUtils.isValidUri(link)) {
       setState(() {
         _buttonState = ButtonState.error;
-        _errorText = 'import_modal_error_no_link'.tr();
+        _errorText = context.tr('import_modal_error_no_link');
       });
       return;
     }
@@ -676,7 +673,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
     if (!BasicUtils.isValidInstagramUrl(input)) {
       setState(() {
         _buttonState = ButtonState.error;
-        _errorText = 'import_modal_error_no_instagram'.tr();
+        _errorText = context.tr('import_modal_error_no_instagram');
       });
       return;
     }
@@ -767,7 +764,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
             _phase = _GenPhase.done;
             MainSnackbar(
               isError: true,
-              message: 'import_modal_partial_warning'.tr(),
+              message: context.tr('import_modal_partial_warning'),
               isDismissible: true,
             ).show(context);
             _schedulePop();
@@ -805,27 +802,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
         isDismissible: true,
       ).show(context);
     } else if (error is AiQuotaExceededException) {
-      logEvent(
-        AnalyticsEvent.aiQuotaExceededShown,
-        {'feature': widget.type.name},
-      );
-      MainSnackbar(
-        message: 'ai_usage_exhausted'.plural(
-          AiUsagePeriod.daysUntilReset(),
-          namedArgs: {
-            'date': DateFormat.Md(context.locale.toLanguageTag())
-                .format(AiUsagePeriod.currentPeriodEnd().toLocal()),
-          },
-        ),
-        isError: true,
-        action: TextButton(
-          onPressed: () => WidgetUtils.showFoodlyBottomSheet<void>(
-            context: context,
-            builder: (_) => const GetPremiumModal(),
-          ),
-          child: Text('ai_usage_upgrade'.tr()),
-        ),
-      ).show(context);
+      GetPremiumModal.showAiQuotaExhausted(context, feature: widget.type.name);
     } else if (error is RateLimitException) {
       MainSnackbar(
         isError: true,
@@ -835,7 +812,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
     } else {
       MainSnackbar(
         isError: true,
-        message: 'import_modal_error_generation'.tr(),
+        message: context.tr('import_modal_error_generation'),
         isDismissible: true,
       ).show(context);
     }
@@ -851,13 +828,13 @@ class _ImportModalState extends ConsumerState<ImportModal>
   String _messageForErrorCode(MealGenerationErrorCode code) {
     switch (code) {
       case MealGenerationErrorCode.notFoodRelated:
-        return 'import_modal_error_not_food'.tr();
+        return context.tr('import_modal_error_not_food');
       case MealGenerationErrorCode.instagramFetchFailed:
-        return 'import_modal_error_instagram_fetch'.tr();
+        return context.tr('import_modal_error_instagram_fetch');
       case MealGenerationErrorCode.internal:
       case MealGenerationErrorCode.streamInterrupted:
       case MealGenerationErrorCode.unknown:
-        return 'import_modal_error_generation'.tr();
+        return context.tr('import_modal_error_generation');
     }
   }
 
@@ -901,20 +878,23 @@ class _ImportModalState extends ConsumerState<ImportModal>
     supportedSitesString = '\n$supportedSitesString';
 
     MainSnackbar(
-      message: 'import_modal_info'.tr(args: [supportedSitesString]),
+      message: context.tr('import_modal_info', args: [supportedSitesString]),
       isDismissible: true,
       duration: 10,
     ).show(context);
   }
 
   void _handleDownloadError() {
+    KeepScreenOn.turnOff();
+    if (!mounted) {
+      return;
+    }
     MainSnackbar(
       isError: true,
-      title: 'import_modal_error_not_found_title'.tr(),
-      message: 'import_modal_error_not_found'.tr(),
+      title: context.tr('import_modal_error_not_found_title'),
+      message: context.tr('import_modal_error_not_found'),
       isDismissible: true,
     ).show(context);
-    KeepScreenOn.turnOff();
     setState(() {
       _buttonState = ButtonState.error;
     });

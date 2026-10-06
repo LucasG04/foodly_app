@@ -71,7 +71,17 @@ class FoodlyUserService {
 
   static Future<void> setIsPremium(String userId, bool isPremium) {
     log.finer('Call setIsPremium with UserId: $userId | isPremium: $isPremium');
-    return _firestore.doc(userId).update(<String, bool>{'isPremium': isPremium});
+    return _firestore
+        .doc(userId)
+        .update(<String, bool>{'isPremium': isPremium});
+  }
+
+  /// Stores (or with null withdraws) the consent to send inputs to third-party AI.
+  static Future<void> setAiConsentAt(String userId, DateTime? consentAt) {
+    log.finer('Call setAiConsentAt with UserId: $userId | $consentAt');
+    return _firestore.doc(userId).update(
+      <String, int?>{'aiConsentAt': consentAt?.millisecondsSinceEpoch},
+    );
   }
 
   static Future<void> resetPremiumGifted(String userId) async {

@@ -214,11 +214,14 @@ class _MealScreenState extends ConsumerState<MealScreen>
                                     Text(
                                       meal.source != null &&
                                               meal.source!.isNotEmpty
-                                          ? 'meal_details_source_known'
-                                              .tr(args: [
-                                              _formatSourceString(meal.source!)
-                                            ])
-                                          : 'meal_details_source_unknown'.tr(),
+                                          ? context.tr(
+                                              'meal_details_source_known',
+                                              args: [
+                                                  _formatSourceString(
+                                                      meal.source!)
+                                                ])
+                                          : context.tr(
+                                              'meal_details_source_unknown'),
                                       style: TextStyle(
                                         fontSize: 16.0,
                                         fontWeight: FontWeight.bold,
@@ -239,11 +242,11 @@ class _MealScreenState extends ConsumerState<MealScreen>
                                     ),
                                     withBorder: true,
                                     child: Text(
-                                      'meal_details_duration_trailing'.tr(
-                                        args: [
-                                          (meal.duration ?? '?').toString(),
-                                        ],
-                                      ),
+                                      context.tr(
+                                          'meal_details_duration_trailing',
+                                          args: [
+                                            (meal.duration ?? '?').toString(),
+                                          ]),
                                       style: const TextStyle(
                                         fontSize: 20.0,
                                         fontWeight: FontWeight.bold,
@@ -273,16 +276,16 @@ class _MealScreenState extends ConsumerState<MealScreen>
                                           withBorder: true,
                                           child: Text(
                                             isScaled
-                                                ? 'meal_details_kcal_scaled'.tr(
+                                                ? context.tr(
+                                                    'meal_details_kcal_scaled',
                                                     args: [
-                                                      displayKcal.toString(),
-                                                    ],
-                                                  )
-                                                : 'meal_details_kcal'.tr(
+                                                        displayKcal.toString(),
+                                                      ])
+                                                : context.tr(
+                                                    'meal_details_kcal',
                                                     args: [
-                                                      displayKcal.toString(),
-                                                    ],
-                                                  ),
+                                                        displayKcal.toString(),
+                                                      ]),
                                             style: const TextStyle(
                                               fontSize: 16.0,
                                               fontWeight: FontWeight.bold,
@@ -324,7 +327,7 @@ class _MealScreenState extends ConsumerState<MealScreen>
                             meal.instructions!.isNotEmpty) ...[
                           const SizedBox(height: kPadding),
                           _buildSection(
-                            'meal_details_instructions'.tr(),
+                            context.tr('meal_details_instructions'),
                             MarkdownBody(
                               data: meal.instructions ?? '',
                               styleSheet: MarkdownStyleSheet.fromTheme(
@@ -365,7 +368,7 @@ class _MealScreenState extends ConsumerState<MealScreen>
           // the `flashOffOutline` icon is used to indicate what will happen when the button is pressed
           foregroundColor: isActive ? Colors.grey[850] : Colors.white,
           backgroundColor: isActive ? Colors.white : Colors.grey[850],
-          tooltip: 'meal_details_keep_screen_on'.tr(),
+          tooltip: context.tr('meal_details_keep_screen_on'),
           child: Icon(
             isActive ? EvaIcons.flashOffOutline : EvaIcons.flashOutline,
           ),
@@ -392,7 +395,7 @@ class _MealScreenState extends ConsumerState<MealScreen>
                 Consumer(builder: (_, ref, __) {
                   return MainButton(
                     onTap: () => _importMeal(meal),
-                    text: 'meal_details_import'.tr(),
+                    text: context.tr('meal_details_import'),
                     isProgress: true,
                     buttonState: ref.watch(_$importButtonState),
                   );
@@ -426,7 +429,7 @@ class _MealScreenState extends ConsumerState<MealScreen>
     return Padding(
       padding: const EdgeInsets.only(top: kPadding),
       child: _buildSection(
-        'meal_details_ingredient'.tr(),
+        context.tr('meal_details_ingredient'),
         hasNamedGroups
             ? Builder(
                 builder: (context) => _buildGroupedIngredientList(
@@ -580,7 +583,7 @@ class _MealScreenState extends ConsumerState<MealScreen>
         return mealStat == null
             ? const SizedBox()
             : _buildSection(
-                'meal_details_stats'.tr(),
+                context.tr('meal_details_stats'),
                 Consumer(
                   builder: (context, ref, child) {
                     final isSubscribed =
@@ -602,7 +605,7 @@ class _MealScreenState extends ConsumerState<MealScreen>
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Text(
-            'meal_details_stats_locked'.tr(),
+            context.tr('meal_details_stats_locked'),
             style: const TextStyle(fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
@@ -616,7 +619,7 @@ class _MealScreenState extends ConsumerState<MealScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'meal_details_stats_unlock'.tr(),
+                  context.tr('meal_details_stats_unlock'),
                   style: TextStyle(
                     color: theme.scaffoldBackgroundColor,
                   ),
@@ -737,7 +740,7 @@ class _MealScreenState extends ConsumerState<MealScreen>
         context: context,
         builder: (_) => OptionsSheet(options: [
           OptionsSheetOptions(
-            title: 'meal_details_import'.tr(),
+            title: context.tr('meal_details_import'),
             icon: EvaIcons.downloadOutline,
             onTap: () => _importMeal(meal),
           ),
@@ -754,25 +757,25 @@ class _MealScreenState extends ConsumerState<MealScreen>
       builder: (_) => OptionsSheet(options: [
         Builder(builder: (ctx) {
           return OptionsSheetOptions(
-            title: 'meal_details_share_meal'.tr(),
+            title: context.tr('meal_details_share_meal'),
             icon: EvaIcons.shareOutline,
             onTap: () => _shareMeal(meal, ctx),
           );
         }),
         OptionsSheetOptions(
-          title: 'meal_details_add_to_plan'.tr(),
+          title: context.tr('meal_details_add_to_plan'),
           icon: EvaIcons.fileAddOutline,
           onTap: () => _openAddToPlan(meal),
         ),
         OptionsSheetOptions(
-          title: 'meal_details_edit'.tr(),
+          title: context.tr('meal_details_edit'),
           icon: EvaIcons.edit2Outline,
           onTap: () => AutoRouter.of(context).push(
             MealCreateScreenRoute(id: meal.id!),
           ),
         ),
         OptionsSheetOptions(
-          title: 'meal_details_delete'.tr(),
+          title: context.tr('meal_details_delete'),
           icon: EvaIcons.minusCircleOutline,
           textColor: theme.colorScheme.error,
           onTap: () => _openConfirmDelete(meal),
@@ -782,9 +785,10 @@ class _MealScreenState extends ConsumerState<MealScreen>
   }
 
   void _openGetPremium() {
-    WidgetUtils.showFoodlyBottomSheet<void>(
-      context: context,
-      builder: (_) => const GetPremiumModal(),
+    GetPremiumModal.show(
+      context,
+      source: 'meal_stats',
+      highlight: PremiumFeature.stats,
     );
   }
 
@@ -877,8 +881,8 @@ class _MealScreenState extends ConsumerState<MealScreen>
     KeepScreenOn.turnOn();
     if (mounted && ref.read(showKeepOnScreenNotification)) {
       MainSnackbar(
-        title: 'meal_details_keep_screen_on'.tr(),
-        message: 'meal_details_keep_screen_on_description'.tr(),
+        title: context.tr('meal_details_keep_screen_on'),
+        message: context.tr('meal_details_keep_screen_on_description'),
         isDismissible: true,
       ).show(context);
       ref.read(showKeepOnScreenNotification.notifier).state = false;

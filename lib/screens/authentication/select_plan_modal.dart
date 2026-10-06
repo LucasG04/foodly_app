@@ -60,7 +60,7 @@ class _SelectPlanModalState extends State<SelectPlanModal> {
               children: [
                 Expanded(
                   child: AutoSizeText(
-                    'modal_select_plan_title'.tr().toUpperCase(),
+                    context.tr('modal_select_plan_title').toUpperCase(),
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -89,7 +89,7 @@ class _SelectPlanModalState extends State<SelectPlanModal> {
                   height: _placeholderHeight,
                   child: Center(
                     child: Text(
-                      'modal_select_plan_no_plan'.tr(),
+                      context.tr('modal_select_plan_no_plan'),
                       textAlign: TextAlign.center,
                     ),
                   ),

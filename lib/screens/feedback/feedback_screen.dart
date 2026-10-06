@@ -57,7 +57,7 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
     return KeyboardAutoDismiss(
       scaffold: Scaffold(
         appBar: MainAppBar(
-          text: 'feedback_title'.tr(),
+          text: context.tr('feedback_title'),
           scrollController: _scrollController,
         ),
         body: Stack(
@@ -75,13 +75,13 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
                       children: [
                         MainTextField(
                           controller: _titleController,
-                          title: 'feedback_title_title'.tr(),
+                          title: context.tr('feedback_title_title'),
                           textInputAction: TextInputAction.next,
                         ),
                         const SizedBox(height: kPadding / 2),
                         MainTextField(
                           controller: _emailController,
-                          title: 'feedback_email_title'.tr(),
+                          title: context.tr('feedback_email_title'),
                           textInputAction: TextInputAction.next,
                           keyboardType: TextInputType.emailAddress,
                           autofillHints: const [AutofillHints.email],
@@ -89,17 +89,19 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
                         const SizedBox(height: kPadding / 2),
                         MainTextField(
                           controller: _textController,
-                          title: 'feedback_text_title'.tr(),
+                          title: context.tr('feedback_text_title'),
                           textInputAction: TextInputAction.send,
                           keyboardType: TextInputType.multiline,
                           isMultiline: true,
-                          errorText: _textError?.tr(),
+                          errorText: _textError == null
+                              ? null
+                              : context.tr(_textError!),
                           focusNode: _textFocusNode,
                           required: true,
                         ),
                         const SizedBox(height: kPadding),
                         MainButton(
-                          text: 'feedback_cta'.tr(),
+                          text: context.tr('feedback_cta'),
                           iconData: EvaIcons.paperPlaneOutline,
                           onTap: _sendFeedback,
                           isProgress: true,
@@ -167,7 +169,7 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
       return;
     }
     MainSnackbar(
-      message: 'feedback_thanks'.tr(args: ['']),
+      message: context.tr('feedback_thanks', args: ['']),
       isSuccess: true,
       duration: 1,
     ).show(context);

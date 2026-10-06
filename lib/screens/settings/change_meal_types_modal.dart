@@ -56,8 +56,8 @@ class _ChangeMealTypeModalState extends ConsumerState<ChangeMealTypesModal> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'settings_section_customization_meal_types'
-                        .tr()
+                    context
+                        .tr('settings_section_customization_meal_types')
                         .toUpperCase(),
                     style: const TextStyle(
                       fontSize: 20,
@@ -70,13 +70,13 @@ class _ChangeMealTypeModalState extends ConsumerState<ChangeMealTypesModal> {
             ),
           ),
           const SizedBox(height: kPadding),
-          _buildCheckboxTile(_$breakfast, 'breakfast'.tr()),
-          _buildCheckboxTile(_$lunch, 'lunch'.tr()),
-          _buildCheckboxTile(_$dinner, 'dinner'.tr()),
+          _buildCheckboxTile(_$breakfast, context.tr('breakfast')),
+          _buildCheckboxTile(_$lunch, context.tr('lunch')),
+          _buildCheckboxTile(_$dinner, context.tr('dinner')),
           const SizedBox(height: kPadding),
           Center(
             child: MainButton(
-              text: 'save'.tr(),
+              text: context.tr('save'),
               onTap: _save,
             ),
           ),
@@ -96,7 +96,7 @@ class _ChangeMealTypeModalState extends ConsumerState<ChangeMealTypesModal> {
         onChanged: (value) {
           ref.read(provider.notifier).state = value!;
         },
-        title: Text(title.tr()),
+        title: Text(title),
         activeColor: Theme.of(context).primaryColor,
       );
     });

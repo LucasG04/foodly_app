@@ -13,7 +13,6 @@ import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -115,14 +114,12 @@ void main() {
         initializeHive(),
       ]);
       await _runApp(
-        Phoenix(
-          child: ProviderScope(
-            child: EasyLocalization(
-              supportedLocales: const [Locale('en'), Locale('de')],
-              path: 'assets/translations',
-              fallbackLocale: const Locale('en'),
-              child: const FoodlyApp(),
-            ),
+        ProviderScope(
+          child: EasyLocalization(
+            supportedLocales: const [Locale('en'), Locale('de')],
+            path: 'assets/translations',
+            fallbackLocale: const Locale('en'),
+            child: const FoodlyApp(),
           ),
         ),
       );
@@ -172,6 +169,10 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
 
   final _appLinks = AppLinks();
 
+  /// Created once: a new stream per build makes StreamBuilder resubscribe,
+  /// briefly swapping in the placeholder app and tearing down the navigator.
+  final _authStream = AuthenticationService.authenticationStream();
+
   /// Handle the initial uni link only when user is in a plan
   bool _handleInitUniLink = true;
 
@@ -194,6 +195,15 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final langCode = context.locale.languageCode;
+    BasicUtils.afterBuild(
+      () => ref.read(languageCodeProvider.notifier).state = langCode,
+    );
+  }
+
+  @override
   void dispose() {
     cancelSubscriptions();
     super.dispose();
@@ -202,7 +212,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: AuthenticationService.authenticationStream(),
+      stream: _authStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active ||
             snapshot.connectionState == ConnectionState.done) {
@@ -220,7 +230,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
               ref.read(initialPlanLoadingProvider.notifier).state = true;
             });
             Future.wait([
-              _loadBaseData(),
+              _loadSupportedImportSites(),
               _loadActivePlan(),
               _loadActiveUser(),
             ]).whenComplete(() => afterUserAndPlanLoaded());
@@ -240,44 +250,47 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
                 ref.read(shoppingListIdProvider.notifier).state = null;
               }
 
-              return MaterialApp.router(
-                routerDelegate: _appRouter.delegate(
-                  initialRoutes: [const HomeScreenRoute()],
-                  navigatorObservers: () => [
-                    FirebaseAnalyticsObserver(
-                      analytics: FirebaseAnalytics.instance,
-                    ),
-                    if (faroEnabled) FaroNavigationObserver(),
+              return ValueListenableBuilder(
+                valueListenable: SettingsService.primaryColorListenable,
+                builder: (context, _, __) => MaterialApp.router(
+                  routerDelegate: _appRouter.delegate(
+                    initialRoutes: [const HomeScreenRoute()],
+                    navigatorObservers: () => [
+                      FirebaseAnalyticsObserver(
+                        analytics: FirebaseAnalytics.instance,
+                      ),
+                      if (faroEnabled) FaroNavigationObserver(),
+                    ],
+                  ),
+                  routeInformationParser:
+                      _DeepLinkGuardedParser(_appRouter.defaultRouteParser()),
+                  debugShowCheckedModeBanner: false,
+                  themeMode: ThemeMode.light,
+                  localizationsDelegates: [
+                    ...context.localizationDelegates,
+                    const LocaleNamesLocalizationsDelegate(),
                   ],
-                ),
-                routeInformationParser:
-                    _DeepLinkGuardedParser(_appRouter.defaultRouteParser()),
-                debugShowCheckedModeBanner: false,
-                themeMode: ThemeMode.light,
-                localizationsDelegates: [
-                  ...context.localizationDelegates,
-                  const LocaleNamesLocalizationsDelegate(),
-                ],
-                supportedLocales: context.supportedLocales,
-                locale: context.locale,
-                theme: ThemeData(
-                  primaryColor: SettingsService.primaryColor,
-                  colorScheme: ColorScheme.fromSeed(
-                    seedColor: SettingsService.primaryColor,
-                  ),
-                  dividerColor: Colors.grey.shade300,
-                  scaffoldBackgroundColor: const Color(0xFFFAFAFA),
-                  dialogTheme: const DialogThemeData(
-                    backgroundColor: Color(0xFFFFFFFF),
-                  ),
-                  cardTheme: const CardThemeData(
-                    color: Color(0xFFFFFFFF),
-                  ),
-                  outlinedButtonTheme: OutlinedButtonThemeData(
-                    style: ButtonStyle(
-                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(kRadius),
+                  supportedLocales: context.supportedLocales,
+                  locale: context.locale,
+                  theme: ThemeData(
+                    primaryColor: SettingsService.primaryColor,
+                    colorScheme: ColorScheme.fromSeed(
+                      seedColor: SettingsService.primaryColor,
+                    ),
+                    dividerColor: Colors.grey.shade300,
+                    scaffoldBackgroundColor: const Color(0xFFFAFAFA),
+                    dialogTheme: const DialogThemeData(
+                      backgroundColor: Color(0xFFFFFFFF),
+                    ),
+                    cardTheme: const CardThemeData(
+                      color: Color(0xFFFFFFFF),
+                    ),
+                    outlinedButtonTheme: OutlinedButtonThemeData(
+                      style: ButtonStyle(
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(kRadius),
+                          ),
                         ),
                       ),
                     ),
@@ -381,19 +394,6 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     ref.read(shoppingListIdProvider.notifier).state = shoppingList.id;
   }
 
-  Future<void> _loadBaseData() {
-    return Future.wait([
-      _loadGroceryGroups(),
-      _loadSupportedImportSites(),
-    ]);
-  }
-
-  Future<void> _loadGroceryGroups() async {
-    final langCode = context.locale.languageCode;
-    final groups = await LunixApiService.getGroceryGroups(langCode);
-    ref.read(dataGroceryGroupsProvider.notifier).state = groups;
-  }
-
   Future<void> _loadSupportedImportSites() async {
     final sites = await LunixApiService.getSupportedImportSites();
     ref.read(dataSupportedImportSitesProvider.notifier).state = sites;
@@ -434,8 +434,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
             context: record.error == null
                 ? null
                 : {
-                    'error':
-                        ConvertUtil.errorDescriptionToString(record.error),
+                    'error': ConvertUtil.errorDescriptionToString(record.error),
                   },
           );
         }).canceledBy(this);
@@ -497,19 +496,12 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       return;
     }
 
-    bool shouldRestartApp = false;
-
     if (SettingsService.primaryColor.toARGB32() !=
         defaultPrimaryColor.toARGB32()) {
       await SettingsService.setPrimaryColor(defaultPrimaryColor);
-      shouldRestartApp = true;
     }
     if (SettingsService.shoppingListSort != defaultShoppingListSort) {
       await SettingsService.setShoppingListSort(defaultShoppingListSort);
-    }
-
-    if (shouldRestartApp && mounted) {
-      Phoenix.rebirth(context);
     }
   }
 

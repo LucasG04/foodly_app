@@ -84,8 +84,9 @@ class PageTitle extends StatelessWidget {
   void _showAlert(BuildContext context) {
     showOkAlertDialog(
       context: context,
-      title: 'page_title_connectivity_error_title'.tr(),
-      message: 'page_title_connectivity_error_message'.tr(args: [kAppName]),
+      title: context.tr('page_title_connectivity_error_title'),
+      message:
+          context.tr('page_title_connectivity_error_message', args: [kAppName]),
     );
   }
 }

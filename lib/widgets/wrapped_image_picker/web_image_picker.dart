@@ -68,7 +68,7 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
             ),
             Expanded(
               child: Text(
-                'image_picker_dialog_web'.tr().toUpperCase(),
+                context.tr('image_picker_dialog_web').toUpperCase(),
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -89,7 +89,8 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
                       child: MainTextField(
                         controller: _inputController,
                         onSubmit: _search,
-                        placeholder: 'image_link_picker_input_placeholder'.tr(),
+                        placeholder:
+                            context.tr('image_link_picker_input_placeholder'),
                         onChange: (_) => _clearResults(),
                       ),
                     ),
@@ -147,16 +148,16 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
   Widget _buildEmptyContent() {
     return UserInformation(
       assetPath: 'assets/images/undraw_empty.png',
-      title: 'image_link_picker_empty_title'.tr(),
-      message: 'image_link_picker_empty_message'.tr(),
+      title: context.tr('image_link_picker_empty_title'),
+      message: context.tr('image_link_picker_empty_message'),
     );
   }
 
   Widget _buildPlaceholderContent() {
     return UserInformation(
       assetPath: 'assets/images/undraw_searching.png',
-      title: 'image_link_picker_placeholder_title'.tr(),
-      message: 'image_link_picker_placeholder_message'.tr(),
+      title: context.tr('image_link_picker_placeholder_title'),
+      message: context.tr('image_link_picker_placeholder_message'),
     );
   }
 
@@ -196,7 +197,7 @@ class _WebImagePickerState extends ConsumerState<WebImagePicker> {
               : TextButton.icon(
                   onPressed: _loadMoreImages,
                   icon: const Icon(EvaIcons.refreshOutline),
-                  label: const Text('image_link_picker_load_more').tr(),
+                  label: Text(context.tr('image_link_picker_load_more')),
                 ),
         ),
       ],

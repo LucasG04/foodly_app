@@ -26,25 +26,25 @@ class SaveChangesModal extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: kPadding),
               child: Text(
-                'save_changes_title'.tr().toUpperCase(),
+                context.tr('save_changes_title').toUpperCase(),
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
             ),
           ),
-          Text('save_changes_text'.tr()),
+          Text(context.tr('save_changes_text')),
           const SizedBox(height: kPadding * 2),
           Center(
             child: MainButton(
-              text: 'save_changes_confirm'.tr(),
+              text: context.tr('save_changes_confirm'),
               onTap: () => Navigator.pop(context, SaveChangesResult.save),
             ),
           ),
           const SizedBox(height: kPadding),
           Center(
             child: MainButton(
-              text: 'save_changes_discard'.tr(),
+              text: context.tr('save_changes_discard'),
               onTap: () => Navigator.pop(context, SaveChangesResult.discard),
               color: Theme.of(context).colorScheme.error,
             ),
@@ -52,7 +52,7 @@ class SaveChangesModal extends StatelessWidget {
           const SizedBox(height: kPadding),
           Center(
             child: MainButton(
-              text: 'save_changes_cancel'.tr(),
+              text: context.tr('save_changes_cancel'),
               onTap: () => Navigator.pop(context, SaveChangesResult.cancel),
               isSecondary: true,
             ),

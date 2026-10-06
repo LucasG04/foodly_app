@@ -71,9 +71,9 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
     }
     if (regenerate &&
         !await _confirm(
-          'mcp_token_regenerate_title'.tr(),
-          'mcp_token_regenerate_confirm'.tr(),
-          'mcp_token_regenerate'.tr(),
+          context.tr('mcp_token_regenerate_title'),
+          context.tr('mcp_token_regenerate_confirm'),
+          context.tr('mcp_token_regenerate'),
         )) {
       return;
     }
@@ -104,9 +104,9 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
   Future<void> _delete() async {
     if (_running != null ||
         !await _confirm(
-          'mcp_token_delete_title'.tr(),
-          'mcp_token_delete_confirm'.tr(),
-          'mcp_token_delete'.tr(),
+          context.tr('mcp_token_delete_title'),
+          context.tr('mcp_token_delete_confirm'),
+          context.tr('mcp_token_delete'),
         )) {
       return;
     }
@@ -128,9 +128,13 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
   }
 
   void _showError(Object e) {
+    if (!mounted) {
+      return;
+    }
     final isAuthError = e is DioException && e.response?.statusCode == 401;
     MainSnackbar(
-      message: (isAuthError ? 'mcp_token_error_auth' : 'mcp_token_error').tr(),
+      message:
+          context.tr(isAuthError ? 'mcp_token_error_auth' : 'mcp_token_error'),
       isError: true,
     ).show(context);
   }
@@ -140,7 +144,7 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
     if (!mounted) {
       return;
     }
-    MainSnackbar(message: 'mcp_token_copied'.tr(), isSuccess: true)
+    MainSnackbar(message: context.tr('mcp_token_copied'), isSuccess: true)
         .show(context);
   }
 
@@ -158,7 +162,7 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
                 actions: [
                   CupertinoDialogAction(
                     onPressed: () => pop(false),
-                    child: Text('mcp_token_cancel'.tr()),
+                    child: Text(context.tr('mcp_token_cancel')),
                   ),
                   CupertinoDialogAction(
                     onPressed: () => pop(true),
@@ -173,7 +177,7 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
                 actions: [
                   TextButton(
                     onPressed: () => pop(false),
-                    child: Text('mcp_token_cancel'.tr()),
+                    child: Text(context.tr('mcp_token_cancel')),
                   ),
                   TextButton(
                     onPressed: () => pop(true),
@@ -223,13 +227,13 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
     return Column(
       children: [
         Text(
-          'mcp_token_title'.tr().toUpperCase(),
+          context.tr('mcp_token_title').toUpperCase(),
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 4),
         Text(
-          'mcp_token_subtitle'.tr(),
+          context.tr('mcp_token_subtitle'),
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.textTheme.bodySmall?.color,
           ),
@@ -264,10 +268,10 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
         _InfoRow(
           icon: EvaIcons.alertCircleOutline,
           color: Theme.of(context).colorScheme.error,
-          text: 'mcp_token_load_error'.tr(),
+          text: context.tr('mcp_token_load_error'),
         ),
         const SizedBox(height: kPadding),
-        MainButton(text: 'mcp_token_retry'.tr(), onTap: _load),
+        MainButton(text: context.tr('mcp_token_retry'), onTap: _load),
       ],
     );
   }
@@ -275,12 +279,12 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
   Widget _buildNoToken() {
     return Column(
       children: [
-        Text('mcp_token_explanation'.tr()),
+        Text(context.tr('mcp_token_explanation')),
         const SizedBox(height: kPadding),
         _buildCapabilities(),
         const SizedBox(height: kPadding),
         MainButton(
-          text: 'mcp_token_create'.tr(),
+          text: context.tr('mcp_token_create'),
           onTap: _create,
           isProgress: true,
           buttonState: _running == _Action.create
@@ -314,11 +318,11 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'mcp_token_active'.tr(),
+                      context.tr('mcp_token_active'),
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      'mcp_token_created_on'.tr(args: [date]),
+                      context.tr('mcp_token_created_on', args: [date]),
                       style: theme.textTheme.bodySmall,
                     ),
                   ],
@@ -330,13 +334,13 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
         const SizedBox(height: kPadding / 2),
         _InfoRow(
           icon: EvaIcons.lockOutline,
-          text: 'mcp_token_hidden_hint'.tr(),
+          text: context.tr('mcp_token_hidden_hint'),
         ),
         const SizedBox(height: kPadding),
         _Disabled(
           disabled: _running == _Action.delete,
           child: MainButton(
-            text: 'mcp_token_regenerate'.tr(),
+            text: context.tr('mcp_token_regenerate'),
             onTap: () => _create(regenerate: true),
             isSecondary: true,
             isProgress: true,
@@ -349,7 +353,7 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
         _Disabled(
           disabled: _running == _Action.create,
           child: MainButton(
-            text: 'mcp_token_delete'.tr(),
+            text: context.tr('mcp_token_delete'),
             onTap: _delete,
             color: theme.colorScheme.error,
             isProgress: true,
@@ -368,26 +372,26 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _Label('mcp_token_your_token'.tr()),
+        _Label(context.tr('mcp_token_your_token')),
         _CodeBox(text: token.token, onCopy: () => _copy(token.token)),
         const SizedBox(height: kPadding / 2),
         _InfoRow(
           icon: EvaIcons.alertTriangleOutline,
           color: Colors.orange,
-          text: 'mcp_token_shown_once'.tr(),
+          text: context.tr('mcp_token_shown_once'),
         ),
         const SizedBox(height: kPadding),
-        _Label('mcp_token_server_url'.tr()),
+        _Label(context.tr('mcp_token_server_url')),
         _CodeBox(text: url, onCopy: () => _copy(url)),
         const SizedBox(height: kPadding),
         _InfoRow(
           icon: EvaIcons.infoOutline,
-          text: 'mcp_token_setup_docs_hint'.tr(),
+          text: context.tr('mcp_token_setup_docs_hint'),
         ),
         const SizedBox(height: kPadding),
         Center(
           child: MainButton(
-            text: 'mcp_token_done'.tr(),
+            text: context.tr('mcp_token_done'),
             onTap: () => Navigator.of(context).pop(),
           ),
         ),
@@ -410,7 +414,7 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
             child: _InfoRow(
               icon: EvaIcons.checkmarkCircle2Outline,
               color: Theme.of(context).primaryColor,
-              text: key.tr(),
+              text: context.tr(key),
             ),
           ),
       ],
@@ -452,7 +456,7 @@ class _CodeBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: 'mcp_token_copy'.tr(),
+      label: context.tr('mcp_token_copy'),
       child: _Card(
         onTap: onCopy,
         child: Row(

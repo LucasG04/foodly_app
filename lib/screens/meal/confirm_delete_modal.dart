@@ -28,7 +28,7 @@ class ConfirmDeleteModal extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: kPadding),
               child: Text(
-                'delete'.tr().toUpperCase(),
+                context.tr('delete').toUpperCase(),
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
@@ -41,13 +41,13 @@ class ConfirmDeleteModal extends StatelessWidget {
                 fontSize: 16.0,
               ),
               children: <TextSpan>[
-                TextSpan(text: '${'modal_delete_sure_leading'.tr()} '),
+                TextSpan(text: '${context.tr('modal_delete_sure_leading')} '),
                 TextSpan(
                   text: '"${meal.name}"',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 TextSpan(
-                  text: ' ${'modal_delete_sure_trailing'.tr()}',
+                  text: ' ${context.tr('modal_delete_sure_trailing')}',
                 ),
               ],
             ),
@@ -55,7 +55,7 @@ class ConfirmDeleteModal extends StatelessWidget {
           const SizedBox(height: kPadding * 2),
           Center(
             child: MainButton(
-              text: 'modal_delete_delete'.tr(),
+              text: context.tr('modal_delete_delete'),
               onTap: () => Navigator.pop(context, true),
               color: theme.colorScheme.error,
             ),

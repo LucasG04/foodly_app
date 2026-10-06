@@ -48,7 +48,7 @@ class _NewVersionModalState extends State<NewVersionModal> {
               child: Padding(
                 padding: const EdgeInsets.only(left: kPadding / 2),
                 child: Text(
-                  'new_version_modal_title'.tr().toUpperCase(),
+                  context.tr('new_version_modal_title').toUpperCase(),
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -88,7 +88,7 @@ class _NewVersionModalState extends State<NewVersionModal> {
                 padding: const EdgeInsets.symmetric(vertical: kPadding),
                 child: MainButton(
                   onTap: _close,
-                  text: 'new_version_modal_continue'.tr(),
+                  text: context.tr('new_version_modal_continue'),
                 ),
               ),
             ],

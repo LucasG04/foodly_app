@@ -80,7 +80,7 @@ class _AddToShoppingListModalState extends ConsumerState<AddToShoppingListModal>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'add'.tr().toUpperCase(),
+                context.tr('add').toUpperCase(),
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -106,14 +106,14 @@ class _AddToShoppingListModalState extends ConsumerState<AddToShoppingListModal>
             }
             return _buildSingleChildWrapper(
               context: context,
-              child: Text('try_again_later'.tr()),
+              child: Text(context.tr('try_again_later')),
             );
           }),
           Consumer(
             builder: (context, ref, _) => MainButton(
               height: 40.0,
               onTap: _addToShoppingList,
-              text: 'add'.tr(),
+              text: context.tr('add'),
               isProgress: true,
               buttonState: ref.watch(_$buttonState),
             ),
@@ -143,7 +143,7 @@ class _AddToShoppingListModalState extends ConsumerState<AddToShoppingListModal>
       children: [
         ListTile(
           title: Text(
-            'add_to_shopping_list_modal_servings'.tr(),
+            context.tr('add_to_shopping_list_modal_servings'),
             style: const TextStyle(fontWeight: FontWeight.bold),
             overflow: TextOverflow.ellipsis,
           ),

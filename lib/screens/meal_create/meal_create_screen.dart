@@ -24,13 +24,13 @@ import '../../services/lunix_api_service.dart';
 import '../../services/meal_service.dart';
 import '../../services/rate_limit_exception.dart';
 import '../../services/storage_service.dart';
-import '../../utils/ai_usage_period.dart';
 import '../../utils/analytics.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/tag_candidates.dart';
 import '../../utils/widget_utils.dart';
+import '../../widgets/ai_consent_sheet.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/image_credit_chip.dart';
 import '../../widgets/link_preview.dart';
@@ -151,8 +151,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         scaffold: Scaffold(
           appBar: MainAppBar(
             text: _isCreatingMeal
-                ? 'meal_create_title_add'.tr()
-                : 'meal_create_title_edit'.tr(),
+                ? context.tr('meal_create_title_add')
+                : context.tr('meal_create_title_edit'),
             scrollController: _scrollController,
             actions: [
               IconButton(
@@ -186,7 +186,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                               children: [
                                 MainTextField(
                                   controller: _titleController,
-                                  title: 'meal_create_title_title'.tr(),
+                                  title: context.tr('meal_create_title_title'),
                                   required: true,
                                 ),
                                 _buildDivider(),
@@ -205,7 +205,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                       meal.ingredientGroupOrder =
                                           updatedGroupOrder;
                                     }),
-                                    title: 'meal_create_ingredients_title'.tr(),
+                                    title: context
+                                        .tr('meal_create_ingredients_title'),
                                   );
                                 }),
                                 _buildDivider(),
@@ -216,10 +217,11 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                   children: [
                                     Flexible(
                                       child: Text(
-                                        'meal_create_servings_title',
+                                        context
+                                            .tr('meal_create_servings_title'),
                                         style: theme.textTheme.bodyLarge,
                                         overflow: TextOverflow.ellipsis,
-                                      ).tr(),
+                                      ),
                                     ),
                                     Consumer(builder: (context, ref, _) {
                                       final servings = ref.watch(
@@ -238,16 +240,15 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                 SizedBox(
                                   width: double.infinity,
                                   child: Text(
-                                    'meal_create_instruction_title',
+                                    context.tr('meal_create_instruction_title'),
                                     style: theme.textTheme.bodyLarge,
-                                  ).tr(),
+                                  ),
                                 ),
                                 MarkdownEditor(
                                   textEditingController:
                                       _instructionsController,
-                                  hintText:
-                                      'meal_create_instruction_placeholder'
-                                          .tr(),
+                                  hintText: context.tr(
+                                      'meal_create_instruction_placeholder'),
                                 ),
                                 _buildDivider(),
                                 Consumer(builder: (context, ref, _) {
@@ -288,9 +289,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                 _buildDivider(),
                                 MainTextField(
                                   controller: _sourceController,
-                                  title: 'meal_create_source_title'.tr(),
-                                  placeholder:
-                                      'meal_create_source_placeholder'.tr(),
+                                  title: context.tr('meal_create_source_title'),
+                                  placeholder: context
+                                      .tr('meal_create_source_placeholder'),
                                   onChange: (newText) =>
                                       _onSourceTextChange(newText.trim()),
                                 ),
@@ -300,7 +301,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                       flex: 3,
                                       child: MainTextField(
                                         controller: _kcalController,
-                                        title: 'meal_create_kcal_title'.tr(),
+                                        title: context
+                                            .tr('meal_create_kcal_title'),
                                         placeholder: '450',
                                         textAlign: TextAlign.end,
                                         keyboardType: TextInputType.number,
@@ -312,8 +314,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                       flex: 2,
                                       child: MainTextField(
                                         controller: _durationController,
-                                        title:
-                                            'meal_create_duration_title'.tr(),
+                                        title: context
+                                            .tr('meal_create_duration_title'),
                                         placeholder: '10',
                                         textAlign: TextAlign.end,
                                         keyboardType: TextInputType.number,
@@ -336,7 +338,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('meal_create_tags_title'.tr()),
+                                    Text(context.tr('meal_create_tags_title')),
                                     IconButton(
                                       onPressed: _openMealTagEdit,
                                       icon: const Icon(EvaIcons.edit2Outline),
@@ -365,7 +367,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
                                   child: Consumer(builder: (context, ref, _) {
                                     final state = ref.watch(_$buttonState);
                                     return MainButton(
-                                      text: 'save'.tr(),
+                                      text: context.tr('save'),
                                       onTap: _saveMeal,
                                       isProgress: true,
                                       buttonState: state,
@@ -401,15 +403,18 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         final showBadge = !isSubscribed && usage != null;
 
         Widget aiButton = IconButton(
-          onPressed:
-              canUse ? _estimateKcal : () => _showAiQuotaExhausted('kcal'),
+          onPressed: canUse
+              ? _estimateKcal
+              : () => GetPremiumModal.showAiQuotaExhausted(context,
+                  feature: 'kcal'),
           icon: Icon(
             Icons.auto_awesome,
             color: canUse ? Theme.of(context).colorScheme.primary : Colors.grey,
           ),
           tooltip: showBadge
-              ? 'ai_usage_remaining'.tr(args: [usage.kcalRemaining.toString()])
-              : 'meal_create_kcal_ai_button'.tr(),
+              ? context.tr('ai_usage_remaining',
+                  args: [usage.kcalRemaining.toString()])
+              : context.tr('meal_create_kcal_ai_button'),
         );
         if (showBadge) {
           aiButton = badges.Badge(
@@ -461,10 +466,11 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         final Widget button = FloatingActionButton(
           heroTag: null,
           backgroundColor: canUse ? theme.primaryColor : Colors.grey,
-          tooltip: 'meal_assistant_title'.tr(),
+          tooltip: context.tr('meal_assistant_title'),
           onPressed: canUse
               ? _openAssistant
-              : () => _showAiQuotaExhausted('assistant'),
+              : () => GetPremiumModal.showAiQuotaExhausted(context,
+                  feature: 'assistant'),
           child: const Icon(Icons.auto_awesome, color: Colors.white),
         );
         return showBadge
@@ -480,24 +486,6 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
             : button;
       },
     );
-  }
-
-  void _showAiQuotaExhausted(String feature) {
-    logEvent(AnalyticsEvent.aiQuotaExceededShown, {'feature': feature});
-    MainSnackbar(
-      message: 'ai_usage_exhausted'.plural(
-        AiUsagePeriod.daysUntilReset(),
-        namedArgs: {
-          'date': DateFormat.Md(context.locale.toLanguageTag())
-              .format(AiUsagePeriod.currentPeriodEnd().toLocal()),
-        },
-      ),
-      isError: true,
-      action: TextButton(
-        onPressed: _openGetPremium,
-        child: Text('ai_usage_upgrade'.tr()),
-      ),
-    ).show(context);
   }
 
   Center _buildDivider() => Center(
@@ -599,7 +587,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
 
     if (!_formIsValid()) {
       MainSnackbar(
-        message: 'meal_create_error_missing_input'.tr(),
+        message: context.tr('meal_create_error_missing_input'),
         isError: true,
       ).show(context);
       ref.read(_$buttonState.notifier).state = ButtonState.error;
@@ -661,7 +649,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         return false;
       }
       MainSnackbar(
-        message: 'meal_create_error_unknown'.tr(),
+        message: context.tr('meal_create_error_unknown'),
         isError: true,
       ).show(context);
       ref.read(_$buttonState.notifier).state = ButtonState.error;
@@ -720,12 +708,12 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         options: [
           OptionsSheetOptions(
             icon: EvaIcons.link2Outline,
-            title: 'import_options_link'.tr(),
+            title: context.tr('import_options_link'),
             onTap: () => _openImportModal(ImportType.link),
           ),
           OptionsSheetOptions(
             icon: SimpleIcons.instagram,
-            title: 'import_options_instagram'.tr(),
+            title: context.tr('import_options_instagram'),
             trailing: showQuotaBadges
                 ? _buildQuotaPill(usage.instagramRemaining)
                 : null,
@@ -736,12 +724,15 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     );
   }
 
-  void _onTapInstagramImport() {
+  Future<void> _onTapInstagramImport() async {
     final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
     final usage = ref.read(aiUsageProvider).valueOrNull;
     final canUse = usage?.canUseInstagram(isSubscribed) ?? true;
     if (!canUse) {
-      _showAiQuotaExhausted('instagram');
+      GetPremiumModal.showAiQuotaExhausted(context, feature: 'instagram');
+      return;
+    }
+    if (!await AiConsentSheet.ensure(context, ref) || !mounted) {
       return;
     }
     _openImportModal(ImportType.instagram);
@@ -788,7 +779,10 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       }
       final canUse = usage?.canUseInstagram(isSubscribed) ?? true;
       if (!canUse) {
-        _showAiQuotaExhausted('instagram');
+        GetPremiumModal.showAiQuotaExhausted(context, feature: 'instagram');
+        return;
+      }
+      if (!await AiConsentSheet.ensure(context, ref) || !mounted) {
         return;
       }
     }
@@ -834,9 +828,12 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         formMeal.instructions!.isEmpty;
     if (!isEmpty && !_fitsAssistant(formMeal)) {
       MainSnackbar(
-        message: 'meal_assistant_error_too_long'.tr(),
+        message: context.tr('meal_assistant_error_too_long'),
         isError: true,
       ).show(context);
+      return;
+    }
+    if (!await AiConsentSheet.ensure(context, ref) || !mounted) {
       return;
     }
 
@@ -861,7 +858,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     final (meal: result, :partial, fromPhoto: _) = assistantResult;
     if (partial) {
       MainSnackbar(
-        message: 'import_modal_partial_warning'.tr(),
+        message: context.tr('import_modal_partial_warning'),
         isError: true,
         isDismissible: true,
       ).show(context);
@@ -922,7 +919,11 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
   }
 
   /// Uses the live form values; the meal state only gets them on save.
+  /// No suggestions without AI consent: they load passively, so never prompt here.
   Future<List<String>>? _getTagSuggestions(List<String> planTags) {
+    if (!AiConsentSheet.hasConsent(ref)) {
+      return null;
+    }
     final baseMeal = ref.read(_$meal);
     final mealForApi = Meal.fromMap(baseMeal.id, baseMeal.toMap())
       ..name = _titleController.text
@@ -930,7 +931,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       ..duration = int.tryParse(_durationController.text.trim());
     final candidates = buildTagCandidates(
       planTags,
-      'meal_tag_starter_set'.tr().split(','),
+      context.tr('meal_tag_starter_set').split(','),
     );
     return _tagSuggestionCache.get(
       name: mealForApi.name,
@@ -1016,22 +1017,18 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         _titleController.text;
   }
 
-  void _openGetPremium() {
-    WidgetUtils.showFoodlyBottomSheet<void>(
-      context: context,
-      builder: (_) => const GetPremiumModal(),
-    );
-  }
-
   Future<void> _estimateKcal() async {
     final baseMeal = ref.read(_$meal);
     final hasName = _titleController.text.isNotEmpty;
     final hasIngredient = baseMeal.ingredients?.isNotEmpty == true;
     if (!hasName || !hasIngredient) {
       MainSnackbar(
-        message: 'meal_create_kcal_ai_missing_input'.tr(),
+        message: context.tr('meal_create_kcal_ai_missing_input'),
         isError: true,
       ).show(context);
+      return;
+    }
+    if (!await AiConsentSheet.ensure(context, ref) || !mounted) {
       return;
     }
 
@@ -1059,7 +1056,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       if (!mounted) {
         return;
       }
-      _showAiQuotaExhausted('kcal');
+      GetPremiumModal.showAiQuotaExhausted(context, feature: 'kcal');
     } on RateLimitException catch (e) {
       if (!mounted) {
         return;
@@ -1073,7 +1070,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         return;
       }
       MainSnackbar(
-        message: 'meal_create_error_unknown'.tr(),
+        message: context.tr('meal_create_error_unknown'),
         isError: true,
       ).show(context);
     } finally {

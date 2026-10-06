@@ -34,11 +34,12 @@ class ImportMealsModal extends StatelessWidget {
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: kPadding),
-              child: const Text(
-                'settings_import_title',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              child: Text(
+                context.tr('settings_import_title'),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
-              ).tr(),
+              ),
             ),
           ),
           FutureBuilder<List<Plan>>(
@@ -57,14 +58,14 @@ class ImportMealsModal extends StatelessWidget {
                   height: 200,
                   child: Center(
                     child: Text(
-                      'settings_import_one_plan_msg',
+                      context.tr('settings_import_one_plan_msg'),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize:
                             Theme.of(context).textTheme.bodyLarge!.fontSize! +
                                 2,
                       ),
-                    ).tr(),
+                    ),
                   ),
                 );
               } else {

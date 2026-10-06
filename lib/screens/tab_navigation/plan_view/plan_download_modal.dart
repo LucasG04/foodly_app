@@ -61,7 +61,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'plan_download_modal_title'.tr().toUpperCase(),
+                  context.tr('plan_download_modal_title').toUpperCase(),
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -79,7 +79,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal>
             ),
           ),
           SettingsTile(
-            text: 'plan_download_modal_exclude_today'.tr(),
+            text: context.tr('plan_download_modal_exclude_today'),
             trailing: Checkbox(
               value: _excludeToday,
               onChanged: _excludeTodayChange,
@@ -88,7 +88,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal>
             onTap: () => _excludeTodayChange(!_excludeToday),
           ),
           SettingsTile(
-            text: 'plan_download_modal_portrait'.tr(),
+            text: context.tr('plan_download_modal_portrait'),
             trailing: Checkbox(
               value: _portraitFormat,
               onChanged: _portraitFormatChange,
@@ -98,7 +98,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal>
           ),
           if (_isBreakfastAvailableForSelectedType())
             SettingsTile(
-              text: 'plan_download_modal_breakfast'.tr(),
+              text: context.tr('plan_download_modal_breakfast'),
               trailing: Checkbox(
                 value: _includeBreakfast,
                 onChanged: _includeBreakfastChange,
@@ -107,14 +107,14 @@ class _PlanDownloadModalState extends State<PlanDownloadModal>
               onTap: () => _includeBreakfastChange(!_includeBreakfast),
             ),
           SettingsTile(
-            text: 'plan_download_modal_type'.tr(),
-            value: _getTextForDocType(_docType).tr(),
+            text: context.tr('plan_download_modal_type'),
+            value: context.tr(_getTextForDocType(_docType)),
             onTap: () => WidgetUtils.showFoodlyBottomSheet<void>(
               context: context,
               builder: (_) => OptionsSheet(options: [
                 for (final type in _PlanDocType.values)
                   OptionsSheetOptions(
-                    title: _getTextForDocType(type).tr(),
+                    title: context.tr(_getTextForDocType(type)),
                     icon: type == _PlanDocType.color
                         ? EvaIcons.colorPaletteOutline
                         : EvaIcons.fileTextOutline,
@@ -127,7 +127,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal>
           Padding(
             padding: const EdgeInsets.only(top: kPadding, bottom: kPadding * 2),
             child: MainButton(
-              text: 'plan_download_modal_cta'.tr(),
+              text: context.tr('plan_download_modal_cta'),
               isProgress: true,
               buttonState: _buttonState,
               onTap: _handleDownload,
@@ -238,9 +238,12 @@ class _PlanDownloadModalState extends State<PlanDownloadModal>
       _buttonState = ButtonState.error;
     });
     await MainSnackbar(
-      message: 'general_error_message'.tr(),
+      message: context.tr('general_error_message'),
       isError: true,
     ).show(context);
+    if (!mounted) {
+      return;
+    }
     setState(() {
       _buttonState = ButtonState.normal;
     });
@@ -248,7 +251,7 @@ class _PlanDownloadModalState extends State<PlanDownloadModal>
 
   Future<dynamic> _openDocxInfo() {
     return MainSnackbar(
-      message: 'plan_download_modal_docx_info'.tr(),
+      message: context.tr('plan_download_modal_docx_info'),
       infinite: true,
     ).show(context);
   }

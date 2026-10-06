@@ -22,47 +22,46 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  final List<PageData> pages = [
-    PageData(
-      assetPath: 'assets/onboarding/welcome.png',
-      title: 'onboarding_one_title'.tr(args: [kAppName]),
-      subtitle: 'onboarding_one_subtitle'.tr(args: [kAppName]),
-      background: const Color(0xFFeb3b5a),
-    ),
-    PageData(
-      assetPath: 'assets/onboarding/scrum.png',
-      title: 'onboarding_two_title'.tr(),
-      subtitle: 'onboarding_two_subtitle'.tr(),
-      background: const Color(0xFF2d98da),
-    ),
-    PageData(
-      assetPath: 'assets/onboarding/shopping.png',
-      title: 'onboarding_three_title'.tr(),
-      subtitle: 'onboarding_three_subtitle'.tr(),
-      background: const Color(0xFF0043D0),
-    ),
-    PageData(
-      assetPath: 'assets/onboarding/cooking.png',
-      title: 'onboarding_four_title'.tr(),
-      subtitle: 'onboarding_four_subtitle'.tr(),
-      background: const Color(0xFFf7b731),
-    ),
-    PageData(
-      assetPath: 'assets/onboarding/rocket.png',
-      title: 'onboarding_five_title'.tr(),
-      subtitle: 'onboarding_five_subtitle'.tr(args: [kAppName]),
-      background: const Color(0xFF20bf6b),
-    ),
-  ];
-
-  List<Color> get _colors => pages.map((p) => p.background).toList();
+  List<PageData> _pages(BuildContext context) => [
+        PageData(
+          assetPath: 'assets/onboarding/welcome.png',
+          title: context.tr('onboarding_one_title', args: [kAppName]),
+          subtitle: context.tr('onboarding_one_subtitle', args: [kAppName]),
+          background: const Color(0xFFeb3b5a),
+        ),
+        PageData(
+          assetPath: 'assets/onboarding/scrum.png',
+          title: context.tr('onboarding_two_title'),
+          subtitle: context.tr('onboarding_two_subtitle'),
+          background: const Color(0xFF2d98da),
+        ),
+        PageData(
+          assetPath: 'assets/onboarding/shopping.png',
+          title: context.tr('onboarding_three_title'),
+          subtitle: context.tr('onboarding_three_subtitle'),
+          background: const Color(0xFF0043D0),
+        ),
+        PageData(
+          assetPath: 'assets/onboarding/cooking.png',
+          title: context.tr('onboarding_four_title'),
+          subtitle: context.tr('onboarding_four_subtitle'),
+          background: const Color(0xFFf7b731),
+        ),
+        PageData(
+          assetPath: 'assets/onboarding/rocket.png',
+          title: context.tr('onboarding_five_title'),
+          subtitle: context.tr('onboarding_five_subtitle', args: [kAppName]),
+          background: const Color(0xFF20bf6b),
+        ),
+      ];
 
   @override
   Widget build(BuildContext context) {
     const heightMultiplier = 0.75;
+    final pages = _pages(context);
     return Scaffold(
       body: ConcentricPageView(
-        colors: _colors,
+        colors: pages.map((p) => p.background).toList(),
         radius: 30,
         curve: Curves.ease,
         duration: const Duration(seconds: 1),

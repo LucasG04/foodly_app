@@ -102,7 +102,9 @@ class _ImageCreditChipState extends State<ImageCreditChip>
     final name = credit.name;
     final label = name == null
         ? credit.source
-        : '${'image_credit_photo_by'.tr(args: [name])} · ${credit.source}';
+        : '${context.tr('image_credit_photo_by', args: [
+                name
+              ])} · ${credit.source}';
     const color = Colors.white;
 
     final pill = ClipRRect(
