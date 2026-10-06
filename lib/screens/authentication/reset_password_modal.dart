@@ -57,7 +57,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal>
                 children: [
                   Flexible(
                     child: AutoSizeText(
-                      'modal_password_reset_title'.tr().toUpperCase(),
+                      context.tr('modal_password_reset_title').toUpperCase(),
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -77,7 +77,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal>
           ),
           MainTextField(
             controller: _emailController,
-            title: 'modal_password_reset_mail_title'.tr(),
+            title: context.tr('modal_password_reset_mail_title'),
             placeholder: 'tony@gmail.com',
             errorText: _errorText,
             onSubmit: _resetPassword,
@@ -96,9 +96,9 @@ class _ResetPasswordModalState extends State<ResetPasswordModal>
                 ),
                 const SizedBox(width: kPadding),
                 Flexible(
-                  child: const Text(
-                    'modal_password_reset_result_msg',
-                  ).tr(),
+                  child: Text(
+                    context.tr('modal_password_reset_result_msg'),
+                  ),
                 ),
               ],
             )
@@ -113,7 +113,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal>
           ),
           Center(
             child: MainButton(
-              text: 'modal_password_reset_reset'.tr(),
+              text: context.tr('modal_password_reset_reset'),
               isProgress: true,
               buttonState: _buttonState,
               onTap: _resetPassword,
@@ -134,7 +134,9 @@ class _ResetPasswordModalState extends State<ResetPasswordModal>
       try {
         await AuthenticationService.resetPassword(_emailController!.text);
       } catch (e) {
-        _handleFirebaseResetException(e);
+        if (mounted) {
+          _handleFirebaseResetException(e);
+        }
         return;
       }
 
@@ -159,7 +161,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal>
       });
     } else {
       setState(() {
-        _errorText = 'modal_password_reset_error_mail_invalid'.tr();
+        _errorText = context.tr('modal_password_reset_error_mail_invalid');
         _buttonState = ButtonState.error;
       });
     }
@@ -168,12 +170,12 @@ class _ResetPasswordModalState extends State<ResetPasswordModal>
   void _handleFirebaseResetException(dynamic exception) {
     if (exception is FirebaseAuthException) {
       if (exception.code == 'user-not-found') {
-        _errorText = 'modal_password_reset_error_mail_not_found'.tr();
+        _errorText = context.tr('modal_password_reset_error_mail_not_found');
       } else {
-        _errorText = 'modal_password_reset_error_unknown'.tr();
+        _errorText = context.tr('modal_password_reset_error_unknown');
       }
     } else {
-      _errorText = 'modal_password_reset_error_unknown'.tr();
+      _errorText = context.tr('modal_password_reset_error_unknown');
     }
     setState(() {
       _buttonState = ButtonState.error;

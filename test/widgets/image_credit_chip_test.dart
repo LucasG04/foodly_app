@@ -3,10 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:foodly/models/image_credit.dart';
 import 'package:foodly/widgets/image_credit_chip.dart';
 
+import '../helpers/test_localizations.dart';
+
 void main() {
   Future<void> pump(WidgetTester tester, ImageCredit? credit) =>
       tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: testLocalizationsDelegates,
           home: Scaffold(body: Center(child: ImageCreditChip(credit))),
         ),
       );
@@ -38,6 +41,7 @@ void main() {
       (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
+        localizationsDelegates: testLocalizationsDelegates,
         home: Scaffold(
           body: Center(
             child: SizedBox(
@@ -75,6 +79,7 @@ void main() {
     var backgroundTaps = 0;
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: testLocalizationsDelegates,
         home: Stack(
           children: [
             Positioned.fill(

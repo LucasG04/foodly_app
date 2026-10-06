@@ -393,9 +393,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
         () => MainSnackbar(
           isSuccess: true,
           duration: 10,
-          title: 'premium_gifted_msg_title'.tr(),
-          message: 'premium_gifted_msg_message'
-              .tr(args: [kAppName, user.premiumGiftedMonths.toString()]),
+          title: context.tr('premium_gifted_msg_title'),
+          message: context.tr('premium_gifted_msg_message',
+              args: [kAppName, user.premiumGiftedMonths.toString()]),
         ).show(context),
       );
       FoodlyUserService.setPremiumGiftedMessageShown(user.id!);

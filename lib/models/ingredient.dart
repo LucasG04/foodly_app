@@ -52,7 +52,9 @@ class Ingredient {
       name: identical(name, _absent) ? this.name : name as String?,
       amount: identical(amount, _absent) ? this.amount : amount as double?,
       unit: identical(unit, _absent) ? this.unit : unit as String?,
-      productGroup: identical(productGroup, _absent) ? this.productGroup : productGroup as String?,
+      productGroup: identical(productGroup, _absent)
+          ? this.productGroup
+          : productGroup as String?,
       group: identical(group, _absent) ? this.group : group as String?,
       sortKey: identical(sortKey, _absent) ? this.sortKey : sortKey as int?,
     );
@@ -111,7 +113,6 @@ class Ingredient {
   }
 
   @override
-  String toString() =>
-      'Ingredient(name: $name, amount: $amount, unit: $unit, '
+  String toString() => 'Ingredient(name: $name, amount: $amount, unit: $unit, '
       'productGroup: $productGroup, group: $group, sortKey: $sortKey)';
 }

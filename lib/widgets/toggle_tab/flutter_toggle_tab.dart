@@ -39,7 +39,7 @@ class FlutterToggleTab extends StatefulWidget {
     this.marginSelected,
     this.isShadowEnable = true,
     this.buttonKeys,
-  })  : assert(buttonKeys == null || labels.length == buttonKeys.length);
+  }) : assert(buttonKeys == null || labels.length == buttonKeys.length);
 
   final List<String> labels;
   final List<IconData?>? icons;

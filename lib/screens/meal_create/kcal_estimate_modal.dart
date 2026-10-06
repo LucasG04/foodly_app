@@ -89,7 +89,7 @@ class _KcalEstimateModalState extends State<KcalEstimateModal> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'meal_create_kcal_ai_title'.tr().toUpperCase(),
+                context.tr('meal_create_kcal_ai_title').toUpperCase(),
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -115,7 +115,7 @@ class _KcalEstimateModalState extends State<KcalEstimateModal> {
               children: [
                 Expanded(
                   child: _ChoiceCard(
-                    label: 'meal_create_kcal_ai_min'.tr(),
+                    label: context.tr('meal_create_kcal_ai_min'),
                     value: widget.estimate.kcalMin,
                     isSelected: _selectedValue == widget.estimate.kcalMin,
                     isHighlighted: false,
@@ -126,7 +126,7 @@ class _KcalEstimateModalState extends State<KcalEstimateModal> {
                 const SizedBox(width: kPadding / 2),
                 Expanded(
                   child: _ChoiceCard(
-                    label: 'meal_create_kcal_ai_recommended'.tr(),
+                    label: context.tr('meal_create_kcal_ai_recommended'),
                     value: widget.estimate.kcalRecommend,
                     isSelected: _selectedValue == widget.estimate.kcalRecommend,
                     isHighlighted: true,
@@ -137,7 +137,7 @@ class _KcalEstimateModalState extends State<KcalEstimateModal> {
                 const SizedBox(width: kPadding / 2),
                 Expanded(
                   child: _ChoiceCard(
-                    label: 'meal_create_kcal_ai_max'.tr(),
+                    label: context.tr('meal_create_kcal_ai_max'),
                     value: widget.estimate.kcalMax,
                     isSelected: _selectedValue == widget.estimate.kcalMax,
                     isHighlighted: false,
@@ -175,7 +175,7 @@ class _KcalEstimateModalState extends State<KcalEstimateModal> {
                       const SizedBox(height: kPadding),
                       Center(
                         child: MainButton(
-                          text: 'meal_create_kcal_ai_apply'.tr(),
+                          text: context.tr('meal_create_kcal_ai_apply'),
                           onTap: _apply,
                         ),
                       ),

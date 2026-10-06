@@ -9,7 +9,9 @@ import 'package:logging/logging.dart';
 import '../constants.dart';
 import '../providers/state_providers.dart';
 import '../services/in_app_purchase_service.dart';
+import '../utils/ai_usage_period.dart';
 import '../utils/analytics.dart';
+import '../utils/main_snackbar.dart';
 import '../utils/widget_utils.dart';
 import 'disposable_widget.dart';
 import 'list_tile_card.dart';
@@ -38,6 +40,33 @@ class GetPremiumModal extends ConsumerStatefulWidget {
 
   /// Opens the paywall. Drag-to-dismiss is off because it fights the inner
   /// scroll view.
+  /// Error snackbar for an exhausted AI quota, with an upgrade action.
+  static void showAiQuotaExhausted(
+    BuildContext context, {
+    required String feature,
+  }) {
+    logEvent(AnalyticsEvent.aiQuotaExceededShown, {'feature': feature});
+    MainSnackbar(
+      message: context.plural(
+        'ai_usage_exhausted',
+        AiUsagePeriod.daysUntilReset(),
+        namedArgs: {
+          'date': DateFormat.Md(context.locale.toLanguageTag())
+              .format(AiUsagePeriod.currentPeriodEnd().toLocal()),
+        },
+      ),
+      isError: true,
+      action: TextButton(
+        onPressed: () => show(
+          context,
+          source: 'ai_quota_$feature',
+          highlight: PremiumFeature.ai,
+        ),
+        child: Text(context.tr('ai_usage_upgrade')),
+      ),
+    ).show(context);
+  }
+
   static Future<void> show(
     BuildContext context, {
     required String source,
@@ -102,8 +131,8 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                     child: Padding(
                       padding: const EdgeInsets.only(left: kPadding / 2),
                       child: Text(
-                        'get_premium_modal_title'
-                            .tr(args: [kAppName]).toUpperCase(),
+                        context.tr('get_premium_modal_title',
+                            args: [kAppName]).toUpperCase(),
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -132,7 +161,7 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                         Padding(
                           padding: const EdgeInsets.only(bottom: kPadding / 2),
                           child: Text(
-                            'get_premium_modal_subtitle'.tr(),
+                            context.tr('get_premium_modal_subtitle'),
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
@@ -142,7 +171,7 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                               const EdgeInsets.symmetric(vertical: kPadding),
                           child: Center(
                             child: Text(
-                              'get_premium_modal_3_description'.tr(),
+                              context.tr('get_premium_modal_3_description'),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -168,25 +197,25 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                 Padding(
                   padding: const EdgeInsets.only(top: kPadding / 4),
                   child: Text(
-                    'get_premium_modal_7_description'.tr(),
+                    context.tr('get_premium_modal_7_description'),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
               const SizedBox(height: kPadding / 2),
               MainButton(
                 onTap: _subscribeToPremium,
-                text: 'get_premium_modal_cta'.tr(args: [kAppName]),
+                text: context.tr('get_premium_modal_cta', args: [kAppName]),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   TextButton(
                     onPressed: _close,
-                    child: Text('get_premium_modal_not_now'.tr()),
+                    child: Text(context.tr('get_premium_modal_not_now')),
                   ),
                   TextButton(
                     onPressed: _restorePurchase,
-                    child: Text('get_premium_modal_restore'.tr()),
+                    child: Text(context.tr('get_premium_modal_restore')),
                   ),
                 ],
               ),
@@ -202,41 +231,41 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
     final features = {
       PremiumFeature.ai: ListTileCard(
         iconData: Icons.auto_awesome,
-        title: 'get_premium_modal_8_title'.tr(),
+        title: context.tr('get_premium_modal_8_title'),
         description: [
-          'get_premium_modal_8_description'.tr(),
+          context.tr('get_premium_modal_8_description'),
           if (limits != null)
-            'get_premium_modal_8_free_limits'.tr(
-              args: [limits.text, limits.instagram, limits.kcal]
-                  .map((e) => e.toString())
-                  .toList(),
-            ),
+            context.tr('get_premium_modal_8_free_limits',
+                args: [limits.text, limits.instagram, limits.kcal]
+                    .map((e) => e.toString())
+                    .toList()),
         ].join('\n'),
       ),
       PremiumFeature.suggestions: ListTileCard(
         iconData: EvaIcons.trendingUpOutline,
-        title: 'get_premium_modal_2_title'.tr(),
-        description: 'get_premium_modal_2_description'.tr(),
+        title: context.tr('get_premium_modal_2_title'),
+        description: context.tr('get_premium_modal_2_description'),
       ),
       PremiumFeature.shoppingListSort: ListTileCard(
         iconData: Icons.sort_rounded,
-        title: 'get_premium_modal_5_title'.tr(),
-        description: 'get_premium_modal_5_description'.tr(),
+        title: context.tr('get_premium_modal_5_title'),
+        description: context.tr('get_premium_modal_5_description'),
       ),
       PremiumFeature.autocomplete: ListTileCard(
         iconData: EvaIcons.loaderOutline,
-        title: 'get_premium_modal_1_title'.tr(),
-        description: 'get_premium_modal_1_description'.tr(),
+        title: context.tr('get_premium_modal_1_title'),
+        description: context.tr('get_premium_modal_1_description'),
       ),
       PremiumFeature.stats: ListTileCard(
         iconData: EvaIcons.activityOutline,
-        title: 'get_premium_modal_4_title'.tr(),
-        description: 'get_premium_modal_4_description'.tr(),
+        title: context.tr('get_premium_modal_4_title'),
+        description: context.tr('get_premium_modal_4_description'),
       ),
       PremiumFeature.color: ListTileCard(
         iconData: EvaIcons.colorPaletteOutline,
-        title: 'get_premium_modal_6_title'.tr(),
-        description: 'get_premium_modal_6_description'.tr(args: [kAppName]),
+        title: context.tr('get_premium_modal_6_title'),
+        description:
+            context.tr('get_premium_modal_6_description', args: [kAppName]),
       ),
     };
     return [
@@ -275,7 +304,8 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                             vertical: kPadding,
                           ),
                           child: Text(
-                            'get_premium_modal_thanks'.tr(args: ['🙂']),
+                            context
+                                .tr('get_premium_modal_thanks', args: ['🙂']),
                             style: const TextStyle(fontSize: 18),
                           ),
                         ),
@@ -304,7 +334,7 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  e.title.tr(),
+                                  context.tr(e.title),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -312,9 +342,9 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                                 Text(e.price ?? '-'),
                                 if (e.pricePerMonth != null)
                                   Text(
-                                    'get_premium_modal_yearly_detail'.tr(
-                                      args: [e.pricePerMonth!],
-                                    ),
+                                    context.tr(
+                                        'get_premium_modal_yearly_detail',
+                                        args: [e.pricePerMonth!]),
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodySmall

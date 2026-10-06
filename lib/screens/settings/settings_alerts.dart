@@ -19,11 +19,11 @@ Future<bool> showLeaveConfirmDialog(BuildContext context) async {
 
 CupertinoAlertDialog _buildIOSLeaveDialog(BuildContext context) {
   return CupertinoAlertDialog(
-    title: Text('settings_plan_leave_dialog_title'.tr()),
+    title: Text(context.tr('settings_plan_leave_dialog_title')),
     content: Column(
       children: [
         const SizedBox(height: kPadding / 2),
-        Text('settings_plan_leave_dialog_description'.tr()),
+        Text(context.tr('settings_plan_leave_dialog_description')),
       ],
     ),
     actions: <Widget>[
@@ -31,7 +31,7 @@ CupertinoAlertDialog _buildIOSLeaveDialog(BuildContext context) {
         onPressed: () => Navigator.of(context).pop(true),
         isDestructiveAction: true,
         child: Text(
-          'settings_plan_leave_dialog_action_leave'.tr().toUpperCase(),
+          context.tr('settings_plan_leave_dialog_action_leave').toUpperCase(),
         ),
       ),
       CupertinoDialogAction(
@@ -40,7 +40,7 @@ CupertinoAlertDialog _buildIOSLeaveDialog(BuildContext context) {
         },
         isDefaultAction: true,
         child: Text(
-          'settings_plan_leave_dialog_action_cancel'.tr().toUpperCase(),
+          context.tr('settings_plan_leave_dialog_action_cancel').toUpperCase(),
           style: TextStyle(color: Theme.of(context).primaryColor),
         ),
       ),
@@ -50,11 +50,11 @@ CupertinoAlertDialog _buildIOSLeaveDialog(BuildContext context) {
 
 AlertDialog _buildLeaveDialog(BuildContext context) {
   return AlertDialog(
-    title: Text('settings_plan_leave_dialog_title'.tr()),
+    title: Text(context.tr('settings_plan_leave_dialog_title')),
     content: Column(
       children: [
         const SizedBox(height: kPadding / 2),
-        Text('settings_plan_leave_dialog_description'.tr()),
+        Text(context.tr('settings_plan_leave_dialog_description')),
       ],
     ),
     actions: <Widget>[
@@ -63,13 +63,13 @@ AlertDialog _buildLeaveDialog(BuildContext context) {
           Navigator.of(context).pop(true);
         },
         child: Text(
-          'settings_plan_leave_dialog_action_leave'.tr(),
+          context.tr('settings_plan_leave_dialog_action_leave'),
           style: TextStyle(color: Theme.of(context).colorScheme.error),
         ),
       ),
       TextButton(
         child: Text(
-          'settings_plan_leave_dialog_action_cancel'.tr(),
+          context.tr('settings_plan_leave_dialog_action_cancel'),
           style: TextStyle(color: Theme.of(context).primaryColor),
         ),
         onPressed: () {
@@ -93,11 +93,11 @@ Future<bool> showDeleteConfirmDialog(BuildContext context) async {
 
 CupertinoAlertDialog _buildIOSDeleteConfirmDialog(BuildContext context) {
   return CupertinoAlertDialog(
-    title: Text('settings_plan_delete_dialog_title'.tr()),
+    title: Text(context.tr('settings_plan_delete_dialog_title')),
     content: Column(
       children: [
         const SizedBox(height: kPadding / 2),
-        Text('settings_plan_delete_dialog_description'.tr()),
+        Text(context.tr('settings_plan_delete_dialog_description')),
       ],
     ),
     actions: <Widget>[
@@ -105,7 +105,7 @@ CupertinoAlertDialog _buildIOSDeleteConfirmDialog(BuildContext context) {
         onPressed: () => Navigator.of(context).pop(true),
         isDestructiveAction: true,
         child: Text(
-          'settings_plan_delete_dialog_action_delete'.tr().toUpperCase(),
+          context.tr('settings_plan_delete_dialog_action_delete').toUpperCase(),
         ),
       ),
       CupertinoDialogAction(
@@ -114,7 +114,7 @@ CupertinoAlertDialog _buildIOSDeleteConfirmDialog(BuildContext context) {
         },
         isDefaultAction: true,
         child: Text(
-          'settings_plan_delete_dialog_action_cancel'.tr().toUpperCase(),
+          context.tr('settings_plan_delete_dialog_action_cancel').toUpperCase(),
           style: TextStyle(color: Theme.of(context).primaryColor),
         ),
       ),
@@ -124,11 +124,11 @@ CupertinoAlertDialog _buildIOSDeleteConfirmDialog(BuildContext context) {
 
 AlertDialog _buildDeleteConfirmDialog(BuildContext context) {
   return AlertDialog(
-    title: Text('settings_plan_delete_dialog_title'.tr()),
+    title: Text(context.tr('settings_plan_delete_dialog_title')),
     content: Column(
       children: [
         const SizedBox(height: kPadding / 2),
-        Text('settings_plan_delete_dialog_description'.tr()),
+        Text(context.tr('settings_plan_delete_dialog_description')),
       ],
     ),
     actions: <Widget>[
@@ -137,13 +137,13 @@ AlertDialog _buildDeleteConfirmDialog(BuildContext context) {
           Navigator.of(context).pop(true);
         },
         child: Text(
-          'settings_plan_delete_dialog_action_delete'.tr(),
+          context.tr('settings_plan_delete_dialog_action_delete'),
           style: TextStyle(color: Theme.of(context).colorScheme.error),
         ),
       ),
       TextButton(
         child: Text(
-          'settings_plan_delete_dialog_action_cancel'.tr(),
+          context.tr('settings_plan_delete_dialog_action_cancel'),
           style: TextStyle(color: Theme.of(context).primaryColor),
         ),
         onPressed: () {

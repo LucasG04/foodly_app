@@ -316,13 +316,13 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
       context: context,
       builder: (_) => OptionsSheet(options: [
         OptionsSheetOptions(
-          title: 'link_preview_options_open_link'.tr(),
+          title: context.tr('link_preview_options_open_link'),
           icon: EvaIcons.externalLinkOutline,
           onTap: () =>
               launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
         ),
         OptionsSheetOptions(
-          title: 'link_preview_options_copy_link'.tr(),
+          title: context.tr('link_preview_options_copy_link'),
           icon: EvaIcons.copyOutline,
           onTap: () async {
             await FlutterClipboard.copy(url);
@@ -330,7 +330,7 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
               return;
             }
             MainSnackbar(
-              message: 'link_preview_options_copy_link_success'.tr(),
+              message: context.tr('link_preview_options_copy_link_success'),
               duration: 3,
               isDismissible: true,
               isCountdown: true,

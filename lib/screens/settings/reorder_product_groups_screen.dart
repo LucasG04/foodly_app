@@ -27,7 +27,7 @@ class _ReorderProductGroupsScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MainAppBar(
-        text: 'reorder_product_groups_title'.tr(),
+        text: context.tr('reorder_product_groups_title'),
         scrollController: _scrollController,
         actions: [
           IconButton(
@@ -37,7 +37,7 @@ class _ReorderProductGroupsScreenState
                   Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
             ),
             splashRadius: kPadding,
-            tooltip: 'reset'.tr(),
+            tooltip: context.tr('reset'),
             onPressed: () {
               SettingsService.setProductGroupOrder([]);
             },
@@ -48,7 +48,8 @@ class _ReorderProductGroupsScreenState
         child: SizedBox(
           width: BasicUtils.contentWidth(context, smallMultiplier: 1),
           child: Consumer(builder: (context, ref, _) {
-            final productGroups = ref.watch(dataGroceryGroupsProvider);
+            final productGroups =
+                ref.watch(dataGroceryGroupsProvider).valueOrNull;
             return productGroups == null
                 ? const SingleChildScrollView(
                     child: SizedBox(

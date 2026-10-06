@@ -20,8 +20,6 @@ import '../../services/ai_generation_exception.dart';
 import '../../services/ai_quota_exceeded_exception.dart';
 import '../../services/lunix_api_service.dart';
 import '../../services/rate_limit_exception.dart';
-import '../../utils/ai_usage_period.dart';
-import '../../utils/analytics.dart';
 import '../../utils/image_access.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
@@ -137,7 +135,7 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'meal_assistant_title'.tr().toUpperCase(),
+            context.tr('meal_assistant_title').toUpperCase(),
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           IconButton(
@@ -160,11 +158,11 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
             (text.isNotEmpty || _image != null);
         final String placeholder;
         if (_isEdit) {
-          placeholder = 'meal_assistant_hint_edit'.tr();
+          placeholder = context.tr('meal_assistant_hint_edit');
         } else if (_image != null) {
-          placeholder = 'meal_assistant_hint_image'.tr();
+          placeholder = context.tr('meal_assistant_hint_image');
         } else {
-          placeholder = 'meal_assistant_hint_create'.tr();
+          placeholder = context.tr('meal_assistant_hint_create');
         }
         final field = MainTextField(
           controller: _controller,
@@ -188,7 +186,7 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
           suffix: _slideAwayOnSend(
             IconButton(
               onPressed: canSend ? _send : null,
-              tooltip: 'meal_assistant_send'.tr(),
+              tooltip: context.tr('meal_assistant_send'),
               style: _edgeIconStyle(Alignment.centerRight),
               icon: Icon(
                 EvaIcons.paperPlaneOutline,
@@ -267,7 +265,7 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
   /// Camera icon left of the field; picking a photo attaches (or replaces) it.
   Widget _buildImageButton() {
     return IconButton(
-      tooltip: 'meal_assistant_image'.tr(),
+      tooltip: context.tr('meal_assistant_image'),
       style: _edgeIconStyle(Alignment.centerLeft),
       onPressed: _compressing ? null : _openImageSourceSheet,
       icon: Icon(EvaIcons.cameraOutline, color: theme.primaryColor),
@@ -279,12 +277,12 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
       context: context,
       builder: (_) => OptionsSheet(options: [
         OptionsSheetOptions(
-          title: 'meal_assistant_image_camera'.tr(),
+          title: context.tr('meal_assistant_image_camera'),
           icon: EvaIcons.cameraOutline,
           onTap: () => _pickImage(ImageSource.camera),
         ),
         OptionsSheetOptions(
-          title: 'meal_assistant_image_gallery'.tr(),
+          title: context.tr('meal_assistant_image_gallery'),
           icon: EvaIcons.imageOutline,
           onTap: () => _pickImage(ImageSource.gallery),
         ),
@@ -316,7 +314,7 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
                   right: kPadding / 2,
                   child: IconButton.filled(
                     onPressed: () => setState(() => _image = null),
-                    tooltip: 'meal_assistant_image_remove'.tr(),
+                    tooltip: context.tr('meal_assistant_image_remove'),
                     visualDensity: VisualDensity.compact,
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.black54,
@@ -359,7 +357,7 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
               duration: const Duration(milliseconds: 250),
               child: _done
                   ? Text(
-                      'meal_assistant_status_done'.tr(),
+                      context.tr('meal_assistant_status_done'),
                       key: const ValueKey('status-done'),
                     )
                   : _Shimmer(
@@ -376,11 +374,11 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
 
   String _statusLabel() {
     if (_enriching) {
-      return 'import_modal_enriching'.tr();
+      return context.tr('import_modal_enriching');
     }
     return _name == null
-        ? 'meal_assistant_status_thinking'.tr()
-        : 'meal_assistant_status_writing'.tr();
+        ? context.tr('meal_assistant_status_thinking')
+        : context.tr('meal_assistant_status_writing');
   }
 
   /// Sends the attached photo (the text is an optional note), else the text.
@@ -419,7 +417,9 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
         return;
       }
       _log.severe('pickImage failed', e);
-      _showError('meal_assistant_error_image'.tr());
+      if (mounted) {
+        _showError(context.tr('meal_assistant_error_image'));
+      }
       return;
     }
     if (file == null || !mounted) {
@@ -455,7 +455,7 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
       _image = image ?? _image;
     });
     if (image == null) {
-      _showError('meal_assistant_error_image'.tr());
+      _showError(context.tr('meal_assistant_error_image'));
     }
   }
 
@@ -537,7 +537,7 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
     }
     _showError(
       _hasContent
-          ? 'meal_assistant_error_edit_incomplete'.tr()
+          ? context.tr('meal_assistant_error_edit_incomplete')
           : _messageFor(code),
     );
     setState(_backToInput);
@@ -548,32 +548,14 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
       return;
     }
     if (error is AiQuotaExceededException) {
-      logEvent(AnalyticsEvent.aiQuotaExceededShown, {'feature': 'assistant'});
-      MainSnackbar(
-        message: 'ai_usage_exhausted'.plural(
-          AiUsagePeriod.daysUntilReset(),
-          namedArgs: {
-            'date': DateFormat.Md(context.locale.toLanguageTag())
-                .format(AiUsagePeriod.currentPeriodEnd().toLocal()),
-          },
-        ),
-        isError: true,
-        action: TextButton(
-          onPressed: () => GetPremiumModal.show(
-            context,
-            source: 'ai_quota_assistant',
-            highlight: PremiumFeature.ai,
-          ),
-          child: Text('ai_usage_upgrade'.tr()),
-        ),
-      ).show(context);
+      GetPremiumModal.showAiQuotaExhausted(context, feature: 'assistant');
     } else if (error is RateLimitException) {
       _showError(error.message);
     } else {
       _showError(
         error is AIRejectionException
             ? _messageFor(error.code)
-            : 'import_modal_error_generation'.tr(),
+            : context.tr('import_modal_error_generation'),
       );
     }
     setState(_backToInput);
@@ -595,11 +577,11 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
 
   String _messageFor(MealGenerationErrorCode code) {
     if (code != MealGenerationErrorCode.notFoodRelated) {
-      return 'import_modal_error_generation'.tr();
+      return context.tr('import_modal_error_generation');
     }
     return _image != null
-        ? 'meal_assistant_error_not_food_image'.tr()
-        : 'meal_assistant_error_not_food'.tr();
+        ? context.tr('meal_assistant_error_not_food_image')
+        : context.tr('meal_assistant_error_not_food');
   }
 
   void _showError(String message) {

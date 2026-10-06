@@ -61,7 +61,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
 
     return Scaffold(
       appBar: MainAppBar(
-        text: 'meal_select_title'.tr(),
+        text: context.tr('meal_select_title'),
         scrollController: _scrollController,
       ),
       body: SingleChildScrollView(
@@ -124,13 +124,13 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
     if (index == 0) {
       return _buildContainer(
         EvaIcons.code,
-        'meal_select_placeholder'.tr(),
+        context.tr('meal_select_placeholder'),
         () => _showPlaceholderDialog(ref),
       );
     } else if (index == 1) {
       return _buildContainer(
         EvaIcons.plus,
-        'meal_select_new'.tr(),
+        context.tr('meal_select_new'),
         () => _createNewMeal(ref),
       );
     } else if (index == 2) {
@@ -163,8 +163,8 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
     return ref.read(_$isSearching)
         ? UserInformation(
             assetPath: 'assets/images/undraw_empty.png',
-            title: 'meal_select_no_results'.tr(),
-            message: 'meal_select_no_results_msg'.tr(),
+            title: context.tr('meal_select_no_results'),
+            message: context.tr('meal_select_no_results_msg'),
           )
         : Consumer(builder: (context, ref, _) {
             final userIsSubscribed =
@@ -211,13 +211,13 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'meal_select_recommendations',
-                      style: TextStyle(
+                    Text(
+                      context.tr('meal_select_recommendations'),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
-                    ).tr(),
+                    ),
                     IconButton(
                       onPressed: _showRecommendationsInfo,
                       icon: Icon(
@@ -272,8 +272,8 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
         vertical: kPadding / 2,
       ),
       child: GetPremiumInfo(
-        title: 'get_premium_modal_2_title'.tr(),
-        description: 'get_premium_modal_2_description_ad'.tr(),
+        title: context.tr('get_premium_modal_2_title'),
+        description: context.tr('get_premium_modal_2_description_ad'),
         source: 'meal_suggestions',
         highlight: PremiumFeature.suggestions,
       ),
@@ -423,7 +423,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
 
   Future<dynamic> _showRecommendationsInfo() {
     return MainSnackbar(
-      message: 'meal_select_recommendations_info'.tr(),
+      message: context.tr('meal_select_recommendations_info'),
       infinite: true,
     ).show(context);
   }

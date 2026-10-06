@@ -14,27 +14,27 @@ class HomeScreenDialogs {
     return CupertinoAlertDialog(
       title: Column(
         children: <Widget>[
-          Text('update_dialog_title'.tr(args: [kAppName])),
+          Text(context.tr('update_dialog_title', args: [kAppName])),
         ],
       ),
       content: Column(
         children: [
           const SizedBox(height: kPadding / 2),
-          Text('update_dialog_description'.tr()),
-          Text('update_dialog_question'.tr()),
+          Text(context.tr('update_dialog_description')),
+          Text(context.tr('update_dialog_question')),
         ],
       ),
       actions: <Widget>[
         CupertinoDialogAction(
           onPressed: onDismiss,
           isDestructiveAction: true,
-          child: Text('update_dialog_action_later'.tr().toUpperCase()),
+          child: Text(context.tr('update_dialog_action_later').toUpperCase()),
         ),
         CupertinoDialogAction(
           onPressed: onUpdate,
           isDefaultAction: true,
           child: Text(
-            'update_dialog_action_update'.tr().toUpperCase(),
+            context.tr('update_dialog_action_update').toUpperCase(),
             style: TextStyle(color: Theme.of(context).primaryColor),
           ),
         ),
@@ -50,26 +50,27 @@ class HomeScreenDialogs {
     return CupertinoAlertDialog(
       title: Column(
         children: <Widget>[
-          Text('lock_plan_dialog_title'.tr()),
+          Text(context.tr('lock_plan_dialog_title')),
         ],
       ),
       content: Column(
         children: [
           const SizedBox(height: kPadding / 2),
-          Text('lock_plan_dialog_description'.tr()),
+          Text(context.tr('lock_plan_dialog_description')),
         ],
       ),
       actions: <Widget>[
         CupertinoDialogAction(
           onPressed: onDismiss,
           isDestructiveAction: true,
-          child: Text('lock_plan_dialog_action_later'.tr().toUpperCase()),
+          child:
+              Text(context.tr('lock_plan_dialog_action_later').toUpperCase()),
         ),
         CupertinoDialogAction(
           onPressed: onLock,
           isDefaultAction: true,
           child: Text(
-            'lock_plan_dialog_action_lock'.tr().toUpperCase(),
+            context.tr('lock_plan_dialog_action_lock').toUpperCase(),
             style: TextStyle(color: Theme.of(context).primaryColor),
           ),
         ),
@@ -85,24 +86,24 @@ class HomeScreenDialogs {
     return AlertDialog(
       title: Column(
         children: <Widget>[
-          Text('lock_plan_dialog_title'.tr()),
+          Text(context.tr('lock_plan_dialog_title')),
         ],
       ),
       content: Column(
         children: [
           const SizedBox(height: kPadding / 2),
-          Text('lock_plan_dialog_description'.tr()),
+          Text(context.tr('lock_plan_dialog_description')),
         ],
       ),
       actions: <Widget>[
         TextButton(
           onPressed: onDismiss,
-          child: Text('lock_plan_dialog_action_later'.tr()),
+          child: Text(context.tr('lock_plan_dialog_action_later')),
         ),
         TextButton(
           onPressed: onLock,
           child: Text(
-            'lock_plan_dialog_action_lock'.tr(),
+            context.tr('lock_plan_dialog_action_lock'),
             style: TextStyle(color: Theme.of(context).primaryColor),
           ),
         ),

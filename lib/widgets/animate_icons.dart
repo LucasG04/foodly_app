@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 class AnimateIcons extends StatefulWidget {
   const AnimateIcons(
       {
-
       /// The IconData that will be visible before animation Starts
       required this.startIcon,
 

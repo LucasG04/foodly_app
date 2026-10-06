@@ -9,37 +9,37 @@ import '../../../../models/page_data.dart';
 import '../../../../widgets/page_card.dart';
 
 class HelpSlideShareImport extends StatelessWidget {
-  HelpSlideShareImport({super.key});
+  const HelpSlideShareImport({super.key});
 
-  final List<PageData> pages = [
-    PageData(
-      assetPath: 'assets/onboarding/welcome.png',
-      title: 'settings_help_share_one_title'.tr(),
-      subtitle: 'settings_help_share_one_subtitle'.tr(),
-      background: const Color(0xFFf05945),
-    ),
-    PageData(
-      assetPath: 'assets/help_slide/share-button.png',
-      title: 'settings_help_share_two_title'.tr(),
-      subtitle: 'settings_help_share_two_subtitle'.tr(),
-      background: const Color(0xFF5eaaa8),
-    ),
-    PageData(
-      assetPath: 'assets/help_slide/share-app.png',
-      title: 'settings_help_share_three_title'.tr(),
-      subtitle: 'settings_help_share_three_subtitle'.tr(args: [kAppName]),
-      background: const Color(0xFFffb037),
-    ),
-  ];
-
-  List<Color> get _colors => pages.map((p) => p.background).toList();
+  List<PageData> _pages(BuildContext context) => [
+        PageData(
+          assetPath: 'assets/onboarding/welcome.png',
+          title: context.tr('settings_help_share_one_title'),
+          subtitle: context.tr('settings_help_share_one_subtitle'),
+          background: const Color(0xFFf05945),
+        ),
+        PageData(
+          assetPath: 'assets/help_slide/share-button.png',
+          title: context.tr('settings_help_share_two_title'),
+          subtitle: context.tr('settings_help_share_two_subtitle'),
+          background: const Color(0xFF5eaaa8),
+        ),
+        PageData(
+          assetPath: 'assets/help_slide/share-app.png',
+          title: context.tr('settings_help_share_three_title'),
+          subtitle: context
+              .tr('settings_help_share_three_subtitle', args: [kAppName]),
+          background: const Color(0xFFffb037),
+        ),
+      ];
 
   @override
   Widget build(BuildContext context) {
     const heightMultiplier = 0.75;
+    final pages = _pages(context);
     return Scaffold(
       body: ConcentricPageView(
-        colors: _colors,
+        colors: pages.map((p) => p.background).toList(),
         radius: 30,
         curve: Curves.ease,
         duration: const Duration(seconds: 1),

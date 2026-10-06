@@ -46,11 +46,12 @@ class _SettingsReauthenticateModalState
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: kPadding),
-              child: const Text(
-                'settings_reauthenticate_title',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              child: Text(
+                context.tr('settings_reauthenticate_title'),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
-              ).tr(),
+              ),
             ),
           ),
           RichText(
@@ -58,13 +59,15 @@ class _SettingsReauthenticateModalState
               style: Theme.of(context).textTheme.bodyLarge,
               children: <TextSpan>[
                 TextSpan(
-                    text: '${'settings_reauthenticate_description_1'.tr()} '),
+                    text:
+                        '${context.tr('settings_reauthenticate_description_1')} '),
                 TextSpan(
                   text: AuthenticationService.currentUser?.email ?? '',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 TextSpan(
-                  text: ' ${'settings_reauthenticate_description_2'.tr()}',
+                  text:
+                      ' ${context.tr('settings_reauthenticate_description_2')}',
                 ),
               ],
             ),
@@ -101,11 +104,11 @@ class _SettingsReauthenticateModalState
         final errorText = ref.watch(_$errorText);
         return MainTextField(
           controller: _passwordController,
-          title: 'settings_reauthenticate_input_title'.tr(),
+          title: context.tr('settings_reauthenticate_input_title'),
           placeholder: '********',
           textInputAction: TextInputAction.go,
           obscureText: true,
-          errorText: errorText?.tr(),
+          errorText: errorText == null ? null : context.tr(errorText),
           errorMaxLines: 2,
           onSubmit: () => _reauthenticate(FirebaseAuthProvider.password),
         );
@@ -115,7 +118,7 @@ class _SettingsReauthenticateModalState
         child: Consumer(builder: (context, ref, _) {
           final buttonState = ref.watch(_$buttonState);
           return MainButton(
-            text: 'settings_reauthenticate_action'.tr(),
+            text: context.tr('settings_reauthenticate_action'),
             isProgress: true,
             buttonState: buttonState,
             onTap: () => _reauthenticate(FirebaseAuthProvider.password),

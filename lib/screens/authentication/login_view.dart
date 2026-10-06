@@ -99,8 +99,11 @@ class _LoginViewState extends ConsumerState<LoginView> {
               fontWeight: FontWeight.w400,
             ),
             labels: _forgotPlan
-                ? ['login_title_login'.tr()]
-                : ['login_title_register'.tr(), 'login_title_login'.tr()],
+                ? [context.tr('login_title_login')]
+                : [
+                    context.tr('login_title_register'),
+                    context.tr('login_title_login')
+                  ],
             selectedLabelIndex: (index) {
               setState(() {
                 _isRegistering = index == 0;
@@ -121,7 +124,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     key: const ValueKey<int>(0),
                     width: size.width,
                     child: Text(
-                      '${'login_register_leading'.tr()} ',
+                      '${context.tr('login_register_leading')} ',
                       style: _titleTextStyle,
                     ),
                   )
@@ -129,7 +132,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     key: const ValueKey<int>(1),
                     width: size.width,
                     child: Text(
-                      '${'login_login_leading'.tr()} ',
+                      '${context.tr('login_login_leading')} ',
                       style: _titleTextStyle,
                     ),
                   ),
@@ -137,11 +140,13 @@ class _LoginViewState extends ConsumerState<LoginView> {
           SizedBox(
             width: size.width,
             child: Text(
-              widget.isCreatingPlan! ? 'login_cta_create' : 'login_cta_join',
+              context.tr(widget.isCreatingPlan!
+                  ? 'login_cta_create'
+                  : 'login_cta_join'),
               style: _titleTextStyle.copyWith(
                 fontWeight: FontWeight.w400,
               ),
-            ).tr(),
+            ),
           ),
           const SizedBox(height: kPadding),
           AutofillGroup(
@@ -151,7 +156,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 MainTextField(
                   key: AuthenticationKeys.inputMail,
                   controller: _emailController,
-                  title: 'login_mail_title'.tr(),
+                  title: context.tr('login_mail_title'),
                   textInputAction: TextInputAction.next,
                   errorText: _emailErrorText,
                   autofocus: true,
@@ -162,7 +167,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 MainTextField(
                   key: AuthenticationKeys.inputPassword,
                   controller: _passwordController,
-                  title: 'login_password_title'.tr(),
+                  title: context.tr('login_password_title'),
                   textInputAction: TextInputAction.go,
                   obscureText: true,
                   errorText: _passwordErrorText,
@@ -186,10 +191,10 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       child: TextButton(
                         onPressed: _showPasswordReset,
                         child: Text(
-                          'login_forgot_password',
+                          context.tr('login_forgot_password'),
                           style:
                               TextStyle(color: Theme.of(context).primaryColor),
-                        ).tr(),
+                        ),
                       ),
                     ),
                   )
@@ -236,7 +241,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   child: Center(
                     child: MainButton(
                       key: AuthenticationKeys.buttonJoin,
-                      text: 'login_join'.tr(),
+                      text: context.tr('login_join'),
                       width: constraints.maxWidth * 0.65,
                       onTap: _authWithEmail,
                       isProgress: true,
@@ -261,7 +266,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
   bool _validateEmail() {
     if (!EmailValidator.validate(_emailController.text)) {
       setState(() {
-        _emailErrorText = 'login_error_wrong_mail'.tr();
+        _emailErrorText = context.tr('login_error_wrong_mail');
       });
       return false;
     }
@@ -272,7 +277,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
     if (_passwordController.text.isEmpty ||
         _passwordController.text.length < 6) {
       setState(() {
-        _passwordErrorText = 'login_error_password'.tr();
+        _passwordErrorText = context.tr('login_error_password');
       });
       return false;
     }
@@ -333,7 +338,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
       }
       _log.severe('ERR! _authWithApple', e);
       setState(() {
-        _unknownErrorText = 'login_error_unknown'.tr();
+        _unknownErrorText = context.tr('login_error_unknown');
         _buttonState = ButtonState.error;
       });
     }
@@ -371,7 +376,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
     if (plan != null && !plan.users!.contains(userId)) {
       if (plan.locked != null && plan.locked!) {
         setState(() {
-          _unknownErrorText = 'login_error_plan_locked'.tr();
+          _unknownErrorText = context.tr('login_error_plan_locked');
           _buttonState = ButtonState.error;
         });
         return;
@@ -423,14 +428,14 @@ class _LoginViewState extends ConsumerState<LoginView> {
   void _handleMailAuthException(dynamic exception) {
     if (exception != null && exception is FirebaseAuthException) {
       if (exception.code == 'weak-password') {
-        _passwordErrorText = 'login_error_password_weak'.tr();
+        _passwordErrorText = context.tr('login_error_password_weak');
       } else if (exception.code == 'email-already-in-use') {
-        _emailErrorText = 'login_error_mail_in_use'.tr();
+        _emailErrorText = context.tr('login_error_mail_in_use');
       } else {
-        _unknownErrorText = 'login_error_unknown'.tr();
+        _unknownErrorText = context.tr('login_error_unknown');
       }
     } else {
-      _unknownErrorText = 'login_error_unknown'.tr();
+      _unknownErrorText = context.tr('login_error_unknown');
     }
     setState(() {
       _buttonState = ButtonState.error;

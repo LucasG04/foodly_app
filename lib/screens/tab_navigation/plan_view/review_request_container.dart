@@ -124,7 +124,7 @@ class _ReviewRequestContainerState extends ConsumerState<ReviewRequestContainer>
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'plan_rate_title'.tr(args: [kAppName]),
+              context.tr('plan_rate_title', args: [kAppName]),
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -149,7 +149,7 @@ class _ReviewRequestContainerState extends ConsumerState<ReviewRequestContainer>
                 AutoRouter.of(context).push(const FeedbackScreenRoute());
                 AppReviewService.discardRequest();
               },
-              label: const Text('plan_rate_feedback').tr(),
+              label: Text(context.tr('plan_rate_feedback')),
               icon: const Icon(EvaIcons.paperPlaneOutline),
             ),
             if (ref.watch(_ratingProvider) >= 4)
@@ -158,12 +158,12 @@ class _ReviewRequestContainerState extends ConsumerState<ReviewRequestContainer>
                   _logResult('store');
                   AppReviewService.requestReview();
                   MainSnackbar(
-                    message: 'feedback_thanks'.tr(args: ['🎉🎉']),
+                    message: context.tr('feedback_thanks', args: ['🎉🎉']),
                     isSuccess: true,
                   ).show(context);
                 },
-                label: const Text('plan_rate_review')
-                    .tr(args: Platform.isIOS ? ['App'] : ['Play']),
+                label: Text(context.tr('plan_rate_review',
+                    args: Platform.isIOS ? ['App'] : ['Play'])),
                 icon: const Icon(EvaIcons.starOutline),
               ),
           ],

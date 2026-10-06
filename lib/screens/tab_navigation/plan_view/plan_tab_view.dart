@@ -34,6 +34,9 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
   @override
   bool get wantKeepAlive => true;
 
+  // broadcast: the StreamBuilder below remounts when the plan reloads
+  final _shouldRequestReview =
+      AppReviewService.shouldRequestReview().asBroadcastStream();
   final AutoDisposeStreamProvider<List<PlanMeal>> planMealsStreamProvider =
       StreamProvider.autoDispose<List<PlanMeal>>((ref) {
     final activePlan = ref.watch(planProvider);
@@ -61,7 +64,7 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
                   Padding(
                     padding: const EdgeInsets.only(left: 5.0),
                     child: PageTitle(
-                      text: 'plan_title'.tr(),
+                      text: context.tr('plan_title'),
                       checkConnectivity: true,
                       actions: [
                         IconButton(
@@ -78,7 +81,7 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
                     ),
                   ),
                   StreamBuilder<bool>(
-                    stream: AppReviewService.shouldRequestReview(),
+                    stream: _shouldRequestReview,
                     builder: (context, snapshot) {
                       if (snapshot.data == null || !snapshot.data!) {
                         return const SizedBox();
@@ -123,7 +126,7 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
       context: context,
       builder: (_) => OptionsSheet(options: [
         OptionsSheetOptions(
-          title: 'plan_history_title'.tr(),
+          title: context.tr('plan_history_title'),
           icon: EvaIcons.clockOutline,
           onTap: () {
             ref.read(planHistoryPageChanged.notifier).state =
@@ -131,7 +134,7 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
           },
         ),
         OptionsSheetOptions(
-          title: 'plan_download_modal_title'.tr(),
+          title: context.tr('plan_download_modal_title'),
           icon: EvaIcons.downloadOutline,
           onTap: () => _openDownloadModal(plan),
         ),

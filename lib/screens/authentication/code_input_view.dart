@@ -56,7 +56,7 @@ class _CodeInputViewState extends State<CodeInputView> with OfContextMixin {
             SizedBox(
               width: contentWidth * 0.7,
               child: Text(
-                '${'login_code_title_msg'.tr()}:',
+                '${context.tr('login_code_title_msg')}:',
                 style: const TextStyle(fontSize: 18),
               ),
             ),
@@ -69,9 +69,9 @@ class _CodeInputViewState extends State<CodeInputView> with OfContextMixin {
                 child: TextButton(
                   key: AuthenticationKeys.buttonForgotCode,
                   child: Text(
-                    'login_code_forgot',
+                    context.tr('login_code_forgot'),
                     style: TextStyle(color: theme.primaryColor),
-                  ).tr(),
+                  ),
                   onPressed: () => widget.onPageChange(CodeInputResult.FORGOT),
                 ),
               ),
@@ -79,17 +79,17 @@ class _CodeInputViewState extends State<CodeInputView> with OfContextMixin {
             SizedBox(height: mediaSize.height * 0.1),
             SizedBox(
               width: contentWidth * 0.7,
-              child: const Text(
-                'login_code_no_plan',
-                style: TextStyle(fontSize: 18),
+              child: Text(
+                context.tr('login_code_no_plan'),
+                style: const TextStyle(fontSize: 18),
                 textAlign: TextAlign.center,
-              ).tr(),
+              ),
             ),
             const SizedBox(height: kPadding * 2),
             Center(
               child: MainButton(
                 key: AuthenticationKeys.buttonCreatePlan,
-                text: 'login_code_create_plan'.tr(),
+                text: context.tr('login_code_create_plan'),
                 onTap: () => widget.onPageChange(CodeInputResult.NEW),
               ),
             ),
@@ -111,13 +111,13 @@ class _CodeInputViewState extends State<CodeInputView> with OfContextMixin {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   SizedBox(height: mediaSize.height * 0.1),
-                  const Text(
-                    'login_code_welcome',
-                    style: TextStyle(
+                  Text(
+                    context.tr('login_code_welcome'),
+                    style: const TextStyle(
                       fontSize: 24.0,
                       color: Colors.white,
                     ),
-                  ).tr(),
+                  ),
                   Text(
                     kAppName,
                     style: const TextStyle(
@@ -182,12 +182,12 @@ class _CodeInputViewState extends State<CodeInputView> with OfContextMixin {
           widget.onPageChange(CodeInputResult.JOIN, plan.id);
         } else {
           setState(() {
-            _errorText = 'login_code_not_found'.tr();
+            _errorText = context.tr('login_code_not_found');
           });
         }
       } catch (e) {
         setState(() {
-          _errorText = 'login_code_not_found'.tr();
+          _errorText = context.tr('login_code_not_found');
         });
       }
 

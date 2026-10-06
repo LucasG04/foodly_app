@@ -66,7 +66,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView>
               fontSize: 14,
               fontWeight: FontWeight.w400,
             ),
-            labels: ['plan_settings_create_plan'.tr()],
+            labels: [context.tr('plan_settings_create_plan')],
           ),
           const SizedBox(height: kPadding * 2),
           Align(
@@ -74,9 +74,9 @@ class _PlanSettingsViewState extends State<PlanSettingsView>
             child: Wrap(
               children: [
                 Text(
-                  'plan_settings_what_name',
+                  context.tr('plan_settings_what_name'),
                   style: _titleTextStyle,
-                ).tr(),
+                ),
               ],
             ),
           ),
@@ -84,7 +84,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView>
           MainTextField(
             key: AuthenticationKeys.buttonPlanNameNext,
             controller: _nameController,
-            title: 'plan_settings_name_title'.tr(),
+            title: context.tr('plan_settings_name_title'),
             textInputAction: TextInputAction.go,
             errorText: _nameErrorText,
             onSubmit: _updatePlanSettings,
@@ -119,7 +119,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView>
                   isSecondary: true,
                 ),
                 MainButton(
-                  text: 'modal_password_reset_next'.tr(),
+                  text: context.tr('modal_password_reset_next'),
                   width: constraints.maxWidth * 0.65,
                   onTap: _updatePlanSettings,
                   isProgress: true,
@@ -143,7 +143,7 @@ class _PlanSettingsViewState extends State<PlanSettingsView>
     if (_nameController!.text.isEmpty ||
         _nameController!.text.trim().length < 3) {
       setState(() {
-        _nameErrorText = 'plan_settings_error_name'.tr();
+        _nameErrorText = context.tr('plan_settings_error_name');
       });
       return false;
     }

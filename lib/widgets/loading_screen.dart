@@ -53,6 +53,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void initState() {
     super.initState();
     _messageIndex = Random().nextInt(_messageKeys.length);
+    // context.tr can't run in initState (inherited lookup)
     _fullText = _messageKeys[_messageIndex].tr();
     _timer = Timer(const Duration(milliseconds: 500), _show);
     _connectionCheckTimer = Timer(_warningDelay, _checkConnectionAndWarn);
@@ -112,7 +113,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       return;
     }
     _messageIndex = (_messageIndex + 1) % _messageKeys.length;
-    _fullText = _messageKeys[_messageIndex].tr();
+    _fullText = context.tr(_messageKeys[_messageIndex]);
     _startTyping();
   }
 
@@ -157,11 +158,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   String get _warningText => switch (_warning) {
-        _LoadingWarning.noConnection => 'loading_warning_no_connection'.tr(),
+        _LoadingWarning.noConnection =>
+          context.tr('loading_warning_no_connection'),
         _LoadingWarning.slowConnection =>
-          'loading_warning_slow_connection'.tr(),
-        _LoadingWarning.slowServer => 'loading_warning_slow_server'.tr(),
-        _LoadingWarning.closeApp => 'loading_warning_close_app'.tr(),
+          context.tr('loading_warning_slow_connection'),
+        _LoadingWarning.slowServer => context.tr('loading_warning_slow_server'),
+        _LoadingWarning.closeApp => context.tr('loading_warning_close_app'),
         null => '',
       };
 

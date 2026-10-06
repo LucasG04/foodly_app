@@ -49,17 +49,17 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
                     children: [
                       _buildPickerTypeTile(
                         EvaIcons.globe2Outline,
-                        'image_picker_dialog_web'.tr(),
+                        context.tr('image_picker_dialog_web'),
                         () => setState(() => _showWebPicker = true),
                       ),
                       _buildPickerTypeTile(
                         EvaIcons.cameraOutline,
-                        'image_picker_dialog_camera'.tr(),
+                        context.tr('image_picker_dialog_camera'),
                         () => _uploadLocalImage(ImageSource.camera),
                       ),
                       _buildPickerTypeTile(
                         EvaIcons.imageOutline,
-                        'image_picker_dialog_gallery'.tr(),
+                        context.tr('image_picker_dialog_gallery'),
                         () => _uploadLocalImage(ImageSource.gallery),
                       ),
                     ],
@@ -98,7 +98,9 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
       // if none is picked, `getImage` will `return` automatically
       // so show error if `image` is null
       if (image == null) {
-        _showErrorSnackBar('image_picker_dialog_error_not_found'.tr());
+        if (mounted) {
+          _showErrorSnackBar(context.tr('image_picker_dialog_error_not_found'));
+        }
         return;
       }
     } catch (e) {
@@ -109,7 +111,9 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
         return;
       }
       _log.severe('Error getImage', e);
-      _showErrorSnackBar('image_picker_dialog_error_not_found'.tr());
+      if (mounted) {
+        _showErrorSnackBar(context.tr('image_picker_dialog_error_not_found'));
+      }
       return;
     }
 
@@ -136,7 +140,7 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
       setState(() {
         _isLoading = false;
       });
-      _showErrorSnackBar('image_picker_dialog_error_not_found'.tr());
+      _showErrorSnackBar(context.tr('image_picker_dialog_error_not_found'));
     }
   }
 

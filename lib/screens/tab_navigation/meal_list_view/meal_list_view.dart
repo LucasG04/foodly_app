@@ -237,15 +237,15 @@ class _MealListViewState extends ConsumerState<MealListView>
         children: [
           UserInformation(
             assetPath: 'assets/images/undraw_empty.png',
-            title: 'meal_list_empty_title'.tr(),
-            message: 'meal_list_empty_subtitle'.tr(),
+            title: context.tr('meal_list_empty_title'),
+            message: context.tr('meal_list_empty_subtitle'),
           ),
           const SizedBox(height: kPadding),
           TextButton.icon(
             onPressed: () => Navigator.push(
               context,
               ConcentricPageRoute<HelpSlideShareImport>(
-                builder: (_) => HelpSlideShareImport(),
+                builder: (_) => const HelpSlideShareImport(),
               ),
             ),
             icon: Icon(
@@ -253,9 +253,9 @@ class _MealListViewState extends ConsumerState<MealListView>
               color: theme.primaryColor,
             ),
             label: Text(
-              'meal_list_help_import',
+              context.tr('meal_list_help_import'),
               style: TextStyle(color: theme.primaryColor),
-            ).tr(),
+            ),
           ),
         ],
       ),
@@ -268,8 +268,8 @@ class _MealListViewState extends ConsumerState<MealListView>
         children: [
           UserInformation(
             assetPath: 'assets/images/undraw_void.png',
-            title: 'meal_list_empty_search_title'.tr(),
-            message: 'meal_list_empty_search_subtitle'.tr(),
+            title: context.tr('meal_list_empty_search_title'),
+            message: context.tr('meal_list_empty_search_subtitle'),
           ),
         ],
       ),

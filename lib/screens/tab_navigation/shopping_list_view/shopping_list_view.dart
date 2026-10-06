@@ -70,7 +70,8 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
             return Consumer(
               builder: (context, ref, _) {
                 final shoppingListId = ref.watch(shoppingListIdProvider);
-                final groceryGroups = ref.watch(dataGroceryGroupsProvider);
+                final groceryGroups =
+                    ref.watch(dataGroceryGroupsProvider).valueOrNull;
                 if (shoppingListId == null || groceryGroups == null) {
                   return _buildLoader();
                 }
@@ -172,12 +173,12 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                   });
                 },
                 title: Text(
-                  'shopping_list_already_bought',
+                  context.tr('shopping_list_already_bought'),
                   style: TextStyle(
                     color: theme.primaryColor,
                     fontWeight: FontWeight.bold,
                   ),
-                ).tr(),
+                ),
                 children: [
                   AnimatedShoppingList(
                     groceries: boughtItems,
@@ -202,11 +203,11 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
                         ),
                       ),
                       child: Text(
-                        'shopping_list_remove_all',
+                        context.tr('shopping_list_remove_all'),
                         style: TextStyle(
                           color: theme.colorScheme.error,
                         ),
-                      ).tr(),
+                      ),
                     ),
                   ),
                 ],
@@ -232,7 +233,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
     return Padding(
       padding: const EdgeInsets.only(left: 5.0),
       child: PageTitle(
-        text: 'shopping_list_title'.tr(),
+        text: context.tr('shopping_list_title'),
         checkConnectivity: true,
         actions: [
           Builder(
@@ -255,13 +256,13 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
   Widget _buildEmptyShoppingList() {
     return UserInformation(
       assetPath: 'assets/images/undraw_empty_cart.png',
-      message: 'shopping_list_empty_subtitle'.tr(),
+      message: context.tr('shopping_list_empty_subtitle'),
     );
   }
 
   List<ShoppingListGroup> _groceriesToGroups(List<Grocery> groceries) {
     final groceriesCopy = List.of(groceries);
-    final groups = ref.read(dataGroceryGroupsProvider) ?? [];
+    final groups = ref.read(dataGroceryGroupsProvider).valueOrNull ?? [];
     final uncategorized = groceriesCopy;
     final listGroups = groups.map(
       (group) {
@@ -295,7 +296,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
       listGroups.add(
         ShoppingListGroup(
           groupId: 'null',
-          name: 'shopping_list_uncategorized'.tr(),
+          name: context.tr('shopping_list_uncategorized'),
           groceries: uncategorized,
         ),
       );
@@ -350,7 +351,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
   void _shareList(List<Grocery> groceries, BuildContext ctx) {
     if (groceries.isEmpty) {
       MainSnackbar(
-        message: 'shopping_list_share_error'.tr(),
+        message: context.tr('shopping_list_share_error'),
         isError: true,
       ).show(ctx);
       return;
@@ -409,7 +410,8 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
 
     ShoppingListService.deleteGrocery(listId, grocery.id!);
     MainSnackbar(
-      message: 'shopping_list_grocery_removed'.tr(args: [grocery.name!]),
+      message:
+          context.tr('shopping_list_grocery_removed', args: [grocery.name!]),
       duration: 3,
       isCountdown: true,
       isDismissible: true,
@@ -444,20 +446,20 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
 
   CupertinoAlertDialog _buildIOSAlertDialog(String listId) {
     return CupertinoAlertDialog(
-      title: Text('shopping_dialog_title'.tr()),
+      title: Text(context.tr('shopping_dialog_title')),
       content: Column(
         children: [
           const SizedBox(height: kPadding / 2),
-          Text('shopping_dialog_description'.tr()),
+          Text(context.tr('shopping_dialog_description')),
           const SizedBox(height: kPadding / 4),
-          Text('shopping_dialog_settings_info'.tr()),
+          Text(context.tr('shopping_dialog_settings_info')),
         ],
       ),
       actions: <Widget>[
         CupertinoDialogAction(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(
-            'shopping_dialog_action_cancel'.tr().toUpperCase(),
+            context.tr('shopping_dialog_action_cancel').toUpperCase(),
             style: TextStyle(color: theme.primaryColor),
           ),
         ),
@@ -468,7 +470,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
           },
           isDefaultAction: true,
           child: Text(
-            'update_dialog_action_delete'.tr().toUpperCase(),
+            context.tr('update_dialog_action_delete').toUpperCase(),
             style: TextStyle(color: theme.primaryColor),
           ),
         ),
@@ -478,19 +480,19 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
 
   AlertDialog _buildAlertDialog(String listId) {
     return AlertDialog(
-      title: Text('shopping_dialog_title'.tr()),
+      title: Text(context.tr('shopping_dialog_title')),
       content: Column(
         children: [
           const SizedBox(height: kPadding / 2),
-          Text('shopping_dialog_description'.tr()),
+          Text(context.tr('shopping_dialog_description')),
           const SizedBox(height: kPadding / 4),
-          Text('shopping_dialog_settings_info'.tr()),
+          Text(context.tr('shopping_dialog_settings_info')),
         ],
       ),
       actions: <Widget>[
         TextButton(
           child: Text(
-            'shopping_dialog_action_cancel'.tr(),
+            context.tr('shopping_dialog_action_cancel'),
             style: TextStyle(color: theme.primaryColor),
           ),
           onPressed: () {
@@ -499,7 +501,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
         ),
         TextButton(
           child: Text(
-            'update_dialog_action_delete'.tr(),
+            context.tr('update_dialog_action_delete'),
             style: TextStyle(color: theme.primaryColor),
           ),
           onPressed: () {

@@ -24,10 +24,9 @@ class ImageAccess {
       return;
     }
     MainSnackbar(
-      message: (isCamera
-              ? 'image_picker_dialog_camera_access_denied'
-              : 'image_picker_dialog_photo_access_denied')
-          .tr(),
+      message: context.tr(isCamera
+          ? 'image_picker_dialog_camera_access_denied'
+          : 'image_picker_dialog_photo_access_denied'),
       isError: true,
       isDismissible: true,
     ).show(context);

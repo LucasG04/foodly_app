@@ -38,7 +38,7 @@ class _PlanHistoryViewState extends ConsumerState<PlanHistoryView> {
 
     return Scaffold(
       appBar: MainAppBar(
-        text: 'plan_history_title'.tr(),
+        text: context.tr('plan_history_title'),
         scrollController: _scrollController,
         showBack: false,
         actions: [
@@ -57,7 +57,7 @@ class _PlanHistoryViewState extends ConsumerState<PlanHistoryView> {
       body: planHistoryAsync.when(
         loading: () => const Center(child: SmallCircularProgressIndicator()),
         error: (error, stackTrace) => Center(
-          child: Text('try_again_later'.tr()),
+          child: Text(context.tr('try_again_later')),
         ),
         data: (planDays) {
           if (!initialScrolledDown && planDays.isNotEmpty) {
@@ -93,7 +93,7 @@ class _PlanHistoryViewState extends ConsumerState<PlanHistoryView> {
                 ),
                 IconButton(
                   onPressed: navigateBack,
-                  tooltip: 'plan_history_back_tooltip'.tr(),
+                  tooltip: context.tr('plan_history_back_tooltip'),
                   icon: const Icon(EvaIcons.arrowDownwardOutline),
                 ),
                 const SizedBox(height: kPadding),

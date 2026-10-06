@@ -5,7 +5,6 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:share_plus/share_plus.dart';
@@ -58,22 +57,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       AutoDisposeStateProvider<bool>((_) => false);
   bool isLoading = false;
 
-  final shoppingListSorts = [
-    _ShoppingListSortValue(
-      ShoppingListSort.name,
-      'shopping_list_sort_name'.tr(),
-    ),
-    _ShoppingListSortValue(
-      ShoppingListSort.group,
-      'shopping_list_sort_group'.tr(),
-    ),
-  ];
+  List<_ShoppingListSortValue> get shoppingListSorts => [
+        _ShoppingListSortValue(
+          ShoppingListSort.name,
+          context.tr('shopping_list_sort_name'),
+        ),
+        _ShoppingListSortValue(
+          ShoppingListSort.group,
+          context.tr('shopping_list_sort_group'),
+        ),
+      ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MainAppBar(
-        text: 'settings_title'.tr(),
+        text: context.tr('settings_title'),
         scrollController: _scrollController,
       ),
       body: Consumer(
@@ -92,11 +91,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                     ),
                     child: Column(
                       children: [
-                        _buildSectionTitle('settings_section_general'.tr()),
+                        _buildSectionTitle(
+                            context.tr('settings_section_general')),
                         _buildSection([
                           SettingsTile(
                             leadingIcon: EvaIcons.globe2Outline,
-                            text: 'settings_section_general_language'.tr(),
+                            text:
+                                context.tr('settings_section_general_language'),
                             value: _localeName(context.locale),
                             onTap: _openLanguagePicker,
                           ),
@@ -106,8 +107,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             child: SettingsTile(
                               onTap: _openGetPremium,
                               leadingIcon: EvaIcons.awardOutline,
-                              text: 'settings_section_general_premium'
-                                  .tr(args: ['✨']),
+                              text: context.tr(
+                                  'settings_section_general_premium',
+                                  args: ['✨']),
                               trailing: const Icon(
                                 EvaIcons.arrowIosForwardOutline,
                               ),
@@ -118,7 +120,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           if (PermissionUtils.allowedToModerate(foodlyUser))
                             SettingsTile(
                               leadingIcon: EvaIcons.code,
-                              text: 'settings_section_general_use_dev_api'.tr(),
+                              text: context
+                                  .tr('settings_section_general_use_dev_api'),
                               trailing: StreamBuilder<bool>(
                                 initialData: SettingsService.useDevApi,
                                 stream: SettingsService.streamUseDevApi(),
@@ -134,14 +137,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             ),
                         ], context),
                         _buildSectionTitle(
-                          'settings_section_customization'.tr(),
+                          context.tr('settings_section_customization'),
                         ),
                         _buildSection([
                           SettingsTile(
                             leadingIcon: EvaIcons.listOutline,
-                            text:
-                                'settings_section_customization_multiple_meals'
-                                    .tr(),
+                            text: context.tr(
+                                'settings_section_customization_multiple_meals'),
                             trailing: Consumer(builder: (context, ref, _) {
                               return Switch.adaptive(
                                 value: SettingsService.multipleMealsPerTime,
@@ -159,8 +161,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             ref: ref,
                             child: SettingsTile(
                               leadingIcon: EvaIcons.trendingUpOutline,
-                              text: 'settings_section_customization_suggestions'
-                                  .tr(),
+                              text: context.tr(
+                                  'settings_section_customization_suggestions'),
                               trailing: Consumer(builder: (context, ref, _) {
                                 return Switch.adaptive(
                                   value: SettingsService.showSuggestions,
@@ -175,8 +177,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           ),
                           SettingsTile(
                             leadingIcon: EvaIcons.trash2Outline,
-                            text: 'settings_section_customization_remove_bought'
-                                .tr(),
+                            text: context.tr(
+                                'settings_section_customization_remove_bought'),
                             trailing: Consumer(builder: (context, ref, _) {
                               return Switch.adaptive(
                                 value: SettingsService.removeBoughtImmediately,
@@ -192,8 +194,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           SettingsTile(
                             onTap: _openChangeMealTypesModal,
                             leadingIcon: Icons.emoji_food_beverage_rounded,
-                            text: 'settings_section_customization_meal_types'
-                                .tr(),
+                            text: context.tr(
+                                'settings_section_customization_meal_types'),
                             trailing: const Icon(
                               EvaIcons.arrowIosForwardOutline,
                             ),
@@ -203,12 +205,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             child: SettingsTile(
                               onTap: _openChangePrimaryColorModal,
                               leadingIcon: EvaIcons.colorPaletteOutline,
-                              text:
-                                  'settings_section_customization_change_color'
-                                      .tr(),
+                              text: context.tr(
+                                  'settings_section_customization_change_color'),
                               trailing: CircleAvatar(
                                 maxRadius: kPadding / 2,
-                                backgroundColor: SettingsService.primaryColor,
+                                backgroundColor: theme.primaryColor,
                               ),
                             ),
                           ),
@@ -218,20 +219,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             child: SettingsTile(
                               onTap: _openReorderProductGroups,
                               leadingIcon: EvaIcons.menu,
-                              text:
-                                  'settings_section_customization_shoppinglist_group_order'
-                                      .tr(),
+                              text: context.tr(
+                                  'settings_section_customization_shoppinglist_group_order'),
                               trailing:
                                   const Icon(EvaIcons.arrowIosForwardOutline),
                             ),
                           ),
                         ], context),
-                        _buildSectionTitle('settings_section_plan'.tr()),
+                        _buildSectionTitle(context.tr('settings_section_plan')),
                         _buildSection([
                           SettingsTile(
                             onTap: _openChangePlanNameModal,
                             leadingIcon: Icons.abc_rounded,
-                            text: 'settings_section_plan_change_name'.tr(),
+                            text:
+                                context.tr('settings_section_plan_change_name'),
                             trailing:
                                 const Icon(EvaIcons.arrowIosForwardOutline),
                           ),
@@ -239,8 +240,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             builder: (BuildContext ctx) => SettingsTile(
                               onTap: () => _shareCode(plan, ctx),
                               leadingIcon: EvaIcons.shareOutline,
-                              text: 'settings_section_plan_share'
-                                  .tr(args: [plan.code!]),
+                              text: context.tr('settings_section_plan_share',
+                                  args: [plan.code!]),
                               trailing:
                                   const Icon(EvaIcons.arrowIosForwardOutline),
                             ),
@@ -248,13 +249,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           SettingsTile(
                             onTap: () => _changePlanCode(plan),
                             leadingIcon: EvaIcons.hashOutline,
-                            text: 'settings_section_plan_change_code'.tr(),
+                            text:
+                                context.tr('settings_section_plan_change_code'),
                             trailing:
                                 const Icon(EvaIcons.arrowIosForwardOutline),
                           ),
                           SettingsTile(
                             leadingIcon: EvaIcons.lockOutline,
-                            text: 'settings_section_plan_change_locked'.tr(),
+                            text: context
+                                .tr('settings_section_plan_change_locked'),
                             trailing: Consumer(builder: (context, ref, _) {
                               final isLoadingLockState =
                                   ref.watch(_$loadingChangePlanLockState);
@@ -270,7 +273,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           SettingsTile(
                             onTap: () => _leavePlan(plan.id!, context),
                             leadingIcon: EvaIcons.closeCircleOutline,
-                            text: 'settings_section_plan_leave'.tr(),
+                            text: context.tr('settings_section_plan_leave'),
                             trailing: const Icon(
                               EvaIcons.arrowIosForwardOutline,
                               color: Colors.red,
@@ -280,7 +283,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           ),
                         ], context),
                         if (foodlyUser.plans!.length > 1)
-                          _buildSectionTitle('settings_section_meals'.tr())
+                          _buildSectionTitle(
+                              context.tr('settings_section_meals'))
                         else
                           const SizedBox(),
                         if (foodlyUser.plans!.length > 1)
@@ -293,14 +297,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                                 context,
                               ),
                               leadingIcon: EvaIcons.downloadOutline,
-                              text: 'settings_section_meals_import'.tr(),
+                              text: context.tr('settings_section_meals_import'),
                               trailing:
                                   const Icon(EvaIcons.arrowIosForwardOutline),
                             ),
                           ], context)
                         else
                           const SizedBox(),
-                        _buildSectionTitle('settings_section_help'.tr()),
+                        _buildSectionTitle(context.tr('settings_section_help')),
                         _buildSection([
                           SettingsTile(
                             onTap: () => Navigator.push(
@@ -310,7 +314,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                               ),
                             ),
                             leadingIcon: EvaIcons.questionMarkCircleOutline,
-                            text: 'settings_section_help_intro'.tr(),
+                            text: context.tr('settings_section_help_intro'),
                             trailing:
                                 const Icon(EvaIcons.arrowIosForwardOutline),
                           ),
@@ -318,11 +322,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             onTap: () => Navigator.push(
                               context,
                               ConcentricPageRoute<HelpSlideShareImport>(
-                                builder: (_) => HelpSlideShareImport(),
+                                builder: (_) => const HelpSlideShareImport(),
                               ),
                             ),
                             leadingIcon: EvaIcons.questionMarkCircleOutline,
-                            text: 'settings_section_help_import'.tr(),
+                            text: context.tr('settings_section_help_import'),
                             trailing:
                                 const Icon(EvaIcons.arrowIosForwardOutline),
                           ),
@@ -330,12 +334,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             onTap: () => AutoRouter.of(context)
                                 .push(const FeedbackScreenRoute()),
                             leadingIcon: EvaIcons.paperPlaneOutline,
-                            text: 'settings_section_help_support'.tr(),
+                            text: context.tr('settings_section_help_support'),
                             trailing:
                                 const Icon(EvaIcons.arrowIosForwardOutline),
                           ),
                         ], context),
-                        _buildSectionTitle('settings_section_account'.tr()),
+                        _buildSectionTitle(
+                            context.tr('settings_section_account')),
                         _buildSection([
                           if (PermissionUtils.allowedToModerate(foodlyUser))
                             SettingsTile(
@@ -348,7 +353,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                                 builder: (_) => const SettingsMcpTokenModal(),
                               ),
                               leadingIcon: EvaIcons.code,
-                              text: 'settings_section_account_mcp'.tr(),
+                              text: context.tr('settings_section_account_mcp'),
                               trailing:
                                   const Icon(EvaIcons.arrowIosForwardOutline),
                             ),
@@ -360,20 +365,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                                 return;
                               }
                               MainSnackbar(
-                                message:
-                                    'settings_section_account_reset_msg'.tr(),
+                                message: context
+                                    .tr('settings_section_account_reset_msg'),
                                 isSuccess: true,
                               ).show(context);
                             },
                             leadingIcon: EvaIcons.lockOutline,
-                            text: 'settings_section_account_reset'.tr(),
+                            text: context.tr('settings_section_account_reset'),
                             trailing:
                                 const Icon(EvaIcons.arrowIosForwardOutline),
                           ),
                           SettingsTile(
                             onTap: _deleteAccount,
                             leadingIcon: EvaIcons.trash2Outline,
-                            text: 'settings_section_account_delete'.tr(),
+                            text: context.tr('settings_section_account_delete'),
                             trailing: const Icon(
                               EvaIcons.arrowIosForwardOutline,
                               color: Colors.red,
@@ -384,7 +389,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           SettingsTile(
                             onTap: _signOut,
                             leadingIcon: EvaIcons.logOutOutline,
-                            text: 'settings_section_account_logout'.tr(),
+                            text: context.tr('settings_section_account_logout'),
                             trailing: const Icon(
                               EvaIcons.arrowIosForwardOutline,
                               color: Colors.red,
@@ -404,7 +409,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                               text: TextSpan(
                                 style: theme.textTheme.bodyLarge,
                                 children: <TextSpan>[
-                                  TextSpan(text: 'settings_sign_in_as'.tr()),
+                                  TextSpan(
+                                      text: context.tr('settings_sign_in_as')),
                                   TextSpan(
                                     text:
                                         '\n${firebaseUser?.email ?? '...'}${isSubscribed ? isGifted ? ' 🎁' : ' ⭐️' : ''}',
@@ -425,14 +431,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                               TextButton(
                                 onPressed: () => _launchUrl(kAppPrivacyUrl),
                                 child: Text(
-                                  'settings_privacy'.tr(),
+                                  context.tr('settings_privacy'),
                                   style: theme.textTheme.bodyLarge,
                                 ),
                               ),
                               TextButton(
                                 onPressed: () => _launchUrl(kAppTermsOfUseUrl),
                                 child: Text(
-                                  'settings_terms_of_use'.tr(),
+                                  context.tr('settings_terms_of_use'),
                                   style: theme.textTheme.bodyLarge,
                                 ),
                               ),
@@ -456,19 +462,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
         stream: SettingsService.streamShoppingListSort(),
         builder: (context, _) {
           final current = SettingsService.shoppingListSort;
+          final sorts = shoppingListSorts;
           return SettingsTile(
             leadingIcon: Icons.sort_rounded,
-            text: 'settings_section_customization_shoppinglist_sort'.tr(),
-            value: shoppingListSorts
+            text:
+                context.tr('settings_section_customization_shoppinglist_sort'),
+            value: sorts
                 .firstWhere(
                   (sort) => sort.value == current,
-                  orElse: () => shoppingListSorts.first,
+                  orElse: () => sorts.first,
                 )
                 .label,
             onTap: () => WidgetUtils.showFoodlyBottomSheet<void>(
               context: context,
               builder: (_) => OptionsSheet(options: [
-                for (final sort in shoppingListSorts)
+                for (final sort in sorts)
                   OptionsSheetOptions(
                     title: sort.label,
                     selected: sort.value == current,
@@ -502,9 +510,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 return;
               }
               await context.setLocale(locale);
-              if (mounted) {
-                Phoenix.rebirth(context);
-              }
             },
           ),
       ]),
@@ -552,7 +557,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   void _shareCode(Plan plan, BuildContext ctx) async {
     if (plan.locked ?? false) {
       MainSnackbar(
-        message: 'settings_share_plan_locked'.tr(),
+        message: context.tr('settings_share_plan_locked'),
         infinite: true,
       ).show(ctx);
       return;
@@ -566,8 +571,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     );
     final box = ctx.findRenderObject() as RenderBox?;
     final params = ShareParams(
-      text: 'settings_share_msg'.tr(args: [kAppName, code, '$joinUrl']),
-      subject: 'settings_share_msg_short'.tr(args: [kAppName, code]),
+      text:
+          context.tr('settings_share_msg', args: [kAppName, code, '$joinUrl']),
+      subject: context.tr('settings_share_msg_short', args: [kAppName, code]),
       sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
     );
     await SharePlus.instance.share(params);

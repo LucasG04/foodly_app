@@ -4,13 +4,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foodly/screens/meal_create/meal_assistant_sheet.dart';
 
+import '../../helpers/test_localizations.dart';
+
 void main() {
   bool fieldHasFocus(WidgetTester tester) =>
       tester.widget<EditableText>(find.byType(EditableText)).focusNode.hasFocus;
 
   testWidgets('camera tap closes the keyboard and the menu does not refocus the field', (tester) async {
     await tester.pumpWidget(const ProviderScope(
-      child: MaterialApp(home: Scaffold(body: MealAssistantSheet())),
+      child: MaterialApp(
+        localizationsDelegates: testLocalizationsDelegates,
+        home: Scaffold(body: MealAssistantSheet()),
+      ),
     ));
     await tester.pump();
     expect(fieldHasFocus(tester), isTrue); // autofocus

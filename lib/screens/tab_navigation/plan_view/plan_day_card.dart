@@ -75,21 +75,21 @@ class PlanDayCard extends StatelessWidget {
                       ),
                       const SizedBox(height: kPadding),
                       _buildMealView(
-                        title: 'plan_day_breakfast'.tr(),
+                        title: context.tr('plan_day_breakfast'),
                         mealType: MealType.BREAKFAST,
                         list: breakfastList,
                         context: context,
                         activeMealTypes: activeMealTypes,
                       ),
                       _buildMealView(
-                        title: 'plan_day_lunch'.tr(),
+                        title: context.tr('plan_day_lunch'),
                         mealType: MealType.LUNCH,
                         list: lunchList,
                         context: context,
                         activeMealTypes: activeMealTypes,
                       ),
                       _buildMealView(
-                        title: 'plan_day_dinner'.tr(),
+                        title: context.tr('plan_day_dinner'),
                         mealType: MealType.DINNER,
                         list: dinnerList,
                         context: context,
@@ -182,12 +182,12 @@ class PlanDayCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                child: const Text(
-                  'add',
-                  style: TextStyle(
+                child: Text(
+                  context.tr('add'),
+                  style: const TextStyle(
                     fontWeight: FontWeight.w500,
                   ),
-                ).tr(),
+                ),
               ),
             ),
           )

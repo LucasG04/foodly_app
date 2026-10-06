@@ -39,13 +39,14 @@ class _EditGrocerySuggestionSheetState
       AutoDisposeStateProvider(
     (ref) => ref
         .read(dataGroceryGroupsProvider)
+        .valueOrNull
         ?.where((group) => group.id == widget.grocery.group)
         .firstOrNull,
   );
 
   @override
   Widget build(BuildContext context) {
-    final productGroups = ref.read(dataGroceryGroupsProvider) ?? [];
+    final productGroups = ref.read(dataGroceryGroupsProvider).valueOrNull ?? [];
     final width = mediaSize.width > 599 ? 580.0 : mediaSize.width * 0.9;
 
     return Container(
@@ -65,7 +66,7 @@ class _EditGrocerySuggestionSheetState
               ),
             ),
             const SizedBox(height: kPadding),
-            Text('edit_grocery_suggestion_group'.tr()),
+            Text(context.tr('edit_grocery_suggestion_group')),
             const SizedBox(height: kPadding / 2),
             Consumer(builder: (context, ref, _) {
               final selectedGroup = ref.watch(_$selectedGroup);
@@ -87,7 +88,7 @@ class _EditGrocerySuggestionSheetState
             Center(
               child: Consumer(builder: (_, ref, __) {
                 return MainButton(
-                  text: 'save'.tr(),
+                  text: context.tr('save'),
                   isProgress: true,
                   buttonState: ref.watch(_$buttonState),
                   onTap: _saveGrocery,
@@ -136,7 +137,7 @@ class _EditGrocerySuggestionSheetState
       }
       ref.read(_$buttonState.notifier).state = ButtonState.normal;
       MainSnackbar(
-        message: 'edit_grocery_suggestion_error'.tr(),
+        message: context.tr('edit_grocery_suggestion_error'),
         isError: true,
       ).show(context);
       return;
@@ -154,7 +155,7 @@ class _EditGrocerySuggestionSheetState
     if (!saved) {
       // Flushbar is a route, so show it after the sheet is popped.
       MainSnackbar(
-        message: 'edit_grocery_suggestion_list_only'.tr(),
+        message: context.tr('edit_grocery_suggestion_list_only'),
         isError: true,
       ).show(navigator.context);
     }

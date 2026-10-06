@@ -55,7 +55,6 @@ dependencies:
   envied: ^1.1.1
   purchases_flutter: ^10.13.2
   permission_handler: ^12.0.1
-  flutter_phoenix: ^1.1.1
   clipboard: ^2.0.2
   internet_connection_checker: ^3.0.1
   app_links: ^6.4.1

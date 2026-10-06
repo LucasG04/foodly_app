@@ -63,8 +63,7 @@ class _ScrollShadowLayoutState extends State<ScrollShadowLayout> {
   }
 
   bool _handleScroll(ScrollNotification notification) {
-    if (notification.depth == 0 &&
-        notification.metrics.axis == Axis.vertical) {
+    if (notification.depth == 0 && notification.metrics.axis == Axis.vertical) {
       final showShadow =
           notification.metrics.pixels > notification.metrics.minScrollExtent;
       if (showShadow != _showShadow) {

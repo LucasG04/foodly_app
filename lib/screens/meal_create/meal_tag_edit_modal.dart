@@ -109,7 +109,7 @@ class _MealTagEditModalState extends State<MealTagEditModal>
             _buildHeader(),
             MainTextField(
               controller: _queryController,
-              placeholder: 'meal_tag_search_hint'.tr(),
+              placeholder: context.tr('meal_tag_search_hint'),
               textCapitalization: TextCapitalization.sentences,
               onSubmit: _submitQuery,
             ),
@@ -118,7 +118,7 @@ class _MealTagEditModalState extends State<MealTagEditModal>
               hidden: _query.isNotEmpty,
               selected: _selected,
               onToggle: _onSuggestionTap,
-              semanticsLabel: 'meal_tag_ai_suggestions_semantics'.tr(),
+              semanticsLabel: context.tr('meal_tag_ai_suggestions_semantics'),
             ),
             const SizedBox(height: kPadding / 2),
             Flexible(
@@ -131,8 +131,9 @@ class _MealTagEditModalState extends State<MealTagEditModal>
                     ? UserInformation(
                         key: const ValueKey('tags-empty'),
                         assetPath: 'assets/images/undraw_empty.png',
-                        title: 'meal_create_edit_tags_no_results'.tr(),
-                        message: 'meal_create_edit_tags_no_results_msg'.tr(),
+                        title: context.tr('meal_create_edit_tags_no_results'),
+                        message:
+                            context.tr('meal_create_edit_tags_no_results_msg'),
                       )
                     : Wrap(
                         spacing: kPadding / 2,
@@ -141,7 +142,8 @@ class _MealTagEditModalState extends State<MealTagEditModal>
                           if (canCreate)
                             TagChip(
                               key: const ValueKey('tag-create'),
-                              label: 'meal_tag_create'.tr(args: [_query]),
+                              label:
+                                  context.tr('meal_tag_create', args: [_query]),
                               style: TagChipStyle.create,
                               onTap: _submitQuery,
                             ),
@@ -170,7 +172,7 @@ class _MealTagEditModalState extends State<MealTagEditModal>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'meal_create_tags_title'.tr().toUpperCase(),
+              context.tr('meal_create_tags_title').toUpperCase(),
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -185,7 +187,7 @@ class _MealTagEditModalState extends State<MealTagEditModal>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('done').tr(),
+                  Text(context.tr('done')),
                   const SizedBox(width: 5.0),
                   const Icon(EvaIcons.doneAllOutline),
                 ],

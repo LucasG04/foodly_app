@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:foodly/screens/meal_create/meal_tag_edit_modal.dart';
 import 'package:foodly/widgets/tag_chip.dart';
 
+import '../helpers/test_localizations.dart';
+
 void main() {
   Future<void> pump(
     WidgetTester tester, {
@@ -13,6 +15,7 @@ void main() {
   }) =>
       tester.pumpWidget(ProviderScope(
         child: MaterialApp(
+          localizationsDelegates: testLocalizationsDelegates,
           home: Scaffold(
             body: MealTagEditModal(
               selectedContent: selected,
@@ -160,6 +163,7 @@ void main() {
   testWidgets('sheet does not shrink while searching', (tester) async {
     await tester.pumpWidget(ProviderScope(
       child: MaterialApp(
+        localizationsDelegates: testLocalizationsDelegates,
         home: Scaffold(
           body: Align(
             alignment: Alignment.bottomCenter,
@@ -185,6 +189,7 @@ void main() {
     addTearDown(tester.view.reset);
     Future<void> pumpWithInset(double inset) => tester.pumpWidget(ProviderScope(
           child: MaterialApp(
+            localizationsDelegates: testLocalizationsDelegates,
             home: MediaQuery(
               data: MediaQueryData(
                 size: const Size(800, 900),

@@ -125,8 +125,8 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
       children: [
         UserInformation(
           assetPath: 'assets/images/undraw_empty.png',
-          title: 'meal_list_empty_title'.tr(),
-          message: 'meal_list_empty_subtitle'.tr(),
+          title: context.tr('meal_list_empty_title'),
+          message: context.tr('meal_list_empty_subtitle'),
         ),
       ],
     );

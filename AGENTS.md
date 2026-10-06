@@ -22,7 +22,7 @@ flutter test --plain-name 'some test name'                 # single test
 
 ## Architecture
 
-- **Entry** `lib/main.dart`: Firebase init → Hive + static service `initialize()` calls → `Phoenix` (app restart) → `ProviderScope` → `EasyLocalization` (`en`, `de`; strings in `assets/translations/*.json`, used as `'key'.tr()`).
+- **Entry** `lib/main.dart`: Firebase init → Hive + static service `initialize()` calls → `ProviderScope` → `EasyLocalization` (`en`, `de`; strings in `assets/translations/*.json`). In widgets use `context.tr('key')` so text rebuilds on language change; static `'key'.tr()` only outside the widget tree (services) or in `initState`. Primary color is reactive via `SettingsService.primaryColorListenable` → `MaterialApp.theme`; read it from `Theme.of(context)`, never restart the app.
 - **Services** (`lib/services/`): static-only classes with private constructors, no DI. Most wrap Firestore collections via `withConverter` (e.g. `PlanService` → `plans`), models expose `fromMap`/`toMap`.
 - **State** (`lib/providers/`): Riverpod `StateProvider`s for global state (`planProvider`, `userProvider`, …); `FoodlyApp` streams user/plan from Firestore and writes them into providers.
 - **Routing**: auto_route v5 in `lib/app_router.dart`; regenerate after edits.
@@ -33,6 +33,7 @@ flutter test --plain-name 'some test name'                 # single test
 
 ## Conventions
 
+- Widget tests: give the pumped `MaterialApp` `localizationsDelegates: testLocalizationsDelegates` (`test/helpers/test_localizations.dart`), otherwise `context.tr` throws `LocalizationNotFoundException`.
 - Strict lints in `analysis_options.yaml`: relative imports, single quotes, `prefer_final_locals`, `avoid_print`, etc.
 - iOS: FlutterFire plugins resolve via Swift Package Manager (Flutter default). Don't re-add the precompiled `FirebaseFirestore` pod to `ios/Podfile` (duplicate symbols).
 - Android: `android/build.gradle` forces `compileSdkVersion 36` on plugin subprojects because some plugins pin an old one that fails AGP's AAR metadata check.

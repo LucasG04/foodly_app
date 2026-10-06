@@ -68,8 +68,8 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'plan_move_${widget.isMoving ? 'move' : 'add'}'
-                        .tr()
+                    context
+                        .tr('plan_move_${widget.isMoving ? 'move' : 'add'}')
                         .toUpperCase(),
                     style: const TextStyle(
                       fontSize: 20,
@@ -82,7 +82,7 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
             ),
           ),
           const SizedBox(height: kPadding),
-          _buildSectionLabel('plan_move_day'.tr()),
+          _buildSectionLabel(context.tr('plan_move_day')),
           _buildTileGrid([
             for (final (i, date) in _dropdownValues.indexed)
               _buildTile(
@@ -91,7 +91,7 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
                 builder: (color) => [
                   Text(
                     i == 0
-                        ? 'plan_move_today'.tr()
+                        ? context.tr('plan_move_today')
                         : DateFormat.E(context.locale.toLanguageTag())
                             .format(date),
                     maxLines: 1,
@@ -110,7 +110,7 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
               ),
           ]),
           const SizedBox(height: kPadding),
-          _buildSectionLabel('plan_move_meal'.tr()),
+          _buildSectionLabel(context.tr('plan_move_meal')),
           _buildTileGrid(
             [
               for (final (type, icon, label) in _mealTypes)
@@ -120,7 +120,7 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
                   builder: (color) => [
                     Icon(icon, color: color),
                     Text(
-                      label.tr(),
+                      context.tr(label),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -137,7 +137,7 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
           const SizedBox(height: kPadding),
           Center(
             child: MainButton(
-              text: 'save'.tr(),
+              text: context.tr('save'),
               onTap: _save,
               isProgress: true,
               buttonState: _buttonState,
