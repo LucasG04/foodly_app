@@ -249,6 +249,9 @@
   "login_password_title": "password",
   "login_forgot_password": "Forgot password?",
   "login_join": "join",
+  "login_legal_notice": "By continuing, you agree to the {terms} and acknowledge the {privacy}.",
+  "login_legal_terms": "Terms of Use",
+  "login_legal_privacy": "Privacy Policy",
   "login_error_wrong_mail": "Please enter a correct email.",
   "login_error_password": "Your password must contain at least 6 characters",
   "login_error_password_weak": "The password is too weak. It must be at least 6 characters long.",
@@ -438,5 +441,17 @@
   "meal_assistant_status_done": "Done",
   "meal_assistant_error_not_food": "That doesn't sound like food. Describe a dish or a change to it.",
   "meal_assistant_error_edit_incomplete": "The change couldn't be finished. Your meal is unchanged.",
-  "meal_assistant_error_too_long": "This meal is too long for the assistant."
+  "meal_assistant_error_too_long": "This meal is too long for the assistant.",
+  "ai_consent_title": "AI features",
+  "ai_consent_intro": "AI features need your permission to send the content you enter to external AI services.",
+  "ai_consent_what_title": "What's sent",
+  "ai_consent_what": "Your recipe's text (name, ingredients, instructions) and, for the AI assistant, your provided message and photo.",
+  "ai_consent_who_title": "Who processes it",
+  "ai_consent_who": "The AI gateway OpenRouter. Requests are completely anonymous. Your input isn't used to train AI.",
+  "ai_consent_when_title": "Only when you use AI",
+  "ai_consent_when": "Nothing is sent otherwise. You can withdraw your permission in the settings at any time.",
+  "ai_consent_privacy": "Privacy policy",
+  "ai_consent_allow": "Allow",
+  "ai_consent_decline": "Not now",
+  "settings_section_general_ai_consent": "Allow AI features"
 }

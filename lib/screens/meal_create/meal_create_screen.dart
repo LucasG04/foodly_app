@@ -30,6 +30,7 @@ import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/tag_candidates.dart';
 import '../../utils/widget_utils.dart';
+import '../../widgets/ai_consent_sheet.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/image_credit_chip.dart';
 import '../../widgets/link_preview.dart';
@@ -723,12 +724,15 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     );
   }
 
-  void _onTapInstagramImport() {
+  Future<void> _onTapInstagramImport() async {
     final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
     final usage = ref.read(aiUsageProvider).valueOrNull;
     final canUse = usage?.canUseInstagram(isSubscribed) ?? true;
     if (!canUse) {
       GetPremiumModal.showAiQuotaExhausted(context, feature: 'instagram');
+      return;
+    }
+    if (!await AiConsentSheet.ensure(context, ref) || !mounted) {
       return;
     }
     _openImportModal(ImportType.instagram);
@@ -778,6 +782,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         GetPremiumModal.showAiQuotaExhausted(context, feature: 'instagram');
         return;
       }
+      if (!await AiConsentSheet.ensure(context, ref) || !mounted) {
+        return;
+      }
     }
     _openImportModal(type, initialUrl: url);
   }
@@ -824,6 +831,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         message: context.tr('meal_assistant_error_too_long'),
         isError: true,
       ).show(context);
+      return;
+    }
+    if (!await AiConsentSheet.ensure(context, ref) || !mounted) {
       return;
     }
 
@@ -909,7 +919,11 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
   }
 
   /// Uses the live form values; the meal state only gets them on save.
+  /// No suggestions without AI consent: they load passively, so never prompt here.
   Future<List<String>>? _getTagSuggestions(List<String> planTags) {
+    if (!AiConsentSheet.hasConsent(ref)) {
+      return null;
+    }
     final baseMeal = ref.read(_$meal);
     final mealForApi = Meal.fromMap(baseMeal.id, baseMeal.toMap())
       ..name = _titleController.text
@@ -1012,6 +1026,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         message: context.tr('meal_create_kcal_ai_missing_input'),
         isError: true,
       ).show(context);
+      return;
+    }
+    if (!await AiConsentSheet.ensure(context, ref) || !mounted) {
       return;
     }
 

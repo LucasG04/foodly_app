@@ -27,6 +27,7 @@ import '../../services/in_app_purchase_service.dart';
 import '../../utils/analytics.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/permission_utils.dart';
+import '../../widgets/ai_consent_sheet.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/options_modal/options_modal.dart';
@@ -100,6 +101,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                                 context.tr('settings_section_general_language'),
                             value: _localeName(context.locale),
                             onTap: _openLanguagePicker,
+                          ),
+                          SettingsTile(
+                            leadingIcon: Icons.auto_awesome,
+                            text: context
+                                .tr('settings_section_general_ai_consent'),
+                            trailing: Switch.adaptive(
+                              value: foodlyUser.aiConsentAt != null,
+                              onChanged: _onAiConsentChanged,
+                            ),
                           ),
                           WidgetUtils.userIsSubscribed(
                             ref: ref,
@@ -700,6 +710,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       context: context,
       builder: (_) => const ChangeMealTypesModal(),
     );
+  }
+
+  Future<void> _onAiConsentChanged(bool allow) async {
+    if (allow) {
+      await AiConsentSheet.ensure(context, ref);
+    } else {
+      AiConsentSheet.setConsent(ref, null);
+    }
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _launchUrl(String href) async {

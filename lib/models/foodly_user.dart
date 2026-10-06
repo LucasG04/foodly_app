@@ -8,6 +8,9 @@ class FoodlyUser {
   DateTime? premiumGiftedAt;
   int? premiumGiftedMonths;
   bool? premiumGiftedMessageShown;
+
+  /// When the user allowed sending their inputs to third-party AI; null = not yet.
+  DateTime? aiConsentAt;
   FoodlyUserRole role;
 
   FoodlyUser({
@@ -18,6 +21,7 @@ class FoodlyUser {
     this.premiumGiftedAt,
     this.premiumGiftedMonths,
     this.premiumGiftedMessageShown,
+    this.aiConsentAt,
     this.role = FoodlyUserRole.user,
   });
 
@@ -29,6 +33,7 @@ class FoodlyUser {
       'premiumGiftedAt': premiumGiftedAt?.millisecondsSinceEpoch,
       'premiumGiftedMonths': premiumGiftedMonths,
       'premiumGiftedMessageShown': premiumGiftedMessageShown,
+      'aiConsentAt': aiConsentAt?.millisecondsSinceEpoch,
       'role': role.toString(),
     };
   }
@@ -44,6 +49,9 @@ class FoodlyUser {
           : null,
       premiumGiftedMessageShown: map['premiumGiftedMessageShown'] as bool?,
       premiumGiftedMonths: map['premiumGiftedMonths'] as int?,
+      aiConsentAt: map['aiConsentAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['aiConsentAt'] as int)
+          : null,
       role: FoodlyUserRole.values.firstWhere(
         (e) => e.toString() == map['role'],
         orElse: () => FoodlyUserRole.user,

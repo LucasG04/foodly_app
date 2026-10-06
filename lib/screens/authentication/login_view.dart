@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -222,7 +223,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       )
                     ],
                   )
-                : const SizedBox(),
+                : Center(child: _buildLegalNotice()),
           ),
           const Spacer(),
           LayoutBuilder(builder: (context, constraints) {
@@ -255,6 +256,48 @@ class _LoginViewState extends ConsumerState<LoginView> {
           const SizedBox(height: kPadding * 2),
         ],
       ),
+    );
+  }
+
+  /// Store policies require accepting the terms before creating content; this
+  /// covers email sign-up and Sign in with Apple alike.
+  Widget _buildLegalNotice() {
+    final theme = Theme.of(context);
+    final style = theme.textTheme.bodySmall!.copyWith(
+      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+    );
+    final links = {
+      'terms': (context.tr('login_legal_terms'), kAppTermsOfUseUrl),
+      'privacy': (context.tr('login_legal_privacy'), kAppPrivacyUrl),
+    };
+    final text = context.tr('login_legal_notice');
+    final spans = <InlineSpan>[];
+    var start = 0;
+    for (final match in RegExp(r'\{(terms|privacy)\}').allMatches(text)) {
+      final (label, url) = links[match[1]]!;
+      spans
+        ..add(TextSpan(text: text.substring(start, match.start)))
+        ..add(WidgetSpan(
+          alignment: PlaceholderAlignment.baseline,
+          baseline: TextBaseline.alphabetic,
+          child: GestureDetector(
+            onTap: () => launchUrl(Uri.parse(url)),
+            child: Text(
+              label,
+              style: style.copyWith(
+                color: theme.primaryColor,
+                decoration: TextDecoration.underline,
+                decorationColor: theme.primaryColor,
+              ),
+            ),
+          ),
+        ));
+      start = match.end;
+    }
+    spans.add(TextSpan(text: text.substring(start)));
+    return Text.rich(
+      TextSpan(style: style, children: spans),
+      textAlign: TextAlign.center,
     );
   }
 

@@ -249,6 +249,9 @@
   "login_password_title": "Passwort",
   "login_forgot_password": "Passwort vergessen?",
   "login_join": "Beitreten",
+  "login_legal_notice": "Mit dem Fortfahren akzeptierst du die {terms} und nimmst die {privacy} zur Kenntnis.",
+  "login_legal_terms": "Nutzungsbedingungen",
+  "login_legal_privacy": "Datenschutzerklärung",
   "login_error_wrong_mail": "Bitte gib eine richtige E-Mail ein.",
   "login_error_password": "Dein Passwort muss mindestens 6 Zeichen enthalten",
   "login_error_password_weak": "Das Passwort ist zu leicht. Es muss mindestens 6 Zeichen lang sein.",
@@ -438,5 +441,17 @@
   "meal_assistant_status_done": "Fertig",
   "meal_assistant_error_not_food": "Das klingt nicht nach Essen. Beschreib ein Gericht oder eine Änderung daran.",
   "meal_assistant_error_edit_incomplete": "Die Änderung konnte nicht abgeschlossen werden. Dein Gericht ist unverändert.",
-  "meal_assistant_error_too_long": "Dieses Gericht ist zu lang für den Assistenten."
+  "meal_assistant_error_too_long": "Dieses Gericht ist zu lang für den Assistenten.",
+  "ai_consent_title": "KI-Funktionen",
+  "ai_consent_intro": "KI-Funktionen benötigen deine Erlaubnis, deine Eingaben an externe KI-Dienste zu senden.",
+  "ai_consent_what_title": "Was gesendet wird",
+  "ai_consent_what": "Der Text deines Rezepts (Name, Zutaten, Zubereitung) und beim KI-Assistenten deine Nachricht und dein Foto.",
+  "ai_consent_who_title": "Wer es verarbeitet",
+  "ai_consent_who": "Das KI-Gateway OpenRouter. Anfragen sind komplett anonym. Deine Eingaben werden nicht zum Training von KI genutzt.",
+  "ai_consent_when_title": "Nur wenn du KI nutzt",
+  "ai_consent_when": "Sonst wird nichts gesendet. Du kannst deine Erlaubnis jederzeit in den Einstellungen widerrufen.",
+  "ai_consent_privacy": "Datenschutzerklärung",
+  "ai_consent_allow": "Erlauben",
+  "ai_consent_decline": "Nicht jetzt",
+  "settings_section_general_ai_consent": "KI-Funktionen erlauben"
 }
