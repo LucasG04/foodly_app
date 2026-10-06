@@ -142,7 +142,8 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
   /// Builds the 8-day display list from the current stream snapshot.
   List<PlanDay> _getDaysByMeals(List<PlanMeal> planMeals) {
     final plan = ref.read(planProvider)!;
-    final now = DateTime.now().toUtc().add(Duration(hours: plan.hourDiffToUtc!));
+    final now =
+        DateTime.now().toUtc().add(Duration(hours: plan.hourDiffToUtc!));
     final today = DateTime(now.year, now.month, now.day);
     final currentMeals = planMeals.where((m) => !m.date.isBefore(today));
     return List.generate(8, (i) {
@@ -158,7 +159,8 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
   /// plan. Runs as side effect via [ref.listen] on [planMealsStreamProvider].
   void _archiveOldMeals(List<PlanMeal> planMeals) {
     final plan = ref.read(planProvider)!;
-    final now = DateTime.now().toUtc().add(Duration(hours: plan.hourDiffToUtc!));
+    final now =
+        DateTime.now().toUtc().add(Duration(hours: plan.hourDiffToUtc!));
     final today = DateTime(now.year, now.month, now.day);
     final oldMeals = planMeals.where((m) => m.date.isBefore(today));
     for (final meal in oldMeals) {

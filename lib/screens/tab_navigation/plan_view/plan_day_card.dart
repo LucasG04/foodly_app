@@ -220,8 +220,8 @@ class PlanDayCard extends StatelessWidget {
     if (readonly) {
       final hasLunch = meals.any((e) => e.type == MealType.LUNCH);
       final hasDinner = meals.any((e) => e.type == MealType.DINNER);
-      final forBreakfast = mealType == MealType.BREAKFAST &&
-          (hasLunch || hasDinner);
+      final forBreakfast =
+          mealType == MealType.BREAKFAST && (hasLunch || hasDinner);
       final forLunch = mealType == MealType.LUNCH && hasDinner;
       return forBreakfast || forLunch;
     }

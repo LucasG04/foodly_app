@@ -9,6 +9,7 @@ class AnimatedShoppingList extends StatefulWidget {
   final void Function(Grocery) onTap;
   final void Function(Grocery) onEdit;
   final void Function(Grocery) onLongPress;
+
   /// Called immediately when the last item is removed locally, before the
   /// Firestore round-trip. Allows the parent to start its own removal animation
   /// in sync with the last grocery's slide-out.
@@ -93,10 +94,10 @@ class _AnimatedShoppingListState extends State<AnimatedShoppingList> {
   }
 
   Widget _buildSlideTile(
-      Grocery grocery,
-      Animation<double> animation,
-      BuildContext context, {
-      Curve curve = Curves.easeOut,
+    Grocery grocery,
+    Animation<double> animation,
+    BuildContext context, {
+    Curve curve = Curves.easeOut,
   }) {
     final curved = CurvedAnimation(parent: animation, curve: curve);
     return SizeTransition(
@@ -138,11 +139,13 @@ class _AnimatedShoppingListState extends State<AnimatedShoppingList> {
 
     _listKey.currentState?.removeItem(
       index,
-      (ctx, animation) => _buildSlideTile(grocery, animation, ctx, curve: Curves.easeIn),
+      (ctx, animation) =>
+          _buildSlideTile(grocery, animation, ctx, curve: Curves.easeIn),
       duration: const Duration(milliseconds: 150),
     );
 
-    Future<void>.delayed(const Duration(milliseconds: 150)).then((_) => onTap(grocery));
+    Future<void>.delayed(const Duration(milliseconds: 150))
+        .then((_) => onTap(grocery));
 
     if (_groceries.isEmpty) {
       widget.onEmpty?.call();

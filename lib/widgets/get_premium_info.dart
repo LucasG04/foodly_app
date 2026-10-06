@@ -4,7 +4,6 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
 import '../constants.dart';
-import '../utils/widget_utils.dart';
 import 'get_premium_modal.dart';
 
 class GetPremiumInfo extends StatelessWidget {
@@ -13,9 +12,15 @@ class GetPremiumInfo extends StatelessWidget {
   final double? width;
   final double displayProbability;
 
+  /// Passed to [GetPremiumModal].
+  final String source;
+  final PremiumFeature? highlight;
+
   const GetPremiumInfo({
     required this.title,
     required this.description,
+    required this.source,
+    this.highlight,
     this.width,
     this.displayProbability = 1.0,
     super.key,
@@ -67,9 +72,6 @@ class GetPremiumInfo extends StatelessWidget {
   }
 
   void _openGetPremium(BuildContext context) {
-    WidgetUtils.showFoodlyBottomSheet<void>(
-      context: context,
-      builder: (_) => const GetPremiumModal(),
-    );
+    GetPremiumModal.show(context, source: source, highlight: highlight);
   }
 }

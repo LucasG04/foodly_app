@@ -96,7 +96,7 @@ class _ChangeMealTypeModalState extends ConsumerState<ChangeMealTypesModal> {
         onChanged: (value) {
           ref.read(provider.notifier).state = value!;
         },
-        title: Text(title.tr()),
+        title: Text(title),
         activeColor: Theme.of(context).primaryColor,
       );
     });

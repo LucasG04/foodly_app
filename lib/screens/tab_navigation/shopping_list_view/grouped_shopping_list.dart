@@ -62,13 +62,14 @@ class _GroupedShoppingListState extends State<GroupedShoppingList> {
 
   /// Header-only exit tile — omits [AnimatedShoppingList] to prevent Flutter
   /// from reusing state via [ValueKey] and triggering a spurious [insertItem].
-  Widget _buildGroupExitTile(
-      ShoppingListGroup group, Animation<double> animation, BuildContext context) {
+  Widget _buildGroupExitTile(ShoppingListGroup group,
+      Animation<double> animation, BuildContext context) {
     final curved = CurvedAnimation(parent: animation, curve: Curves.easeIn);
     return SizeTransition(
       sizeFactor: curved,
       child: SlideTransition(
-        position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero).animate(curved),
+        position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
+            .animate(curved),
         child: StickyHeader(
           controller: widget.pageScrollController,
           header: _buildGroupHeader(group, context),
@@ -108,10 +109,12 @@ class _GroupedShoppingListState extends State<GroupedShoppingList> {
 
     for (int i = 0; i < newGroups.length; i++) {
       final group = newGroups[i];
-      final existingIndex = _groups.indexWhere((g) => g.groupId == group.groupId);
+      final existingIndex =
+          _groups.indexWhere((g) => g.groupId == group.groupId);
       if (existingIndex == -1) {
         _groups.insert(i, group);
-        _listKey.currentState?.insertItem(i, duration: const Duration(milliseconds: 150));
+        _listKey.currentState
+            ?.insertItem(i, duration: const Duration(milliseconds: 150));
       } else {
         _groups[existingIndex] = group;
       }
@@ -131,13 +134,14 @@ class _GroupedShoppingListState extends State<GroupedShoppingList> {
     );
   }
 
-  Widget _buildGroupTile(
-      ShoppingListGroup group, Animation<double> animation, BuildContext context) {
+  Widget _buildGroupTile(ShoppingListGroup group, Animation<double> animation,
+      BuildContext context) {
     final curved = CurvedAnimation(parent: animation, curve: Curves.easeOut);
     return SizeTransition(
       sizeFactor: curved,
       child: SlideTransition(
-        position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero).animate(curved),
+        position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
+            .animate(curved),
         child: StickyHeader(
           controller: widget.pageScrollController,
           header: _buildGroupHeader(group, context),

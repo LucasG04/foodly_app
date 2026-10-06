@@ -782,9 +782,10 @@ class _MealScreenState extends ConsumerState<MealScreen>
   }
 
   void _openGetPremium() {
-    WidgetUtils.showFoodlyBottomSheet<void>(
-      context: context,
-      builder: (_) => const GetPremiumModal(),
+    GetPremiumModal.show(
+      context,
+      source: 'meal_stats',
+      highlight: PremiumFeature.stats,
     );
   }
 

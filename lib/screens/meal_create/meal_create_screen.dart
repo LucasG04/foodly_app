@@ -494,7 +494,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       ),
       isError: true,
       action: TextButton(
-        onPressed: _openGetPremium,
+        onPressed: () => _openGetPremium(feature),
         child: Text('ai_usage_upgrade'.tr()),
       ),
     ).show(context);
@@ -1016,10 +1016,11 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         _titleController.text;
   }
 
-  void _openGetPremium() {
-    WidgetUtils.showFoodlyBottomSheet<void>(
-      context: context,
-      builder: (_) => const GetPremiumModal(),
+  void _openGetPremium(String feature) {
+    GetPremiumModal.show(
+      context,
+      source: 'ai_quota_$feature',
+      highlight: PremiumFeature.ai,
     );
   }
 

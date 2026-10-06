@@ -47,9 +47,7 @@ class _EditIngredientsState extends State<EditIngredients> {
     final groups = ingredients.map((i) => i.group).toSet();
     final result = List<Ingredient>.from(ingredients);
     for (final group in groups) {
-      final groupItems = result
-          .where((i) => i.group == group)
-          .toList()
+      final groupItems = result.where((i) => i.group == group).toList()
         ..sort((a, b) => (a.sortKey ?? 9999).compareTo(b.sortKey ?? 9999));
       for (var i = 0; i < groupItems.length; i++) {
         if (groupItems[i].sortKey == null) {

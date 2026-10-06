@@ -24,7 +24,6 @@ import '../../utils/basic_utils.dart';
 import '../../utils/convert_util.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
-import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/foodly_network_image.dart';
 import '../../widgets/get_premium_modal.dart';
@@ -819,9 +818,10 @@ class _ImportModalState extends ConsumerState<ImportModal>
         ),
         isError: true,
         action: TextButton(
-          onPressed: () => WidgetUtils.showFoodlyBottomSheet<void>(
-            context: context,
-            builder: (_) => const GetPremiumModal(),
+          onPressed: () => GetPremiumModal.show(
+            context,
+            source: 'ai_quota_${widget.type.name}',
+            highlight: PremiumFeature.ai,
           ),
           child: Text('ai_usage_upgrade'.tr()),
         ),

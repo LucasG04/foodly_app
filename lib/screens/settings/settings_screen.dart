@@ -686,10 +686,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   }
 
   void _openGetPremium() {
-    WidgetUtils.showFoodlyBottomSheet<void>(
-      context: context,
-      builder: (_) => const GetPremiumModal(),
-    );
+    GetPremiumModal.show(context, source: 'settings');
   }
 
   void _openChangeMealTypesModal() {

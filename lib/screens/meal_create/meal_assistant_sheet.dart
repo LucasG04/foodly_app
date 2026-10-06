@@ -559,9 +559,10 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
         ),
         isError: true,
         action: TextButton(
-          onPressed: () => WidgetUtils.showFoodlyBottomSheet<void>(
-            context: context,
-            builder: (_) => const GetPremiumModal(),
+          onPressed: () => GetPremiumModal.show(
+            context,
+            source: 'ai_quota_assistant',
+            highlight: PremiumFeature.ai,
           ),
           child: Text('ai_usage_upgrade'.tr()),
         ),

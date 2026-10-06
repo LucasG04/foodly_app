@@ -21,6 +21,7 @@ import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/get_premium_info.dart';
+import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/meal_pagination.dart';
 import '../../widgets/user_information.dart';
@@ -273,6 +274,8 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
       child: GetPremiumInfo(
         title: 'get_premium_modal_2_title'.tr(),
         description: 'get_premium_modal_2_description_ad'.tr(),
+        source: 'meal_suggestions',
+        highlight: PremiumFeature.suggestions,
       ),
     );
   }
