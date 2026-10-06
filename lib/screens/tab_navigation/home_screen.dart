@@ -389,15 +389,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
     final showMessage =
         user.isPremiumGifted == true && user.premiumGiftedMessageShown != true;
     if (showMessage && mounted) {
-      BasicUtils.afterBuild(
-        () => MainSnackbar(
+      BasicUtils.afterBuild(() {
+        if (!mounted) {
+          return;
+        }
+        MainSnackbar(
           isSuccess: true,
           duration: 10,
           title: context.tr('premium_gifted_msg_title'),
           message: context.tr('premium_gifted_msg_message',
               args: [kAppName, user.premiumGiftedMonths.toString()]),
-        ).show(context),
-      );
+        ).show(context);
+      });
       FoodlyUserService.setPremiumGiftedMessageShown(user.id!);
     }
   }

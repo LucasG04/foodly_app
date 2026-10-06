@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/grocery_group.dart';
@@ -11,12 +13,18 @@ final dataGroceryGroupsProvider =
     FutureProvider<List<GroceryGroup>>((ref) async {
   final langCode = ref.watch(languageCodeProvider);
   if (langCode == null) {
-    return [];
+    // Stay loading until FoodlyApp sets the language; this provider then rebuilds.
+    return Completer<List<GroceryGroup>>().future;
   }
   final previous = ref.state.valueOrNull;
   final groups = await LunixApiService.getGroceryGroups(langCode);
-  // getGroceryGroups returns [] on failure; keep the last good list.
-  return groups.isEmpty && previous != null ? previous : groups;
+  if (groups.isEmpty) {
+    // getGroceryGroups returns [] on failure: retry later, keep the last good list.
+    final retry = Timer(const Duration(seconds: 30), ref.invalidateSelf);
+    ref.onDispose(retry.cancel);
+    return previous ?? [];
+  }
+  return groups;
 });
 
 /// Provides the supported sites to import dishes from

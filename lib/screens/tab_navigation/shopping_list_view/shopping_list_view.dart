@@ -308,11 +308,11 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
   List<ShoppingListGroup> _sortGroceriesWithGroups(
       List<ShoppingListGroup> groups) {
     final groupOrder = SettingsService.productGroupOrder;
-    final List<ShoppingListGroup> sorted = [];
-    for (final groupId in groupOrder) {
-      final group = groups.firstWhere((e) => e.groupId == groupId);
-      sorted.add(group);
-    }
+    // Saved ids can be stale (group removed or groups not loaded), so skip them.
+    final sorted = [
+      for (final groupId in groupOrder)
+        ...groups.where((e) => e.groupId == groupId),
+    ];
 
     final List<ShoppingListGroup> unSorted = groups
         .where((element) => !groupOrder.contains(element.groupId))

@@ -38,8 +38,6 @@ class GetPremiumModal extends ConsumerStatefulWidget {
 
   const GetPremiumModal({required this.source, this.highlight, super.key});
 
-  /// Opens the paywall. Drag-to-dismiss is off because it fights the inner
-  /// scroll view.
   /// Error snackbar for an exhausted AI quota, with an upgrade action.
   static void showAiQuotaExhausted(
     BuildContext context, {
@@ -57,16 +55,24 @@ class GetPremiumModal extends ConsumerStatefulWidget {
       ),
       isError: true,
       action: TextButton(
-        onPressed: () => show(
-          context,
-          source: 'ai_quota_$feature',
-          highlight: PremiumFeature.ai,
-        ),
+        onPressed: () {
+          // The caller (often a bottom sheet) may be gone by the time it's tapped.
+          if (!context.mounted) {
+            return;
+          }
+          show(
+            context,
+            source: 'ai_quota_$feature',
+            highlight: PremiumFeature.ai,
+          );
+        },
         child: Text(context.tr('ai_usage_upgrade')),
       ),
     ).show(context);
   }
 
+  /// Opens the paywall. Drag-to-dismiss is off because it fights the inner
+  /// scroll view.
   static Future<void> show(
     BuildContext context, {
     required String source,

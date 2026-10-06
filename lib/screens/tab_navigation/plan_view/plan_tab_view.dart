@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -34,9 +36,9 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
   @override
   bool get wantKeepAlive => true;
 
-  // broadcast: the StreamBuilder below remounts when the plan reloads
-  final _shouldRequestReview =
-      AppReviewService.shouldRequestReview().asBroadcastStream();
+  // Survives remounts of the builder below (it remounts when the plan reloads).
+  final _shouldRequestReview = ValueNotifier(false);
+  late final StreamSubscription<bool> _shouldRequestReviewSub;
   final AutoDisposeStreamProvider<List<PlanMeal>> planMealsStreamProvider =
       StreamProvider.autoDispose<List<PlanMeal>>((ref) {
     final activePlan = ref.watch(planProvider);
@@ -44,6 +46,20 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
   });
 
   // TODO: initState to listen on plan meal changes; create providers for all days or one that can be used with select for individual days
+
+  @override
+  void initState() {
+    super.initState();
+    _shouldRequestReviewSub = AppReviewService.shouldRequestReview()
+        .listen((value) => _shouldRequestReview.value = value);
+  }
+
+  @override
+  void dispose() {
+    _shouldRequestReviewSub.cancel();
+    _shouldRequestReview.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,10 +96,10 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
                       ],
                     ),
                   ),
-                  StreamBuilder<bool>(
-                    stream: _shouldRequestReview,
-                    builder: (context, snapshot) {
-                      if (snapshot.data == null || !snapshot.data!) {
+                  ValueListenableBuilder<bool>(
+                    valueListenable: _shouldRequestReview,
+                    builder: (context, shouldRequestReview, _) {
+                      if (!shouldRequestReview) {
                         return const SizedBox();
                       }
                       return SizedBox(

@@ -885,13 +885,16 @@ class _ImportModalState extends ConsumerState<ImportModal>
   }
 
   void _handleDownloadError() {
+    KeepScreenOn.turnOff();
+    if (!mounted) {
+      return;
+    }
     MainSnackbar(
       isError: true,
       title: context.tr('import_modal_error_not_found_title'),
       message: context.tr('import_modal_error_not_found'),
       isDismissible: true,
     ).show(context);
-    KeepScreenOn.turnOff();
     setState(() {
       _buttonState = ButtonState.error;
     });
