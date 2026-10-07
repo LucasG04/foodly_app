@@ -16,6 +16,7 @@ import '../../../widgets/main_button.dart';
 import '../../../widgets/options_modal/options_modal.dart';
 import '../../../widgets/options_modal/options_modal_option.dart';
 import '../../../widgets/progress_button.dart';
+import '../../../widgets/sheet_header.dart';
 import '../../settings/settings_tile.dart';
 
 class PlanDownloadModal extends StatefulWidget {
@@ -55,28 +56,17 @@ class _PlanDownloadModalState extends State<PlanDownloadModal>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: kPadding / 2),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  context.tr('plan_download_modal_title').toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+          SheetHeader(
+            title: context.tr('plan_download_modal_title'),
+            actions: [
+              IconButton(
+                onPressed: _openDocxInfo,
+                icon: Icon(
+                  EvaIcons.infoOutline,
+                  color: theme.primaryColor,
                 ),
-                IconButton(
-                  onPressed: _openDocxInfo,
-                  icon: Icon(
-                    EvaIcons.infoOutline,
-                    color: theme.primaryColor,
-                  ),
-                  splashRadius: 25.0,
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
           SettingsTile(
             text: context.tr('plan_download_modal_exclude_today'),
@@ -125,7 +115,10 @@ class _PlanDownloadModalState extends State<PlanDownloadModal>
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: kPadding, bottom: kPadding * 2),
+            padding: EdgeInsets.only(
+              top: kPadding,
+              bottom: WidgetUtils.sheetBottomPadding(context),
+            ),
             child: MainButton(
               text: context.tr('plan_download_modal_cta'),
               isProgress: true,

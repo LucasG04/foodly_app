@@ -493,15 +493,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
   }
 
   Future<Plan?> _showPlanSelect(String userId) {
-    return showModalBottomSheet(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(10.0),
-        ),
-      ),
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+    return WidgetUtils.showFoodlyBottomSheet<Plan>(
       context: context,
-      isScrollControlled: true,
       builder: (_) => SelectPlanModal(userId),
     );
   }

@@ -12,8 +12,10 @@ import '../../models/mcp_token.dart';
 import '../../services/lunix_api_service.dart';
 import '../../utils/analytics.dart';
 import '../../utils/main_snackbar.dart';
+import '../../utils/widget_utils.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/progress_button.dart';
+import '../../widgets/sheet_header.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
 class SettingsMcpTokenModal extends StatefulWidget {
@@ -196,14 +198,13 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
     final width = size.width > 599 ? 580.0 : size.width * 0.88;
 
     return PopScope(
-      // Only "Done" may close while a request runs or the token is shown.
-      canPop: _newToken == null && _running == null,
+      canPop: _canClose,
       child: Padding(
         padding: EdgeInsets.fromLTRB(
           (size.width - width) / 2,
           kPadding,
           (size.width - width) / 2,
-          kPadding + MediaQuery.paddingOf(context).bottom,
+          WidgetUtils.sheetBottomPadding(context),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -225,23 +226,25 @@ class _SettingsMcpTokenModalState extends State<SettingsMcpTokenModal> {
   Widget _buildHeader() {
     final theme = Theme.of(context);
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          context.tr('mcp_token_title').toUpperCase(),
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
+        SheetHeader(
+          title: context.tr('mcp_token_title'),
+          showClose: _canClose,
+          padding: EdgeInsets.zero,
         ),
-        const SizedBox(height: 4),
         Text(
           context.tr('mcp_token_subtitle'),
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.textTheme.bodySmall?.color,
           ),
-          textAlign: TextAlign.center,
         ),
       ],
     );
   }
+
+  /// Only "Done" may close while a request runs or the token is shown.
+  bool get _canClose => _newToken == null && _running == null;
 
   Widget _buildBody() {
     if (_loading) {

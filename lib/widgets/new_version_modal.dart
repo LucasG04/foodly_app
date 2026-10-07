@@ -1,11 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
 import '../constants.dart';
 import '../models/foodly_change.dart';
+import '../utils/widget_utils.dart';
 import 'main_button.dart';
 import 'scroll_shadow_layout.dart';
+import 'sheet_header.dart';
 
 class NewVersionModal extends StatefulWidget {
   final List<VersionGroup> versionGroups;
@@ -40,59 +41,37 @@ class _NewVersionModalState extends State<NewVersionModal> {
   Widget build(BuildContext context) {
     return ScrollShadowLayout(
       header: Container(
-        padding: const EdgeInsets.all(kPadding / 2),
         color: Theme.of(context).dialogTheme.backgroundColor,
-        child: Row(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(left: kPadding / 2),
-                child: Text(
-                  context.tr('new_version_modal_title').toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            IconButton(
-              icon: const Icon(EvaIcons.close),
-              onPressed: _close,
-            ),
-          ],
+        child: SheetHeader(
+          title: context.tr('new_version_modal_title'),
+          padding: const EdgeInsets.fromLTRB(
+              kPadding, kPadding, kPadding, kPadding / 2),
         ),
       ),
       body: SingleChildScrollView(
-        child: Container(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.sizeOf(context).height * 0.8,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: kPadding),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ...widget.versionGroups.map(
-                      (g) => _buildVersionSection(g),
-                    ),
-                  ],
-                ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: kPadding),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final group in widget.versionGroups)
+                    _buildVersionSection(group),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: kPadding),
-                child: MainButton(
-                  onTap: _close,
-                  text: context.tr('new_version_modal_continue'),
-                ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                  bottom: WidgetUtils.sheetBottomPadding(context)),
+              child: MainButton(
+                onTap: _close,
+                text: context.tr('new_version_modal_continue'),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -100,7 +79,7 @@ class _NewVersionModalState extends State<NewVersionModal> {
 
   Widget _buildVersionSection(VersionGroup group) {
     return Padding(
-      padding: const EdgeInsets.only(top: kPadding),
+      padding: const EdgeInsets.only(bottom: kPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

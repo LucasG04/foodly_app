@@ -11,8 +11,10 @@ import '../../../services/settings_service.dart';
 import '../../../utils/analytics.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/of_context_mixin.dart';
+import '../../../utils/widget_utils.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/progress_button.dart';
+import '../../../widgets/sheet_header.dart';
 
 class PlanMoveMealModal extends ConsumerStatefulWidget {
   final bool isMoving;
@@ -61,27 +63,10 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.only(top: kPadding),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    context
-                        .tr('plan_move_${widget.isMoving ? 'move' : 'add'}')
-                        .toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  )
-                ],
-              ),
-            ),
+          SheetHeader(
+            title: context.tr('plan_move_${widget.isMoving ? 'move' : 'add'}'),
           ),
-          const SizedBox(height: kPadding),
+          const SizedBox(height: kPadding / 2),
           _buildSectionLabel(context.tr('plan_move_day')),
           _buildTileGrid([
             for (final (i, date) in _dropdownValues.indexed)
@@ -143,7 +128,7 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
               buttonState: _buttonState,
             ),
           ),
-          const SizedBox(height: kPadding * 2),
+          SizedBox(height: WidgetUtils.sheetBottomPadding(context)),
         ],
       ),
     );

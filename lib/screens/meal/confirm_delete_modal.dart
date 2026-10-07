@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 
 import '../../constants.dart';
 import '../../models/meal.dart';
+import '../../utils/widget_utils.dart';
 import '../../widgets/main_button.dart';
+import '../../widgets/sheet_header.dart';
 
 class ConfirmDeleteModal extends StatelessWidget {
   final Meal meal;
@@ -24,16 +26,9 @@ class ConfirmDeleteModal extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: kPadding),
-              child: Text(
-                context.tr('delete').toUpperCase(),
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-            ),
+          SheetHeader(
+            title: context.tr('delete'),
+            padding: const EdgeInsets.only(top: kPadding, bottom: kPadding / 2),
           ),
           RichText(
             text: TextSpan(
@@ -60,7 +55,7 @@ class ConfirmDeleteModal extends StatelessWidget {
               color: theme.colorScheme.error,
             ),
           ),
-          const SizedBox(height: kPadding * 2),
+          SizedBox(height: WidgetUtils.sheetBottomPadding(context)),
         ],
       ),
     );

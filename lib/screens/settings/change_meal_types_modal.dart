@@ -6,7 +6,9 @@ import 'package:logging/logging.dart';
 import '../../constants.dart';
 import '../../models/plan_meal.dart';
 import '../../services/settings_service.dart';
+import '../../utils/widget_utils.dart';
 import '../../widgets/main_button.dart';
+import '../../widgets/sheet_header.dart';
 
 class ChangeMealTypesModal extends ConsumerStatefulWidget {
   const ChangeMealTypesModal({super.key});
@@ -49,27 +51,9 @@ class _ChangeMealTypeModalState extends ConsumerState<ChangeMealTypesModal> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.only(top: kPadding),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    context
-                        .tr('settings_section_customization_meal_types')
-                        .toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  )
-                ],
-              ),
-            ),
+          SheetHeader(
+            title: context.tr('settings_section_customization_meal_types'),
           ),
-          const SizedBox(height: kPadding),
           _buildCheckboxTile(_$breakfast, context.tr('breakfast')),
           _buildCheckboxTile(_$lunch, context.tr('lunch')),
           _buildCheckboxTile(_$dinner, context.tr('dinner')),
@@ -80,7 +64,7 @@ class _ChangeMealTypeModalState extends ConsumerState<ChangeMealTypesModal> {
               onTap: _save,
             ),
           ),
-          const SizedBox(height: kPadding),
+          SizedBox(height: WidgetUtils.sheetBottomPadding(context)),
         ],
       ),
     );
@@ -97,6 +81,7 @@ class _ChangeMealTypeModalState extends ConsumerState<ChangeMealTypesModal> {
           ref.read(provider.notifier).state = value!;
         },
         title: Text(title),
+        contentPadding: EdgeInsets.zero,
         activeColor: Theme.of(context).primaryColor,
       );
     });

@@ -834,13 +834,7 @@ class _MealScreenState extends ConsumerState<MealScreen>
   }
 
   void _openConfirmDelete(Meal meal) async {
-    final result = await showModalBottomSheet<bool>(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(10.0),
-        ),
-      ),
-      isScrollControlled: true,
+    final result = await WidgetUtils.showFoodlyBottomSheet<bool>(
       context: context,
       builder: (_) => ConfirmDeleteModal(meal),
     );

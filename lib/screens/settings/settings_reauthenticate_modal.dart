@@ -7,9 +7,11 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../constants.dart';
 import '../../services/authentication_service.dart';
 import '../../utils/firebase_auth_providers.dart';
+import '../../utils/widget_utils.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
+import '../../widgets/sheet_header.dart';
 
 /// Reauthenticates the user with password.
 ///
@@ -43,16 +45,9 @@ class _SettingsReauthenticateModalState
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: kPadding),
-              child: Text(
-                context.tr('settings_reauthenticate_title'),
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-            ),
+          SheetHeader(
+            title: context.tr('settings_reauthenticate_title'),
+            padding: const EdgeInsets.only(top: kPadding, bottom: kPadding / 2),
           ),
           RichText(
             text: TextSpan(
@@ -80,7 +75,7 @@ class _SettingsReauthenticateModalState
             ..._buildPassword(),
           SizedBox(
             height: MediaQuery.viewInsetsOf(context).bottom == 0
-                ? kPadding * 2
+                ? WidgetUtils.sheetBottomPadding(context)
                 : MediaQuery.viewInsetsOf(context).bottom,
           ),
         ],

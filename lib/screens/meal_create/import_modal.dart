@@ -22,12 +22,14 @@ import '../../utils/basic_utils.dart';
 import '../../utils/convert_util.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
+import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
 import '../../widgets/foodly_network_image.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
+import '../../widgets/sheet_header.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
 enum ImportType { link, instagram }
@@ -139,36 +141,16 @@ class _ImportModalState extends ConsumerState<ImportModal>
   }
 
   Widget _buildTitleRow() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: kPadding),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            context.tr('import_modal_title').toUpperCase(),
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+    return SheetHeader(
+      title: context.tr('import_modal_title'),
+      actions: [
+        if (widget.type == ImportType.link)
+          IconButton(
+            onPressed: _showInfo,
+            icon: const Icon(EvaIcons.infoOutline),
+            color: theme.primaryColor,
           ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (widget.type == ImportType.link)
-                IconButton(
-                  onPressed: _showInfo,
-                  icon: const Icon(EvaIcons.infoOutline),
-                  color: theme.primaryColor,
-                ),
-              IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(EvaIcons.close),
-              ),
-            ],
-          ),
-        ],
-      ),
+      ],
     );
   }
 
@@ -230,7 +212,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
             buttonState: _buttonState,
           ),
         ),
-        const SizedBox(height: kPadding * 2),
+        SizedBox(height: WidgetUtils.sheetBottomPadding(context)),
       ],
     );
   }
@@ -283,7 +265,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
                   ),
           ),
         ),
-        const SizedBox(height: kPadding * 2),
+        SizedBox(height: WidgetUtils.sheetBottomPadding(context)),
       ],
     );
   }

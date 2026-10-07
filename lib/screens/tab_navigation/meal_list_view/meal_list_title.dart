@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants.dart';
 import '../../../providers/state_providers.dart';
 import '../../../utils/of_context_mixin.dart';
+import '../../../utils/widget_utils.dart';
 import 'tag_filter_modal.dart';
 
 class MealListTitle extends StatefulWidget {
@@ -160,13 +161,7 @@ class _MealListTitleState extends State<MealListTitle> with OfContextMixin {
   }
 
   void _openTagFilterModal(BuildContext context) {
-    showModalBottomSheet<List<String>>(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(10.0),
-        ),
-      ),
-      isScrollControlled: true,
+    WidgetUtils.showFoodlyBottomSheet<void>(
       context: context,
       builder: (_) => const TagFilterModal(),
     );

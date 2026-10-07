@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// A fixed [header] above a scrollable [body]. Shows a shadow below the
 /// header once the body is scrolled. The shadow is painted on top of the body
-/// so opaque content (e.g. cards) doesn't cover it.
+/// so opaque content (e.g. cards) doesn't cover it. Hugs short content.
 class ScrollShadowLayout extends StatefulWidget {
   final Widget header;
   final Widget body;
@@ -24,11 +24,13 @@ class _ScrollShadowLayoutState extends State<ScrollShadowLayout> {
   Widget build(BuildContext context) {
     final shadowColor = Theme.of(context).primaryColor;
     return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         widget.header,
-        Expanded(
+        Flexible(
           child: Stack(
-            fit: StackFit.expand,
+            fit: StackFit.passthrough,
             children: [
               NotificationListener<ScrollNotification>(
                 onNotification: _handleScroll,

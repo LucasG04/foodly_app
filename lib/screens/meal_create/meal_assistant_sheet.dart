@@ -29,6 +29,7 @@ import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/options_modal/options_modal.dart';
 import '../../widgets/options_modal/options_modal_option.dart';
+import '../../widgets/sheet_header.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
 /// Longest side the picker returns. With the 1024 px short side from
@@ -129,21 +130,8 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
   }
 
   Widget _buildTitleRow() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: kPadding),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            context.tr('meal_assistant_title').toUpperCase(),
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(EvaIcons.close),
-          ),
-        ],
-      ),
+    return SheetHeader(
+      title: context.tr('meal_assistant_title'),
     );
   }
 
