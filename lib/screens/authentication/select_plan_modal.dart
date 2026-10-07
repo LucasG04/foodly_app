@@ -1,12 +1,11 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
 import '../../models/plan.dart';
 import '../../services/foodly_user_service.dart';
 import '../../services/plan_service.dart';
+import '../../widgets/sheet_header.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
 class SelectPlanModal extends StatefulWidget {
@@ -47,34 +46,14 @@ class _SelectPlanModalState extends State<SelectPlanModal> {
       padding: EdgeInsets.only(
         left: (size.width - width) / 2,
         right: (size.width - width) / 2,
-        bottom: kPadding + MediaQuery.paddingOf(context).bottom,
+        bottom: kPadding / 2 + MediaQuery.paddingOf(context).bottom,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: kPadding),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: AutoSizeText(
-                    context.tr('modal_select_plan_title').toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  alignment: Alignment.centerRight,
-                  icon: const Icon(EvaIcons.close),
-                  onPressed: () => Navigator.maybePop(context),
-                ),
-              ],
-            ),
+          SheetHeader(
+            title: context.tr('modal_select_plan_title'),
           ),
           FutureBuilder<List<Plan>?>(
             future: _plansFuture,

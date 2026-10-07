@@ -11,6 +11,7 @@ import '../../../services/lunix_api_service.dart';
 import '../../../services/shopping_list_service.dart';
 import '../../../utils/main_snackbar.dart';
 import '../../../utils/of_context_mixin.dart';
+import '../../../utils/widget_utils.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/progress_button.dart';
 import '../../../widgets/tag_chip.dart';
@@ -97,7 +98,7 @@ class _EditGrocerySuggestionSheetState
             ),
             SizedBox(
               height: mediaViewInsets.bottom == 0
-                  ? kPadding * 2
+                  ? WidgetUtils.sheetBottomPadding(context)
                   : mediaViewInsets.bottom,
             ),
           ],

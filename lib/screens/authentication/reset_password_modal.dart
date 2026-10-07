@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -8,9 +7,11 @@ import 'package:flutter/material.dart';
 import '../../constants.dart';
 import '../../services/authentication_service.dart';
 import '../../utils/of_context_mixin.dart';
+import '../../utils/widget_utils.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
+import '../../widgets/sheet_header.dart';
 
 class ResetPasswordModal extends StatefulWidget {
   final String? email;
@@ -49,31 +50,8 @@ class _ResetPasswordModalState extends State<ResetPasswordModal>
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: kPadding),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: AutoSizeText(
-                      context.tr('modal_password_reset_title').toUpperCase(),
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                      minFontSize: 16,
-                      maxLines: 1,
-                    ),
-                  ),
-                  GestureDetector(
-                    child: const Icon(EvaIcons.close),
-                    onTap: () => Navigator.maybePop(context),
-                  ),
-                ],
-              ),
-            ),
+          SheetHeader(
+            title: context.tr('modal_password_reset_title'),
           ),
           MainTextField(
             controller: _emailController,
@@ -119,7 +97,7 @@ class _ResetPasswordModalState extends State<ResetPasswordModal>
               onTap: _resetPassword,
             ),
           ),
-          const SizedBox(height: kPadding * 2),
+          SizedBox(height: WidgetUtils.sheetBottomPadding(context)),
         ],
       ),
     );

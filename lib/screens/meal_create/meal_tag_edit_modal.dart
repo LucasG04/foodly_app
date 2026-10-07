@@ -7,6 +7,7 @@ import '../../utils/analytics.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/tag_candidates.dart';
 import '../../widgets/main_text_field.dart';
+import '../../widgets/sheet_header.dart';
 import '../../widgets/tag_chip.dart';
 import '../../widgets/user_information.dart';
 import 'ai_tag_suggestions.dart';
@@ -165,37 +166,25 @@ class _MealTagEditModalState extends State<MealTagEditModal>
   }
 
   Widget _buildHeader() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.only(top: kPadding),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              context.tr('meal_create_tags_title').toUpperCase(),
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            TextButton(
-              onPressed: _close,
-              style: TextButton.styleFrom(
-                foregroundColor: theme.primaryColor,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(context.tr('done')),
-                  const SizedBox(width: 5.0),
-                  const Icon(EvaIcons.doneAllOutline),
-                ],
-              ),
-            ),
-          ],
+    return SheetHeader(
+      title: context.tr('meal_create_tags_title'),
+      showClose: false,
+      actions: [
+        TextButton(
+          onPressed: _close,
+          style: TextButton.styleFrom(
+            foregroundColor: theme.primaryColor,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(context.tr('done')),
+              const SizedBox(width: 5.0),
+              const Icon(EvaIcons.doneAllOutline),
+            ],
+          ),
         ),
-      ),
+      ],
     );
   }
 

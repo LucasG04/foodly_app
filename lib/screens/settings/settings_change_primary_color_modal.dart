@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../constants.dart';
 import '../../primary_colors.dart';
 import '../../services/settings_service.dart';
+import '../../utils/widget_utils.dart';
+import '../../widgets/sheet_header.dart';
 
 class SettingsChangePrimaryColorModal extends ConsumerStatefulWidget {
   const SettingsChangePrimaryColorModal({super.key});
@@ -41,29 +42,9 @@ class _SettingsChangePrimaryColorModalState
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: kPadding),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AutoSizeText(
-                    context
-                        .tr('settings_section_customization_change_color')
-                        .toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  GestureDetector(
-                    child: const Icon(EvaIcons.close),
-                    onTap: () => Navigator.maybePop(context),
-                  ),
-                ],
-              ),
-            ),
+          SheetHeader(
+            title: context.tr('settings_section_customization_change_color'),
+            padding: const EdgeInsets.only(top: kPadding, bottom: kPadding / 2),
           ),
           Wrap(
             runSpacing: kPadding / 2,
@@ -105,7 +86,7 @@ class _SettingsChangePrimaryColorModalState
                 )
                 .toList(),
           ),
-          const SizedBox(height: kPadding * 2),
+          SizedBox(height: WidgetUtils.sheetBottomPadding(context)),
         ],
       ),
     );

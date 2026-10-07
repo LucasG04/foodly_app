@@ -13,6 +13,7 @@ import '../services/foodly_user_service.dart';
 import '../utils/basic_utils.dart';
 import '../utils/widget_utils.dart';
 import 'main_button.dart';
+import 'sheet_header.dart';
 
 /// Asks once before user inputs go to third-party AI (App Store 5.1.2(i)).
 class AiConsentSheet extends StatelessWidget {
@@ -72,27 +73,10 @@ class AiConsentSheet extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: kPadding,
-                  bottom: kPadding / 2,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.auto_awesome, color: theme.primaryColor),
-                    const SizedBox(width: kPadding / 2),
-                    Flexible(
-                      child: Text(
-                        context.tr('ai_consent_title').toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              SheetHeader(
+                title: context.tr('ai_consent_title'),
+                icon: Icons.auto_awesome,
+                showClose: false,
               ),
               Text(
                 context.tr('ai_consent_intro'),
@@ -119,10 +103,7 @@ class AiConsentSheet extends StatelessWidget {
               ),
               Center(
                 child: TextButton(
-                  onPressed: () => launchUrl(
-                    Uri.parse(kAppPrivacyUrl),
-                    mode: LaunchMode.externalApplication,
-                  ),
+                  onPressed: () => launchUrl(Uri.parse(kAppPrivacyUrl)),
                   child: Text(
                     context.tr('ai_consent_privacy'),
                     style: TextStyle(color: mutedColor),

@@ -445,7 +445,7 @@
   "ai_consent_title": "KI-Funktionen",
   "ai_consent_intro": "KI-Funktionen benötigen deine Erlaubnis, deine Eingaben an externe KI-Dienste zu senden.",
   "ai_consent_what_title": "Was gesendet wird",
-  "ai_consent_what": "Der Text deines Rezepts (Name, Zutaten, Zubereitung) und beim KI-Assistenten deine Nachricht und dein Foto.",
+  "ai_consent_what": "Der Text deines Rezepts (Titel, Zutaten, Zubereitung) und beim KI-Assistenten die Nachricht und das Foto.",
   "ai_consent_who_title": "Wer es verarbeitet",
   "ai_consent_who": "Das KI-Gateway OpenRouter. Anfragen sind komplett anonym. Deine Eingaben werden nicht zum Training von KI genutzt.",
   "ai_consent_when_title": "Nur wenn du KI nutzt",

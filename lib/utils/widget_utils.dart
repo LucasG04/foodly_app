@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_classes_with_only_static_members
 
+import 'dart:math' as math;
+
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
+import '../constants.dart';
 import '../services/in_app_purchase_service.dart';
 import 'basic_utils.dart';
 
@@ -47,6 +50,13 @@ class WidgetUtils {
     }
     return result;
   }
+
+  /// Space under a sheet's last button: [kPadding] * 2, or more when the system
+  /// navigation bar (e.g. Android 3-button) needs it.
+  static double sheetBottomPadding(BuildContext context) => math.max(
+        kPadding * 2,
+        MediaQuery.paddingOf(context).bottom + kPadding / 2,
+      );
 
   /// Shows a edit dialog for a placeholder plan meal.
   static Future<String?> showPlaceholderEditDialog(

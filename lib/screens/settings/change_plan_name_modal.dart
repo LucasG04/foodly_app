@@ -8,6 +8,8 @@ import '../../../services/plan_service.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/main_text_field.dart';
 import '../../../widgets/progress_button.dart';
+import '../../utils/widget_utils.dart';
+import '../../widgets/sheet_header.dart';
 
 class ChangePlanNameModal extends ConsumerStatefulWidget {
   const ChangePlanNameModal({super.key});
@@ -42,27 +44,9 @@ class _ChangePlanNameModalState extends ConsumerState<ChangePlanNameModal> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.only(top: kPadding),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    context
-                        .tr('settings_section_plan_change_name')
-                        .toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  )
-                ],
-              ),
-            ),
+          SheetHeader(
+            title: context.tr('settings_section_plan_change_name'),
           ),
-          const SizedBox(height: kPadding),
           MainTextField(
             controller: _textEditingController,
             errorText: _nameValid
@@ -83,10 +67,9 @@ class _ChangePlanNameModalState extends ConsumerState<ChangePlanNameModal> {
             ),
           ),
           SizedBox(
-            height: kPadding +
-                (MediaQuery.viewInsetsOf(context).bottom == 0
-                    ? 0
-                    : MediaQuery.viewInsetsOf(context).bottom),
+            height: MediaQuery.viewInsetsOf(context).bottom == 0
+                ? WidgetUtils.sheetBottomPadding(context)
+                : kPadding + MediaQuery.viewInsetsOf(context).bottom,
           ),
         ],
       ),

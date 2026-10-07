@@ -1,6 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -15,8 +14,10 @@ import '../utils/analytics.dart';
 import '../utils/basic_utils.dart';
 import '../utils/convert_util.dart';
 import '../utils/of_context_mixin.dart';
+import '../utils/widget_utils.dart';
 import 'main_button.dart';
 import 'progress_button.dart';
+import 'sheet_header.dart';
 import 'small_circular_progress_indicator.dart';
 import 'small_number_input.dart';
 
@@ -75,23 +76,7 @@ class _AddToShoppingListModalState extends ConsumerState<AddToShoppingListModal>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          const SizedBox(height: kPadding / 2),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                context.tr('add').toUpperCase(),
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              IconButton(
-                onPressed: _close,
-                icon: const Icon(EvaIcons.close),
-              ),
-            ],
-          ),
+          SheetHeader(title: context.tr('add')),
           const SizedBox(height: kPadding / 2),
           Consumer(builder: (context, ref, _) {
             final loadState = ref.watch(_$loadingData);
@@ -118,7 +103,7 @@ class _AddToShoppingListModalState extends ConsumerState<AddToShoppingListModal>
               buttonState: ref.watch(_$buttonState),
             ),
           ),
-          const SizedBox(height: kPadding),
+          SizedBox(height: WidgetUtils.sheetBottomPadding(context)),
         ],
       ),
     );
@@ -142,6 +127,7 @@ class _AddToShoppingListModalState extends ConsumerState<AddToShoppingListModal>
     return Column(
       children: [
         ListTile(
+          contentPadding: EdgeInsets.zero,
           title: Text(
             context.tr('add_to_shopping_list_modal_servings'),
             style: const TextStyle(fontWeight: FontWeight.bold),
@@ -169,6 +155,7 @@ class _AddToShoppingListModalState extends ConsumerState<AddToShoppingListModal>
                 final amountString = ConvertUtil.amountToString(
                     ingredient.amount, ingredient.unit);
                 return CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
                   value: isChecked,
                   onChanged: (value) => ref
                       .read(_ingredientStates![index].$isChecked.notifier)

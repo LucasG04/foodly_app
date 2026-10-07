@@ -3,7 +3,6 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../constants.dart';
 import '../../../models/plan.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/meal_service.dart';
@@ -11,6 +10,8 @@ import '../../../services/plan_service.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import '../../utils/analytics.dart';
+import '../../utils/widget_utils.dart';
+import '../../widgets/sheet_header.dart';
 
 class ImportMealsModal extends StatelessWidget {
   final List<String?> planIds;
@@ -31,16 +32,8 @@ class ImportMealsModal extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: kPadding),
-              child: Text(
-                context.tr('settings_import_title'),
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-            ),
+          SheetHeader(
+            title: context.tr('settings_import_title'),
           ),
           FutureBuilder<List<Plan>>(
             future: PlanService.getPlansByIds(planIds),
@@ -79,7 +72,8 @@ class ImportMealsModal extends StatelessWidget {
             },
           ),
           SizedBox(
-            height: kPadding * 2 + MediaQuery.viewInsetsOf(context).bottom,
+            height: WidgetUtils.sheetBottomPadding(context) +
+                MediaQuery.viewInsetsOf(context).bottom,
           ),
         ],
       ),
@@ -102,6 +96,7 @@ class _CopyPlanMealsTileState extends ConsumerState<CopyPlanMealsTile> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      contentPadding: EdgeInsets.zero,
       leading: const Icon(EvaIcons.minus),
       title: Text(widget.plan.name!),
       trailing: IconButton(
@@ -144,6 +139,9 @@ class _CopyPlanMealsTileState extends ConsumerState<CopyPlanMealsTile> {
       _buttonState = CopyButtonState.done;
     });
     await Future<void>.delayed(const Duration(seconds: 1));
+    if (!mounted) {
+      return;
+    }
     setState(() {
       _buttonState = CopyButtonState.normal;
     });

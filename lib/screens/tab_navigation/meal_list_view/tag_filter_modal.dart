@@ -6,7 +6,9 @@ import '../../../constants.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/lunix_api_service.dart';
 import '../../../utils/of_context_mixin.dart';
+import '../../../utils/widget_utils.dart';
 import '../../../widgets/scroll_shadow_layout.dart';
+import '../../../widgets/sheet_header.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import '../../../widgets/tag_chip.dart';
 
@@ -25,12 +27,17 @@ class TagFilterModal extends ConsumerStatefulWidget {
 
 class _TagFilterModalState extends ConsumerState<TagFilterModal>
     with OfContextMixin {
+  // Fetched once: the sheet sizes to its content, so refetching on rebuild
+  // would collapse it to the loader.
+  late final Future<List<String>> _tagsFuture =
+      LunixApiService.getAllTagsInPlan(ref.read(planProvider)!.id!);
+
   @override
   Widget build(BuildContext context) {
     final width = mediaSize.width > 700 ? 700.0 : mediaSize.width * 0.9;
 
-    return SizedBox(
-      height: mediaSize.height * 0.8,
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: mediaSize.height * 0.8),
       child: ScrollShadowLayout(
         header: _buildModalHeader(context, width),
         body: Container(
@@ -42,11 +49,8 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal>
           child: SingleChildScrollView(
             child: Column(
               children: [
-                const SizedBox(height: kPadding / 2),
                 FutureBuilder<List<String>>(
-                    future: LunixApiService.getAllTagsInPlan(
-                      ref.read(planProvider)!.id!,
-                    ),
+                    future: _tagsFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return _buildLoader();
@@ -77,7 +81,7 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal>
                         );
                       });
                     }),
-                const SizedBox(height: kPadding),
+                SizedBox(height: WidgetUtils.sheetBottomPadding(context)),
               ],
             ),
           ),
@@ -108,25 +112,15 @@ class _TagFilterModalState extends ConsumerState<TagFilterModal>
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: (mediaSize.width - width) / 2,
-          vertical: kPadding / 2,
         ),
-        child: Row(
-          children: [
-            const Text(
-              'FILTER',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const Spacer(),
+        child: SheetHeader(
+          title: 'Filter',
+          padding: const EdgeInsets.only(top: kPadding, bottom: kPadding / 2),
+          actions: [
             IconButton(
               icon: const Icon(EvaIcons.trash2Outline),
               onPressed: () =>
                   ref.read(mealTagFilterProvider.notifier).state = [],
-            ),
-            const SizedBox(width: kPadding / 2),
-            IconButton(
-              icon: const Icon(EvaIcons.arrowIosDownwardOutline),
-              onPressed: () => Navigator.pop(context),
             ),
           ],
         ),

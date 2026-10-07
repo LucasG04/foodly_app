@@ -102,15 +102,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             value: _localeName(context.locale),
                             onTap: _openLanguagePicker,
                           ),
-                          SettingsTile(
-                            leadingIcon: Icons.auto_awesome,
-                            text: context
-                                .tr('settings_section_general_ai_consent'),
-                            trailing: Switch.adaptive(
-                              value: foodlyUser.aiConsentAt != null,
-                              onChanged: _onAiConsentChanged,
-                            ),
-                          ),
                           WidgetUtils.userIsSubscribed(
                             ref: ref,
                             negate: true,
@@ -367,6 +358,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                               trailing:
                                   const Icon(EvaIcons.arrowIosForwardOutline),
                             ),
+                          SettingsTile(
+                            leadingIcon: Icons.auto_awesome,
+                            text: context
+                                .tr('settings_section_general_ai_consent'),
+                            trailing: Switch.adaptive(
+                              value: foodlyUser.aiConsentAt != null,
+                              onChanged: _onAiConsentChanged,
+                            ),
+                          ),
                           SettingsTile(
                             onTap: () async {
                               await AuthenticationService.resetPassword(

@@ -2,7 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
+import '../../utils/widget_utils.dart';
 import '../../widgets/main_button.dart';
+import '../../widgets/sheet_header.dart';
 
 enum SaveChangesResult { discard, save, cancel }
 
@@ -22,16 +24,10 @@ class SaveChangesModal extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: kPadding),
-              child: Text(
-                context.tr('save_changes_title').toUpperCase(),
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-            ),
+          SheetHeader(
+            title: context.tr('save_changes_title'),
+            showClose: false,
+            padding: const EdgeInsets.only(top: kPadding, bottom: kPadding / 2),
           ),
           Text(context.tr('save_changes_text')),
           const SizedBox(height: kPadding * 2),
@@ -57,7 +53,7 @@ class SaveChangesModal extends StatelessWidget {
               isSecondary: true,
             ),
           ),
-          const SizedBox(height: kPadding * 2),
+          SizedBox(height: WidgetUtils.sheetBottomPadding(context)),
         ],
       ),
     );

@@ -47,6 +47,17 @@ No `DropdownButton`/`PopupMenuButton`. Pick by context; the current choice is al
 - **Single or multi choice inside a form sheet**, free-length labels (grocery group, tags): wrapping `TagChip` cloud, `Wrap(spacing/runSpacing: kPadding / 2)`. No horizontal-scrolling chip rows.
 - **Ordered, fixed-count values** (days, meal types): grid of equal two-line tiles (small label/icon over a bold value), 4 per row, or one row when there are ≤ 3 options. Sized by content (not fixed aspect ratio). Selected tile filled with primary color + white text, others the 6 % text-color fill of `OptionsSheetOptions`; wrap in `Semantics(selected: …)`. Several grids in one sheet each get a small section label (600 weight, 60 % text color) and `kPadding` between them. Reference: `_buildTileGrid` / `_buildTile` in `plan_move_meal_modal.dart`.
 
+## UI: bottom sheets
+
+- Show via `WidgetUtils.showFoodlyBottomSheet`.
+- Header: `SheetHeader` (`lib/widgets/sheet_header.dart`): left-aligned uppercase title (shrinks to one line), extra buttons in `actions`, ✕ close by default. Its default padding is `top: kPadding`; override `padding` instead of wrapping it.
+- Hide the ✕ (`showClose: false`) only when another button already closes the sheet (a picker's "Done", a decision sheet's "Cancel"/"Not now") or while the sheet can't be closed (`PopScope`).
+- The header row is 48 px tall, which already leaves ~12 px under the title, so follow it with at most `kPadding / 2`.
+- Under the last button leave `WidgetUtils.sheetBottomPadding(context)` (`kPadding * 2`, more when the system navigation bar needs it).
+- Size sheets to their content (cap with `maxHeight`); never give them a fixed or minimum height.
+- Rows under the header (`ListTile`, `CheckboxListTile`) use `contentPadding: EdgeInsets.zero` so they line up with the title.
+- Action sheets (`OptionsSheet`) have no title and no ✕.
+
 ## Release
 
 Push to `master` deploys (iOS → TestFlight, Android → Play internal via fastlane). Version comes from the **commit message**, which must start with the version, e.g. `1.2.3 - New Release` (`.github/scripts/update_version*.sh`). PRs target `master` and run analyze + test; `dev` is the integration branch.

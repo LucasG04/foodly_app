@@ -1,11 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../constants.dart';
 import '../../models/kcal_estimate.dart';
+import '../../utils/widget_utils.dart';
 import '../../widgets/main_button.dart';
+import '../../widgets/sheet_header.dart';
 
 class KcalEstimateModal extends StatefulWidget {
   final KcalEstimate estimate;
@@ -79,27 +80,16 @@ class _KcalEstimateModalState extends State<KcalEstimateModal> {
         horizontalPad,
         kPadding,
         horizontalPad,
-        kPadding * 2 + MediaQuery.of(context).viewInsets.bottom,
+        WidgetUtils.sheetBottomPadding(context) +
+            MediaQuery.viewInsetsOf(context).bottom,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                context.tr('meal_create_kcal_ai_title').toUpperCase(),
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              IconButton(
-                icon: const Icon(EvaIcons.close),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
+          SheetHeader(
+            title: context.tr('meal_create_kcal_ai_title'),
+            padding: EdgeInsets.zero,
           ),
           Text(
             widget.estimate.explanation,

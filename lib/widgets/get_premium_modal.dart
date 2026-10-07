@@ -17,6 +17,7 @@ import 'disposable_widget.dart';
 import 'list_tile_card.dart';
 import 'main_button.dart';
 import 'scroll_shadow_layout.dart';
+import 'sheet_header.dart';
 import 'small_circular_progress_indicator.dart';
 
 /// Premium features, in the order the paywall lists them by default.
@@ -125,32 +126,16 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Expanded(
+        Flexible(
           child: ScrollShadowLayout(
             header: Container(
-              padding: const EdgeInsets.all(kPadding / 2),
               color: Theme.of(context).dialogTheme.backgroundColor,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: kPadding / 2),
-                      child: Text(
-                        context.tr('get_premium_modal_title',
-                            args: [kAppName]).toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(EvaIcons.close),
-                    onPressed: _close,
-                  ),
-                ],
+              child: SheetHeader(
+                title: context.tr('get_premium_modal_title', args: [kAppName]),
+                padding: const EdgeInsets.fromLTRB(
+                    kPadding, kPadding, kPadding, kPadding / 2),
               ),
             ),
             body: SingleChildScrollView(
