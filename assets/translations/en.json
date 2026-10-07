@@ -445,7 +445,7 @@
   "ai_consent_title": "AI features",
   "ai_consent_intro": "AI features need your permission to send the content you enter to external AI services.",
   "ai_consent_what_title": "What's sent",
-  "ai_consent_what": "Your recipe's text (name, ingredients, instructions) and, for the AI assistant, your provided message and photo.",
+  "ai_consent_what": "Your recipe's text (title, ingredients, instructions) and, for the AI assistant, your provided message and photo.",
   "ai_consent_who_title": "Who processes it",
   "ai_consent_who": "The AI gateway OpenRouter. Requests are completely anonymous. Your input isn't used to train AI.",
   "ai_consent_when_title": "Only when you use AI",
