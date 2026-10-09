@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_classes_with_only_static_members
 
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
@@ -9,18 +10,10 @@ class ConvertUtil {
   /// Splits an array into multiple arrays with the length specified by `splitAt`.
   static List<List<dynamic>> splitArray(List<dynamic> array,
       [int splitAt = 10]) {
-    final List<List<dynamic>> result = [<dynamic>[]];
-    var currentIndex = 0;
-
-    for (var i = 0; i < array.length; i++) {
-      result[currentIndex].add(array[i]);
-      if ((i + 1) % splitAt == 0) {
-        result.add(<dynamic>[]);
-        currentIndex++;
-      }
-    }
-
-    return result;
+    return [
+      for (var i = 0; i < array.length; i += splitAt)
+        array.sublist(i, min(i + splitAt, array.length)),
+    ];
   }
 
   /// Converts the amount and the unit (optional) to a better readable string

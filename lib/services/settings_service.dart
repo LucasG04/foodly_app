@@ -56,7 +56,10 @@ class SettingsService {
 
   static Color get primaryColor {
     final value = _settingsBox.get('primaryColor') as int?;
-    return value != null ? Color(value) : defaultPrimaryColor;
+    if (value == null) {
+      return defaultPrimaryColor;
+    }
+    return legacyPrimaryColors[value] ?? Color(value);
   }
 
   static ShoppingListSort? get shoppingListSort {

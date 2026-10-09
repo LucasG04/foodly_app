@@ -21,15 +21,9 @@ class ShoppingListService {
 
   ShoppingListService._();
 
-  static Future<ShoppingList> createShoppingListWithPlanId(
-      String planId) async {
+  static void createShoppingListWithPlanId(WriteBatch batch, String planId) {
     _log.finer('Call createShoppingListWithPlanId with $planId');
-    final list = ShoppingList(meals: [], planId: planId);
-
-    final created = await _firestore.add(list);
-    list.id = created.id;
-
-    return list;
+    batch.set(_firestore.doc(), ShoppingList(meals: [], planId: planId));
   }
 
   static Future<ShoppingList?> getShoppingListByPlanId(String planId) async {

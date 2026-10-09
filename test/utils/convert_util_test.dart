@@ -72,4 +72,28 @@ void main() {
       expect(result, 0.33);
     });
   });
+
+  group('splitArray', () {
+    List<int> numbers(int count) => List.generate(count, (i) => i);
+    List<int> chunkSizes(int count) =>
+        ConvertUtil.splitArray(numbers(count)).map((e) => e.length).toList();
+
+    test('should return no chunks for an empty list', () {
+      expect(ConvertUtil.splitArray([]), isEmpty);
+    });
+
+    test('should never add an empty chunk (Firestore whereIn rejects it)', () {
+      expect(chunkSizes(10), [10]);
+      expect(chunkSizes(20), [10, 10]);
+    });
+
+    test('should put the remainder in the last chunk', () {
+      expect(chunkSizes(3), [3]);
+      expect(chunkSizes(23), [10, 10, 3]);
+    });
+
+    test('should keep the order', () {
+      expect(ConvertUtil.splitArray(numbers(12)).expand((e) => e), numbers(12));
+    });
+  });
 }

@@ -177,7 +177,7 @@ class _CodeInputViewState extends State<CodeInputView> with OfContextMixin {
 
       // Check code
       try {
-        final plan = await PlanService.getPlanByCode(text, withMeals: false);
+        final plan = await PlanService.getPlanByCode(text);
         if (plan != null) {
           widget.onPageChange(CodeInputResult.JOIN, plan.id);
         } else {

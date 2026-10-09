@@ -595,7 +595,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       isLoading = true;
     });
     String code = PlanService.generateCode();
-    while ((await PlanService.getPlanById(code)) != null) {
+    while ((await PlanService.getPlanByCode(code)) != null) {
       code = PlanService.generateCode();
     }
     plan.code = code;

@@ -4,7 +4,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,6 +27,7 @@ import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
 import '../../widgets/toggle_tab/flutter_toggle_tab.dart';
+import 'auth_error.dart';
 import 'authentication_keys.dart';
 import 'reset_password_modal.dart';
 import 'select_plan_modal.dart';
@@ -364,8 +364,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
               _emailController.text, _passwordController.text));
       await _processAuthentication(userId, FirebaseAuthProvider.password);
       TextInput.finishAutofillContext();
-    } catch (e) {
-      _handleMailAuthException(e);
+    } catch (e, s) {
+      _handleAuthError(e, s);
     }
   }
 
@@ -375,15 +375,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
     try {
       final userId = await AuthenticationService.signInWithApple();
       await _processAuthentication(userId, FirebaseAuthProvider.apple);
-    } catch (e) {
-      if (!mounted) {
-        return;
-      }
-      _log.severe('ERR! _authWithApple', e);
-      setState(() {
-        _unknownErrorText = context.tr('login_error_unknown');
-        _buttonState = ButtonState.error;
-      });
+    } catch (e, s) {
+      _handleAuthError(e, s);
     }
   }
 
@@ -400,63 +393,76 @@ class _LoginViewState extends ConsumerState<LoginView> {
       throw Exception('No user id.');
     }
 
-    Plan? plan;
-    if (_forgotPlan) {
-      plan = await _showPlanSelect(userId);
-      if (plan == null) {
-        await AuthenticationService.signOut();
-        throw Exception('No plan selected.');
+    final Plan plan;
+    final FoodlyUser foodlyUser;
+    final bool isNewUser;
+    try {
+      // Look the user up instead of trusting the Register/Login tab: Sign in
+      // with Apple can be either, and `createUserWithId` overwrites the doc.
+      // Before the plan, so creating one can update the user in its batch.
+      final existingUser = await FoodlyUserService.getUserById(userId);
+      isNewUser = existingUser == null;
+      foodlyUser =
+          existingUser ?? await FoodlyUserService.createUserWithId(userId);
+      plan = await _resolvePlan(userId);
+      if (!foodlyUser.plans!.contains(plan.id)) {
+        foodlyUser.plans!.add(plan.id);
       }
-    } else {
-      plan = widget.isCreatingPlan!
-          ? await PlanService.createPlan(widget.plan!.name)
-          : await PlanService.getPlanById(widget.plan!.id);
-      if (widget.isCreatingPlan! && plan != null) {
-        logEvent(AnalyticsEvent.planCreate);
+      await FoodlyUserService.addPlanIdToUser(userId, plan.id);
+    } catch (_) {
+      // Signed in to Firebase but not set up: sign out so a retry starts clean.
+      await AuthenticationService.signOut();
+      if (mounted) {
+        BasicUtils.clearAllProvider(ref);
       }
+      rethrow;
     }
-
-    if (plan != null && !plan.users!.contains(userId)) {
-      if (plan.locked != null && plan.locked!) {
-        setState(() {
-          _unknownErrorText = context.tr('login_error_plan_locked');
-          _buttonState = ButtonState.error;
-        });
-        return;
-      }
-      plan.users!.add(userId);
-      plan.lastUserJoined = DateTime.now();
-      await PlanService.updatePlan(plan);
-      if (widget.isCreatingPlan != true) {
-        logEvent(AnalyticsEvent.planJoin);
-      }
-    }
-
-    FoodlyUser foodlyUser;
-    if (_isRegistering) {
-      foodlyUser = await FoodlyUserService.createUserWithId(userId);
-    } else {
-      foodlyUser = (await FoodlyUserService.getUserById(userId))!;
-    }
-
-    foodlyUser.plans!.add(plan!.id);
-    await FoodlyUserService.addPlanIdToUser(userId, plan.id);
-
-    setState(() {
-      _buttonState = ButtonState.normal;
-    });
 
     if (!mounted) {
       return;
     }
-    if (_isRegistering) {
-      logEvent(AnalyticsEvent.signUp, {'method': platform});
-    } else {
-      logEvent(AnalyticsEvent.login, {'method': platform});
-    }
+    setState(() {
+      _buttonState = ButtonState.normal;
+    });
+    logEvent(
+      isNewUser ? AnalyticsEvent.signUp : AnalyticsEvent.login,
+      {'method': platform},
+    );
     ref.read(planProvider.notifier).state = plan;
     ref.read(userProvider.notifier).state = foodlyUser;
     AutoRouter.of(context).replace(const HomeScreenRoute());
+  }
+
+  /// Returns the plan to join and adds [userId] to it.
+  Future<Plan> _resolvePlan(String userId) async {
+    final Plan? plan;
+    if (_forgotPlan) {
+      plan = await _showPlanSelect(userId);
+      if (plan == null) {
+        throw const PlanSelectCancelled();
+      }
+    } else {
+      plan = widget.isCreatingPlan!
+          ? await PlanService.createPlan(widget.plan!.name, userId)
+          : await PlanService.getPlanById(widget.plan!.id);
+      if (plan == null) {
+        throw Exception('Plan ${widget.plan!.id} not found.');
+      }
+      if (widget.isCreatingPlan!) {
+        logEvent(AnalyticsEvent.planCreate);
+      }
+    }
+
+    if (!plan.users!.contains(userId)) {
+      if (plan.locked == true) {
+        throw const PlanLockedException();
+      }
+      plan.users!.add(userId);
+      plan.lastUserJoined = DateTime.now();
+      await PlanService.updatePlan(plan);
+      logEvent(AnalyticsEvent.planJoin);
+    }
+    return plan;
   }
 
   void _resetErrors() {
@@ -468,19 +474,31 @@ class _LoginViewState extends ConsumerState<LoginView> {
     });
   }
 
-  void _handleMailAuthException(dynamic exception) {
-    if (exception != null && exception is FirebaseAuthException) {
-      if (exception.code == 'weak-password') {
-        _passwordErrorText = context.tr('login_error_password_weak');
-      } else if (exception.code == 'email-already-in-use') {
-        _emailErrorText = context.tr('login_error_mail_in_use');
-      } else {
-        _unknownErrorText = context.tr('login_error_unknown');
-      }
-    } else {
-      _unknownErrorText = context.tr('login_error_unknown');
+  void _handleAuthError(Object error, StackTrace stackTrace) {
+    final message = authErrorMessage(error);
+    // Before the mounted check, so it's reported even if the view is gone.
+    if (message?.key == unknownAuthErrorKey) {
+      _log.severe('ERR! authentication', error, stackTrace);
     }
+    if (!mounted) {
+      return;
+    }
+    if (message == null) {
+      setState(() {
+        _buttonState = ButtonState.normal;
+      });
+      return;
+    }
+    final text = context.tr(message.key);
     setState(() {
+      switch (message.field) {
+        case AuthErrorField.email:
+          _emailErrorText = text;
+        case AuthErrorField.password:
+          _passwordErrorText = text;
+        case AuthErrorField.general:
+          _unknownErrorText = text;
+      }
       _buttonState = ButtonState.error;
     });
   }
