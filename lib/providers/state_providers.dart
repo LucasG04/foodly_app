@@ -52,10 +52,6 @@ final planHistoryPageChanged = StateProvider<int>((_) => 0);
 /// controller has been changed
 final hasConnectionProvider = StateProvider<bool>((_) => true);
 
-/// Whether the "keep on screen" notification should be shown.
-/// It shows once per app start, after the first "keep on screen" action
-final showKeepOnScreenNotification = StateProvider<bool>((_) => true);
-
 /// Free-plan AI limits from the backend. Cached once fetched; a failed fetch
 /// silently retries every 10s while anything is listening.
 final aiLimitsProvider = FutureProvider.autoDispose<AiLimits>((ref) async {

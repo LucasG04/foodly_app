@@ -414,7 +414,6 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
           context.tr('shopping_list_grocery_removed', args: [grocery.name!]),
       duration: 3,
       isCountdown: true,
-      isDismissible: true,
       action: IconButton(
         icon: Icon(EvaIcons.undoOutline, color: theme.primaryColor),
         onPressed: () {

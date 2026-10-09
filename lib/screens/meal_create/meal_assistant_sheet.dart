@@ -576,8 +576,7 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
     if (!mounted) {
       return;
     }
-    MainSnackbar(message: message, isError: true, isDismissible: true)
-        .show(context);
+    MainSnackbar(message: message, isError: true).show(context);
   }
 
   /// Shows the finished state briefly, then hands the meal to the form.

@@ -747,7 +747,6 @@ class _ImportModalState extends ConsumerState<ImportModal>
             MainSnackbar(
               isError: true,
               message: context.tr('import_modal_partial_warning'),
-              isDismissible: true,
             ).show(context);
             _schedulePop();
           } else {
@@ -760,7 +759,6 @@ class _ImportModalState extends ConsumerState<ImportModal>
             MainSnackbar(
               isError: true,
               message: _messageForErrorCode(code),
-              isDismissible: true,
             ).show(context);
           }
         case MealGenerationUnknownEvent():
@@ -781,7 +779,6 @@ class _ImportModalState extends ConsumerState<ImportModal>
       MainSnackbar(
         isError: true,
         message: _messageForErrorCode(error.code),
-        isDismissible: true,
       ).show(context);
     } else if (error is AiQuotaExceededException) {
       GetPremiumModal.showAiQuotaExhausted(context, feature: widget.type.name);
@@ -789,13 +786,11 @@ class _ImportModalState extends ConsumerState<ImportModal>
       MainSnackbar(
         isError: true,
         message: error.message,
-        isDismissible: true,
       ).show(context);
     } else {
       MainSnackbar(
         isError: true,
         message: context.tr('import_modal_error_generation'),
-        isDismissible: true,
       ).show(context);
     }
     KeepScreenOn.turnOff();
@@ -861,7 +856,6 @@ class _ImportModalState extends ConsumerState<ImportModal>
 
     MainSnackbar(
       message: context.tr('import_modal_info', args: [supportedSitesString]),
-      isDismissible: true,
       duration: 10,
     ).show(context);
   }
@@ -875,7 +869,6 @@ class _ImportModalState extends ConsumerState<ImportModal>
       isError: true,
       title: context.tr('import_modal_error_not_found_title'),
       message: context.tr('import_modal_error_not_found'),
-      isDismissible: true,
     ).show(context);
     setState(() {
       _buttonState = ButtonState.error;

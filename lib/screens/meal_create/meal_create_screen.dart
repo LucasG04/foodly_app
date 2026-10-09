@@ -860,7 +860,6 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       MainSnackbar(
         message: context.tr('import_modal_partial_warning'),
         isError: true,
-        isDismissible: true,
       ).show(context);
     }
 

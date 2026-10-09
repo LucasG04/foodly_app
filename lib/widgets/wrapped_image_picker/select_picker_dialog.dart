@@ -158,7 +158,6 @@ class _SelectPickerDialogState extends State<SelectPickerDialog> {
     MainSnackbar(
       message: message,
       isError: true,
-      isDismissible: true,
     ).show(context);
   }
 }
