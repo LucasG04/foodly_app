@@ -126,7 +126,7 @@ class PlanService {
   }
 
   static Future<Plan?> getPlanByCode(String code,
-      {bool withMeals = true}) async {
+      {bool withMeals = false}) async {
     _log.finer('Call getPlanByCode with $code');
     final snaps =
         await _firestore.where('code', isEqualTo: code).limit(1).get();
@@ -138,7 +138,7 @@ class PlanService {
 
     final plan = snaps.docs.first.data();
 
-    if (!withMeals) {
+    if (withMeals) {
       final snapMeals = await _firestore.doc(plan.id).collection('meals').get();
 
       _log.finest('getPlanByCode: Query meals result: ${snapMeals.docs}');
