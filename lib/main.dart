@@ -217,6 +217,10 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
         if (snapshot.connectionState == ConnectionState.active ||
             snapshot.connectionState == ConnectionState.done) {
           if (snapshot.data == null) {
+            if (_initialDataLoadStarted) {
+              FirebaseCrashlytics.instance.setUserIdentifier('');
+              Faro().setUser(const FaroUser.cleared());
+            }
             _initialDataLoadStarted = false;
             _lastLoadedShoppingListPlanId = null;
             BasicUtils.afterBuild(() {
@@ -309,12 +313,14 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   Future<void> _loadActivePlan() async {
     final refPlanProvider = ref.read(planProvider.notifier);
     final refInitLoading = ref.read(initialPlanLoadingProvider.notifier);
+    final uid = AuthenticationService.currentUser?.uid;
     if (refPlanProvider.state == null) {
       final String? planId = await PlanService.getCurrentPlanId();
       if (planId != null && planId.isNotEmpty) {
         FirebaseCrashlytics.instance.setCustomKey('planId', planId);
         final Plan? newPlan = await PlanService.getPlanById(planId);
-        if (!mounted) {
+        // Signed out meanwhile (e.g. login aborted): don't restore its plan.
+        if (!mounted || AuthenticationService.currentUser?.uid != uid) {
           return;
         }
         refPlanProvider.state = newPlan;
@@ -339,6 +345,11 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       Faro().setUser(FaroUser(id: firebaseUser.uid));
       final FoodlyUser? user =
           await FoodlyUserService.getUserById(firebaseUser.uid);
+      // Signed out meanwhile (e.g. login aborted): don't restore that user.
+      if (!mounted ||
+          AuthenticationService.currentUser?.uid != firebaseUser.uid) {
+        return;
+      }
       if (user == null) {
         refInitLoading.state = false;
         return;

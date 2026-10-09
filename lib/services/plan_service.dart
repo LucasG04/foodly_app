@@ -10,6 +10,7 @@ import '../models/plan_meal.dart';
 import '../utils/convert_util.dart';
 import 'app_review_service.dart';
 import 'authentication_service.dart';
+import 'foodly_user_service.dart';
 import 'meal_stat_service.dart';
 import 'shopping_list_service.dart';
 
@@ -84,28 +85,32 @@ class PlanService {
         .map((snap) => snap.data()!);
   }
 
-  static Future<Plan> createPlan(String? name) async {
+  /// Creates the plan with [userId] as member, its shopping list and the
+  /// user's plan reference in one batch, so a failure leaves nothing behind.
+  static Future<Plan> createPlan(String? name, String userId) async {
     _log.finer('Call createPlan');
     String code = generateCode();
-    while ((await getPlanById(code)) != null) {
+    while ((await getPlanByCode(code)) != null) {
       code = generateCode();
     }
     _log.finest('createPlan: Generated code: $code');
 
     final now = DateTime.now();
+    final doc = _firestore.doc();
     final plan = Plan(
+      id: doc.id,
       code: code,
       hourDiffToUtc: now.differenceTimeZoneOffset(now.toUtc()).inHours,
       name: name,
-      users: [],
-      lastUserJoined: DateTime.now(),
+      users: [userId],
+      lastUserJoined: now,
     );
     _log.finest('createPlan: Plan is: ${plan.toMap()}');
 
-    final created = await _firestore.add(plan);
-    plan.id = created.id;
-
-    await ShoppingListService.createShoppingListWithPlanId(created.id);
+    final batch = FirebaseFirestore.instance.batch()..set(doc, plan);
+    ShoppingListService.createShoppingListWithPlanId(batch, doc.id);
+    FoodlyUserService.addPlanIdToUserInBatch(batch, userId, doc.id);
+    await batch.commit();
 
     return plan;
   }

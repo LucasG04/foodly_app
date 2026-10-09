@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import '../../constants.dart';
 import '../../models/plan.dart';
@@ -11,13 +12,19 @@ import '../../widgets/small_circular_progress_indicator.dart';
 class SelectPlanModal extends StatefulWidget {
   final String userId;
 
-  const SelectPlanModal(this.userId, {super.key});
+  /// Replaces loading the user's plans from Firestore.
+  @visibleForTesting
+  final Future<List<Plan>?> Function()? loadPlans;
+
+  const SelectPlanModal(this.userId, {this.loadPlans, super.key});
 
   @override
   State<SelectPlanModal> createState() => _SelectPlanModalState();
 }
 
 class _SelectPlanModalState extends State<SelectPlanModal> {
+  static final _log = Logger('SelectPlanModal');
+
   // Roughly two plan tiles, so the sheet keeps its height once plans load.
   static const _placeholderHeight = 150.0;
 
@@ -26,15 +33,20 @@ class _SelectPlanModalState extends State<SelectPlanModal> {
   @override
   void initState() {
     super.initState();
-    _plansFuture = _loadUserPlans();
+    _plansFuture = widget.loadPlans?.call() ?? _loadUserPlans();
   }
 
   Future<List<Plan>?> _loadUserPlans() async {
-    final user = await FoodlyUserService.getUserById(widget.userId);
-    if (user?.plans == null || user!.plans!.isEmpty) {
-      return null;
+    try {
+      final user = await FoodlyUserService.getUserById(widget.userId);
+      if (user?.plans == null || user!.plans!.isEmpty) {
+        return null;
+      }
+      return await PlanService.getPlansByIds(user.plans!);
+    } catch (e, s) {
+      _log.severe('ERR! _loadUserPlans', e, s);
+      rethrow;
     }
-    return PlanService.getPlansByIds(user.plans!);
   }
 
   @override
@@ -63,16 +75,10 @@ class _SelectPlanModalState extends State<SelectPlanModal> {
                   height: _placeholderHeight,
                   child: Center(child: SmallCircularProgressIndicator()),
                 );
+              } else if (snapshot.hasError) {
+                return _buildMessage(context.tr('login_error_unknown'));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return SizedBox(
-                  height: _placeholderHeight,
-                  child: Center(
-                    child: Text(
-                      context.tr('modal_select_plan_no_plan'),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                );
+                return _buildMessage(context.tr('modal_select_plan_no_plan'));
               }
 
               return ConstrainedBox(
@@ -84,8 +90,8 @@ class _SelectPlanModalState extends State<SelectPlanModal> {
                       .map(
                         (plan) => ListTile(
                           contentPadding: EdgeInsets.zero,
-                          title: Text(plan.name!),
-                          subtitle: Text(plan.code!),
+                          title: Text(plan.name ?? ''),
+                          subtitle: Text(plan.code ?? ''),
                           onTap: () => Navigator.pop(context, plan),
                           trailing: const Icon(Icons.arrow_forward_ios_rounded),
                         ),
@@ -97,6 +103,13 @@ class _SelectPlanModalState extends State<SelectPlanModal> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildMessage(String text) {
+    return SizedBox(
+      height: _placeholderHeight,
+      child: Center(child: Text(text, textAlign: TextAlign.center)),
     );
   }
 }

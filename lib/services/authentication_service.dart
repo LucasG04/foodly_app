@@ -25,31 +25,20 @@ class AuthenticationService {
 
   static Future<String?> signInUser(String email, String password) async {
     _log.finer('Call signInWithEmailAndPassword with $email');
-    try {
-      final login = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      return login.user?.uid;
-    } catch (e) {
-      _log.fine('ERR! signInUser with $email', e);
-      return null;
-    }
+    final login = await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return login.user?.uid;
   }
 
   static Future<String?> registerUser(String email, String password) async {
     _log.finer('Call createUserWithEmailAndPassword with $email');
-
-    try {
-      final login = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      return login.user?.uid;
-    } catch (e) {
-      _log.fine('ERR! signInUser with $email', e);
-      return null;
-    }
+    final login = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return login.user?.uid;
   }
 
   static Future<void> signOut() async {

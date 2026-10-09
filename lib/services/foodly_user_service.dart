@@ -41,6 +41,16 @@ class FoodlyUserService {
         'Call addOldPlanIdToUser with UserId: $userId | PlanId: $planId | $user');
   }
 
+  static void addPlanIdToUserInBatch(
+      WriteBatch batch, String userId, String planId) {
+    log.finer(
+        'Call addPlanIdToUserInBatch with UserId: $userId | PlanId: $planId');
+    // Untyped ref: the converter's ref only accepts a FoodlyUser in a batch.
+    batch.update(FirebaseFirestore.instance.doc(_firestore.doc(userId).path), {
+      'oldPlans': FieldValue.arrayUnion([planId]),
+    });
+  }
+
   static Future<void> removePlanFromUser(String userId, String planId) async {
     log.finer('Call removePlanFromUser with UserId: $userId | PlanId: $planId');
     final user = await getUserById(userId);
