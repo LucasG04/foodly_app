@@ -28,7 +28,6 @@ class ImageAccess {
           ? 'image_picker_dialog_camera_access_denied'
           : 'image_picker_dialog_photo_access_denied'),
       isError: true,
-      isDismissible: true,
     ).show(context);
   }
 }

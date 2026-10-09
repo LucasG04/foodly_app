@@ -26,7 +26,7 @@ class MainSnackbar {
     this.isError = false,
     this.isCountdown = false,
     this.infinite = false,
-    this.isDismissible = false,
+    this.isDismissible = true,
   }) : assert(!isSuccess || !isError || !isCountdown);
 
   /// Show the snackbar.

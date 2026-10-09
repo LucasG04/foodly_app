@@ -19,6 +19,7 @@ import '../../services/in_app_purchase_service.dart';
 import '../../services/meal_service.dart';
 import '../../services/meal_stat_service.dart';
 import '../../services/plan_service.dart';
+import '../../services/settings_service.dart';
 import '../../utils/analytics.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/convert_util.dart';
@@ -873,13 +874,12 @@ class _MealScreenState extends ConsumerState<MealScreen>
     }
 
     KeepScreenOn.turnOn();
-    if (mounted && ref.read(showKeepOnScreenNotification)) {
+    if (mounted && !SettingsService.keepScreenOnHintSeen) {
       MainSnackbar(
         title: context.tr('meal_details_keep_screen_on'),
         message: context.tr('meal_details_keep_screen_on_description'),
-        isDismissible: true,
       ).show(context);
-      ref.read(showKeepOnScreenNotification.notifier).state = false;
+      SettingsService.setKeepScreenOnHintSeen();
     }
   }
 }

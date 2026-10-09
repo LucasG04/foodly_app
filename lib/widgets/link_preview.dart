@@ -334,7 +334,6 @@ class _LinkPreviewState extends State<LinkPreview> with OfContextMixin {
             MainSnackbar(
               message: context.tr('link_preview_options_copy_link_success'),
               duration: 3,
-              isDismissible: true,
               isCountdown: true,
             ).show(context);
           },

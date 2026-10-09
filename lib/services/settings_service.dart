@@ -33,6 +33,13 @@ class SettingsService {
     await _settingsBox.put('firstUsage', false);
   }
 
+  static bool get keepScreenOnHintSeen =>
+      _settingsBox.get('keepScreenOnHintSeen', defaultValue: false) as bool;
+
+  static Future<void> setKeepScreenOnHintSeen() async {
+    await _settingsBox.put('keepScreenOnHintSeen', true);
+  }
+
   static bool get multipleMealsPerTime =>
       _settingsBox.get('multipleMealsPerTime', defaultValue: false) as bool;
 
