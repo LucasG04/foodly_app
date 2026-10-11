@@ -10,6 +10,7 @@ class Grocery {
   String? group;
   bool bought;
   DateTime lastBoughtEdited;
+  List<GrocerySource> sources;
 
   Grocery({
     this.id,
@@ -19,6 +20,7 @@ class Grocery {
     this.group,
     this.bought = false,
     required this.lastBoughtEdited,
+    this.sources = const [],
   });
 
   Map<String, dynamic> toMap() {
@@ -29,6 +31,7 @@ class Grocery {
       'group': group,
       'bought': bought,
       'lastBoughtEdited': lastBoughtEdited.millisecondsSinceEpoch,
+      'sources': sources.map((e) => e.toMap()).toList(),
     };
   }
 
@@ -56,6 +59,17 @@ class Grocery {
       lastBoughtEdited: map['lastBoughtEdited'] == null
           ? DateTime.now()
           : DateTime.fromMillisecondsSinceEpoch(map['lastBoughtEdited'] as int),
+      // Skips malformed entries: one bad doc must not break the list stream.
+      sources: [
+        if (map['sources'] case final List<dynamic> sources)
+          for (final source in sources)
+            if (source
+                case {
+                  'mealId': final String mealId,
+                  'mealName': final String mealName,
+                })
+              GrocerySource(mealId: mealId, mealName: mealName),
+      ],
     );
   }
 
@@ -93,6 +107,7 @@ class Grocery {
     String? group,
     bool? bought,
     DateTime? lastBoughtEdited,
+    List<GrocerySource>? sources,
   }) {
     return Grocery(
       id: id ?? this.id,
@@ -102,6 +117,17 @@ class Grocery {
       group: group ?? this.group,
       bought: bought ?? this.bought,
       lastBoughtEdited: lastBoughtEdited ?? this.lastBoughtEdited,
+      sources: sources ?? this.sources,
     );
   }
+}
+
+/// A meal a [Grocery] was added for.
+class GrocerySource {
+  final String mealId;
+  final String mealName;
+
+  const GrocerySource({required this.mealId, required this.mealName});
+
+  Map<String, dynamic> toMap() => {'mealId': mealId, 'mealName': mealName};
 }

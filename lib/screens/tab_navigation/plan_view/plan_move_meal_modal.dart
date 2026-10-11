@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../constants.dart';
 import '../../../models/meal.dart';
@@ -159,8 +160,8 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
           Icons.free_breakfast_outlined,
           'plan_move_breakfast',
         ),
-        (MealType.LUNCH, Icons.lunch_dining_outlined, 'plan_move_lunch'),
-        (MealType.DINNER, Icons.dinner_dining_outlined, 'plan_move_dinner'),
+        (MealType.LUNCH, Symbols.meal_lunch, 'plan_move_lunch'),
+        (MealType.DINNER, Symbols.meal_dinner, 'plan_move_dinner'),
       ].where((m) => _showMealTile(m.$1)).toList();
 
   Widget _buildSectionLabel(String text) {

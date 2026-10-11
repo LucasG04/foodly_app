@@ -35,6 +35,10 @@ class _AnimatedShoppingListState extends State<AnimatedShoppingList> {
   /// [_tapItem] (tap-driven removals) and [didUpdateWidget] (stream updates).
   late List<Grocery> _groceries;
 
+  /// Ids removed by [_tapItem] whose write hasn't reached the stream yet, so
+  /// an unrelated update in between doesn't re-insert them.
+  final Set<String?> _pendingRemovals = {};
+
   @override
   void initState() {
     super.initState();
@@ -48,7 +52,12 @@ class _AnimatedShoppingListState extends State<AnimatedShoppingList> {
   }
 
   /// Diffs [_groceries] against [newList] and updates [AnimatedList] accordingly.
-  void _syncWithNewList(List<Grocery> newList) {
+  void _syncWithNewList(List<Grocery> allGroceries) {
+    // Once the stream drops a pending id its write has landed.
+    _pendingRemovals.removeWhere((id) => !allGroceries.any((g) => g.id == id));
+    final newList =
+        allGroceries.where((g) => !_pendingRemovals.contains(g.id)).toList();
+
     // Remove items that are no longer in the new list (iterate in reverse to
     // keep indices stable as we remove).
     for (int i = _groceries.length - 1; i >= 0; i--) {
@@ -112,9 +121,7 @@ class _AnimatedShoppingListState extends State<AnimatedShoppingList> {
           onLongPress: () => widget.onLongPress(grocery),
           child: ListTile(
             title: Text(grocery.name!, style: const TextStyle(fontSize: 18.0)),
-            subtitle: grocery.amount != null && grocery.amount != 0
-                ? Text(ConvertUtil.amountToString(grocery.amount, grocery.unit))
-                : null,
+            subtitle: _buildSubtitle(grocery),
             trailing: IconButton(
               icon: const Icon(EvaIcons.moreHorizontalOutline),
               onPressed: () => widget.onEdit(grocery),
@@ -126,6 +133,23 @@ class _AnimatedShoppingListState extends State<AnimatedShoppingList> {
     );
   }
 
+  /// Amount and the meals the item is for, e.g. "400 g · Lasagne, Chili".
+  Widget? _buildSubtitle(Grocery grocery) {
+    final parts = [
+      if (grocery.amount != null && grocery.amount != 0)
+        ConvertUtil.amountToString(grocery.amount, grocery.unit),
+      if (grocery.sources.isNotEmpty)
+        grocery.sources.map((e) => e.mealName).join(', '),
+    ];
+    return parts.isEmpty
+        ? null
+        : Text(
+            parts.join(' · '),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          );
+  }
+
   void _tapItem(int index) {
     if (index < 0 || index >= _groceries.length) {
       return;
@@ -134,8 +158,7 @@ class _AnimatedShoppingListState extends State<AnimatedShoppingList> {
     // Remove immediately so the Firestore stream update finds nothing to diff,
     // preventing a double removeItem animation.
     final grocery = _groceries.removeAt(index);
-    // Capture before onEmpty can trigger group removal and unmount this widget.
-    final onTap = widget.onTap;
+    _pendingRemovals.add(grocery.id);
 
     _listKey.currentState?.removeItem(
       index,
@@ -144,8 +167,9 @@ class _AnimatedShoppingListState extends State<AnimatedShoppingList> {
       duration: const Duration(milliseconds: 150),
     );
 
-    Future<void>.delayed(const Duration(milliseconds: 150))
-        .then((_) => onTap(grocery));
+    // Write right away: Firestore's local cache then drops the item from the
+    // stream before any later update, even if onEmpty unmounts this widget.
+    widget.onTap(grocery);
 
     if (_groceries.isEmpty) {
       widget.onEmpty?.call();
