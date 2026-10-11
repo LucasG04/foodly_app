@@ -55,7 +55,11 @@ class ShoppingListService {
         .doc(listId)
         .collection('groceries')
         .doc(grocery.id)
-        .update(grocery.toMap());
+        // Only the toggled fields: the rest of [grocery] may be stale.
+        .update({
+      'bought': grocery.bought,
+      'lastBoughtEdited': grocery.lastBoughtEdited.millisecondsSinceEpoch,
+    });
   }
 
   static Future<void> updateGrocery(
