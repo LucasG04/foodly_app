@@ -121,7 +121,13 @@ class _AnimatedShoppingListState extends State<AnimatedShoppingList> {
           onLongPress: () => widget.onLongPress(grocery),
           child: ListTile(
             title: Text(grocery.name!, style: const TextStyle(fontSize: 18.0)),
-            subtitle: _buildSubtitle(grocery),
+            subtitle: grocery.amount != null && grocery.amount != 0
+                ? Text(
+                    ConvertUtil.amountToString(grocery.amount, grocery.unit),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  )
+                : null,
             trailing: IconButton(
               icon: const Icon(EvaIcons.moreHorizontalOutline),
               onPressed: () => widget.onEdit(grocery),
@@ -131,23 +137,6 @@ class _AnimatedShoppingListState extends State<AnimatedShoppingList> {
         ),
       ),
     );
-  }
-
-  /// Amount and the meals the item is for, e.g. "400 g · Lasagne, Chili".
-  Widget? _buildSubtitle(Grocery grocery) {
-    final parts = [
-      if (grocery.amount != null && grocery.amount != 0)
-        ConvertUtil.amountToString(grocery.amount, grocery.unit),
-      if (grocery.sources.isNotEmpty)
-        grocery.sources.map((e) => e.mealName).join(', '),
-    ];
-    return parts.isEmpty
-        ? null
-        : Text(
-            parts.join(' · '),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          );
   }
 
   void _tapItem(int index) {

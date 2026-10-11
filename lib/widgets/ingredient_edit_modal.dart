@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
@@ -23,9 +24,13 @@ class IngredientEditModal extends ConsumerStatefulWidget {
   final Ingredient ingredient;
   final Future<void> Function(Ingredient)? onSaved;
 
+  /// Meals the grocery was added for, shown read-only below the inputs.
+  final List<GrocerySource> sources;
+
   const IngredientEditModal({
     required this.ingredient,
     this.onSaved,
+    this.sources = const [],
     super.key,
   });
 
@@ -160,7 +165,10 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal>
                 ),
               ],
             ),
-            const SizedBox(height: kPadding * 2),
+            if (widget.sources.isNotEmpty) _buildSources(),
+            SizedBox(
+              height: widget.sources.isEmpty ? kPadding * 2 : kPadding,
+            ),
             Center(
               child: Consumer(builder: (_, ref, __) {
                 return MainButton(
@@ -178,6 +186,32 @@ class _IngredientEditModalState extends ConsumerState<IngredientEditModal>
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// "For Lasagne, Chili" as a muted caption.
+  Widget _buildSources() {
+    return Padding(
+      padding: const EdgeInsets.only(top: kPadding / 2),
+      child: Row(
+        children: [
+          const Icon(EvaIcons.bookOutline, size: 16, color: kLightTextColor),
+          const SizedBox(width: kPadding / 4),
+          Expanded(
+            child: Text(
+              context.tr(
+                'edit_grocery_modal_sources',
+                args: [
+                  widget.sources.map((e) => e.mealName).toSet().join(', ')
+                ],
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 14, color: kLightTextColor),
+            ),
+          ),
+        ],
       ),
     );
   }

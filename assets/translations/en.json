@@ -27,6 +27,7 @@
   "edit_grocery_modal_ctrl_unit_placeholder": "piece",
   "edit_grocery_modal_ctrl_amount_title": "Amount",
   "edit_grocery_modal_error": "Please enter a description.",
+  "edit_grocery_modal_sources": "For {}",
   "settings_title": "Settings",
   "settings_section_general": "General",
   "settings_section_general_language": "Language",
