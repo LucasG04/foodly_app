@@ -326,6 +326,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
       context: context,
       builder: (_) => IngredientEditModal(
         ingredient: isCreating ? Ingredient() : grocery.toIngredient(),
+        sources: grocery?.sources ?? const [],
         onSaved: (result) async {
           final updatedGrocery = Grocery.fromIngredient(result);
           if (isCreating) {

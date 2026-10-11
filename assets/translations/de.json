@@ -27,6 +27,7 @@
   "edit_grocery_modal_ctrl_unit_placeholder": "Stück",
   "edit_grocery_modal_ctrl_amount_title": "Menge",
   "edit_grocery_modal_error": "Bitte trage eine Bezeichnung ein.",
+  "edit_grocery_modal_sources": "Für {}",
   "settings_title": "Einstellungen",
   "settings_section_general": "Allgemein",
   "settings_section_general_language": "Sprache",

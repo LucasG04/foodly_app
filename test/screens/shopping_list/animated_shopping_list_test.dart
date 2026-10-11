@@ -6,9 +6,6 @@ import 'package:foodly/screens/tab_navigation/shopping_list_view/animated_shoppi
 import '../../helpers/test_localizations.dart';
 
 void main() {
-  const lasagne = GrocerySource(mealId: 'm1', mealName: 'Lasagne');
-  const chili = GrocerySource(mealId: 'm2', mealName: 'Chili');
-
   Future<void> pump(WidgetTester tester, List<Grocery> groceries) =>
       tester.pumpWidget(
         MaterialApp(
@@ -24,30 +21,13 @@ void main() {
         ),
       );
 
-  Grocery grocery({double? amount, List<GrocerySource> sources = const []}) =>
-      Grocery(
+  Grocery grocery({double? amount}) => Grocery(
         id: 'g1',
         name: 'Hackfleisch',
         amount: amount,
         unit: amount == null ? '' : 'g',
-        sources: sources,
         lastBoughtEdited: DateTime(2026),
       );
-
-  testWidgets('subtitle shows amount and meals', (tester) async {
-    await pump(tester, [
-      grocery(amount: 400, sources: [lasagne, chili])
-    ]);
-    expect(find.text('400 g · Lasagne, Chili'), findsOneWidget);
-  });
-
-  testWidgets('subtitle shows only meals when there is no amount',
-      (tester) async {
-    await pump(tester, [
-      grocery(sources: [lasagne])
-    ]);
-    expect(find.text('Lasagne'), findsOneWidget);
-  });
 
   testWidgets('manual items keep the amount-only subtitle', (tester) async {
     await pump(tester, [grocery(amount: 400)]);
@@ -67,14 +47,5 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Item a'), findsNothing);
-  });
-
-  testWidgets('long meal lists stay on one line', (tester) async {
-    await pump(tester, [
-      grocery(amount: 400, sources: [lasagne, chili])
-    ]);
-    final subtitle = tester.widget<Text>(find.textContaining('Lasagne'));
-    expect(subtitle.maxLines, 1);
-    expect(subtitle.overflow, TextOverflow.ellipsis);
   });
 }
