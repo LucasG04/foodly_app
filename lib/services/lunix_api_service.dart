@@ -251,6 +251,18 @@ class LunixApiService {
         .toList();
   }
 
+  /// Lets the API load the plan's meals early so the first search is fast.
+  static Future<void> warmPlanMeals(String planId) async {
+    try {
+      await _dio.post<void>(
+        '$apiEndpoint/warm-plan-meals',
+        queryParameters: <String, String>{'planId': planId},
+      );
+    } catch (e) {
+      _log.warning('ERR in warmPlanMeals', e);
+    }
+  }
+
   static Future<List<Meal>> searchMeals(String planId, String query) async {
     _log.finer('Call searchMeals() with $planId and "$query"');
     Response? response;
