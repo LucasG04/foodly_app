@@ -184,6 +184,9 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   bool _initialDataLoadStarted = false;
   String? _lastLoadedShoppingListPlanId;
 
+  /// Re-warms the plan's meals on resume; the API drops them after 3 h idle.
+  late final AppLifecycleListener _lifecycleListener;
+
   @override
   void initState() {
     _initializeLogger();
@@ -192,6 +195,20 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     super.initState();
     InAppPurchaseService.setRef(ref);
     SettingsService.setRef(ref);
+    ref.listenManual(planProvider, (previous, next) {
+      if (next?.id != previous?.id) {
+        _warmPlanMeals();
+      }
+    });
+    _lifecycleListener = AppLifecycleListener(onResume: _warmPlanMeals);
+  }
+
+  /// Lets the API load the plan's meals before the first search.
+  void _warmPlanMeals() {
+    final planId = ref.read(planProvider)?.id;
+    if (planId != null && AuthenticationService.currentUser != null) {
+      LunixApiService.warmPlanMeals(planId);
+    }
   }
 
   @override
@@ -205,6 +222,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
 
   @override
   void dispose() {
+    _lifecycleListener.dispose();
     cancelSubscriptions();
     super.dispose();
   }
