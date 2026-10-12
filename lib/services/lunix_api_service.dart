@@ -38,15 +38,16 @@ class LunixApiService {
   static final Dio _dio = Dio(
     BaseOptions(
       headers: <String, dynamic>{
-        'x-api-key': _lunixApiKey,
         'Authorization':
             'Basic ${base64Encode(utf8.encode('${Env.lunixAuthUsername}:${Env.lunixAuthPassword}'))}'
       },
     ),
   )..interceptors.add(
       InterceptorsWrapper(
-        // Lets lunix-api gate features by app version (`appVersionAtLeast`).
         onRequest: (options, handler) async {
+          // Per request so the dev API toggle applies without a restart.
+          options.headers['x-api-key'] = _lunixApiKey;
+          // Lets lunix-api gate features by app version (`appVersionAtLeast`).
           try {
             options.headers['x-app-version'] =
                 (await PackageInfo.fromPlatform()).version;
