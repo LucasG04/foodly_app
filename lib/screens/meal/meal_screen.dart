@@ -8,6 +8,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:keep_screen_on/keep_screen_on.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -331,6 +332,13 @@ class _MealScreenState extends ConsumerState<MealScreen>
                             context.tr('meal_details_instructions'),
                             MarkdownBody(
                               data: meal.instructions ?? '',
+                              onTapLink: (_, href, __) {
+                                final uri =
+                                    href == null ? null : Uri.tryParse(href);
+                                if (uri != null) {
+                                  launchUrl(uri);
+                                }
+                              },
                               styleSheet: MarkdownStyleSheet.fromTheme(
                                 ThemeData(
                                   textTheme: const TextTheme(
