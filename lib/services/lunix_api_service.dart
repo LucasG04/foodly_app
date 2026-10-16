@@ -75,16 +75,11 @@ class LunixApiService {
     );
   }
 
-  static String get _lunixApiKey => true
-      ? '123'
-      : SettingsService.useDevApi
-          ? Env.lunixApiKeyDev
-          : Env.lunixApiKey;
-  static String get apiEndpoint => true
-      ? 'http://localhost:3001/foodly'
-      : SettingsService.useDevApi
-          ? 'https://lunix-api-dev.golenia.dev/foodly'
-          : 'https://lunix-api.golenia.dev/foodly';
+  static String get _lunixApiKey =>
+      SettingsService.useDevApi ? Env.lunixApiKeyDev : Env.lunixApiKey;
+  static String get apiEndpoint => SettingsService.useDevApi
+      ? 'https://lunix-api-dev.golenia.dev/foodly'
+      : 'https://lunix-api.golenia.dev/foodly';
   static String get mcpEndpoint => '$apiEndpoint/mcp';
 
   static Future<Options> _firebaseAuthOptions() async => Options(
