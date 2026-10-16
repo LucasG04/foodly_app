@@ -17,11 +17,15 @@ class SelectMealTile extends StatefulWidget {
   final Function()? secondaryAction;
   final bool isLoading;
 
+  /// Replaces opening the meal screen, e.g. for library dishes.
+  final VoidCallback? onTap;
+
   const SelectMealTile({
     this.meal,
     this.onAddMeal,
     this.secondaryAction,
     this.isLoading = false,
+    this.onTap,
     super.key,
   }) : assert(isLoading || (!isLoading && meal != null && onAddMeal != null));
 
@@ -37,14 +41,15 @@ class _SelectMealTileState extends State<SelectMealTile> {
     final width = MediaQuery.sizeOf(context).width;
     return Align(
       child: GestureDetector(
-        onTap: () {
-          if (widget.meal == null || widget.meal!.id == null) {
-            return;
-          }
-          AutoRouter.of(context).push(
-            MealScreenRoute(id: widget.meal!.id!, showOptions: false),
-          );
-        },
+        onTap: widget.onTap ??
+            () {
+              if (widget.meal == null || widget.meal!.id == null) {
+                return;
+              }
+              AutoRouter.of(context).push(
+                MealScreenRoute(id: widget.meal!.id!, showOptions: false),
+              );
+            },
         child: CardListTile(
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(kRadius),
@@ -118,9 +123,13 @@ class _SelectMealTileState extends State<SelectMealTile> {
         _buttonState = _ButtonState.LOADING;
       });
 
-      await widget.onAddMeal!();
+      final added = await widget.onAddMeal!();
 
       if (!mounted) {
+        return;
+      }
+      if (added == false) {
+        setState(() => _buttonState = _ButtonState.DEFAULT);
         return;
       }
       setState(() {

@@ -300,7 +300,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
   void _openAppStore() async {
     final url = Uri.parse('https://apps.apple.com/app/id$kAppBundleId');
     if (await canLaunchUrl(url)) {
-      await launchUrl(url);
+      await launchUrl(url, mode: LaunchMode.externalApplication);
     }
   }
 

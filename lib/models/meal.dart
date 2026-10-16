@@ -19,6 +19,9 @@ class Meal {
   List<String>? ingredientGroupOrder;
   int? kcal;
 
+  /// Id of the library dish this meal was copied from (lunix-api import).
+  String? libraryId;
+
   Meal({
     this.id,
     required this.name,
@@ -36,6 +39,7 @@ class Meal {
     this.createdAt,
     this.ingredientGroupOrder,
     this.kcal,
+    this.libraryId,
   });
 
   Map<String, dynamic> toMap() {
@@ -56,6 +60,7 @@ class Meal {
       if (ingredientGroupOrder != null && ingredientGroupOrder!.isNotEmpty)
         'ingredientGroupOrder': ingredientGroupOrder,
       'kcal': kcal,
+      if (libraryId != null) 'libraryId': libraryId,
     };
   }
 
@@ -84,6 +89,7 @@ class Meal {
           ? List<String>.from(map['ingredientGroupOrder'] as List<dynamic>)
           : null,
       kcal: map['kcal'] as int?,
+      libraryId: map['libraryId'] as String?,
     );
   }
 

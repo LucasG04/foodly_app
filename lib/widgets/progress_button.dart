@@ -77,7 +77,9 @@ class _ProgressButtonState extends State<ProgressButton>
 
     _progressAnimationController = AnimationController(
         vsync: this,
-        duration: Duration(milliseconds: widget.progressAnimationDuration));
+        duration: Duration(milliseconds: widget.progressAnimationDuration),
+        // Built while already in progress: start as the circle.
+        value: widget.buttonState == ButtonState.inProgress ? 1 : 0);
 
     // Define errorAnimation sequence
     final rightToLeftSwing = TweenSequenceItem<Offset>(
@@ -215,20 +217,30 @@ class _ProgressButtonState extends State<ProgressButton>
 
     return AnimatedBuilder(
       animation: _progressAnimationController,
-      builder: (context, child) {
-        return InkWell(
-          onTap: widget.buttonState == ButtonState.inProgress
-              ? null
-              : widget.onPressed,
-          borderRadius: borderRadius,
-          child: Ink(
-            width: buttonWidth,
-            height: buttonHeight,
-            decoration: widgetDecoration.copyWith(borderRadius: borderRadius),
-            child: Center(child: buttonContent),
+      // Loose constraints for the button, so it can shrink to a circle even
+      // where the parent forces a width (e.g. a full-width bottom bar); sized
+      // to the button otherwise.
+      builder: (context, child) => Align(
+        widthFactor: 1,
+        heightFactor: 1,
+        // Ink paints on the nearest Material; without this one that can be
+        // the Scaffold's, behind other content (e.g. a list under the button).
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTap: widget.buttonState == ButtonState.inProgress
+                ? null
+                : widget.onPressed,
+            borderRadius: borderRadius,
+            child: Ink(
+              width: buttonWidth,
+              height: buttonHeight,
+              decoration: widgetDecoration.copyWith(borderRadius: borderRadius),
+              child: Center(child: buttonContent),
+            ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

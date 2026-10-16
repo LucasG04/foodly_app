@@ -30,6 +30,10 @@ final mealTagFilterProvider = StateProvider<List<String>>((_) => []);
 /// Provides the last locally changed meal id
 final lastChangedMealProvider = StateProvider<String?>((_) => null);
 
+/// Bumped when library dishes were copied into the plan; the meal list
+/// reloads and keeps its search and tag filter.
+final libraryImportedProvider = StateProvider<int>((_) => 0);
+
 /// Provides the current initial search for the WebImagePicker
 final initSearchWebImagePickerProvider = StateProvider<String>((_) => '');
 

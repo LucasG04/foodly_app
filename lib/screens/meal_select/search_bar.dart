@@ -9,7 +9,16 @@ import '../../widgets/animate_icons.dart';
 class SearchBar extends StatefulWidget {
   final void Function(String) onSearch;
 
-  const SearchBar({required this.onSearch, super.key});
+  /// Lets the caller set the text (e.g. a prefilled query).
+  final TextEditingController? controller;
+  final String? hintText;
+
+  const SearchBar({
+    required this.onSearch,
+    this.controller,
+    this.hintText,
+    super.key,
+  });
 
   @override
   State<SearchBar> createState() => _SearchBarState();
@@ -21,12 +30,9 @@ class _SearchBarState extends State<SearchBar> with OfContextMixin {
   AnimateIconController? _closeIconController;
   Timer? _debounce;
 
-  late bool _isLoading;
-
   @override
   void initState() {
-    _isLoading = false;
-    _textEditingController = TextEditingController();
+    _textEditingController = widget.controller ?? TextEditingController();
     _closeIconController = AnimateIconController();
     super.initState();
     _focusNode.addListener(() {
@@ -50,44 +56,32 @@ class _SearchBarState extends State<SearchBar> with OfContextMixin {
     return SizedBox(
       width: mediaSize.width > 649 ? 650.0 : mediaSize.width * 0.95,
       child: Card(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: TextFormField(
-                focusNode: _focusNode,
-                controller: _textEditingController,
-                style: const TextStyle(fontSize: 20.0),
-                cursorColor: theme.primaryColor,
-                decoration: InputDecoration(
-                  suffixIcon: _buildClearIcon(),
-                  icon: Icon(
-                    EvaIcons.searchOutline,
-                    color: theme.primaryColor,
-                  ),
-                  border: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  errorBorder: InputBorder.none,
-                  disabledBorder: InputBorder.none,
-                ),
-                onChanged: (text) {
-                  if (_debounce?.isActive ?? false) {
-                    _debounce!.cancel();
-                  }
-                  _debounce = Timer(const Duration(milliseconds: 500), () {
-                    widget.onSearch(text);
-                  });
-                },
-              ),
+        child: TextFormField(
+          focusNode: _focusNode,
+          controller: _textEditingController,
+          style: const TextStyle(fontSize: 20.0),
+          cursorColor: theme.primaryColor,
+          decoration: InputDecoration(
+            hintText: widget.hintText,
+            suffixIcon: _buildClearIcon(),
+            prefixIcon: Icon(
+              EvaIcons.searchOutline,
+              color: theme.primaryColor,
             ),
-            SizedBox(
-              height: 4.0,
-              child: _isLoading
-                  ? const LinearProgressIndicator()
-                  : const SizedBox(),
-            ),
-          ],
+            border: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            disabledBorder: InputBorder.none,
+          ),
+          onChanged: (text) {
+            if (_debounce?.isActive ?? false) {
+              _debounce!.cancel();
+            }
+            _debounce = Timer(const Duration(milliseconds: 500), () {
+              widget.onSearch(text);
+            });
+          },
         ),
       ),
     );

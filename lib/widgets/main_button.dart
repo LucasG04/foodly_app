@@ -13,6 +13,9 @@ class MainButton extends StatelessWidget {
   final ButtonState? buttonState;
   final Color? color;
 
+  /// Shadow under the button, for one floating over content.
+  final bool floating;
+
   Color get kTextHeadlineColor => const Color(0xFF333333);
 
   const MainButton({
@@ -25,6 +28,7 @@ class MainButton extends StatelessWidget {
     this.isProgress = false,
     this.buttonState,
     this.color,
+    this.floating = false,
     super.key,
   })  : assert(isProgress && buttonState != null || !isProgress),
         assert(text != null || iconData != null);
@@ -33,22 +37,28 @@ class MainButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textColor = color ?? theme.primaryColor;
+    final decoration = BoxDecoration(
+      color: isSecondary ? theme.scaffoldBackgroundColor : textColor,
+      borderRadius: BorderRadius.circular(10),
+      // Part of the decoration, so it follows the progress button's shape.
+      boxShadow: floating
+          ? [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.18),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ]
+          : null,
+      border: isSecondary ? Border.all(color: textColor) : null,
+    );
     return !isProgress
         ? InkWell(
             onTap: onTap,
             child: Container(
               width: width,
               height: height,
-              decoration: !isSecondary
-                  ? BoxDecoration(
-                      color: textColor,
-                      borderRadius: BorderRadius.circular(10),
-                    )
-                  : BoxDecoration(
-                      color: theme.scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: textColor),
-                    ),
+              decoration: decoration,
               child: Center(
                 child: text != null
                     ? Text(
@@ -74,16 +84,7 @@ class MainButton extends StatelessWidget {
             child: ProgressButton(
               buttonState: buttonState,
               onPressed: onTap,
-              decoration: !isSecondary
-                  ? BoxDecoration(
-                      color: textColor,
-                      borderRadius: BorderRadius.circular(10),
-                    )
-                  : BoxDecoration(
-                      color: theme.scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: textColor),
-                    ),
+              decoration: decoration,
               progressColor: !isSecondary
                   ? Colors.white
                   // ? Theme.of(context).textTheme.button.color

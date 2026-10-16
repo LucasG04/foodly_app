@@ -30,7 +30,14 @@ class PlanHistoryView extends ConsumerStatefulWidget {
 
 class _PlanHistoryViewState extends ConsumerState<PlanHistoryView> {
   final ScrollController _scrollController = ScrollController();
+
   bool initialScrolledDown = false;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
