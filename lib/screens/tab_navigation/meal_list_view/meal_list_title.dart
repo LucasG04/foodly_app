@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:easy_localization/easy_localization.dart';
@@ -5,6 +6,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app_router.gr.dart';
 import '../../../constants.dart';
 import '../../../providers/state_providers.dart';
 import '../../../utils/of_context_mixin.dart';
@@ -55,6 +57,14 @@ class _MealListTitleState extends State<MealListTitle> with OfContextMixin {
                 ),
               ),
               const SizedBox(width: kPadding),
+              if (!_searchActive)
+                IconButton(
+                  icon: const Icon(EvaIcons.bookOpenOutline),
+                  tooltip: context.tr('library_title'),
+                  onPressed: () =>
+                      AutoRouter.of(context).push(LibraryScreenRoute()),
+                  splashRadius: 25.0,
+                ),
               if (!_searchActive)
                 IconButton(
                   icon: const Icon(EvaIcons.refreshOutline),

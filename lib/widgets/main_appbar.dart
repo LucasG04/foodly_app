@@ -39,10 +39,7 @@ class _MainAppBarState extends State<MainAppBar> with OfContextMixin {
 
   @override
   void dispose() {
-    try {
-      widget.scrollController.dispose();
-      // ignore: empty_catches
-    } catch (e) {}
+    widget.scrollController.removeListener(_scrollListener);
     super.dispose();
   }
 

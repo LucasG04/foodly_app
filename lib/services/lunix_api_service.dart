@@ -14,6 +14,7 @@ import '../models/grocery.dart';
 import '../models/grocery_group.dart';
 import '../models/ingredient.dart';
 import '../models/kcal_estimate.dart';
+import '../models/library_meal.dart';
 import '../models/lunix_docx.dart';
 import '../models/lunix_image.dart';
 import '../models/mcp_token.dart';
@@ -74,11 +75,16 @@ class LunixApiService {
     );
   }
 
-  static String get _lunixApiKey =>
-      SettingsService.useDevApi ? Env.lunixApiKeyDev : Env.lunixApiKey;
-  static String get apiEndpoint => SettingsService.useDevApi
-      ? 'https://lunix-api-dev.golenia.dev/foodly'
-      : 'https://lunix-api.golenia.dev/foodly';
+  static String get _lunixApiKey => true
+      ? '123'
+      : SettingsService.useDevApi
+          ? Env.lunixApiKeyDev
+          : Env.lunixApiKey;
+  static String get apiEndpoint => true
+      ? 'http://localhost:3001/foodly'
+      : SettingsService.useDevApi
+          ? 'https://lunix-api-dev.golenia.dev/foodly'
+          : 'https://lunix-api.golenia.dev/foodly';
   static String get mcpEndpoint => '$apiEndpoint/mcp';
 
   static Future<Options> _firebaseAuthOptions() async => Options(
@@ -318,7 +324,94 @@ class LunixApiService {
     return response.data != null ? data : [];
   }
 
-  static Future<List<Meal>> searchMealsByTags(
+  /// Library dishes for [filter]; `null` on failure.
+  static Future<LibraryPage?> searchLibrary({
+    required String lang,
+    String? planId,
+    LibraryFilter filter = const LibraryFilter(),
+    bool hideImported = false,
+    int offset = 0,
+    int limit = 30,
+  }) async {
+    _log.finer('Call searchLibrary() with ${filter.toMap()}, offset $offset');
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        '$apiEndpoint/library/search',
+        data: <String, dynamic>{
+          'lang': lang,
+          if (planId != null) 'planId': planId,
+          ...filter.toMap(),
+          if (hideImported) 'hideImported': true,
+          'offset': offset,
+          'limit': limit,
+        },
+      );
+      final data = response.data!;
+      return LibraryPage(
+        (data['items'] as List<dynamic>)
+            .map((dynamic e) => LibraryMeal.fromMap(e as Map<String, dynamic>))
+            .toList(),
+        (data['total'] as num).toInt(),
+      );
+    } catch (e) {
+      _log.severe('ERR in searchLibrary', e);
+      return null;
+    }
+  }
+
+  /// The localized library recipe with credits; `null` if missing or on failure.
+  static Future<LibraryMeal?> getLibraryMeal(
+    String id,
+    String lang,
+    String? planId,
+  ) async {
+    _log.finer('Call getLibraryMeal() with $id');
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        '$apiEndpoint/library/meal',
+        queryParameters: <String, String>{
+          'id': id,
+          'lang': lang,
+          if (planId != null) 'planId': planId,
+        },
+      );
+      return LibraryMeal.fromMap(response.data!);
+    } catch (e) {
+      _log.severe('ERR in getLibraryMeal', e);
+      return null;
+    }
+  }
+
+  /// Copies library dishes into the plan. Returns the plan's meals for [ids]
+  /// (dishes the plan already has aren't copied again); `null` on failure.
+  static Future<LibraryImport?> importLibraryMeals(
+    String planId,
+    List<String> ids,
+    String lang,
+  ) async {
+    _log.finer('Call importLibraryMeals() with $planId, $ids');
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        '$apiEndpoint/library/import',
+        data: <String, dynamic>{'planId': planId, 'ids': ids, 'lang': lang},
+        options: await _firebaseAuthOptions(),
+      );
+      final data = response.data!;
+      return (
+        meals: (data['meals'] as List<dynamic>).map((dynamic e) {
+          final map = e as Map<String, dynamic>;
+          return Meal.fromMap(map['id'] as String, map);
+        }).toList(),
+        created: (data['created'] as num).toInt(),
+      );
+    } catch (e) {
+      _log.severe('ERR in importLibraryMeals', e);
+      return null;
+    }
+  }
+
+  /// Meals of the plan with any of [tags]; `null` on failure.
+  static Future<List<Meal>?> searchMealsByTags(
     String planId,
     List<String> tags,
   ) async {
@@ -336,7 +429,10 @@ class LunixApiService {
       _log.severe('ERR in searchMealsByTags. Response is null', e);
     }
 
-    if (response == null || response.data == null) {
+    if (response == null) {
+      return null;
+    }
+    if (response.data == null) {
       return [];
     }
 

@@ -2,6 +2,8 @@ import 'package:auto_route/auto_route.dart';
 
 import 'screens/authentication/authentication_screen.dart';
 import 'screens/feedback/feedback_screen.dart';
+import 'screens/library/library_meal_screen.dart';
+import 'screens/library/library_screen.dart';
 import 'screens/meal/meal_screen.dart';
 import 'screens/meal_create/meal_create_screen.dart';
 import 'screens/meal_select/meal_select.dart';
@@ -25,6 +27,8 @@ import 'screens/upcoming_features/upcoming_features_screen.dart';
     CupertinoRoute<dynamic>(page: FeedbackScreen),
     CupertinoRoute<dynamic>(page: UpcomingFeaturesScreen),
     CupertinoRoute<dynamic>(page: ReorderProductGroupsScreen),
+    CupertinoRoute<dynamic>(page: LibraryScreen),
+    CupertinoRoute<dynamic>(page: LibraryMealScreen),
     CupertinoRoute<dynamic>(path: '/meal-create/:id', page: MealCreateScreen),
     CupertinoRoute<dynamic>(path: '/meal', page: MealScreen),
     CupertinoRoute<dynamic>(path: '*', page: UnknownRouteScreen),

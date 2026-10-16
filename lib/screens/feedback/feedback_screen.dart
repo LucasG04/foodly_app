@@ -45,6 +45,7 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
   @override
   void dispose() {
     _textFocusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 

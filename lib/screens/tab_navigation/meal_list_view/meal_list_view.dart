@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:concentric_transition/concentric_transition.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -6,7 +7,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app_router.gr.dart';
 import '../../../constants.dart';
+import '../../../models/library_meal.dart';
 import '../../../models/meal.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/lunix_api_service.dart';
@@ -15,9 +18,12 @@ import '../../../utils/analytics.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/debouncer.dart';
 import '../../../utils/of_context_mixin.dart';
+import '../../../utils/widget_utils.dart';
 import '../../../widgets/disposable_widget.dart';
+import '../../../widgets/main_button.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import '../../../widgets/user_information.dart';
+import '../../library/library_starter_sheet.dart';
 import '../../settings/help_slides/help_slide_share_import.dart';
 import 'meal_list_tile.dart';
 import 'meal_list_title.dart';
@@ -43,7 +49,7 @@ class _MealListViewState extends ConsumerState<MealListView>
   bool _paginationAtEnd = false;
   QueryDocumentSnapshot<Meal>? _lastMealDoc;
   // Cache the latest tag query to avoid refetching on rebuild.
-  Future<List<Meal>>? _tagSearchFuture;
+  Future<List<Meal>?>? _tagSearchFuture;
   List<String> _lastTagSearch = const [];
   String? _lastTagPlanId;
   // Monotonic token to drop stale async search results.
@@ -52,6 +58,8 @@ class _MealListViewState extends ConsumerState<MealListView>
   bool _searchLoading = false;
   // Bumped on refresh to force MealListTitle to reconstruct (resets search UI).
   int _searchGeneration = 0;
+  // Offered as a library search when the plan has no match.
+  String _lastQuery = '';
 
   @override
   bool get wantKeepAlive => true;
@@ -241,6 +249,14 @@ class _MealListViewState extends ConsumerState<MealListView>
             message: context.tr('meal_list_empty_subtitle'),
           ),
           const SizedBox(height: kPadding),
+          MainButton(
+            text: context.tr('library_starter_cta'),
+            onTap: _openStarter,
+          ),
+          _buildLibraryButton(
+            context.tr('library_browse_all'),
+            () => _openLibrary(entry: 'empty_list'),
+          ),
           TextButton.icon(
             onPressed: () => Navigator.push(
               context,
@@ -271,20 +287,45 @@ class _MealListViewState extends ConsumerState<MealListView>
             title: context.tr('meal_list_empty_search_title'),
             message: context.tr('meal_list_empty_search_subtitle'),
           ),
+          const SizedBox(height: kPadding),
+          _buildLibraryButton(
+            context.tr('library_search_cta', args: [_lastQuery]),
+            () => _openLibrary(query: _lastQuery, entry: 'search'),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildGroupedTagList(List<String> selectedTags) {
-    return FutureBuilder<List<Meal>>(
+    return FutureBuilder<List<Meal>?>(
         future: _searchMealsByTagsCached(selectedTags),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState != ConnectionState.done) {
             return _buildLoadingMealList();
+          }
+          // Failed: not the same as "no meal has these tags".
+          if (snapshot.data == null) {
+            return SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  UserInformation(
+                    assetPath: 'assets/images/undraw_void.png',
+                    message: context.tr('try_again_later'),
+                  ),
+                  TextButton(
+                    onPressed: () => setState(() => _tagSearchFuture = null),
+                    child: Text(context.tr('library_retry')),
+                  ),
+                ],
+              ),
+            );
           }
 
           final groups = _groupMealsByTags(snapshot.data!, selectedTags);
+          if (groups.every((g) => g.meals.isEmpty)) {
+            return _buildEmptyTagFilter(selectedTags);
+          }
           final rows = _buildGroupRows(groups);
 
           return SliverList(
@@ -314,7 +355,65 @@ class _MealListViewState extends ConsumerState<MealListView>
         });
   }
 
-  Future<List<Meal>> _searchMealsByTagsCached(List<String> selectedTags) {
+  /// No meal has any selected tag: offer the library, filtered by those
+  /// tags that are library tags.
+  Widget _buildEmptyTagFilter(List<String> selectedTags) {
+    final lang = libraryLang(context.locale.languageCode);
+    final libraryTags = LibraryTag.values.map((t) => t.label(lang)).toSet();
+    return SliverToBoxAdapter(
+      child: Column(
+        children: [
+          UserInformation(
+            assetPath: 'assets/images/undraw_void.png',
+            title: context.tr('meal_list_empty_search_title'),
+            message: context.tr('library_tag_filter_empty'),
+          ),
+          const SizedBox(height: kPadding),
+          _buildLibraryButton(
+            context.tr('library_search_cta_tags'),
+            () => _openLibrary(
+              tags: selectedTags.where(libraryTags.contains).toList(),
+              entry: 'tag_filter',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLibraryButton(String text, VoidCallback onPressed) {
+    return TextButton.icon(
+      onPressed: onPressed,
+      icon: Icon(EvaIcons.bookOpenOutline, color: theme.primaryColor),
+      label: Text(text, style: TextStyle(color: theme.primaryColor)),
+    );
+  }
+
+  void _openLibrary({
+    String? query,
+    List<String>? tags,
+    StarterAnswers? starter,
+    required String entry,
+  }) {
+    AutoRouter.of(context).push(LibraryScreenRoute(
+      query: query,
+      tags: tags,
+      starter: starter,
+      entry: entry,
+    ));
+  }
+
+  Future<void> _openStarter() async {
+    final answers = await WidgetUtils.showFoodlyBottomSheet<StarterAnswers>(
+      context: context,
+      builder: (_) => const LibraryStarterSheet(),
+    );
+    if (answers != null && mounted) {
+      _openLibrary(starter: answers, entry: 'starter');
+    }
+  }
+
+  Future<List<Meal>?> _searchMealsByTagsCached(List<String> selectedTags) {
     final planId = ref.read(planProvider)!.id!;
 
     // Reuse the previous future as long as plan + tags are unchanged.
@@ -387,6 +486,7 @@ class _MealListViewState extends ConsumerState<MealListView>
     if (query.isEmpty) {
       return;
     }
+    _lastQuery = query;
     // Each new request invalidates older ones.
     final requestToken = ++_searchRequestToken;
 
@@ -484,12 +584,33 @@ class _MealListViewState extends ConsumerState<MealListView>
 
   void _listenForMealsChange(WidgetRef ref) {
     final stream = ref.read(lastChangedMealProvider.notifier).stream;
-    BasicUtils.afterBuild(
-      () => stream
+    final imports = ref.read(libraryImportedProvider.notifier).stream;
+    BasicUtils.afterBuild(() {
+      stream
           .where((mealId) => mealId != null)
           .listen((mealId) => _onMealChanged(mealId!))
-          .canceledBy(this),
-    );
+          .canceledBy(this);
+      imports.listen((_) => _reloadAfterImport()).canceledBy(this);
+    });
+  }
+
+  /// Library dishes were added: reload the list, but keep the user's tag
+  /// filter and search (unlike [_refreshMeals]).
+  Future<void> _reloadAfterImport() async {
+    _lastMealDoc = null;
+    _paginationAtEnd = false;
+    // Skeleton instead of a flash of the empty state.
+    ref.read(_$isLoading.notifier).state = true;
+    ref.read(_$loadedMeals.notifier).state = [];
+    setState(() => _tagSearchFuture = null);
+    await _loadNextMeals(ref);
+    if (!mounted) {
+      return;
+    }
+    ref.read(_$isLoading.notifier).state = false;
+    if (ref.read(_$isSearching) && _lastQuery.isNotEmpty) {
+      await _searchMeal(_lastQuery);
+    }
   }
 
   /// Patches a loaded meal in place; unknown ids (created/imported meals) need a full refresh

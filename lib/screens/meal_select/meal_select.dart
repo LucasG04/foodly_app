@@ -7,6 +7,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
+import '../../models/library_meal.dart';
 import '../../models/meal.dart';
 import '../../models/plan_meal.dart';
 import '../../providers/state_providers.dart';
@@ -25,6 +26,7 @@ import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/meal_pagination.dart';
 import '../../widgets/user_information.dart';
+import '../library/library_import.dart';
 import '../tab_navigation/meal_list_view/meal_list_tile.dart';
 import 'search_bar.dart' as foodly_search_bar;
 import 'select_meal_tile.dart';
@@ -50,9 +52,21 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
 
   List<Meal> searchedMeals = [];
 
+  /// Library dishes for a search without own results.
+  List<LibraryMeal> _libraryMeals = [];
+
+  // Drops results of older searches.
+  int _searchToken = 0;
+
   double get _containerWidth {
     final width = mediaSize.width * 0.9;
     return width > 599 ? 600 : width;
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -69,6 +83,8 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
         child: Column(
           children: [
             foodly_search_bar.SearchBar(onSearch: _onSearchEvent),
+            if (searchedMeals.isEmpty && _libraryMeals.isNotEmpty)
+              _buildLibraryMeals(activePlan.id!),
             Consumer(builder: (context, ref, _) {
               final isSearching = ref.watch(_$isSearching);
 
@@ -109,6 +125,55 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
         ),
       ),
     );
+  }
+
+  Widget _buildLibraryMeals(String planId) {
+    return Column(
+      children: [
+        _buildSizeWrapper(
+          padding: const EdgeInsets.only(top: kPadding),
+          child: Text(
+            context.tr('meal_select_from_library'),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ),
+        for (final dish in _libraryMeals)
+          SelectMealTile(
+            key: ValueKey('library-${dish.id}'),
+            meal: dish.toPreviewMeal(),
+            onTap: () => AutoRouter.of(context).push(
+              LibraryMealScreenRoute(id: dish.id, entry: 'meal_select'),
+            ),
+            onAddMeal: () => _addLibraryMealToPlan(dish, planId),
+          ),
+      ],
+    );
+  }
+
+  /// Imports the dish (once) and adds the plan's copy to this day. False if
+  /// the import failed, so the tile doesn't report success.
+  Future<bool> _addLibraryMealToPlan(LibraryMeal dish, String planId) async {
+    final mealId = dish.importedMealId ??
+        (await importFromLibrary(context, [dish.id], entry: 'meal_select'))
+            ?.meals
+            .firstOrNull
+            ?.id;
+    if (mealId == null) {
+      return false;
+    }
+    await _addMealToPlan(mealId, planId);
+    return true;
+  }
+
+  /// A few library dishes for [query]; empty on failure.
+  Future<List<LibraryMeal>> _searchLibrary(String query) async {
+    final page = await LunixApiService.searchLibrary(
+      lang: libraryLang(context.locale.languageCode),
+      planId: ref.read(planProvider)!.id,
+      filter: LibraryFilter(query: query),
+      limit: 5,
+    );
+    return page?.items ?? [];
   }
 
   Widget _buildLoader() {
@@ -345,12 +410,21 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
   }
 
   void _onSearchEvent(String query) async {
+    final token = ++_searchToken;
     if (query.isNotEmpty && query.length > 2) {
       ref.read(_$isSearching.notifier).state = true;
-      searchedMeals = await _searchMeal(ref, query);
-      if (!mounted) {
+      final meals = await _searchMeal(ref, query);
+      final libraryMeals = meals.isEmpty && mounted
+          ? await _searchLibrary(query)
+          : <LibraryMeal>[];
+      if (!mounted || token != _searchToken) {
         return;
       }
+      // The library section is built outside the isSearching Consumer.
+      setState(() {
+        searchedMeals = meals;
+        _libraryMeals = libraryMeals;
+      });
       ref.read(_$isSearching.notifier).state = false;
       logEvent(AnalyticsEvent.searchMealSelect, {
         'query_length': '${query.length}',
@@ -358,6 +432,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
       });
     } else {
       searchedMeals = [];
+      _libraryMeals = [];
       ref.read(_$isSearching.notifier).state = false;
       setState(() {});
     }

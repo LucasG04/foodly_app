@@ -13,6 +13,7 @@ import '../../../utils/analytics.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/of_context_mixin.dart';
 import '../../../utils/widget_utils.dart';
+import '../../../widgets/choice_tile.dart';
 import '../../../widgets/main_button.dart';
 import '../../../widgets/progress_button.dart';
 import '../../../widgets/sheet_header.dart';
@@ -69,9 +70,9 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
           ),
           const SizedBox(height: kPadding / 2),
           _buildSectionLabel(context.tr('plan_move_day')),
-          _buildTileGrid([
+          ChoiceTileGrid([
             for (final (i, date) in _dropdownValues.indexed)
-              _buildTile(
+              ChoiceTile(
                 selected: date == _selectedDate,
                 onTap: () => _changeDate(date),
                 builder: (color) => [
@@ -97,10 +98,10 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
           ]),
           const SizedBox(height: kPadding),
           _buildSectionLabel(context.tr('plan_move_meal')),
-          _buildTileGrid(
+          ChoiceTileGrid(
             [
               for (final (type, icon, label) in _mealTypes)
-                _buildTile(
+                ChoiceTile(
                   selected: type == _selectedMealType,
                   onTap: () => _changeMealType(type),
                   builder: (color) => [
@@ -172,59 +173,6 @@ class PlanMoveMealModalState extends ConsumerState<PlanMoveMealModal>
         style: TextStyle(
           color: theme.textTheme.bodyLarge?.color?.withValues(alpha: 0.6),
           fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
-  /// Equal-width tiles, [columns] per row.
-  Widget _buildTileGrid(List<Widget> tiles, {int columns = 4}) {
-    return Column(
-      children: [
-        for (var row = 0; row < tiles.length; row += columns)
-          Padding(
-            padding: EdgeInsets.only(top: row == 0 ? 0 : kPadding / 2),
-            child: Row(
-              children: [
-                for (var i = row; i < row + columns; i++) ...[
-                  if (i > row) const SizedBox(width: kPadding / 2),
-                  Expanded(
-                    child: i < tiles.length ? tiles[i] : const SizedBox(),
-                  ),
-                ],
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-
-  /// A choice tile, filled with the primary color when [selected]. [builder]
-  /// gets the matching content color.
-  Widget _buildTile({
-    required bool selected,
-    required VoidCallback onTap,
-    required List<Widget> Function(Color color) builder,
-  }) {
-    final textColor = theme.textTheme.bodyLarge?.color ?? Colors.black;
-    return Semantics(
-      selected: selected,
-      child: Material(
-        color:
-            selected ? theme.primaryColor : textColor.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(kRadius),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(kRadius),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: kPadding / 2,
-              horizontal: kPadding / 4,
-            ),
-            child: Column(
-              children: builder(selected ? Colors.white : textColor),
-            ),
-          ),
         ),
       ),
     );

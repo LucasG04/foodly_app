@@ -54,6 +54,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     with OfContextMixin {
   final Logger _log = Logger('SettingsScreen');
   final ScrollController _scrollController = ScrollController();
+
   final _$loadingChangePlanLockState =
       AutoDisposeStateProvider<bool>((_) => false);
   bool isLoading = false;
@@ -68,6 +69,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           context.tr('shopping_list_sort_group'),
         ),
       ];
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

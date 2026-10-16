@@ -12,7 +12,13 @@ import '../../../widgets/skeleton_container.dart';
 class MealListTile extends StatelessWidget {
   final Meal? meal;
 
-  const MealListTile(this.meal, {super.key});
+  /// Replaces opening the meal screen (e.g. library dishes).
+  final VoidCallback? onTap;
+
+  /// Shown at the end of the tile, e.g. a selection circle.
+  final Widget? trailing;
+
+  const MealListTile(this.meal, {this.onTap, this.trailing, super.key});
 
   double get height => 80.0;
 
@@ -54,6 +60,7 @@ class MealListTile extends StatelessWidget {
                   )
                 : null,
           ),
+          if (trailing != null) trailing!,
         ],
       ),
     );
@@ -88,11 +95,12 @@ class MealListTile extends StatelessWidget {
     final width = MediaQuery.sizeOf(context).width;
     return Align(
       child: GestureDetector(
-        onTap: () {
-          if (meal != null && meal!.id != null) {
-            AutoRouter.of(context).push(MealScreenRoute(id: meal!.id!));
-          }
-        },
+        onTap: onTap ??
+            () {
+              if (meal != null && meal!.id != null) {
+                AutoRouter.of(context).push(MealScreenRoute(id: meal!.id!));
+              }
+            },
         child: Container(
           width: width > 599 ? 600 : width * 0.9,
           height: height,

@@ -32,6 +32,8 @@ enum AnalyticsEvent {
   mealsImport('meals_import'),
   searchMealList('search_meal_list'),
   searchMealSelect('search_meal_select'),
+  libraryOpen('library_open'),
+  libraryImport('library_import'),
 
   // AI
   aiTagSuggestionApplied('ai_tag_suggestion_applied'),

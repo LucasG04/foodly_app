@@ -35,6 +35,12 @@ class _UpcomingFeaturesScreenState
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final fullWidth = MediaQuery.sizeOf(context).width > 699
         ? 700.0
