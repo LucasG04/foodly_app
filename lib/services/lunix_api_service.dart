@@ -532,12 +532,23 @@ class LunixApiService {
     _log.finer('Call getMealFromUrl() with $url');
 
     try {
+      // Optional rate-limit key (per user instead of per IP): import works
+      // without it, so a missing user or failed token refresh mustn't abort.
+      final String? idToken = await AuthenticationService.currentUser
+          ?.getIdToken()
+          .timeout(const Duration(seconds: 3))
+          .catchError((Object _) => null);
       final response = await _dio.get<dynamic>(
         '$apiEndpoint/import',
         queryParameters: <String, dynamic>{
           'url': url,
           'language': langCode,
         },
+        options: Options(
+          headers: <String, dynamic>{
+            if (idToken != null) 'x-firebase-token': idToken,
+          },
+        ),
       );
       if (response.statusCode != 200) {
         return null;
@@ -545,6 +556,9 @@ class LunixApiService {
 
       return Meal.fromMap(null, response.data as Map<String, dynamic>);
     } catch (e) {
+      if (e is DioException && e.response?.statusCode == 429) {
+        throw _tooManyRequests(e.response?.data);
+      }
       _log.severe('ERR in getMealFromUrl with $url. API Request failed', e);
       return null;
     }
@@ -707,12 +721,13 @@ class LunixApiService {
     await stream.drain<void>();
   }
 
-  static Future<List<String>> getSupportedImportSites() async {
+  static Future<List<String>> getSupportedImportSites(String langCode) async {
     _log.finer('Call getSupportedImportSites()');
 
     try {
       final response = await _dio.get<dynamic>(
         '$apiEndpoint/import/supported-sites',
+        queryParameters: <String, dynamic>{'language': langCode},
       );
       if (response.statusCode != 200) {
         return [];

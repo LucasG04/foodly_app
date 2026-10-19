@@ -636,11 +636,19 @@ class _ImportModalState extends ConsumerState<ImportModal>
         return;
       }
       _buttonState = ButtonState.normal;
+      KeepScreenOn.turnOff();
       if (!mounted) {
         return;
       }
       FocusScope.of(context).unfocus();
       Navigator.pop(context, meal);
+    } on RateLimitException catch (e) {
+      KeepScreenOn.turnOff();
+      if (!mounted) {
+        return;
+      }
+      setState(() => _buttonState = ButtonState.error);
+      MainSnackbar(isError: true, message: e.message).show(context);
     } catch (e) {
       _handleDownloadError();
     }

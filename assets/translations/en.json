@@ -188,7 +188,7 @@
   "import_modal_link_title": "link from website",
   "import_modal_error_not_found_title": "Not found",
   "import_modal_error_not_found": "Unfortunately, no dish could be found for this link.",
-  "import_modal_info": "You can import dishes directly from popular websites. To do this, paste the link to the dish and click \"Import\". Supported sites are: {}",
+  "import_modal_info": "You can import dishes from almost any recipe website. To do this, paste the link to the dish and click \"Import\". For example: {}",
   "import_modal_import": "import",
   "import_modal_error_no_link": "Please enter a link.",
   "import_options_link": "From Link",
