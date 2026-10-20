@@ -211,11 +211,7 @@ class _AddToShoppingListModalState extends ConsumerState<AddToShoppingListModal>
   }
 
   void _close() {
-    final sheet = ModalRoute.of(context);
-    // An error snackbar from a failed attempt may still be on top.
-    Navigator.of(context)
-      ..popUntil((route) => route == sheet)
-      ..pop();
+    Navigator.of(context).pop();
   }
 
   List<IngredientState> _getIngredientStates(Meal meal) {

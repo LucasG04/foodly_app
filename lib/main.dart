@@ -44,6 +44,7 @@ import 'utils/analytics.dart';
 import 'utils/basic_utils.dart';
 import 'utils/convert_util.dart';
 import 'utils/env.dart';
+import 'utils/main_snackbar.dart';
 import 'widgets/disposable_widget.dart';
 
 Future<void> _configureFirebase() async {
@@ -302,6 +303,8 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
                   routeInformationParser:
                       _DeepLinkGuardedParser(_appRouter.defaultRouteParser()),
                   debugShowCheckedModeBanner: false,
+                  // Snackbars live above all routes (see MainSnackbar.show).
+                  builder: (context, child) => SnackbarHost(child: child!),
                   themeMode: ThemeMode.light,
                   localizationsDelegates: [
                     ...context.localizationDelegates,
