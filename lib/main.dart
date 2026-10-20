@@ -524,8 +524,8 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       return;
     }
 
-    final extractedLink = BasicUtils.getUrlFromString(sharedText);
-    if (extractedLink != null && BasicUtils.isValidUri(extractedLink)) {
+    final extractedLink = BasicUtils.extractLink(sharedText);
+    if (extractedLink != null) {
       final importRoute = MealCreateScreenRoute(
         id: Uri.encodeComponent(extractedLink),
         navigateToDetailOnCreate: true,

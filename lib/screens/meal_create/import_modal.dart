@@ -612,9 +612,9 @@ class _ImportModalState extends ConsumerState<ImportModal>
   }
 
   Future<void> _importFromLink() async {
-    final String? link = BasicUtils.getUrlFromString(_controller.text.trim());
+    final link = BasicUtils.extractLink(_controller.text);
 
-    if (link == null || link.isEmpty || !BasicUtils.isValidUri(link)) {
+    if (link == null) {
       setState(() {
         _buttonState = ButtonState.error;
         _errorText = context.tr('import_modal_error_no_link');
