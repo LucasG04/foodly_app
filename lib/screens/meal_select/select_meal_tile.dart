@@ -67,7 +67,8 @@ class _SelectMealTileState extends State<SelectMealTile> {
                       ),
           ),
           content: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            // Sized by the name; the card centres it.
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
@@ -80,6 +81,8 @@ class _SelectMealTileState extends State<SelectMealTile> {
                     : AutoSizeText(
                         widget.meal!.name,
                         maxLines: 3,
+                        // Shrinks rather than splitting a word ("Colesla|w").
+                        wrapWords: false,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 16.0,

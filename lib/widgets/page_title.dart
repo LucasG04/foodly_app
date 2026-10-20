@@ -34,14 +34,21 @@ class PageTitle extends StatelessWidget {
               : MediaQuery.sizeOf(context).width * 0.9,
           child: Row(
             children: [
-              _buildTitle(),
-              if (checkConnectivity) ...[
-                const SizedBox(width: kPadding / 2),
-                _buildConnectivityIndicator(context),
-              ],
+              // The title gets the room left of the actions and shrinks to
+              // fit it, e.g. at large text sizes.
+              Expanded(
+                child: Row(
+                  children: [
+                    Flexible(child: _buildTitle()),
+                    if (checkConnectivity) ...[
+                      const SizedBox(width: kPadding / 2),
+                      _buildConnectivityIndicator(context),
+                    ],
+                  ],
+                ),
+              ),
               if (actions != null && actions!.isNotEmpty) ...[
                 const SizedBox(width: kPadding),
-                const Spacer(),
                 ...actions!,
               ],
             ],
@@ -55,7 +62,8 @@ class PageTitle extends StatelessWidget {
     return AutoSizeText(
       text,
       maxFontSize: 30.0,
-      minFontSize: 26.0,
+      minFontSize: 16.0,
+      maxLines: 1,
       style: TextStyle(
         fontSize: autoSize ? null : 30.0,
         fontWeight: FontWeight.w700,
