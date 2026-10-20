@@ -126,6 +126,39 @@ void main() {
       );
     });
 
+    test('parses the TikTok fetch error', () {
+      final event = MealGenerationEvent.fromJson(<String, dynamic>{
+        'type': 'error',
+        'code': 'TIKTOK_FETCH_FAILED',
+      });
+      expect(
+        (event as ErrorEvent).code,
+        MealGenerationErrorCode.tiktokFetchFailed,
+      );
+    });
+
+    test('parses post', () {
+      final event = MealGenerationEvent.fromJson(<String, dynamic>{
+        'type': 'post',
+        'coverUrl': 'https://p16.tiktokcdn.com/c.jpg',
+        'owner': 'chef.anna',
+      });
+      expect(event, isA<PostEvent>());
+      event as PostEvent;
+      expect(event.coverUrl, 'https://p16.tiktokcdn.com/c.jpg');
+      expect(event.owner, 'chef.anna');
+    });
+
+    test('parses post without cover or owner', () {
+      final event = MealGenerationEvent.fromJson(<String, dynamic>{
+        'type': 'post',
+        'coverUrl': null,
+        'owner': null,
+      });
+      expect((event as PostEvent).coverUrl, isNull);
+      expect(event.owner, isNull);
+    });
+
     test('maps an unrecognized error code to unknown', () {
       final event = MealGenerationEvent.fromJson(<String, dynamic>{
         'type': 'error',

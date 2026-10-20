@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foodly/models/ai_usage.dart';
 
-const limits = AiLimits(text: 3, instagram: 3, kcal: 6);
+const limits = AiLimits(text: 3, social: 3, kcal: 6);
 
 void main() {
   group('AiUsage.fromDoc', () {
@@ -18,7 +18,7 @@ void main() {
       );
       expect(usage.kcalUsed, 2);
       expect(usage.textUsed, 1);
-      expect(usage.instagramUsed, 3);
+      expect(usage.socialUsed, 3);
     });
 
     test('treats counts as zero when the doc is null', () {
@@ -29,7 +29,7 @@ void main() {
       );
       expect(usage.kcalUsed, 0);
       expect(usage.textUsed, 0);
-      expect(usage.instagramUsed, 0);
+      expect(usage.socialUsed, 0);
       expect(usage.periodKey, '2026-06-08');
     });
 
@@ -46,7 +46,7 @@ void main() {
       );
       expect(usage.kcalUsed, 0);
       expect(usage.textUsed, 0);
-      expect(usage.instagramUsed, 0);
+      expect(usage.socialUsed, 0);
     });
   });
 
@@ -56,12 +56,12 @@ void main() {
         periodKey: 'k',
         kcalUsed: 2,
         textUsed: 1,
-        instagramUsed: 1,
+        socialUsed: 1,
         limits: limits,
       );
       expect(usage.kcalRemaining, limits.kcal - 2);
       expect(usage.textRemaining, limits.text - 1);
-      expect(usage.instagramRemaining, limits.instagram - 1);
+      expect(usage.socialRemaining, limits.social - 1);
     });
 
     test('clamps remaining at zero when over the limit', () {
@@ -69,12 +69,12 @@ void main() {
         periodKey: 'k',
         kcalUsed: 99,
         textUsed: 99,
-        instagramUsed: 99,
+        socialUsed: 99,
         limits: limits,
       );
       expect(usage.kcalRemaining, 0);
       expect(usage.textRemaining, 0);
-      expect(usage.instagramRemaining, 0);
+      expect(usage.socialRemaining, 0);
     });
   });
 
@@ -84,12 +84,12 @@ void main() {
         periodKey: 'k',
         kcalUsed: 99,
         textUsed: 99,
-        instagramUsed: 99,
+        socialUsed: 99,
         limits: limits,
       );
       expect(usage.canUseKcal(true), isTrue);
       expect(usage.canUseText(true), isTrue);
-      expect(usage.canUseInstagram(true), isTrue);
+      expect(usage.canUseSocial(true), isTrue);
     });
 
     test('free user gated once quota is exhausted', () {
@@ -97,23 +97,23 @@ void main() {
         periodKey: 'k',
         kcalUsed: limits.kcal,
         textUsed: limits.text,
-        instagramUsed: limits.instagram,
+        socialUsed: limits.social,
         limits: limits,
       );
       expect(exhausted.canUseKcal(false), isFalse);
       expect(exhausted.canUseText(false), isFalse);
-      expect(exhausted.canUseInstagram(false), isFalse);
+      expect(exhausted.canUseSocial(false), isFalse);
 
       const fresh = AiUsage(
         periodKey: 'k',
         kcalUsed: 0,
         textUsed: 0,
-        instagramUsed: 0,
+        socialUsed: 0,
         limits: limits,
       );
       expect(fresh.canUseKcal(false), isTrue);
       expect(fresh.canUseText(false), isTrue);
-      expect(fresh.canUseInstagram(false), isTrue);
+      expect(fresh.canUseSocial(false), isTrue);
     });
   });
 }

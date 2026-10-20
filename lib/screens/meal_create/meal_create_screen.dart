@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:keyboard_service/keyboard_service.dart';
 import 'package:logging/logging.dart';
-import 'package:simple_icons/simple_icons.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -15,6 +14,7 @@ import '../../models/ai_usage.dart';
 import '../../models/image_credit.dart';
 import '../../models/ingredient.dart';
 import '../../models/meal.dart';
+import '../../models/social_platform.dart';
 import '../../providers/state_providers.dart';
 import '../../services/ai_quota_exceeded_exception.dart';
 import '../../services/authentication_service.dart';
@@ -522,8 +522,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       // Shared URL: open the import modal pre-filled, choosing the type by host.
       _isCreatingMeal = true;
       final url = Uri.decodeComponent(widget.id);
-      final type = BasicUtils.isValidInstagramUrl(url)
-          ? ImportType.instagram
+      final type = BasicUtils.socialPlatformOf(url) != null
+          ? ImportType.social
           : ImportType.link;
       final meal = ref.read(_$meal.notifier).state;
       meal.ingredients = [];
@@ -752,30 +752,31 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
             onTap: () => _openImportModal(ImportType.link),
           ),
           OptionsSheetOptions(
-            icon: SimpleIcons.instagram,
-            title: context.tr('import_options_instagram'),
+            leading: const _SocialIcons(),
+            title: context.tr('import_options_social'),
             trailing: showQuotaBadges
-                ? _buildQuotaPill(usage.instagramRemaining)
+                ? _buildQuotaPill(usage.socialRemaining)
                 : null,
-            onTap: _onTapInstagramImport,
+            onTap: _onTapSocialImport,
           ),
         ],
       ),
     );
   }
 
-  Future<void> _onTapInstagramImport() async {
+  Future<void> _onTapSocialImport() async {
     final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
     final usage = ref.read(aiUsageProvider).valueOrNull;
-    final canUse = usage?.canUseInstagram(isSubscribed) ?? true;
+    final canUse = usage?.canUseSocial(isSubscribed) ?? true;
     if (!canUse) {
-      GetPremiumModal.showAiQuotaExhausted(context, feature: 'instagram');
+      // No link yet, so no platform.
+      GetPremiumModal.showAiQuotaExhausted(context, feature: 'social');
       return;
     }
     if (!await AiConsentSheet.ensure(context, ref) || !mounted) {
       return;
     }
-    _openImportModal(ImportType.instagram);
+    _openImportModal(ImportType.social);
   }
 
   Widget _buildQuotaPill(int remaining) {
@@ -796,13 +797,14 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     );
   }
 
-  /// Opens the import modal for a shared URL, gating Instagram imports behind
-  /// the AI usage quota just like the in-app Instagram import button. Awaits the
+  /// Opens the import modal for a shared URL, gating Instagram and TikTok
+  /// imports behind the AI usage quota just like the in-app import row. Awaits the
   /// first usage value: on the share flow this runs right after the screen opens,
   /// before the streamed usage has arrived, so reading it synchronously would
   /// see null and skip the gate.
   Future<void> _startSharedUrlImport(ImportType type, String url) async {
-    if (type == ImportType.instagram) {
+    final platform = BasicUtils.socialPlatformOf(url);
+    if (platform != null) {
       final isSubscribed = ref.read(InAppPurchaseService.$userIsSubscribed);
       AiUsage? usage;
       try {
@@ -817,9 +819,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       if (!mounted) {
         return;
       }
-      final canUse = usage?.canUseInstagram(isSubscribed) ?? true;
+      final canUse = usage?.canUseSocial(isSubscribed) ?? true;
       if (!canUse) {
-        GetPremiumModal.showAiQuotaExhausted(context, feature: 'instagram');
+        GetPremiumModal.showAiQuotaExhausted(context, feature: platform.name);
         return;
       }
       if (!await AiConsentSheet.ensure(context, ref) || !mounted) {
@@ -836,8 +838,11 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     );
 
     if (result != null && mounted) {
-      _mealSource =
-          initialUrl == null ? type.name : '${widget.origin}_${type.name}';
+      // Social imports log their platform (instagram / tiktok).
+      final name = type == ImportType.social
+          ? BasicUtils.socialPlatformOf(result.source ?? '')?.name ?? type.name
+          : type.name;
+      _mealSource = initialUrl == null ? name : '${widget.origin}_$name';
       final meal = ref.read(_$meal.notifier).state;
       _titleController.text = result.name;
       meal.name = result.name;
@@ -1121,5 +1126,28 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         ref.read(_$isAiLoading.notifier).state = false;
       }
     }
+  }
+}
+
+/// Instagram and TikTok icons overlapping in one 24 px icon slot.
+class _SocialIcons extends StatelessWidget {
+  const _SocialIcons();
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).textTheme.bodyLarge?.color;
+    return SizedBox.square(
+      dimension: 24,
+      child: Stack(
+        children: [
+          Icon(SocialPlatform.instagram.icon, size: 15, color: color),
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Icon(SocialPlatform.tiktok.icon, size: 15, color: color),
+          ),
+        ],
+      ),
+    );
   }
 }

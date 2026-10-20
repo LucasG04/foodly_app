@@ -2,18 +2,21 @@
 /// (`GET /foodly/ai-limits`) as the single source of truth.
 class AiLimits {
   final int text;
-  final int instagram;
+
+  /// Instagram and TikTok imports together.
+  final int social;
   final int kcal;
 
   const AiLimits({
     required this.text,
-    required this.instagram,
+    required this.social,
     required this.kcal,
   });
 
   factory AiLimits.fromMap(Map<String, dynamic> map) => AiLimits(
         text: (map['text'] as num).toInt(),
-        instagram: (map['instagram'] as num).toInt(),
+        // Named before TikTok joined; it is the shared social quota.
+        social: (map['instagram'] as num).toInt(),
         kcal: (map['kcal'] as num).toInt(),
       );
 }
@@ -23,14 +26,16 @@ class AiUsage {
   final String periodKey;
   final int kcalUsed;
   final int textUsed;
-  final int instagramUsed;
+
+  /// Instagram and TikTok imports together.
+  final int socialUsed;
   final AiLimits limits;
 
   const AiUsage({
     required this.periodKey,
     required this.kcalUsed,
     required this.textUsed,
-    required this.instagramUsed,
+    required this.socialUsed,
     required this.limits,
   });
 
@@ -47,7 +52,7 @@ class AiUsage {
         periodKey: currentPeriodKey,
         kcalUsed: 0,
         textUsed: 0,
-        instagramUsed: 0,
+        socialUsed: 0,
         limits: limits,
       );
     }
@@ -55,7 +60,8 @@ class AiUsage {
       periodKey: currentPeriodKey,
       kcalUsed: (data['kcalUsed'] as num?)?.toInt() ?? 0,
       textUsed: (data['textUsed'] as num?)?.toInt() ?? 0,
-      instagramUsed: (data['instagramUsed'] as num?)?.toInt() ?? 0,
+      // Stored as `instagramUsed` from before TikTok joined.
+      socialUsed: (data['instagramUsed'] as num?)?.toInt() ?? 0,
       limits: limits,
     );
   }
@@ -64,13 +70,12 @@ class AiUsage {
 
   int get textRemaining => (limits.text - textUsed).clamp(0, limits.text);
 
-  int get instagramRemaining =>
-      (limits.instagram - instagramUsed).clamp(0, limits.instagram);
+  int get socialRemaining =>
+      (limits.social - socialUsed).clamp(0, limits.social);
 
   bool canUseKcal(bool isSubscribed) => isSubscribed || kcalRemaining > 0;
 
   bool canUseText(bool isSubscribed) => isSubscribed || textRemaining > 0;
 
-  bool canUseInstagram(bool isSubscribed) =>
-      isSubscribed || instagramRemaining > 0;
+  bool canUseSocial(bool isSubscribed) => isSubscribed || socialRemaining > 0;
 }

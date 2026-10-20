@@ -566,7 +566,7 @@ class LunixApiService {
 
   /// Streams a meal generated from [data] — either free text (a recipe, a dish
   /// idea or, with [currentMeal], a change request) or an
-  /// Instagram post/reel URL, per [source] — as a sequence of typed events
+  /// Instagram or TikTok post URL, per [source] — as a sequence of typed events
   /// (NDJSON). Fields, ingredients and enrichment (product groups, image)
   /// arrive incrementally; the stream is terminated by a [DoneEvent] or an
   /// [ErrorEvent].

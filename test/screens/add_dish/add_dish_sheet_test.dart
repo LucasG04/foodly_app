@@ -13,12 +13,12 @@ import '../../helpers/load_translations.dart';
 import '../../helpers/screen_size.dart';
 import '../../helpers/test_localizations.dart';
 
-AiUsage _usage({int textUsed = 0, int instagramUsed = 0}) => AiUsage(
+AiUsage _usage({int textUsed = 0, int socialUsed = 0}) => AiUsage(
       periodKey: '2026-10-19',
       kcalUsed: 0,
       textUsed: textUsed,
-      instagramUsed: instagramUsed,
-      limits: const AiLimits(text: 3, instagram: 3, kcal: 6),
+      socialUsed: socialUsed,
+      limits: const AiLimits(text: 3, social: 3, kcal: 6),
     );
 
 void main() {
@@ -72,15 +72,39 @@ void main() {
   testWidgets('recipe website link is free and imports', (tester) async {
     await pumpSheet(tester, usage: _usage());
     await type(tester, 'https://www.chefkoch.de/r/1');
-    expect(find.text('Recipe website · free'), findsOneWidget);
+    expect(find.text('Recipe website'), findsOneWidget);
     expect(find.text('Import'), findsOneWidget);
   });
 
   testWidgets('instagram link shows remaining imports', (tester) async {
-    await pumpSheet(tester, usage: _usage(instagramUsed: 1));
+    await pumpSheet(tester, usage: _usage(socialUsed: 1));
     await type(tester, 'https://www.instagram.com/reel/a/');
-    expect(find.text('Instagram · 2 of 3 left this week'), findsOneWidget);
+    expect(find.text('Instagram & TikTok · 2 of 3 left this week'),
+        findsOneWidget);
     expect(find.text('Import'), findsOneWidget);
+  });
+
+  testWidgets('tiktok link shows the shared count and its icon',
+      (tester) async {
+    final result = await pumpSheet(tester, usage: _usage(socialUsed: 1));
+    await type(tester, 'https://vm.tiktok.com/ZGdCqSCL3/');
+    expect(find.text('Instagram & TikTok · 2 of 3 left this week'),
+        findsOneWidget);
+    expect(find.byIcon(SimpleIcons.tiktok), findsOneWidget);
+    await tester.tap(find.text('Import'));
+    await tester.pumpAndSettle();
+    final link = result()! as AddDishLink;
+    expect(link.url, 'https://vm.tiktok.com/ZGdCqSCL3/');
+    expect(link.kind, AddDishKind.social);
+  });
+
+  testWidgets('switching from an instagram to a tiktok link swaps the icon',
+      (tester) async {
+    await pumpSheet(tester, usage: _usage());
+    await type(tester, 'https://www.instagram.com/reel/a/');
+    await type(tester, 'https://www.tiktok.com/@chef/video/1');
+    expect(find.byIcon(SimpleIcons.instagram), findsNothing);
+    expect(find.byIcon(SimpleIcons.tiktok), findsOneWidget);
   });
 
   testWidgets('exhausted AI quota offers premium', (tester) async {
@@ -96,11 +120,32 @@ void main() {
   });
 
   testWidgets('get premium pops with the exhausted feature', (tester) async {
-    final result = await pumpSheet(tester, usage: _usage(instagramUsed: 3));
+    final result = await pumpSheet(tester, usage: _usage(socialUsed: 3));
     await type(tester, 'https://www.instagram.com/reel/a/');
     await tester.tap(find.text('Get Premium'));
     await tester.pumpAndSettle();
     expect((result()! as AddDishPremium).feature, 'instagram');
+  });
+
+  testWidgets('tiktok shares the exhausted quota and names its platform',
+      (tester) async {
+    final result = await pumpSheet(tester, usage: _usage(socialUsed: 3));
+    await type(tester, 'https://vm.tiktok.com/ZGdCqSCL3/');
+    expect(
+      find.text('No Instagram & TikTok imports left this week · '
+          'links from recipe websites stay free'),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Get Premium'));
+    await tester.pumpAndSettle();
+    expect((result()! as AddDishPremium).feature, 'tiktok');
+  });
+
+  testWidgets('premium users see the platform name', (tester) async {
+    await pumpSheet(tester, usage: _usage(socialUsed: 3), subscribed: true);
+    await type(tester, 'https://vm.tiktok.com/ZGdCqSCL3/');
+    expect(find.text('TikTok'), findsOneWidget);
+    expect(find.text('Import'), findsOneWidget);
   });
 
   testWidgets('premium users see no counts', (tester) async {
@@ -160,11 +205,10 @@ void main() {
     loadTranslations('de');
     setScreenSize(tester, const Size(320, 640));
 
-    await pumpSheet(tester,
-        usage: _usage(instagramUsed: 3), showOtherPlans: true);
+    await pumpSheet(tester, usage: _usage(socialUsed: 3), showOtherPlans: true);
     await type(tester, 'https://www.instagram.com/reel/a/');
     expect(
-      find.text('Keine Instagram-Importe mehr diese Woche · '
+      find.text('Keine Instagram- & TikTok-Importe mehr diese Woche · '
           'Links von Rezeptseiten bleiben kostenlos'),
       findsOneWidget,
     );
@@ -195,7 +239,7 @@ void main() {
         find.byType(TextField), 'https://www.chefkoch.de/r/12');
     await tester.pump(const Duration(milliseconds: 50));
     // Same kind: no outgoing copy of the line/button fading out.
-    expect(find.text('Recipe website · free'), findsOneWidget);
+    expect(find.text('Recipe website'), findsOneWidget);
     expect(find.text('Import'), findsOneWidget);
   });
 

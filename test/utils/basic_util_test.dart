@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foodly/models/grocery_group.dart';
+import 'package:foodly/models/social_platform.dart';
 import 'package:foodly/utils/basic_utils.dart';
 
 void main() {
@@ -28,31 +29,46 @@ void main() {
     });
   });
 
-  group('isValidInstagramUrl', () {
-    test('accepts various URLs', () {
+  group('socialPlatformOf', () {
+    test('accepts various Instagram URLs', () {
       expect(
-        BasicUtils.isValidInstagramUrl('https://www.instagram.com/p/Cxy123_-/'),
-        isTrue,
+        BasicUtils.socialPlatformOf('https://www.instagram.com/p/Cxy123_-/'),
+        SocialPlatform.instagram,
       );
       expect(
-        BasicUtils.isValidInstagramUrl(
+        BasicUtils.socialPlatformOf(
             'https://instagram.com/reel/Cxy123?ig_sha=abc123'),
-        isTrue,
+        SocialPlatform.instagram,
       );
       expect(
-        BasicUtils.isValidInstagramUrl(
+        BasicUtils.socialPlatformOf(
             'https://instagram.com/Cxy123?ig_sha=abc123'),
-        isTrue,
+        SocialPlatform.instagram,
       );
     });
 
-    test('rejects non-post Instagram URLs and other hosts', () {
+    test('accepts TikTok video and short links', () {
+      for (final url in [
+        'https://www.tiktok.com/@chef/video/7686516156886224161',
+        'https://tiktok.com/@chef/photo/123',
+        'https://vm.tiktok.com/ZGdCqSCL3/',
+        'https://vt.tiktok.com/ZSabc123/',
+        'https://m.tiktok.com/v/123.html',
+      ]) {
+        expect(BasicUtils.socialPlatformOf(url), SocialPlatform.tiktok,
+            reason: url);
+      }
+    });
+
+    test('rejects other hosts', () {
       expect(
-        BasicUtils.isValidInstagramUrl('https://www.chefkoch.de/rezepte/123'),
-        isFalse,
+        BasicUtils.socialPlatformOf('https://www.chefkoch.de/rezepte/123'),
+        isNull,
       );
-      expect(BasicUtils.isValidInstagramUrl('just some recipe text'), isFalse);
-      expect(BasicUtils.isValidInstagramUrl(''), isFalse);
+      expect(BasicUtils.socialPlatformOf('https://tiktok.com.evil.com/x'),
+          isNull);
+      expect(BasicUtils.socialPlatformOf('just some recipe text'), isNull);
+      expect(BasicUtils.socialPlatformOf(''), isNull);
     });
 
     test('isValidUri', () {

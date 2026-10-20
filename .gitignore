@@ -29,6 +29,7 @@ hosting.*
 CLAUDE.md
 .superpowers/
 docs/
+.impeccable/
 
 # IntelliJ related
 *.iml

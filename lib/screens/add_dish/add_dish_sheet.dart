@@ -5,7 +5,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:simple_icons/simple_icons.dart';
 
 import '../../app_router.gr.dart';
 import '../../constants.dart';
@@ -53,7 +52,8 @@ class AddDishManual extends AddDishChoice {
   const AddDishManual();
 }
 
-/// The weekly quota for [feature] (`instagram` / `assistant`) is used up.
+/// The weekly quota for [feature] (`instagram` / `tiktok` / `assistant`) is
+/// used up; both platforms share one quota.
 class AddDishPremium extends AddDishChoice {
   final String feature;
   const AddDishPremium(this.feature);
@@ -85,7 +85,7 @@ Future<Meal?> showAddDishSheet(
   // form.
   final aiText = switch (choice) {
     AddDishAi(:final prompt) => prompt,
-    AddDishLink(:final url, kind: AddDishKind.instagram) => url,
+    AddDishLink(:final url, kind: AddDishKind.social) => url,
     _ => null,
   };
   if (aiText != null && !await AiConsentSheet.ensure(context, ref)) {
@@ -146,36 +146,39 @@ Future<Meal?> showAddDishSheet(
   return null;
 }
 
-/// The cost line shown before the user commits to [kind]. Counts only for
+/// The cost line shown before the user commits to [input]. Counts only for
 /// free users with a known quota; when the quota is unknown the server still
 /// enforces it, so the action stays available.
 ({String label, bool exhausted}) addDishCost(
   BuildContext context,
-  AddDishKind kind,
+  AddDishInput input,
   AiUsage? usage,
   bool isSubscribed,
 ) {
-  switch (kind) {
+  switch (input.kind) {
     case AddDishKind.empty:
       return (label: '', exhausted: false);
     case AddDishKind.website:
       return (label: context.tr('add_dish_cost_free'), exhausted: false);
-    case AddDishKind.instagram:
+    case AddDishKind.social:
     case AddDishKind.ai:
-      final isInstagram = kind == AddDishKind.instagram;
-      final name = isInstagram ? 'instagram' : 'ai';
+      final platform = input.platform;
+      final isSocial = platform != null;
+      final name = isSocial ? 'social' : 'ai';
       if (isSubscribed || usage == null) {
-        return (label: context.tr('add_dish_kind_$name'), exhausted: false);
+        return (
+          label: platform?.label ?? context.tr('add_dish_kind_ai'),
+          exhausted: false,
+        );
       }
-      final remaining =
-          isInstagram ? usage.instagramRemaining : usage.textRemaining;
+      final remaining = isSocial ? usage.socialRemaining : usage.textRemaining;
       if (remaining == 0) {
         return (
           label: context.tr('add_dish_cost_exhausted_$name'),
           exhausted: true,
         );
       }
-      final limit = isInstagram ? usage.limits.instagram : usage.limits.text;
+      final limit = isSocial ? usage.limits.social : usage.limits.text;
       return (
         label: context.tr('add_dish_cost_$name',
             args: [remaining.toString(), limit.toString()]),
@@ -211,35 +214,42 @@ class _AddDishSheetState extends ConsumerState<AddDishSheet> {
   /// forth, and a key that is still fading out must not come back.
   int _inputVersion = 0;
 
-  /// Kinds whose used-up quota was already logged in this sheet.
-  final _loggedExhausted = <AddDishKind>{};
+  /// Features whose used-up quota was already logged in this sheet.
+  final _loggedExhausted = <String>{};
 
   @override
   void initState() {
     super.initState();
-    BasicUtils.afterBuild(() => _logIfExhausted(_input.kind));
+    BasicUtils.afterBuild(() => _logIfExhausted(_input));
     // Listens to the controller (not onChange) so pasting updates it too.
     _controller.addListener(() {
       final input = classifyAddDishInput(_controller.text);
-      // The cost line and button only depend on the kind; a new url or
-      // prompt is read on commit.
-      if (input.kind != _input.kind) {
+      // The cost line and button only depend on the kind and platform; a new
+      // url or prompt is read on commit.
+      if (input.kind != _input.kind || input.platform != _input.platform) {
         setState(() {
           _input = input;
           _inputVersion++;
         });
-        _logIfExhausted(input.kind);
+        _logIfExhausted(input);
       } else {
         _input = input;
       }
     });
   }
 
-  /// Same event as the quota snackbar elsewhere, once per kind.
-  void _logIfExhausted(AddDishKind kind) {
-    if (mounted && _cost(kind).exhausted && _loggedExhausted.add(kind)) {
+  /// Quota feature for analytics and the paywall: the platform for social
+  /// links (they share one quota), `assistant` for AI.
+  static String _feature(AddDishInput input) =>
+      input.platform?.name ?? 'assistant';
+
+  /// Same event as the quota snackbar elsewhere, once per feature.
+  void _logIfExhausted(AddDishInput input) {
+    if (mounted &&
+        _cost(input).exhausted &&
+        _loggedExhausted.add(_feature(input))) {
       logEvent(AnalyticsEvent.aiQuotaExceededShown, {
-        'feature': kind == AddDishKind.instagram ? 'instagram' : 'assistant',
+        'feature': _feature(input),
       });
     }
   }
@@ -260,20 +270,20 @@ class _AddDishSheetState extends ConsumerState<AddDishSheet> {
     if (input.kind == AddDishKind.empty) {
       return;
     }
-    if (_cost(input.kind).exhausted) {
-      final feature =
-          input.kind == AddDishKind.instagram ? 'instagram' : 'assistant';
+    if (_cost(input).exhausted) {
+      final feature = _feature(input);
       _pop(AddDishPremium(feature), 'premium_$feature');
     } else if (input.kind == AddDishKind.ai) {
       _pop(AddDishAi(input.text), input.kind.name);
     } else {
-      _pop(AddDishLink(input.url!, input.kind), input.kind.name);
+      _pop(AddDishLink(input.url!, input.kind),
+          input.platform?.name ?? input.kind.name);
     }
   }
 
-  ({String label, bool exhausted}) _cost(AddDishKind kind) => addDishCost(
+  ({String label, bool exhausted}) _cost(AddDishInput input) => addDishCost(
         context,
-        kind,
+        input,
         ref.read(aiUsageProvider).valueOrNull,
         ref.read(InAppPurchaseService.$userIsSubscribed),
       );
@@ -328,7 +338,7 @@ class _AddDishSheetState extends ConsumerState<AddDishSheet> {
   /// Cost line + action button for the current input; cross-fades when the
   /// input kind changes.
   Widget _buildCommit() {
-    final kind = _input.kind;
+    final input = _input;
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
     final duration =
         reduceMotion ? Duration.zero : const Duration(milliseconds: 200);
@@ -344,29 +354,27 @@ class _AddDishSheetState extends ConsumerState<AddDishSheet> {
           alignment: Alignment.topCenter,
           children: [...previous, if (current != null) current],
         ),
-        child: kind == AddDishKind.empty
+        child: input.kind == AddDishKind.empty
             ? SizedBox(
                 key: ValueKey(_inputVersion),
                 width: double.infinity,
               )
-            : _buildCostAndButton(kind),
+            : _buildCostAndButton(input),
       ),
     );
   }
 
-  Widget _buildCostAndButton(AddDishKind kind) {
+  Widget _buildCostAndButton(AddDishInput input) {
+    final kind = input.kind;
     final theme = Theme.of(context);
-    final cost = _cost(kind);
+    final cost = _cost(input);
     final textScaler = MediaQuery.textScalerOf(context);
     final iconSize = textScaler.scale(16);
     final color = cost.exhausted
         ? theme.colorScheme.error
         : theme.textTheme.bodyLarge?.color?.withValues(alpha: 0.6);
-    final icon = switch (kind) {
-      AddDishKind.instagram => SimpleIcons.instagram,
-      AddDishKind.ai => Icons.auto_awesome,
-      _ => EvaIcons.link2Outline,
-    };
+    final icon = input.platform?.icon ??
+        (kind == AddDishKind.ai ? Icons.auto_awesome : EvaIcons.link2Outline);
     final String buttonText;
     if (cost.exhausted) {
       buttonText = context.tr('add_dish_get_premium');
