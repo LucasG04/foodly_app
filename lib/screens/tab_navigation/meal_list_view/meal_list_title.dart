@@ -78,6 +78,8 @@ class _MealListTitleState extends State<MealListTitle> with OfContextMixin {
                     final tagFilterLength =
                         ref.watch(mealTagFilterProvider).length;
                     return badges.Badge(
+                      // Only an active filter needs a count.
+                      showBadge: tagFilterLength > 0,
                       badgeStyle: badges.BadgeStyle(
                         badgeColor: theme.primaryColor,
                       ),

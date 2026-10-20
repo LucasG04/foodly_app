@@ -1,6 +1,5 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:concentric_transition/concentric_transition.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/foundation.dart';
@@ -14,19 +13,19 @@ import '../../../models/meal.dart';
 import '../../../providers/state_providers.dart';
 import '../../../services/lunix_api_service.dart';
 import '../../../services/meal_service.dart';
+import '../../../services/settings_service.dart';
 import '../../../utils/analytics.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/debouncer.dart';
 import '../../../utils/of_context_mixin.dart';
-import '../../../utils/widget_utils.dart';
 import '../../../widgets/disposable_widget.dart';
-import '../../../widgets/main_button.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import '../../../widgets/user_information.dart';
+import '../../add_dish/add_dish_sheet.dart';
 import '../../library/library_starter_sheet.dart';
-import '../../settings/help_slides/help_slide_share_import.dart';
 import 'meal_list_tile.dart';
 import 'meal_list_title.dart';
+import 'week_goal_line.dart';
 
 class MealListView extends ConsumerStatefulWidget {
   const MealListView({super.key});
@@ -219,7 +218,8 @@ class _MealListViewState extends ConsumerState<MealListView>
         return _buildEmptyMeals();
       }
 
-      return SliverPadding(
+      final planId = ref.read(planProvider)?.id;
+      final list = SliverPadding(
         padding: const EdgeInsets.symmetric(vertical: kPadding / 2),
         sliver: SliverList(
           delegate: SliverChildBuilderDelegate(
@@ -236,6 +236,24 @@ class _MealListViewState extends ConsumerState<MealListView>
           ),
         ),
       );
+      final showGoal = showWeekGoal(
+        count: loadedMeals.length,
+        // No plan while signing out or leaving it.
+        reached: planId == null || SettingsService.weekGoalReached(planId),
+        busy: ref.watch(_$isLoadingPagination),
+      );
+      if (!showGoal) {
+        return list;
+      }
+      return SliverMainAxisGroup(slivers: [
+        SliverToBoxAdapter(
+          child: WeekGoalLine(
+            count: loadedMeals.length,
+            onAdd: () => showAddDishSheet(context, ref),
+          ),
+        ),
+        list,
+      ]);
     });
   }
 
@@ -243,36 +261,28 @@ class _MealListViewState extends ConsumerState<MealListView>
     return SliverToBoxAdapter(
       child: Column(
         children: [
+          // No illustration: the starter questions should be in view.
           UserInformation(
-            assetPath: 'assets/images/undraw_empty.png',
             title: context.tr('meal_list_empty_title'),
             message: context.tr('meal_list_empty_subtitle'),
           ),
-          const SizedBox(height: kPadding),
-          MainButton(
-            text: context.tr('library_starter_cta'),
-            onTap: _openStarter,
-          ),
-          _buildLibraryButton(
-            context.tr('library_browse_all'),
-            () => _openLibrary(entry: 'empty_list'),
-          ),
-          TextButton.icon(
-            onPressed: () => Navigator.push(
-              context,
-              ConcentricPageRoute<HelpSlideShareImport>(
-                builder: (_) => const HelpSlideShareImport(),
-              ),
+          SizedBox(
+            width: BasicUtils.contentWidth(context),
+            child: LibraryStarterQuestions(
+              onSubmit: (answers) =>
+                  _openLibrary(starter: answers, entry: 'empty_inline'),
             ),
-            icon: Icon(
-              EvaIcons.questionMarkCircleOutline,
-              color: theme.primaryColor,
-            ),
-            label: Text(
-              context.tr('meal_list_help_import'),
+          ),
+          const SizedBox(height: kPadding / 2),
+          TextButton(
+            onPressed: () => showAddDishSheet(context, ref),
+            child: Text(
+              context.tr('meal_list_empty_import'),
               style: TextStyle(color: theme.primaryColor),
             ),
           ),
+          // Lets the last button scroll clear of the action button.
+          const SizedBox(height: kPadding * 4),
         ],
       ),
     );
@@ -292,6 +302,7 @@ class _MealListViewState extends ConsumerState<MealListView>
             context.tr('library_search_cta', args: [_lastQuery]),
             () => _openLibrary(query: _lastQuery, entry: 'search'),
           ),
+          _buildCreateWithAiButton(_lastQuery),
         ],
       ),
     );
@@ -381,6 +392,18 @@ class _MealListViewState extends ConsumerState<MealListView>
     );
   }
 
+  /// Opens the add-dish sheet prefilled with [query], showing the AI cost.
+  Widget _buildCreateWithAiButton(String query) {
+    return TextButton.icon(
+      onPressed: () => showAddDishSheet(context, ref, initialText: query),
+      icon: Icon(Icons.auto_awesome, color: theme.primaryColor),
+      label: Text(
+        context.tr('search_create_ai', args: [query]),
+        style: TextStyle(color: theme.primaryColor),
+      ),
+    );
+  }
+
   Widget _buildLibraryButton(String text, VoidCallback onPressed) {
     return TextButton.icon(
       onPressed: onPressed,
@@ -401,16 +424,6 @@ class _MealListViewState extends ConsumerState<MealListView>
       starter: starter,
       entry: entry,
     ));
-  }
-
-  Future<void> _openStarter() async {
-    final answers = await WidgetUtils.showFoodlyBottomSheet<StarterAnswers>(
-      context: context,
-      builder: (_) => const LibraryStarterSheet(),
-    );
-    if (answers != null && mounted) {
-      _openLibrary(starter: answers, entry: 'starter');
-    }
   }
 
   Future<List<Meal>?> _searchMealsByTagsCached(List<String> selectedTags) {
@@ -531,9 +544,10 @@ class _MealListViewState extends ConsumerState<MealListView>
     refIsLoadingPagination.state = true;
     const pageSize = 30;
     final refMeals = ref.read(_$loadedMeals.notifier);
+    final planId = ref.read(planProvider)!.id!;
 
     final (nextMeals, lastDoc) = await MealService.getMealsPaginated(
-      ref.read(planProvider)!.id!,
+      planId,
       lastDocument: refMeals.state.isEmpty ? null : _lastMealDoc,
       amount: pageSize, // ignore: avoid_redundant_argument_values
     );
@@ -549,6 +563,11 @@ class _MealListViewState extends ConsumerState<MealListView>
 
     refMeals.state = [...refMeals.state, ...nextMeals];
     refIsLoadingPagination.state = false;
+    // Once a week's worth of dishes was there, the goal line stays hidden.
+    if (refMeals.state.length >= weekGoal &&
+        !SettingsService.weekGoalReached(planId)) {
+      SettingsService.setWeekGoalReached(planId);
+    }
   }
 
   bool _paginationActive() {
