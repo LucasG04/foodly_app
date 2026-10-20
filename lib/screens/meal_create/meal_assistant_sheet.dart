@@ -522,6 +522,7 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
         case PhaseEvent():
         case GroupEvent():
         case ProductGroupEvent():
+        case PostEvent():
         case ErrorEvent():
         case MealGenerationUnknownEvent():
           break;

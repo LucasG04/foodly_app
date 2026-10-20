@@ -6,6 +6,7 @@ import 'ingredient.dart';
 enum MealGenerationSource {
   text('text'),
   instagram('instagram'),
+  tiktok('tiktok'),
   image('image');
 
   const MealGenerationSource(this.wireValue);
@@ -19,6 +20,7 @@ enum MealGenerationSource {
 enum MealGenerationErrorCode {
   notFoodRelated('NOT_FOOD_RELATED'),
   instagramFetchFailed('INSTAGRAM_FETCH_FAILED'),
+  tiktokFetchFailed('TIKTOK_FETCH_FAILED'),
   internal('INTERNAL'),
 
   /// Client-generated when the stream closes without a terminal event.
@@ -61,6 +63,11 @@ sealed class MealGenerationEvent {
         );
       case 'phase':
         return PhaseEvent(value: json['value'] as String);
+      case 'post':
+        return PostEvent(
+          coverUrl: json['coverUrl'] as String?,
+          owner: json['owner'] as String?,
+        );
       case 'enrichment.group':
         return GroupEvent(
           index: json['index'] as int,
@@ -112,6 +119,15 @@ class PhaseEvent extends MealGenerationEvent {
   final String value;
 
   const PhaseEvent({required this.value});
+}
+
+/// A social import found its post (after the scrape, before the recipe):
+/// shown while the recipe is written.
+class PostEvent extends MealGenerationEvent {
+  final String? coverUrl;
+  final String? owner;
+
+  const PostEvent({required this.coverUrl, required this.owner});
 }
 
 /// The display group label for the ingredient at [index]. Emitted during the

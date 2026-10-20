@@ -229,7 +229,7 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
           context.tr('get_premium_modal_8_description'),
           if (limits != null)
             context.tr('get_premium_modal_8_free_limits',
-                args: [limits.text, limits.instagram, limits.kcal]
+                args: [limits.text, limits.social, limits.kcal]
                     .map((e) => e.toString())
                     .toList()),
         ].join('\n'),

@@ -13,6 +13,7 @@ import '../../models/image_credit.dart';
 import '../../models/ingredient.dart';
 import '../../models/meal.dart';
 import '../../models/meal_generation_event.dart';
+import '../../models/social_platform.dart';
 import '../../providers/data_provider.dart';
 import '../../services/ai_generation_exception.dart';
 import '../../services/ai_quota_exceeded_exception.dart';
@@ -32,10 +33,11 @@ import '../../widgets/progress_button.dart';
 import '../../widgets/sheet_header.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
-enum ImportType { link, instagram }
+/// [social]: an Instagram or TikTok link; the platform comes from the link.
+enum ImportType { link, social }
 
-/// Phases of the streaming import build-up. [scraping] only occurs for the
-/// Instagram import, while the post/reel is being fetched.
+/// Phases of the streaming import build-up. [scraping] only occurs while a
+/// social post is being fetched.
 enum _GenPhase { input, scraping, generating, enriching, done }
 
 /// Sub-steps within [_GenPhase.enriching], each surfaced with its own status
@@ -63,8 +65,12 @@ class _ImportModalState extends ConsumerState<ImportModal>
   String? _errorText;
   ButtonState? _buttonState;
 
-  // Streaming build-up state (Instagram import only).
+  // Streaming build-up state (social import only).
   _GenPhase _phase = _GenPhase.input;
+  // The submitted link's platform.
+  SocialPlatform? _platform;
+  // The found post, shown until the recipe arrives.
+  PostEvent? _post;
   // Current sub-step while [_phase] is [_GenPhase.enriching]. Only advances.
   _EnrichStep _enrichStep = _EnrichStep.polishing;
   // Set shortly after submit (once the fields have collapsed) so the button
@@ -119,9 +125,9 @@ class _ImportModalState extends ConsumerState<ImportModal>
     super.dispose();
   }
 
-  /// The Instagram import streams its result; the link import is a one-shot
+  /// The social import streams its result; the link import is a one-shot
   /// request with a static layout.
-  bool get _isStreaming => widget.type == ImportType.instagram;
+  bool get _isStreaming => widget.type == ImportType.social;
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +141,9 @@ class _ImportModalState extends ConsumerState<ImportModal>
           ? _buildInput()
           : AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
-              child: _hasContent ? _buildGeneration() : _buildTextInputState(),
+              child: _hasContent || _post != null
+                  ? _buildGeneration()
+                  : _buildTextInputState(),
             ),
     );
   }
@@ -168,15 +176,15 @@ class _ImportModalState extends ConsumerState<ImportModal>
           pasteValidator: (text) => BasicUtils.isValidUri(text),
           submitOnPaste: true,
         );
-      case ImportType.instagram:
+      case ImportType.social:
         return MainTextField(
           controller: _controller,
-          title: context.tr('import_modal_instagram_title'),
-          placeholder: 'instagram.com/reel/DVOxtiijAB-/',
+          title: context.tr('import_modal_social_title'),
+          placeholder: context.tr('import_modal_social_hint'),
           errorText: _errorText,
           onSubmit: _importMeal,
           pasteFromClipboard: true,
-          pasteValidator: (text) => BasicUtils.isValidInstagramUrl(text),
+          pasteValidator: (text) => BasicUtils.socialPlatformOf(text) != null,
           submitOnPaste: true,
         );
     }
@@ -292,11 +300,16 @@ class _ImportModalState extends ConsumerState<ImportModal>
     );
   }
 
-  /// Pre-content loader label: while an Instagram post is being scraped we say
-  /// so explicitly; otherwise it's the generic "reading your recipe" copy.
-  String _loaderLabel() => _phase == _GenPhase.scraping
-      ? context.tr('import_modal_scraping')
-      : context.tr('import_modal_generating');
+  /// Pre-content label: while a post is being scraped we say so, with a time
+  /// hint; once it's found, that the recipe is being written; otherwise the
+  /// generic "reading your recipe" copy.
+  String _loaderLabel() {
+    if (_phase == _GenPhase.scraping) {
+      return context.tr('import_modal_scraping', args: [_platform!.label]);
+    }
+    return context.tr(
+        _post != null ? 'import_modal_post_found' : 'import_modal_generating');
+  }
 
   /// Status copy for the current enrichment sub-step.
   String _enrichLabel() {
@@ -372,6 +385,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
+                    _buildPost(),
                     _buildHeader(),
                     _buildIngredients(),
                     _buildInstructions(),
@@ -433,6 +447,42 @@ class _ImportModalState extends ConsumerState<ImportModal>
                 ),
               ),
             ),
+    );
+  }
+
+  /// The found post's cover and creator, so the wait for the recipe shows
+  /// the right video/post was picked up.
+  Widget _buildPost() {
+    final post = _post;
+    if (post == null) {
+      return const SizedBox.shrink();
+    }
+    final coverUrl = post.coverUrl;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: kPadding),
+      child: Row(
+        children: [
+          if (coverUrl != null && coverUrl.isNotEmpty) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: SizedBox.square(
+                dimension: 56,
+                child: FoodlyNetworkImage(coverUrl),
+              ),
+            ),
+            const SizedBox(width: kPadding / 2),
+          ],
+          Icon(_platform!.icon, size: 16, color: kLightTextColor),
+          const SizedBox(width: kPadding / 4),
+          Flexible(
+            child: Text(
+              post.owner != null ? '@${post.owner}' : _platform!.label,
+              style: kCardSubtitle,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -578,16 +628,10 @@ class _ImportModalState extends ConsumerState<ImportModal>
           ],
         );
       case _GenPhase.scraping:
-        return _statusRow(
-          const ValueKey('scraping'),
-          context.tr('import_modal_scraping'),
-        );
       case _GenPhase.generating:
       case _GenPhase.input:
-        return _statusRow(
-          const ValueKey('generating'),
-          context.tr('import_modal_generating'),
-        );
+        final label = _loaderLabel();
+        return _statusRow(ValueKey(label), label);
     }
   }
 
@@ -598,7 +642,9 @@ class _ImportModalState extends ConsumerState<ImportModal>
       children: [
         const SmallCircularProgressIndicator(),
         const SizedBox(width: kPadding / 2),
-        Text(label, style: const TextStyle(color: kLightTextColor)),
+        Flexible(
+          child: Text(label, style: const TextStyle(color: kLightTextColor)),
+        ),
       ],
     );
   }
@@ -659,11 +705,12 @@ class _ImportModalState extends ConsumerState<ImportModal>
       return; // already submitting / streaming
     }
     final input = _controller.text.trim();
+    final platform = BasicUtils.socialPlatformOf(input);
 
-    if (!BasicUtils.isValidInstagramUrl(input)) {
+    if (platform == null) {
       setState(() {
         _buttonState = ButtonState.error;
-        _errorText = context.tr('import_modal_error_no_instagram');
+        _errorText = context.tr('import_modal_error_no_social');
       });
       return;
     }
@@ -671,6 +718,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
     FocusScope.of(context).unfocus();
     setState(() {
       _errorText = null;
+      _platform = platform;
       _phase = _GenPhase.generating; // collapses the title + field
       _enrichStep = _EnrichStep.polishing;
       _partialWarning = false;
@@ -686,7 +734,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
 
     final langCode = context.locale.languageCode;
     LunixApiService.streamGeneratedMeal(
-      source: MealGenerationSource.instagram,
+      source: platform.source,
       data: input,
       langCode: langCode,
     )
@@ -722,6 +770,9 @@ class _ImportModalState extends ConsumerState<ImportModal>
           _ingredients[index] = ingredient;
         case PhaseEvent(value: 'scraping'):
           _phase = _GenPhase.scraping;
+        case PostEvent():
+          _post = event;
+          _phase = _GenPhase.generating;
         case PhaseEvent(value: 'enriching'):
           _phase = _GenPhase.enriching;
         case PhaseEvent():
@@ -762,6 +813,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
             // return to the input so the user can retry.
             KeepScreenOn.turnOff();
             _phase = _GenPhase.input;
+            _post = null;
             _buttonLoading = false;
             _buttonState = ButtonState.error;
             MainSnackbar(
@@ -789,7 +841,8 @@ class _ImportModalState extends ConsumerState<ImportModal>
         message: _messageForErrorCode(error.code),
       ).show(context);
     } else if (error is AiQuotaExceededException) {
-      GetPremiumModal.showAiQuotaExhausted(context, feature: widget.type.name);
+      GetPremiumModal.showAiQuotaExhausted(context,
+          feature: _platform?.name ?? widget.type.name);
     } else if (error is RateLimitException) {
       MainSnackbar(
         isError: true,
@@ -815,7 +868,11 @@ class _ImportModalState extends ConsumerState<ImportModal>
       case MealGenerationErrorCode.notFoodRelated:
         return context.tr('import_modal_error_not_food');
       case MealGenerationErrorCode.instagramFetchFailed:
-        return context.tr('import_modal_error_instagram_fetch');
+        return context.tr('import_modal_error_social_fetch',
+            args: [SocialPlatform.instagram.label]);
+      case MealGenerationErrorCode.tiktokFetchFailed:
+        return context.tr('import_modal_error_social_fetch',
+            args: [SocialPlatform.tiktok.label]);
       case MealGenerationErrorCode.internal:
       case MealGenerationErrorCode.streamInterrupted:
       case MealGenerationErrorCode.unknown:

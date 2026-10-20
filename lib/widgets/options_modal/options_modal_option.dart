@@ -5,6 +5,9 @@ import '../../constants.dart';
 
 class OptionsSheetOptions extends StatelessWidget {
   final IconData? icon;
+
+  /// Replaces [icon] when one icon isn't enough; keep it 24 px wide.
+  final Widget? leading;
   final String title;
   final Function() onTap;
   final Color? textColor;
@@ -18,6 +21,7 @@ class OptionsSheetOptions extends StatelessWidget {
     required this.title,
     required this.onTap,
     this.icon,
+    this.leading,
     this.textColor,
     this.trailing,
     this.selected = false,
@@ -44,11 +48,12 @@ class OptionsSheetOptions extends StatelessWidget {
         padding: const EdgeInsets.all(kPadding),
         child: Row(
           children: [
-            if (icon != null) ...[
-              Icon(
-                icon,
-                color: color ?? theme.textTheme.bodyLarge?.color,
-              ),
+            if (leading != null || icon != null) ...[
+              leading ??
+                  Icon(
+                    icon,
+                    color: color ?? theme.textTheme.bodyLarge?.color,
+                  ),
               const SizedBox(width: kPadding),
             ],
             Expanded(

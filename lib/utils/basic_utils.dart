@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/foodly_user.dart';
 import '../models/grocery_group.dart';
+import '../models/social_platform.dart';
 import '../providers/state_providers.dart';
 
 // ignore: avoid_classes_with_only_static_members
@@ -106,14 +107,27 @@ class BasicUtils {
     return parsed != null && parsed.isAbsolute && parsed.host.isNotEmpty;
   }
 
-  static final RegExp _instagramPostExp = RegExp(
-    r'^https?:\/\/(www\.)?instagram\.com',
-    caseSensitive: false,
-  );
+  static final Map<SocialPlatform, RegExp> _socialHostExps = {
+    SocialPlatform.instagram: RegExp(
+      r'^https?:\/\/(www\.)?instagram\.com',
+      caseSensitive: false,
+    ),
+    SocialPlatform.tiktok: RegExp(
+      r'^https?:\/\/((www|m|vm|vt)\.)?tiktok\.com(\/|$)',
+      caseSensitive: false,
+    ),
+  };
 
-  /// Whether [url] points at an Instagram post/reel that can be imported.
-  static bool isValidInstagramUrl(String url) {
-    return _instagramPostExp.hasMatch(url.trim());
+  /// The platform when [url] is an Instagram or TikTok link to import; the
+  /// server checks it is a post.
+  static SocialPlatform? socialPlatformOf(String url) {
+    final trimmed = url.trim();
+    for (final MapEntry(:key, :value) in _socialHostExps.entries) {
+      if (value.hasMatch(trimmed)) {
+        return key;
+      }
+    }
+    return null;
   }
 
   static List<DateTime> getPlanDateTimes(int hourDiffToUtc, {int amount = 8}) {

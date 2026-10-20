@@ -27,6 +27,12 @@ void main() {
     expectLink('linktr.ee/chef https://www.instagram.com/reel/x/',
         'https://www.instagram.com/reel/x/');
   });
+  test('tiktok share text', () {
+    expectLink(
+        'Lemon brownies 🍋 #baking https://vm.tiktok.com/ZGdCqSCL3/ '
+            'Shared via TikTok Lite',
+        'https://vm.tiktok.com/ZGdCqSCL3/');
+  });
   test('bare lowercase links still count', () {
     expectLink('chefkoch.de/rezepte/123', 'https://chefkoch.de/rezepte/123');
     expectLink('www.chefkoch.de', 'https://www.chefkoch.de');
