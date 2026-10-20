@@ -136,7 +136,6 @@ flutter:
   assets:
     - assets/images/
     - assets/onboarding/
-    - assets/help_slide/
     - assets/translations/
     - assets/icon/
 

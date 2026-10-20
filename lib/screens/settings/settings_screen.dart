@@ -36,7 +36,6 @@ import '../../widgets/small_circular_progress_indicator.dart';
 import '../onboarding/onboarding_screen.dart';
 import 'change_meal_types_modal.dart';
 import 'change_plan_name_modal.dart';
-import 'help_slides/help_slide_share_import.dart';
 import 'import_meals_modal.dart';
 import 'settings_alerts.dart';
 import 'settings_change_primary_color_modal.dart';
@@ -323,18 +322,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             ),
                             leadingIcon: EvaIcons.questionMarkCircleOutline,
                             text: context.tr('settings_section_help_intro'),
-                            trailing:
-                                const Icon(EvaIcons.arrowIosForwardOutline),
-                          ),
-                          SettingsTile(
-                            onTap: () => Navigator.push(
-                              context,
-                              ConcentricPageRoute<HelpSlideShareImport>(
-                                builder: (_) => const HelpSlideShareImport(),
-                              ),
-                            ),
-                            leadingIcon: EvaIcons.questionMarkCircleOutline,
-                            text: context.tr('settings_section_help_import'),
                             trailing:
                                 const Icon(EvaIcons.arrowIosForwardOutline),
                           ),
