@@ -63,12 +63,19 @@ class AiConsentSheet extends StatelessWidget {
     // The "Not now" button's own padding already clears most of the home
     // indicator, so only part of the bottom inset is added.
     final bottomInset = MediaQuery.paddingOf(context).bottom / 2;
+    final width = BasicUtils.contentWidth(context);
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
       child: Center(
         heightFactor: 1,
-        child: SizedBox(
-          width: BasicUtils.contentWidth(context),
+        child: ConstrainedBox(
+          // The explanation scrolls at large text sizes; the answers below
+          // stay on screen.
+          constraints: BoxConstraints(
+            minWidth: width,
+            maxWidth: width,
+            maxHeight: MediaQuery.sizeOf(context).height * 0.9,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,35 +85,45 @@ class AiConsentSheet extends StatelessWidget {
                 icon: Icons.auto_awesome,
                 showClose: false,
               ),
-              Text(
-                context.tr('ai_consent_intro'),
-                style: theme.textTheme.bodyLarge,
-              ),
-              const SizedBox(height: kPadding),
-              _buildPoint(
-                context,
-                EvaIcons.fileTextOutline,
-                context.tr('ai_consent_what_title'),
-                context.tr('ai_consent_what'),
-              ),
-              _buildPoint(
-                context,
-                EvaIcons.globe2Outline,
-                context.tr('ai_consent_who_title'),
-                context.tr('ai_consent_who'),
-              ),
-              _buildPoint(
-                context,
-                EvaIcons.shieldOutline,
-                context.tr('ai_consent_when_title'),
-                context.tr('ai_consent_when'),
-              ),
-              Center(
-                child: TextButton(
-                  onPressed: () => launchUrl(Uri.parse(kAppPrivacyUrl)),
-                  child: Text(
-                    context.tr('ai_consent_privacy'),
-                    style: TextStyle(color: mutedColor),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        context.tr('ai_consent_intro'),
+                        style: theme.textTheme.bodyLarge,
+                      ),
+                      const SizedBox(height: kPadding),
+                      _buildPoint(
+                        context,
+                        EvaIcons.fileTextOutline,
+                        context.tr('ai_consent_what_title'),
+                        context.tr('ai_consent_what'),
+                      ),
+                      _buildPoint(
+                        context,
+                        EvaIcons.globe2Outline,
+                        context.tr('ai_consent_who_title'),
+                        context.tr('ai_consent_who'),
+                      ),
+                      _buildPoint(
+                        context,
+                        EvaIcons.shieldOutline,
+                        context.tr('ai_consent_when_title'),
+                        context.tr('ai_consent_when'),
+                      ),
+                      Center(
+                        child: TextButton(
+                          onPressed: () =>
+                              launchUrl(Uri.parse(kAppPrivacyUrl)),
+                          child: Text(
+                            context.tr('ai_consent_privacy'),
+                            style: TextStyle(color: mutedColor),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

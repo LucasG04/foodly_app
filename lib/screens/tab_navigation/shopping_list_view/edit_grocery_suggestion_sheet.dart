@@ -154,7 +154,7 @@ class _EditGrocerySuggestionSheetState
       navigator.pop();
     }
     if (!saved) {
-      // Flushbar is a route, so show it after the sheet is popped.
+      // Shown after the sheet is popped, over the shopping list.
       MainSnackbar(
         message: context.tr('edit_grocery_suggestion_list_only'),
         isError: true,

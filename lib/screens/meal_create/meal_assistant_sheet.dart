@@ -20,6 +20,7 @@ import '../../services/ai_generation_exception.dart';
 import '../../services/ai_quota_exceeded_exception.dart';
 import '../../services/lunix_api_service.dart';
 import '../../services/rate_limit_exception.dart';
+import '../../utils/basic_utils.dart';
 import '../../utils/image_access.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
@@ -50,7 +51,10 @@ class MealAssistantSheet extends StatefulWidget {
   /// The live form state; null when the form is still empty (create).
   final Meal? currentMeal;
 
-  const MealAssistantSheet({this.currentMeal, super.key});
+  /// Prefilled and sent right away (the user already confirmed it elsewhere).
+  final String? initialPrompt;
+
+  const MealAssistantSheet({this.currentMeal, this.initialPrompt, super.key});
 
   @override
   State<MealAssistantSheet> createState() => _MealAssistantSheetState();
@@ -84,6 +88,19 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
 
   bool get _hasContent =>
       (_name?.isNotEmpty ?? false) || _ingredients.isNotEmpty;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialPrompt != null) {
+      _controller.text = widget.initialPrompt!;
+      BasicUtils.afterBuild(() {
+        if (mounted) {
+          _send();
+        }
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -157,7 +174,7 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
           placeholder: placeholder,
           isMultiline: true,
           minLines: 1,
-          autofocus: true,
+          autofocus: widget.initialPrompt == null,
           textInputAction: TextInputAction.newline,
           textCapitalization: TextCapitalization.sentences,
           // Stays on screen with the request while the assistant works.

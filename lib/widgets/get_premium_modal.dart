@@ -45,6 +45,9 @@ class GetPremiumModal extends ConsumerStatefulWidget {
     required String feature,
   }) {
     logEvent(AnalyticsEvent.aiQuotaExceededShown, {'feature': feature});
+    // The snackbar outlives the caller (often a bottom sheet); the
+    // navigator doesn't, so the paywall opens from there.
+    final navigatorContext = Navigator.of(context).context;
     MainSnackbar(
       message: context.plural(
         'ai_usage_exhausted',
@@ -57,12 +60,11 @@ class GetPremiumModal extends ConsumerStatefulWidget {
       isError: true,
       action: TextButton(
         onPressed: () {
-          // The caller (often a bottom sheet) may be gone by the time it's tapped.
-          if (!context.mounted) {
+          if (!navigatorContext.mounted) {
             return;
           }
           show(
-            context,
+            navigatorContext,
             source: 'ai_quota_$feature',
             highlight: PremiumFeature.ai,
           );

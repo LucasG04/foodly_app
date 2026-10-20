@@ -23,27 +23,41 @@ class CardListTile extends StatelessWidget {
     final double width = MediaQuery.sizeOf(context).width * 0.9;
     return Container(
       width: width > 599 ? 600 : width,
-      height: height,
       margin: const EdgeInsets.symmetric(vertical: kPadding / 2),
       decoration: BoxDecoration(
         boxShadow: const [kSmallShadow],
         borderRadius: BorderRadius.circular(kRadius),
         color: Colors.white,
       ),
-      child: Row(
+      // The text decides the height (at least [height], more for large
+      // text); the leading picture fills it.
+      child: Stack(
         children: [
-          SizedBox(
-            height: height,
-            width: height,
-            child: leading,
-          ),
-          Expanded(
+          ConstrainedBox(
+            constraints: BoxConstraints(minHeight: height),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: content,
+              padding: EdgeInsets.only(left: height),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      child: content,
+                    ),
+                  ),
+                  ...actions.map((e) => _buildActionContainer(e, context)),
+                ],
+              ),
             ),
           ),
-          ...actions.map((e) => _buildActionContainer(e, context)),
+          if (leading != null)
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: height,
+              child: leading!,
+            ),
         ],
       ),
     );

@@ -125,7 +125,9 @@ class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
                     width: 50.0,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10000),
-                      child: const Center(child: Icon(EvaIcons.code)),
+                      child: const Center(
+                        child: Icon(Icons.restaurant_outlined),
+                      ),
                     ),
                   )
                 : meal!.imageUrl != null && meal.imageUrl!.isNotEmpty

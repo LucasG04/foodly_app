@@ -423,7 +423,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
             grocery,
             BasicUtils.getActiveLanguage(context),
           );
-          Navigator.of(context).maybePop();
+          // The snackbar closes itself after an action.
         },
       ),
     ).show(context);

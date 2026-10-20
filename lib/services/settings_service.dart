@@ -40,6 +40,30 @@ class SettingsService {
     await _settingsBox.put('keepScreenOnHintSeen', true);
   }
 
+  /// Plans whose meal list had 7 dishes once; their week goal line stays
+  /// hidden. Per plan, so a new plan on this device still shows it.
+  static List<String> get _weekGoalReachedPlans =>
+      (_settingsBox.get('weekGoalReachedPlans', defaultValue: <dynamic>[])
+              as List)
+          .cast<String>();
+
+  static bool weekGoalReached(String planId) =>
+      _weekGoalReachedPlans.contains(planId);
+
+  static Future<void> setWeekGoalReached(String planId) async {
+    await _settingsBox
+        .put('weekGoalReachedPlans', [..._weekGoalReachedPlans, planId]);
+  }
+
+  /// The one-time tip about importing via the share sheet was shown (or the
+  /// user already shared a dish into the app).
+  static bool get shareTipSeen =>
+      _settingsBox.get('shareTipSeen', defaultValue: false) as bool;
+
+  static Future<void> setShareTipSeen() async {
+    await _settingsBox.put('shareTipSeen', true);
+  }
+
   static bool get multipleMealsPerTime =>
       _settingsBox.get('multipleMealsPerTime', defaultValue: false) as bool;
 

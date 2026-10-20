@@ -14,12 +14,17 @@ class SheetHeader extends StatelessWidget {
   final bool showClose;
   final EdgeInsetsGeometry padding;
 
+  /// Lines the title may take before it is cut off; more than one keeps a
+  /// long title readable at large text sizes.
+  final int maxLines;
+
   const SheetHeader({
     required this.title,
     this.icon,
     this.actions = const [],
     this.showClose = true,
     this.padding = const EdgeInsets.only(top: kPadding),
+    this.maxLines = 1,
     super.key,
   });
 
@@ -45,7 +50,7 @@ class SheetHeader extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                   minFontSize: 16,
-                  maxLines: 1,
+                  maxLines: maxLines,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -55,22 +60,11 @@ class SheetHeader extends StatelessWidget {
               IconButton(
                 icon: const Icon(EvaIcons.close),
                 tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-                onPressed: () => _close(context),
+                onPressed: () => Navigator.of(context).maybePop(),
               ),
           ],
         ),
       ),
     );
-  }
-
-  /// Snackbars are routes above the sheet, so a plain pop would close them
-  /// instead. Pop down to the sheet first, then let it decide (PopScope).
-  void _close(BuildContext context) {
-    final navigator = Navigator.of(context);
-    final route = ModalRoute.of(context);
-    if (route != null && !route.isCurrent) {
-      navigator.popUntil((r) => r == route);
-    }
-    navigator.maybePop();
   }
 }

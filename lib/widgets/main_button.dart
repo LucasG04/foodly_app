@@ -13,6 +13,10 @@ class MainButton extends StatelessWidget {
   final ButtonState? buttonState;
   final Color? color;
 
+  /// Label colour on a filled button; white by default. Light fills such as
+  /// the premium yellow need dark ink to stay readable.
+  final Color? textColor;
+
   /// Shadow under the button, for one floating over content.
   final bool floating;
 
@@ -28,6 +32,7 @@ class MainButton extends StatelessWidget {
     this.isProgress = false,
     this.buttonState,
     this.color,
+    this.textColor,
     this.floating = false,
     super.key,
   })  : assert(isProgress && buttonState != null || !isProgress),
@@ -36,9 +41,9 @@ class MainButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textColor = color ?? theme.primaryColor;
+    final fillColor = color ?? theme.primaryColor;
     final decoration = BoxDecoration(
-      color: isSecondary ? theme.scaffoldBackgroundColor : textColor,
+      color: isSecondary ? theme.scaffoldBackgroundColor : fillColor,
       borderRadius: BorderRadius.circular(10),
       // Part of the decoration, so it follows the progress button's shape.
       boxShadow: floating
@@ -50,7 +55,7 @@ class MainButton extends StatelessWidget {
               ),
             ]
           : null,
-      border: isSecondary ? Border.all(color: textColor) : null,
+      border: isSecondary ? Border.all(color: fillColor) : null,
     );
     return !isProgress
         ? InkWell(
@@ -65,7 +70,7 @@ class MainButton extends StatelessWidget {
                         text!,
                         style: !isSecondary
                             ? theme.textTheme.labelLarge!
-                                .copyWith(color: Colors.white)
+                                .copyWith(color: textColor ?? Colors.white)
                             : theme.textTheme.bodyLarge!.copyWith(
                                 color: kTextHeadlineColor,
                                 fontWeight: FontWeight.bold,
@@ -73,7 +78,9 @@ class MainButton extends StatelessWidget {
                       )
                     : Icon(
                         iconData,
-                        color: isSecondary ? kTextHeadlineColor : Colors.white,
+                        color: isSecondary
+                            ? kTextHeadlineColor
+                            : textColor ?? Colors.white,
                       ),
               ),
             ),
@@ -92,7 +99,8 @@ class MainButton extends StatelessWidget {
               child: Text(
                 text!,
                 style: !isSecondary
-                    ? theme.textTheme.labelLarge!.copyWith(color: Colors.white)
+                    ? theme.textTheme.labelLarge!
+                        .copyWith(color: textColor ?? Colors.white)
                     : theme.textTheme.bodyLarge!.copyWith(
                         color: kTextHeadlineColor,
                         fontWeight: FontWeight.bold,

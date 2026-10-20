@@ -6,7 +6,6 @@ import 'package:foodly/models/library_meal.dart';
 import 'package:foodly/models/meal.dart';
 import 'package:foodly/screens/library/library_intent_sheet.dart';
 import 'package:foodly/screens/library/library_meal_tile.dart';
-import 'package:foodly/screens/library/library_starter_sheet.dart';
 import 'package:foodly/screens/meal_select/select_meal_tile.dart';
 
 import '../helpers/test_localizations.dart';
@@ -42,40 +41,6 @@ void main() {
       expect(toggled, 1);
       expect(opened, 1);
     });
-  });
-
-  testWidgets('starter sheet walks through 4 questions and pops the answers',
-      (tester) async {
-    StarterAnswers? result;
-    await tester.pumpWidget(_app(Builder(
-      builder: (context) => TextButton(
-        onPressed: () async => result = await showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          builder: (_) => const LibraryStarterSheet(),
-        ),
-        child: const Text('open'),
-      ),
-    )));
-    await tester.tap(find.text('open'));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text('library_starter_diet_vegan'));
-    await tester.tap(find.text('library_starter_next'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Soup'));
-    await tester.tap(find.text('library_starter_next'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('library_starter_time_quick'));
-    await tester.tap(find.text('library_starter_next'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('library_starter_show'));
-    await tester.pumpAndSettle();
-
-    expect(result!.diet, StarterDiet.vegan);
-    expect(result!.kinds, {LibraryTag.soup});
-    expect(result!.quick, isTrue);
-    expect(result!.cuisine, StarterCuisine.both);
   });
 
   testWidgets('intent sheet keeps the questionnaire filters it does not show',

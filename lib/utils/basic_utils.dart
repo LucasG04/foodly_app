@@ -41,11 +41,64 @@ class BasicUtils {
         : MediaQuery.sizeOf(context).width * smallMultiplier;
   }
 
-  static String? getUrlFromString(String input) {
-    final RegExp exp =
-        RegExp(r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+');
-    final match = exp.firstMatch(input);
-    return match != null ? input.substring(match.start, match.end) : null;
+  /// A link candidate: optional scheme, dotted host (letters incl. umlauts)
+  /// ending in a 2+ letter TLD, optional port and path. Case-insensitive
+  /// because keyboards capitalize "Https://".
+  static final RegExp _linkExp = RegExp(
+    r'(https?://)?(?:[\p{L}\p{N}_-]+\.)+\p{L}{2,}(?![\p{L}\p{N}_-])'
+    r'(?::\d+)?(?:[/?#]\S*)?',
+    caseSensitive: false,
+    unicode: true,
+  );
+
+  /// Ends a sentence or wraps a link (incl. „…“ and »…«), not part of it.
+  static const _trailingPunctuation = ').,;:!?\'"]}“”„«»‘’‚›‹';
+
+  /// The first link in [input] as an `https://` URL, or null. Links with a
+  /// scheme win over bare ones. A bare link needs `www.` or a lowercase host
+  /// with a path: "chefkoch.de", "Spinat.Schnell" or "Oma.Style/vegetarisch"
+  /// are more likely part of a sentence.
+  static String? extractLink(String input) {
+    final matches = _linkExp.allMatches(input).toList();
+    for (final withScheme in [true, false]) {
+      for (final match in matches) {
+        final scheme = match.group(1);
+        if ((scheme != null) != withScheme) {
+          continue;
+        }
+        final rest = _trimTrailing(
+          match.group(0)!.substring(scheme?.length ?? 0),
+        );
+        final host = rest.split(RegExp('[/?#:]')).first;
+        final isWww = host.toLowerCase().startsWith('www.');
+        if (scheme == null &&
+            !isWww &&
+            !(rest.contains('/') && host == host.toLowerCase())) {
+          continue;
+        }
+        final url = 'https://$rest';
+        if (Uri.tryParse(url)?.host.isNotEmpty == true) {
+          return url;
+        }
+      }
+    }
+    return null;
+  }
+
+  /// Drops trailing punctuation; a closing bracket stays when it closes one
+  /// inside the link (".../Lasagne_(Gericht)").
+  static String _trimTrailing(String link) {
+    var result = link;
+    while (result.isNotEmpty &&
+        _trailingPunctuation.contains(result[result.length - 1])) {
+      final last = result[result.length - 1];
+      if (last == ')' &&
+          '('.allMatches(result).length >= ')'.allMatches(result).length) {
+        break;
+      }
+      result = result.substring(0, result.length - 1);
+    }
+    return result;
   }
 
   static bool isValidUri(String uri) {

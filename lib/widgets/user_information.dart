@@ -4,12 +4,13 @@ import '../constants.dart';
 import '../utils/basic_utils.dart';
 
 class UserInformation extends StatelessWidget {
-  final String assetPath;
+  /// Illustration above the text; null leaves it out.
+  final String? assetPath;
   final String? title;
   final String? message;
 
   const UserInformation({
-    required this.assetPath,
+    this.assetPath,
     this.title,
     this.message,
     super.key,
@@ -23,13 +24,14 @@ class UserInformation extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            padding: EdgeInsets.all(size.width * 0.1),
-            child: Image.asset(
-              assetPath,
-              height: size.height * 0.2,
+          if (assetPath != null)
+            Padding(
+              padding: EdgeInsets.all(size.width * 0.1),
+              child: Image.asset(
+                assetPath!,
+                height: size.height * 0.2,
+              ),
             ),
-          ),
           if (title != null && title!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(kPadding),

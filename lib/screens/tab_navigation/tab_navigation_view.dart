@@ -1,11 +1,9 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
 
-import '../../app_router.gr.dart';
 import '../../models/grocery.dart';
 import '../../models/ingredient.dart';
 import '../../providers/state_providers.dart';
@@ -15,6 +13,7 @@ import '../../utils/basic_utils.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/ingredient_edit_modal.dart';
+import '../add_dish/add_dish_sheet.dart';
 import 'meal_list_view/meal_list_view.dart';
 import 'plan_view/plan_tab_view.dart';
 import 'shopping_list_view/shopping_list_view.dart';
@@ -150,8 +149,6 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView>
   }
 
   void _openMealCreate() {
-    AutoRouter.of(context).push(
-      MealCreateScreenRoute(id: 'create', navigateToDetailOnCreate: true),
-    );
+    showAddDishSheet(context, ref);
   }
 }

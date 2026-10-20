@@ -26,7 +26,9 @@ import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/meal_pagination.dart';
 import '../../widgets/user_information.dart';
+import '../add_dish/add_dish_sheet.dart';
 import '../library/library_import.dart';
+import '../library/library_starter_sheet.dart';
 import '../tab_navigation/meal_list_view/meal_list_tile.dart';
 import 'search_bar.dart' as foodly_search_bar;
 import 'select_meal_tile.dart';
@@ -48,12 +50,30 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
   final _$randomMeal = FutureProvider.autoDispose<Meal?>(
       (ref) => LunixApiService.getRandomMeal(ref.read(planProvider)!.id!));
 
+  /// Whether the plan has no dishes yet; it then gets the starter questions
+  /// instead of suggestions.
+  late final _$cookbookEmpty = FutureProvider.autoDispose<bool>((ref) async {
+    // A random dish means there are dishes: no extra read then.
+    final randomMeal = ref.watch(_$randomMeal.future);
+    if (await randomMeal != null) {
+      return false;
+    }
+    final (meals, _) = await MealService.getMealsPaginated(
+      ref.read(planProvider)!.id!,
+      amount: 1,
+    );
+    return meals.isEmpty;
+  });
+
   final ScrollController _scrollController = ScrollController();
 
   List<Meal> searchedMeals = [];
 
   /// Library dishes for a search without own results.
   List<LibraryMeal> _libraryMeals = [];
+
+  /// The query of the shown results; empty when not searching.
+  String _lastQuery = '';
 
   // Drops results of older searches.
   int _searchToken = 0;
@@ -82,9 +102,24 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
         controller: _scrollController,
         child: Column(
           children: [
-            foodly_search_bar.SearchBar(onSearch: _onSearchEvent),
+            foodly_search_bar.SearchBar(
+              onSearch: _onSearchEvent,
+              hintText: context.tr('meal_select_search_hint'),
+            ),
             if (searchedMeals.isEmpty && _libraryMeals.isNotEmpty)
               _buildLibraryMeals(activePlan.id!),
+            if (searchedMeals.isEmpty && _lastQuery.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: kPadding / 2),
+                child: TextButton.icon(
+                  onPressed: _createFromSheet,
+                  icon: Icon(Icons.auto_awesome, color: theme.primaryColor),
+                  label: Text(
+                    context.tr('search_create_ai', args: [_lastQuery]),
+                    style: TextStyle(color: theme.primaryColor),
+                  ),
+                ),
+              ),
             Consumer(builder: (context, ref, _) {
               final isSearching = ref.watch(_$isSearching);
 
@@ -188,7 +223,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
   Widget _buildNoResultsForIndex(int index, String planId) {
     if (index == 0) {
       return _buildContainer(
-        EvaIcons.code,
+        Icons.restaurant_outlined,
         context.tr('meal_select_placeholder'),
         () => _showPlaceholderDialog(ref),
       );
@@ -196,7 +231,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
       return _buildContainer(
         EvaIcons.plus,
         context.tr('meal_select_new'),
-        () => _createNewMeal(ref),
+        _createFromSheet,
       );
     } else if (index == 2) {
       return Consumer(builder: (context, ref, _) {
@@ -232,6 +267,14 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
             message: context.tr('meal_select_no_results_msg'),
           )
         : Consumer(builder: (context, ref, _) {
+            final cookbookEmpty = ref.watch(_$cookbookEmpty);
+            // Nothing until known, so neither block flashes in first.
+            if (!cookbookEmpty.hasValue && !cookbookEmpty.hasError) {
+              return const SizedBox.shrink();
+            }
+            if (cookbookEmpty.valueOrNull ?? false) {
+              return _buildStarter();
+            }
             final userIsSubscribed =
                 ref.watch(InAppPurchaseService.$userIsSubscribed);
             return !userIsSubscribed
@@ -240,6 +283,39 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
                     ? _buildPreviewMeals()
                     : _buildPaginatedMealList();
           });
+  }
+
+  /// Empty cookbook: the starter questions instead of suggestions, so a new
+  /// plan gets dishes before the first one is picked.
+  Widget _buildStarter() {
+    return _buildSizeWrapper(
+      padding: const EdgeInsets.only(top: kPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.tr('meal_list_empty_title'),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: kPadding / 2),
+          Text(context.tr('meal_list_empty_subtitle')),
+          const SizedBox(height: kPadding),
+          LibraryStarterQuestions(
+            onSubmit: (answers) async {
+              await AutoRouter.of(context).push(LibraryScreenRoute(
+                starter: answers,
+                entry: 'meal_select_empty',
+              ));
+              if (mounted) {
+                ref.invalidate(_$cookbookEmpty);
+                ref.invalidate(_$randomMeal);
+              }
+            },
+          ),
+          const SizedBox(height: kPadding * 2),
+        ],
+      ),
+    );
   }
 
   Widget _buildSizeWrapper({required Widget child, EdgeInsets? padding}) {
@@ -347,63 +423,69 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
 
   Widget _buildContainer(IconData iconData, String text, Function action) {
     const double height = 75.0;
+    final onTap = action as void Function()?;
     return Align(
       // ignore: avoid_redundant_argument_values
       alignment: Alignment.center,
       child: Container(
         width: _containerWidth,
-        height: height,
+        // At least [height]; taller when large text wraps the label.
+        constraints: const BoxConstraints(minHeight: height),
         margin: const EdgeInsets.symmetric(vertical: kPadding / 2),
         decoration: BoxDecoration(
           boxShadow: const [kSmallShadow],
           borderRadius: BorderRadius.circular(kRadius),
-          color: Colors.white,
         ),
-        child: Row(
-          children: [
-            SizedBox(
-              height: height,
-              width: height,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(kRadius),
-                child: Icon(iconData),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
+        // The whole row is the button, not only the arrow.
+        child: Material(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(kRadius),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Row(
+              children: [
+                SizedBox(
+                  width: height,
+                  child: Icon(iconData),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15.0,
+                      vertical: kPadding / 2,
+                    ),
+                    child: Text(
                       text,
                       style: const TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
+                Container(
+                  height: height / 2,
+                  width: height / 2,
+                  margin: const EdgeInsets.only(right: 20.0),
+                  // The row already is the button for screen readers.
+                  child: ExcludeSemantics(
+                    child: OutlinedButton(
+                      onPressed: onTap,
+                      style: ButtonStyle(
+                        padding: WidgetStateProperty.resolveWith(
+                            (states) => EdgeInsets.zero),
+                      ),
+                      child: const Icon(
+                        EvaIcons.arrowIosForwardOutline,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            Container(
-              height: height / 2,
-              width: height / 2,
-              margin: const EdgeInsets.only(right: 20.0),
-              child: OutlinedButton(
-                onPressed: action as void Function()?,
-                style: ButtonStyle(
-                  padding: WidgetStateProperty.resolveWith(
-                      (states) => EdgeInsets.zero),
-                ),
-                child: const Icon(
-                  EvaIcons.arrowIosForwardOutline,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -412,6 +494,8 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
   void _onSearchEvent(String query) async {
     final token = ++_searchToken;
     if (query.isNotEmpty && query.length > 2) {
+      // The old query's "create with AI" button must not stay while loading.
+      setState(() => _lastQuery = '');
       ref.read(_$isSearching.notifier).state = true;
       final meals = await _searchMeal(ref, query);
       final libraryMeals = meals.isEmpty && mounted
@@ -424,6 +508,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
       setState(() {
         searchedMeals = meals;
         _libraryMeals = libraryMeals;
+        _lastQuery = query;
       });
       ref.read(_$isSearching.notifier).state = false;
       logEvent(AnalyticsEvent.searchMealSelect, {
@@ -433,6 +518,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
     } else {
       searchedMeals = [];
       _libraryMeals = [];
+      _lastQuery = '';
       ref.read(_$isSearching.notifier).state = false;
       setState(() {});
     }
@@ -456,18 +542,24 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
     AutoRouter.of(context).pop();
   }
 
-  Future<void> _createNewMeal(WidgetRef ref) async {
+  /// The add-dish sheet (prefilled with the search query); a dish created
+  /// there fills this slot.
+  Future<void> _createFromSheet() async {
     final planId = ref.read(planProvider)!.id!;
-    final meal =
-        await AutoRouter.of(context).push(MealCreateScreenRoute(id: 'create'));
-
-    if (meal != null && meal is Meal) {
-      await _addMealToPlan(meal.id!, planId);
-      if (!mounted) {
-        return;
-      }
-      AutoRouter.of(context).pop();
+    final meal = await showAddDishSheet(
+      context,
+      ref,
+      initialText: _lastQuery,
+      returnsMeal: true,
+    );
+    if (meal?.id == null || !mounted) {
+      return;
     }
+    await _addMealToPlan(meal!.id!, planId);
+    if (!mounted) {
+      return;
+    }
+    AutoRouter.of(context).pop();
   }
 
   Future<void> _addMealToPlan(String mealId, String planId) async {

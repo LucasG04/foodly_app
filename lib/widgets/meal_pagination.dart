@@ -126,7 +126,7 @@ class _MealPaginationState extends ConsumerState<MealPagination> {
         UserInformation(
           assetPath: 'assets/images/undraw_empty.png',
           title: context.tr('meal_list_empty_title'),
-          message: context.tr('meal_list_empty_subtitle'),
+          message: context.tr('meal_pagination_empty_subtitle'),
         ),
       ],
     );

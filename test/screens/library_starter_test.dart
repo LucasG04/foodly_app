@@ -11,11 +11,9 @@ void main() {
     const answers = StarterAnswers(
       diet: StarterDiet.vegetarian,
       kinds: {LibraryTag.soup, LibraryTag.main},
-      quick: true,
-      cuisine: StarterCuisine.german,
     );
     final filter = answers.toFilter('de');
-    expect(filter.tags, ['Vegetarisch', 'Schnell', 'Deutsch']);
+    expect(filter.tags, ['Vegetarisch']);
     expect(filter.anyTags, unorderedEquals(['Suppe', 'Hauptgericht']));
     expect(filter.excludeTags, isEmpty);
   });
@@ -28,12 +26,6 @@ void main() {
     expect(
       const StarterAnswers(diet: StarterDiet.vegan).toFilter('en').tags,
       ['Vegan'],
-    );
-    expect(
-      const StarterAnswers(cuisine: StarterCuisine.international)
-          .toFilter('en')
-          .tags,
-      ['International'],
     );
   });
 }

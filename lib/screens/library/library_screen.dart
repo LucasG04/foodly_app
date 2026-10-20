@@ -447,6 +447,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
     setState(_selected.clear);
     // Dishes the plan already had (or that left the library) aren't counted.
     if (result.created > 0) {
+      // Stays when this screen pops back to the meal list.
       MainSnackbar(
         message: context.plural('library_imported_n', result.created),
         isSuccess: true,

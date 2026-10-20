@@ -45,6 +45,9 @@ class MainTextField extends ConsumerStatefulWidget {
   /// caller decides what an over-long value means.
   final int? maxLength;
 
+  /// Lines the placeholder may wrap to (it is cut off after one by default).
+  final int? hintMaxLines;
+
   const MainTextField({
     required this.controller,
     this.focusNode,
@@ -73,6 +76,7 @@ class MainTextField extends ConsumerStatefulWidget {
     this.submitOnPaste = false,
     this.onTapOutside,
     this.maxLength,
+    this.hintMaxLines,
     super.key,
   }) : assert(
             (obscureText && !pasteFromClipboard) ||
@@ -153,6 +157,7 @@ class _MainTextFieldState extends ConsumerState<MainTextField>
         cursorColor: theme.primaryColor,
         decoration: InputDecoration(
           hintText: widget.placeholder,
+          hintMaxLines: widget.hintMaxLines,
           border: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.grey[300]!),
           ),
@@ -207,6 +212,8 @@ class _MainTextFieldState extends ConsumerState<MainTextField>
                         }
                       },
                       icon: const Icon(EvaIcons.clipboardOutline),
+                      tooltip: MaterialLocalizations.of(context)
+                          .pasteButtonLabel,
                       splashRadius: kIconHeight,
                     )
                   : null,

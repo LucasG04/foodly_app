@@ -23,11 +23,13 @@ import '../../services/link_metadata_service.dart';
 import '../../services/lunix_api_service.dart';
 import '../../services/meal_service.dart';
 import '../../services/rate_limit_exception.dart';
+import '../../services/settings_service.dart';
 import '../../services/storage_service.dart';
 import '../../utils/analytics.dart';
 import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
+import '../../utils/share_tip.dart';
 import '../../utils/tag_candidates.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/ai_consent_sheet.dart';
@@ -56,9 +58,18 @@ class MealCreateScreen extends ConsumerStatefulWidget {
   final String id;
   final bool navigateToDetailOnCreate;
 
+  /// Analytics prefix for a meal imported from a URL [id]: `share` (OS share
+  /// sheet) or `sheet` (add-dish sheet).
+  final String origin;
+
+  /// With [id] `create`: opens the assistant right away with this prompt.
+  final String? assistantPrompt;
+
   const MealCreateScreen({
     required this.id,
     this.navigateToDetailOnCreate = false,
+    this.origin = 'share',
+    this.assistantPrompt,
     super.key,
   });
 
@@ -502,6 +513,10 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       final meal = ref.read(_$meal.notifier).state;
       meal.ingredients = [];
       meal.tags = [];
+      if (widget.assistantPrompt != null) {
+        BasicUtils.afterBuild(
+            () => _openAssistant(initialPrompt: widget.assistantPrompt));
+      }
       return meal;
     } else if (widget.id.startsWith('https')) {
       // Shared URL: open the import modal pre-filled, choosing the type by host.
@@ -635,6 +650,9 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         BasicUtils.getActiveLanguage(context),
       );
       BasicUtils.emitMealsChanged(ref, newMeal?.id ?? '');
+      if (_isCreatingMeal) {
+        _showShareTipOnce();
+      }
       if (_isCreatingMeal &&
           widget.navigateToDetailOnCreate &&
           newMeal?.id != null) {
@@ -642,7 +660,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
         // of the underlying list.
         AutoRouter.of(context).replace(MealScreenRoute(id: newMeal!.id!));
       } else {
-        AutoRouter.of(context).pop();
+        // Callers picking a dish for a plan slot use the saved meal.
+        AutoRouter.of(context).pop(newMeal);
       }
       return true;
     } catch (e) {
@@ -655,6 +674,26 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       ).show(context);
       ref.read(_$buttonState.notifier).state = ButtonState.error;
       return false;
+    }
+  }
+
+  /// After the first dish not shared from another app: one tip that recipes
+  /// can be shared straight into the app. It stays while this screen is left.
+  void _showShareTipOnce() {
+    switch (shareTipAfterSave(
+      mealSource: _mealSource,
+      seen: SettingsService.shareTipSeen,
+    )) {
+      case ShareTip.none:
+        return;
+      case ShareTip.markSeen:
+        SettingsService.setShareTipSeen();
+      case ShareTip.show:
+        SettingsService.setShareTipSeen();
+        MainSnackbar(
+          message: context.tr('share_tip', args: [kAppName]),
+          duration: 8,
+        ).show(context);
     }
   }
 
@@ -797,7 +836,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     );
 
     if (result != null && mounted) {
-      _mealSource = initialUrl == null ? type.name : 'share_${type.name}';
+      _mealSource =
+          initialUrl == null ? type.name : '${widget.origin}_${type.name}';
       final meal = ref.read(_$meal.notifier).state;
       _titleController.text = result.name;
       meal.name = result.name;
@@ -818,7 +858,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
   }
 
   /// Sends the live form as the meal to edit, or nothing while it is empty.
-  void _openAssistant() async {
+  /// [initialPrompt] is sent right away (from the add-dish sheet).
+  void _openAssistant({String? initialPrompt}) async {
     final baseMeal = ref.read(_$meal);
     final formMeal = Meal.fromMap(baseMeal.id, baseMeal.toMap())
       ..name = _titleController.text.trim()
@@ -841,8 +882,10 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     final assistantResult =
         await WidgetUtils.showFoodlyBottomSheet<MealAssistantResult>(
       context: context,
-      builder: (_) =>
-          MealAssistantSheet(currentMeal: isEmpty ? null : formMeal),
+      builder: (_) => MealAssistantSheet(
+        currentMeal: isEmpty ? null : formMeal,
+        initialPrompt: initialPrompt,
+      ),
     );
     logEvent(AnalyticsEvent.mealAssistant, {
       'applied': (assistantResult != null).toString(),
@@ -854,7 +897,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
       return;
     }
     if (isEmpty) {
-      _mealSource = 'assistant';
+      _mealSource = initialPrompt != null ? 'sheet_assistant' : 'assistant';
     }
     final (meal: result, :partial, fromPhoto: _) = assistantResult;
     if (partial) {
