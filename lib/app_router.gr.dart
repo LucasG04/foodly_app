@@ -122,6 +122,8 @@ class AppRouter extends _i14.RootStackRouter {
         child: _i11.MealCreateScreen(
           id: args.id,
           navigateToDetailOnCreate: args.navigateToDetailOnCreate,
+          origin: args.origin,
+          assistantPrompt: args.assistantPrompt,
           key: args.key,
         ),
       );
@@ -433,6 +435,8 @@ class MealCreateScreenRoute
   MealCreateScreenRoute({
     required String id,
     bool navigateToDetailOnCreate = false,
+    String origin = 'share',
+    String? assistantPrompt,
     _i15.Key? key,
   }) : super(
           MealCreateScreenRoute.name,
@@ -440,6 +444,8 @@ class MealCreateScreenRoute
           args: MealCreateScreenRouteArgs(
             id: id,
             navigateToDetailOnCreate: navigateToDetailOnCreate,
+            origin: origin,
+            assistantPrompt: assistantPrompt,
             key: key,
           ),
         );
@@ -451,6 +457,8 @@ class MealCreateScreenRouteArgs {
   const MealCreateScreenRouteArgs({
     required this.id,
     this.navigateToDetailOnCreate = false,
+    this.origin = 'share',
+    this.assistantPrompt,
     this.key,
   });
 
@@ -458,11 +466,15 @@ class MealCreateScreenRouteArgs {
 
   final bool navigateToDetailOnCreate;
 
+  final String origin;
+
+  final String? assistantPrompt;
+
   final _i15.Key? key;
 
   @override
   String toString() {
-    return 'MealCreateScreenRouteArgs{id: $id, navigateToDetailOnCreate: $navigateToDetailOnCreate, key: $key}';
+    return 'MealCreateScreenRouteArgs{id: $id, navigateToDetailOnCreate: $navigateToDetailOnCreate, origin: $origin, assistantPrompt: $assistantPrompt, key: $key}';
   }
 }
 
