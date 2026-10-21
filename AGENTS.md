@@ -24,7 +24,7 @@ flutter test --plain-name 'some test name'                 # single test
 
 - **Entry** `lib/main.dart`: Firebase init → Hive + static service `initialize()` calls → `ProviderScope` → `EasyLocalization` (`en`, `de`; strings in `assets/translations/*.json`). In widgets use `context.tr('key')` so text rebuilds on language change; static `'key'.tr()` only outside the widget tree (services) or in `initState`. Primary color is reactive via `SettingsService.primaryColorListenable` → `MaterialApp.theme`; read it from `Theme.of(context)`, never restart the app.
 - **Services** (`lib/services/`): static-only classes with private constructors, no DI. Most wrap Firestore collections via `withConverter` (e.g. `PlanService` → `plans`), models expose `fromMap`/`toMap`.
-- **State** (`lib/providers/`): Riverpod `StateProvider`s for global state (`planProvider`, `userProvider`, …); `FoodlyApp` streams user/plan from Firestore and writes them into providers.
+- **State** (`lib/providers/`): Riverpod `StateProvider`s for global state (`planProvider`, `userProvider`, …); `FoodlyApp` writes user/plan into providers. The plan is loaded once (`_loadActivePlan`), not streamed, so `planProvider` can be stale: persist plan edits with `PlanService.updatePlanFields` (changed fields only), never `updatePlan(plan)` from the provider, which would overwrite `users`.
 - **Routing**: auto_route v5 in `lib/app_router.dart`; regenerate after edits.
 - **Local storage**: Hive boxes (settings, plan, link metadata, versions); ObjectBox only for the image cache (`models/cached_image.dart`, `services/image_cache_manager.dart`). Hive can't move to `hive_ce` because of an envied issue (see `pubspec.yaml`).
 - **lunix-api** (`services/lunix_api_service.dart`): Dio with `x-api-key` + Basic auth; user-scoped calls add `x-firebase-token`. `SettingsService.useDevApi` switches to `lunix-api-dev.golenia.dev`. AI features (meal generation, kcal estimates) go through here; quota/rate limits surface as `AiQuotaExceededException` / `RateLimitException`.
@@ -57,6 +57,21 @@ No `DropdownButton`/`PopupMenuButton`. Pick by context; the current choice is al
 - Size sheets to their content (cap with `maxHeight`); never give them a fixed or minimum height.
 - Rows under the header (`ListTile`, `CheckboxListTile`) use `contentPadding: EdgeInsets.zero` so they line up with the title.
 - Action sheets (`OptionsSheet`) have no title and no ✕.
+
+## Firestore rules
+
+`firestore.rules` is the source of truth. `firebase.json` doesn't reference it; deploy by pasting it into the Firebase console.
+
+```bash
+cd firestore_rules_test && npm install && npm test   # emulator; needs firebase CLI + Java 21+
+```
+
+- The tests replay the app's real call shapes (`lib/services`). When adding or changing a Firestore read/write, add a matching test and run them before deploying the rules.
+- Collections without a `match` (`mcpTokens`, `generatedMeals`, `instagramPosts`, `issues`, `changes`, `missingGroceries`) are lunix-api only (Admin SDK bypasses rules).
+- `plans` are publicly readable because the join-by-code lookup runs before sign-in. A non-member may only add themself to an unlocked plan; a member may only remove themself from `users`. Plan subcollections and `shoppinglists/*/groceries` are members only.
+- `users/{uid}` is owner only; clients can't raise `role` or gifted premium. `isPremium` is still client-written (RevenueCat sync), so the API's premium check trusts the client.
+- Writes that send a whole `toMap()` must leave other fields' values unchanged. Legacy docs may store flags (`adFree`, `locked`, `isPublic`) as `null`; the rules treat only `true` as set.
+- A query is denied as a whole if any document it could return is denied (`documentId in [...]` is checked per document).
 
 ## Release
 
