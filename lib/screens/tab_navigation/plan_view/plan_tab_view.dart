@@ -166,7 +166,7 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
     final today = DateTime(now.year, now.month, now.day);
     final currentMeals = planMeals.where((m) => !m.date.isBefore(today));
     return List.generate(8, (i) {
-      final date = today.add(Duration(days: i));
+      final date = DateTime(today.year, today.month, today.day + i);
       return PlanDay(
         date,
         currentMeals.where((m) => DateUtils.isSameDay(m.date, date)).toList(),
