@@ -593,7 +593,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       code = PlanService.generateCode();
     }
     plan.code = code;
-    await PlanService.updatePlan(plan);
+    await PlanService.updatePlanFields(plan.id!, {'code': code});
     if (!mounted) {
       return;
     }
@@ -606,7 +606,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   Future<void> _changePlanLockState(Plan plan, bool locked) async {
     ref.read(_$loadingChangePlanLockState.notifier).state = true;
     plan.locked = locked;
-    await PlanService.updatePlan(plan);
+    await PlanService.updatePlanFields(plan.id!, {'locked': locked});
     if (!mounted) {
       return;
     }

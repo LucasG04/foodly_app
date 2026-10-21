@@ -156,6 +156,13 @@ class PlanService {
     return _firestore.doc(plan.id).update(plan.toMap());
   }
 
+  /// Writes only [fields], so a stale local [Plan] can't overwrite `users`.
+  static Future<void> updatePlanFields(
+      String planId, Map<String, Object?> fields) {
+    _log.finer('Call updatePlanFields with planId: $planId | $fields');
+    return _firestore.doc(planId).update(fields);
+  }
+
   static Stream<List<PlanMeal>> streamPlanMealsByPlanId(String? id) {
     _log.finer('Call streamPlanMealsByPlanId with $id');
     return _firestore
