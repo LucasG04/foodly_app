@@ -90,7 +90,7 @@ class _ChangePlanNameModalState extends ConsumerState<ChangePlanNameModal> {
     });
     final newPlan = ref.read(planProvider)!;
     newPlan.name = newName;
-    await PlanService.updatePlan(newPlan);
+    await PlanService.updatePlanFields(newPlan.id!, {'name': newName});
     setState(() {
       _buttonState = ButtonState.normal;
     });

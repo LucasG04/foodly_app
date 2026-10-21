@@ -132,9 +132,9 @@ class BasicUtils {
 
   static List<DateTime> getPlanDateTimes(int hourDiffToUtc, {int amount = 8}) {
     final now = DateTime.now().toUtc().add(Duration(hours: hourDiffToUtc));
-    final today = DateTime(now.year, now.month, now.day);
-
-    return List.generate(amount, (i) => today.add(Duration(days: i)));
+    // Calendar-day steps; adding Duration(days: 1) breaks across DST changes.
+    return List.generate(
+        amount, (i) => DateTime(now.year, now.month, now.day + i));
   }
 
   static void emitMealsChanged(WidgetRef ref, [String id = '']) {

@@ -1,0 +1,11 @@
+{
+  "name": "foodly-firestore-rules-test",
+  "private": true,
+  "scripts": {
+    "test": "firebase emulators:exec --only firestore --project demo-foodly 'node --test --test-concurrency=1'"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "6.0.0",
+    "firebase": "13.0.0"
+  }
+}

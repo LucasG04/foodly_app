@@ -61,6 +61,9 @@ class InAppPurchaseService {
 
   static Future<void> removeUserId() async {
     try {
+      if (await Purchases.isAnonymous) {
+        return;
+      }
       await Purchases.logOut();
       await fetchUserSubscription();
     } catch (e) {

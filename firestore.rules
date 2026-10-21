@@ -1,0 +1,114 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Collections without a match below are denied to clients and only touched by
+    // lunix-api (Admin SDK): mcpTokens, generatedMeals, instagramPosts, issues,
+    // changes, missingGroceries.
+
+    function signedIn() { return request.auth != null; }
+    function uid() { return request.auth.uid; }
+    function planPath(planId) { return /databases/$(database)/documents/plans/$(planId); }
+    function isMember(planId) { return signedIn() && uid() in get(planPath(planId)).data.users; }
+    // A field is unchanged by the write; a missing field counts as `fallback`.
+    function same(key, fallback) {
+      return request.resource.data.get(key, fallback) == resource.data.get(key, fallback);
+    }
+    // Flags the app writes as `x ?? false`; legacy docs may hold null or lack them.
+    function isTrue(data, key) { return data.get(key, false) == true; }
+    function sameFlag(key) { return isTrue(request.resource.data, key) == isTrue(resource.data, key); }
+
+    // Legacy: not read by the current app.
+    match /versions/{document=**} {
+      allow read;
+    }
+
+    match /plans/{planId} {
+      // Members may edit name/code/lock; `users` may only lose the caller (leave).
+      function memberUpdate() {
+        return uid() in resource.data.users
+          && (same('users', []) || request.resource.data.users == resource.data.users.removeAll([uid()]));
+      }
+      // A non-member adds only themself to an unlocked plan. updatePlan() writes the
+      // whole map, so missing or null fields on old docs come back as defaults.
+      function join() {
+        return !(uid() in resource.data.users)
+          && !isTrue(resource.data, 'locked')
+          && !isTrue(request.resource.data, 'locked')
+          && request.resource.data.users == resource.data.users.concat([uid()])
+          && same('name', null)
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['users', 'lastUserJoined', 'adFree', 'locked', 'hourDiffToUtc', 'name']);
+      }
+
+      // Public: the join-by-code lookup runs before sign-in (code_input_view.dart).
+      allow read;
+      allow create: if signedIn()
+        && request.resource.data.users == [uid()]
+        && !isTrue(request.resource.data, 'locked')
+        && !isTrue(request.resource.data, 'adFree');
+      allow update: if signedIn() && sameFlag('adFree') && (memberUpdate() || join());
+
+      // libraryImports is written by the API only.
+      match /{sub}/{docId} {
+        allow read, write: if sub in ['meals', 'mealHistory', 'stats'] && isMember(planId);
+      }
+    }
+
+    match /meals/{mealId} {
+      // Shared /meal/<id> links open meals of other plans, and getMealsByIds() uses
+      // documentId-in queries, so reads stay open to signed-in users.
+      allow read: if signedIn();
+      allow create: if isMember(request.resource.data.planId)
+        && !isTrue(request.resource.data, 'isPublic');
+      allow update: if isMember(resource.data.planId)
+        && same('planId', null)
+        && sameFlag('isPublic');
+      allow delete: if isMember(resource.data.planId);
+    }
+
+    match /shoppinglists/{listId} {
+      allow read: if signedIn();
+      // Created in createPlan()'s batch, together with the plan.
+      allow create: if signedIn()
+        && uid() in getAfter(planPath(request.resource.data.planId)).data.users;
+
+      match /groceries/{groceryId} {
+        allow read, write: if isMember(
+          get(/databases/$(database)/documents/shoppinglists/$(listId)).data.planId);
+      }
+    }
+
+    match /users/{userId} {
+      function isOwner() { return signedIn() && uid() == userId; }
+
+      allow read, delete: if isOwner();
+      allow create: if isOwner()
+        && request.resource.data.get('role', 'user') == 'user'
+        && request.resource.data.get('isPremium', false) != true
+        && request.resource.data.get('isPremiumGifted', false) != true
+        && request.resource.data.get('premiumGiftedMonths', null) == null;
+      // Roles and gifted premium can only be reset (FoodlyUser.fromMap maps unknown
+      // roles to 'user'). isPremium stays client-writable until a server-side
+      // RevenueCat sync exists (in_app_purchase_service.dart).
+      allow update: if isOwner()
+        && request.resource.data.get('role', 'user') in [resource.data.get('role', 'user'), 'user']
+        && same('premiumGiftedMonths', null)
+        && (same('isPremiumGifted', null) || request.resource.data.isPremiumGifted in [false, null])
+        && (same('premiumGiftedAt', null) || request.resource.data.premiumGiftedAt == null);
+    }
+
+    match /feedbacks/{feedbackId} {
+      allow create: if signedIn();
+    }
+
+    // Free-plan AI usage: users read their own counter; only the API writes.
+    match /aiUsage/{userId} {
+      allow read: if signedIn() && uid() == userId;
+    }
+
+    // Meal library: written only by publish.ts (Admin SDK).
+    match /library_meals/{mealId} {
+      allow read: if signedIn();
+    }
+  }
+}
