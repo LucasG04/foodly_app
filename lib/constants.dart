@@ -16,6 +16,10 @@ final kAppTermsOfUseUrl = Platform.isIOS || Platform.isMacOS
     : '$kAppWebBaseUrl/eula/foodly';
 const kAppWebBaseUrl = 'https://foodly.golenia.dev';
 
+/// Supported recipe sites + import help (foodly-web); takes the app language.
+String appRecipeSitesUrl(String langCode) =>
+    '$kAppWebBaseUrl/recipe-sites/${kAppName.toLowerCase()}?lang=$langCode';
+
 /// Styling
 const kPadding = 20.0;
 const kRadius = 5.0;

@@ -170,11 +170,6 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
 
   final _appLinks = AppLinks();
 
-  /// Language of the last import-sites request; reloaded when the locale
-  /// changes, and on resume while not loaded (request failed).
-  String? _supportedSitesLang;
-  bool _supportedSitesLoaded = false;
-
   /// Created once: a new stream per build makes StreamBuilder resubscribe,
   /// briefly swapping in the placeholder app and tearing down the navigator.
   final _authStream = AuthenticationService.authenticationStream();
@@ -209,14 +204,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
         _warmPlanMeals();
       }
     });
-    _lifecycleListener = AppLifecycleListener(
-      onResume: () {
-        _warmPlanMeals();
-        if (_supportedSitesLang != null && !_supportedSitesLoaded) {
-          _loadSupportedImportSites();
-        }
-      },
-    );
+    _lifecycleListener = AppLifecycleListener(onResume: _warmPlanMeals);
   }
 
   /// Lets the API load the plan's meals before the first search.
@@ -234,9 +222,6 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     BasicUtils.afterBuild(
       () => ref.read(languageCodeProvider.notifier).state = langCode,
     );
-    if (_supportedSitesLang != null && _supportedSitesLang != langCode) {
-      _loadSupportedImportSites();
-    }
   }
 
   @override
@@ -273,7 +258,6 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
               ref.read(initialPlanLoadingProvider.notifier).state = true;
             });
             // Not awaited below: shares and links don't need it.
-            _loadSupportedImportSites();
             _loadInitialData(snapshot.data!.uid);
           }
 
@@ -467,18 +451,6 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       );
     }
     ref.read(shoppingListIdProvider.notifier).state = shoppingList.id;
-  }
-
-  Future<void> _loadSupportedImportSites() async {
-    final langCode = _supportedSitesLang = context.locale.languageCode;
-    _supportedSitesLoaded = false;
-    final sites = await LunixApiService.getSupportedImportSites(langCode);
-    // A slower response for a previous language mustn't overwrite the current one.
-    if (!mounted || langCode != _supportedSitesLang) {
-      return;
-    }
-    _supportedSitesLoaded = sites.isNotEmpty; // empty = request failed
-    ref.read(dataSupportedImportSitesProvider.notifier).state = sites;
   }
 
   void _initializeLogger() {
