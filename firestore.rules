@@ -2,11 +2,15 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Collections without a match below are denied to clients and only touched by
-    // lunix-api (Admin SDK): mcpTokens, generatedMeals, instagramPosts, issues,
-    // changes, missingGroceries.
+    // lunix-api (Admin SDK): mcpTokens, generatedMeals, instagramPosts, issues.
 
     function signedIn() { return request.auth != null; }
     function uid() { return request.auth.uid; }
+    // foodly-info (admin tool). Clients can't raise their role (see /users).
+    function isAdmin() {
+      return signedIn()
+        && get(/databases/$(database)/documents/users/$(uid())).data.get('role', 'user') == 'admin';
+    }
     function planPath(planId) { return /databases/$(database)/documents/plans/$(planId); }
     function isMember(planId) { return signedIn() && uid() in get(planPath(planId)).data.users; }
     // A field is unchanged by the write; a missing field counts as `fallback`.
@@ -95,10 +99,23 @@ service cloud.firestore {
         && same('premiumGiftedMonths', null)
         && (same('isPremiumGifted', null) || request.resource.data.isPremiumGifted in [false, null])
         && (same('premiumGiftedAt', null) || request.resource.data.premiumGiftedAt == null);
+
+      allow read: if isAdmin();
+      // giftPremium() in foodly-info.
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['isPremiumGifted', 'premiumGiftedMessageShown', 'premiumGiftedAt', 'premiumGiftedMonths']);
     }
 
     match /feedbacks/{feedbackId} {
       allow create: if signedIn();
+      allow read, delete: if isAdmin();
+    }
+
+    // Admin-only collections; lunix-api also writes changes and missingGroceries.
+    match /{col}/{docId} {
+      allow read, delete: if col in ['changes', 'missingGroceries', 'logs'] && isAdmin();
+      allow create, update: if col == 'changes' && isAdmin();
     }
 
     // Free-plan AI usage: users read their own counter; only the API writes.
