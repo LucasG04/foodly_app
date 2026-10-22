@@ -179,13 +179,15 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   /// briefly swapping in the placeholder app and tearing down the navigator.
   final _authStream = AuthenticationService.authenticationStream();
 
-  /// Handle the initial uni link only when user is in a plan
-  bool _handleInitUniLink = true;
-
   /// Subscription that handles uni links when the app is in the foreground.
   /// Will be canceled by [cancelSubscriptions] when the app is closed
   // ignore: cancel_subscriptions
   StreamSubscription<String?>? _uniLinkSub;
+
+  /// Shares wait for the initial user/plan/premium load, so the import screen
+  /// never sees a half-loaded app (quota, consent and plan come from it).
+  bool _initialDataLoaded = false;
+  SharedMedia? _pendingShare;
 
   bool _initialDataLoadStarted = false;
   String? _lastLoadedShoppingListPlanId;
@@ -201,6 +203,7 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     super.initState();
     InAppPurchaseService.setRef(ref);
     SettingsService.setRef(ref);
+    ref.listenManual(initialLoadRetryProvider, (_, __) => _retryInitialLoad());
     ref.listenManual(planProvider, (previous, next) {
       if (next?.id != previous?.id) {
         _warmPlanMeals();
@@ -256,10 +259,12 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
               Faro().setUser(const FaroUser.cleared());
             }
             _initialDataLoadStarted = false;
+            _initialDataLoaded = false;
             _lastLoadedShoppingListPlanId = null;
             BasicUtils.afterBuild(() {
               ref.read(initialUserLoadingProvider.notifier).state = false;
               ref.read(initialPlanLoadingProvider.notifier).state = false;
+              ref.read(initialLoadFailedProvider.notifier).state = false;
             });
           } else if (!_initialDataLoadStarted) {
             _initialDataLoadStarted = true;
@@ -267,11 +272,9 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
               ref.read(initialUserLoadingProvider.notifier).state = true;
               ref.read(initialPlanLoadingProvider.notifier).state = true;
             });
-            Future.wait([
-              _loadSupportedImportSites(),
-              _loadActivePlan(),
-              _loadActiveUser(),
-            ]).whenComplete(() => afterUserAndPlanLoaded());
+            // Not awaited below: shares and links don't need it.
+            _loadSupportedImportSites();
+            _loadInitialData(snapshot.data!.uid);
           }
 
           return Consumer(
@@ -346,6 +349,32 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     );
   }
 
+  /// Loads user and plan. On failure the loading screen offers a retry.
+  Future<void> _loadInitialData(String uid) async {
+    try {
+      await Future.wait([_loadActivePlan(), _loadActiveUser()]);
+    } catch (e) {
+      _log.severe('Initial user/plan load failed', e);
+      if (mounted && AuthenticationService.currentUser?.uid == uid) {
+        ref.read(initialLoadFailedProvider.notifier).state = true;
+      }
+      return;
+    }
+    // Signed out meanwhile: this load no longer belongs to the session.
+    if (AuthenticationService.currentUser?.uid == uid) {
+      afterUserAndPlanLoaded();
+    }
+  }
+
+  void _retryInitialLoad() {
+    final uid = AuthenticationService.currentUser?.uid;
+    if (uid == null) {
+      return;
+    }
+    ref.read(initialLoadFailedProvider.notifier).state = false;
+    _loadInitialData(uid);
+  }
+
   Future<void> _loadActivePlan() async {
     final refPlanProvider = ref.read(planProvider.notifier);
     final refInitLoading = ref.read(initialPlanLoadingProvider.notifier);
@@ -400,7 +429,6 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       BasicUtils.afterBuild(
         () => refUserProvider.state = null,
       );
-      _handleInitUniLink = false;
     }
 
     BasicUtils.afterBuild(
@@ -518,6 +546,13 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     if (AuthenticationService.currentUser == null || value == null) {
       return;
     }
+    if (!_initialDataLoaded) {
+      _pendingShare = value;
+      return;
+    }
+    if (ref.read(userProvider) == null || ref.read(planProvider) == null) {
+      return;
+    }
 
     final sharedText = value.content ?? '';
     if (sharedText.isEmpty) {
@@ -570,19 +605,16 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   }
 
   Future<void> afterUserAndPlanLoaded() async {
+    _initialDataLoaded = true;
     _initUniLinks();
+    final share = _pendingShare;
+    _pendingShare = null;
+    _handleReceivedMealShare(share);
   }
 
-  Future<void> _initUniLinks() async {
-    if (_handleInitUniLink) {
-      try {
-        final initialLink = await _appLinks.getInitialLinkString();
-        _processLink(initialLink);
-      } catch (e) {
-        _log.finer('Failed to get initial link', e);
-      }
-    }
-
+  void _initUniLinks() {
+    // The stream also delivers the link that launched the app (on first listen),
+    // so getInitialLinkString() would handle it a second time.
     if (_uniLinkSub == null) {
       _uniLinkSub = _appLinks.stringLinkStream.listen(
         _processLink,
