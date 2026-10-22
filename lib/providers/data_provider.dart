@@ -26,6 +26,3 @@ final dataGroceryGroupsProvider =
   }
   return groups;
 });
-
-/// Provides the supported sites to import dishes from
-final dataSupportedImportSitesProvider = StateProvider<List<String>>((_) => []);

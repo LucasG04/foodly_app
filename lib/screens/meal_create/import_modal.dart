@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:keep_screen_on/keep_screen_on.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../constants.dart';
 import '../../models/image_credit.dart';
@@ -15,7 +16,6 @@ import '../../models/ingredient.dart';
 import '../../models/meal.dart';
 import '../../models/meal_generation_event.dart';
 import '../../models/social_platform.dart';
-import '../../providers/data_provider.dart';
 import '../../services/ai_generation_exception.dart';
 import '../../services/ai_quota_exceeded_exception.dart';
 import '../../services/lunix_api_service.dart';
@@ -921,16 +921,14 @@ class _ImportModalState extends ConsumerState<ImportModal>
   }
 
   void _showInfo() {
-    final providerSites = ref.read(dataSupportedImportSitesProvider);
-    final backupSites = ['chefkoch.de', 'kitchenstories.com'];
-    var supportedSites = providerSites.isEmpty ? backupSites : providerSites;
-    supportedSites = supportedSites.map((e) => '- $e').toList();
-    var supportedSitesString = supportedSites.join('\n');
-    supportedSitesString = '\n$supportedSitesString';
-
+    final url = Uri.parse(appRecipeSitesUrl(context.locale.languageCode));
     MainSnackbar(
-      message: context.tr('import_modal_info', args: [supportedSitesString]),
+      message: context.tr('import_modal_info'),
       duration: 10,
+      action: TextButton(
+        onPressed: () => launchUrl(url),
+        child: Text(context.tr('import_modal_info_sites')),
+      ),
     ).show(context);
   }
 

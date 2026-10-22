@@ -326,6 +326,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                                 const Icon(EvaIcons.arrowIosForwardOutline),
                           ),
                           SettingsTile(
+                            onTap: () => _launchUrl(appRecipeSitesUrl(
+                              context.locale.languageCode,
+                            )),
+                            leadingIcon: EvaIcons.questionMarkCircleOutline,
+                            text: context.tr(
+                              'settings_section_help_recipe_sites',
+                            ),
+                            trailing: const Icon(EvaIcons.externalLinkOutline),
+                          ),
+                          SettingsTile(
                             onTap: () => AutoRouter.of(context)
                                 .push(const FeedbackScreenRoute()),
                             leadingIcon: EvaIcons.paperPlaneOutline,

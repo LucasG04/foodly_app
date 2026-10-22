@@ -56,6 +56,11 @@ beforeEach(async () => {
     await db.doc("library_meals/l1").set({ name: "x" });
     await db.doc("versions/v").set({ v: 1 });
     await db.doc("mcpTokens/alice").set({ hash: "h", createdAt: 1 });
+    await db.doc("users/admin").set(userMap({ role: "admin" }));
+    await db.doc("feedbacks/f1").set({ userId: "alice", title: "Hi", date: 1 });
+    await db.doc("logs/l1").set({ message: "x" });
+    await db.doc("changes/c1").set({ version: "1.0.0", text: "x" });
+    await db.doc("missingGroceries/mg1").set({ count: 12, groupSuggestion: null });
   });
 });
 
@@ -233,4 +238,43 @@ test("API-only collections denied", async () => {
     await assertFails(db.doc(`${c}/x`).set({ a: 1 }));
     await assertFails(db.collection(c).get());
   }
+});
+
+// --- foodly-info (admin) ---------------------------------------------------------------
+test("admin: feedback, logs, missing groceries", async () => {
+  const db = as("admin");
+  await assertSucceeds(db.collection("feedbacks").orderBy("date", "desc").get());
+  await assertSucceeds(db.collection("feedbacks").where("userId", "==", "alice").get());
+  await assertSucceeds(db.doc("feedbacks/f1").delete());
+  await assertSucceeds(db.collection("logs").get());
+  await assertSucceeds(db.doc("logs/l1").delete());
+  await assertSucceeds(db.collection("missingGroceries").where("count", ">=", 10).limit(50).get());
+  await assertSucceeds(db.doc("missingGroceries/mg1").delete());
+  await assertFails(db.doc("missingGroceries/x").set({ count: 1 }));
+});
+test("admin: changes CRUD", async () => {
+  const db = as("admin");
+  await assertSucceeds(db.collection("changes").get());
+  await assertSucceeds(db.collection("changes").where("version", "==", "1.0.0").get());
+  await assertSucceeds(db.doc("changes/c2").set({ version: "1.0.1", text: "y" }));
+  await assertSucceeds(db.doc("changes/c1").delete());
+});
+test("admin: read user + giftPremium", async () => {
+  const db = as("admin");
+  await assertSucceeds(db.doc("users/alice").get());
+  await assertSucceeds(db.doc("users/alice").update({
+    isPremiumGifted: true, premiumGiftedMessageShown: false, premiumGiftedAt: 9, premiumGiftedMonths: 12,
+  }));
+});
+test("admin: other user fields denied", async () => {
+  await assertFails(as("admin").doc("users/alice").update({ role: "admin" }));
+  await assertFails(as("admin").doc("users/alice").update({ isPremium: true }));
+  await assertFails(as("admin").doc("users/alice").delete());
+});
+test("non-admin: admin collections denied", async () => {
+  const db = as("alice");
+  await assertFails(db.doc("feedbacks/f1").delete());
+  await assertFails(db.collection("logs").get());
+  await assertFails(db.doc("changes/c1").get());
+  await assertFails(as(null).collection("changes").get());
 });

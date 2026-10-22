@@ -67,7 +67,8 @@ cd firestore_rules_test && npm install && npm test   # emulator; needs firebase 
 ```
 
 - The tests replay the app's real call shapes (`lib/services`). When adding or changing a Firestore read/write, add a matching test and run them before deploying the rules.
-- Collections without a `match` (`mcpTokens`, `generatedMeals`, `instagramPosts`, `issues`, `changes`, `missingGroceries`) are lunix-api only (Admin SDK bypasses rules).
+- Collections without a `match` (`mcpTokens`, `generatedMeals`, `instagramPosts`, `issues`) are lunix-api only (Admin SDK bypasses rules).
+- `isAdmin()` (`users/{uid}.role == 'admin'`, set via console only) grants the `foodly-info` admin tool its access: `feedbacks`/`logs`/`missingGroceries` read+delete, `changes` read+write, `users` read + gift-premium fields.
 - `plans` are publicly readable because the join-by-code lookup runs before sign-in. A non-member may only add themself to an unlocked plan; a member may only remove themself from `users`. Plan subcollections and `shoppinglists/*/groceries` are members only.
 - `users/{uid}` is owner only; clients can't raise `role` or gifted premium. `isPremium` is still client-written (RevenueCat sync), so the API's premium check trusts the client.
 - Writes that send a whole `toMap()` must leave other fields' values unchanged. Legacy docs may store flags (`adFree`, `locked`, `isPublic`) as `null`; the rules treat only `true` as set.
