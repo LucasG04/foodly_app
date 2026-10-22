@@ -56,7 +56,7 @@ dependencies:
   permission_handler: ^12.0.1
   clipboard: ^2.0.2
   internet_connection_checker: ^3.0.1
-  app_links: ^6.4.1
+  app_links: ^7.2.2
   keep_screen_on: ^4.0.0
   objectbox: ^4.1.0
   objectbox_flutter_libs: ^4.1.0

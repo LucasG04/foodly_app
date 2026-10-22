@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:math';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -289,20 +290,28 @@ class _ImportModalState extends ConsumerState<ImportModal>
         children: <Widget>[
           const SmallCircularProgressIndicator(),
           const SizedBox(width: kPadding / 2),
-          Flexible(
-            child: Text(
-              _loaderLabel(),
-              style: const TextStyle(color: kLightTextColor),
-            ),
-          ),
+          Flexible(child: _loaderText()),
         ],
       ),
     );
   }
 
-  /// Pre-content label: while a post is being scraped we say so, with a time
-  /// hint; once it's found, that the recipe is being written; otherwise the
-  /// generic "reading your recipe" copy.
+  /// [_loaderLabel]; while scraping, a time hint types in after a while.
+  Widget _loaderText() {
+    const style = TextStyle(color: kLightTextColor);
+    final label = _loaderLabel();
+    return _phase == _GenPhase.scraping
+        ? _TypedHintText(
+            label,
+            hint: context.tr('import_modal_scraping_hint'),
+            style: style,
+          )
+        : Text(label, style: style);
+  }
+
+  /// Pre-content label: while a post is being scraped we say so; once it's
+  /// found, that the recipe is being written; otherwise the generic "reading
+  /// your recipe" copy.
   String _loaderLabel() {
     if (_phase == _GenPhase.scraping) {
       return context.tr('import_modal_scraping', args: [_platform!.label]);
@@ -603,7 +612,10 @@ class _ImportModalState extends ConsumerState<ImportModal>
       case _GenPhase.enriching:
         return _statusRow(
           ValueKey('enriching-${_enrichStep.name}'),
-          _enrichLabel(),
+          Text(
+            _enrichLabel(),
+            style: const TextStyle(color: kLightTextColor),
+          ),
         );
       case _GenPhase.done:
         return Row(
@@ -630,21 +642,18 @@ class _ImportModalState extends ConsumerState<ImportModal>
       case _GenPhase.scraping:
       case _GenPhase.generating:
       case _GenPhase.input:
-        final label = _loaderLabel();
-        return _statusRow(ValueKey(label), label);
+        return _statusRow(ValueKey(_loaderLabel()), _loaderText());
     }
   }
 
-  Widget _statusRow(Key key, String label) {
+  Widget _statusRow(Key key, Widget text) {
     return Row(
       key: key,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const SmallCircularProgressIndicator(),
         const SizedBox(width: kPadding / 2),
-        Flexible(
-          child: Text(label, style: const TextStyle(color: kLightTextColor)),
-        ),
+        Flexible(child: text),
       ],
     );
   }
@@ -938,6 +947,56 @@ class _ImportModalState extends ConsumerState<ImportModal>
     setState(() {
       _buttonState = ButtonState.error;
     });
+  }
+}
+
+/// [text], then [hint] typed in after [_delay] (like the loading screen) so
+/// the wait time only shows up once the wait gets long.
+class _TypedHintText extends StatefulWidget {
+  final String text;
+  final String hint;
+  final TextStyle style;
+
+  const _TypedHintText(this.text, {required this.hint, required this.style});
+
+  @override
+  State<_TypedHintText> createState() => _TypedHintTextState();
+}
+
+class _TypedHintTextState extends State<_TypedHintText> {
+  static const _delay = Duration(seconds: 7);
+  static const _charDuration = Duration(milliseconds: 40);
+
+  Timer? _timer;
+  int _typed = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer(_delay, () {
+      _timer = Timer.periodic(_charDuration, (timer) {
+        setState(() => _typed++);
+        if (_typed >= widget.hint.length) {
+          timer.cancel();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // The hint may shrink mid-typing (language change).
+    final hint = widget.hint.substring(0, min(_typed, widget.hint.length));
+    return Text(
+      hint.isEmpty ? widget.text : '${widget.text} $hint',
+      style: widget.style,
+    );
   }
 }
 

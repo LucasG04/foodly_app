@@ -84,7 +84,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with DisposableWidget {
       } else if (!initialUserLoading && !initialPlanLoading && user != null) {
         return _buildNavigationView();
       } else {
-        return const LoadingScreen();
+        return LoadingScreen(
+          failed: ref.watch(initialLoadFailedProvider),
+          onRetry: () => ref.read(initialLoadRetryProvider.notifier).state++,
+        );
       }
     });
   }

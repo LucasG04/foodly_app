@@ -21,6 +21,12 @@ final initialUserLoadingProvider = StateProvider<bool>((_) => true);
 /// Provides if the top level stream is loading the plan
 final initialPlanLoadingProvider = StateProvider<bool>((_) => true);
 
+/// Provides if loading the initial user or plan failed (e.g. offline, no cache)
+final initialLoadFailedProvider = StateProvider<bool>((_) => false);
+
+/// Bumped to retry the initial user/plan load
+final initialLoadRetryProvider = StateProvider<int>((_) => 0);
+
 /// Provides the active shopping list id.
 final shoppingListIdProvider = StateProvider<String?>((_) => null);
 

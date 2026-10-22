@@ -11,7 +11,13 @@ import 'small_circular_progress_indicator.dart';
 enum _LoadingWarning { noConnection, slowConnection, slowServer, closeApp }
 
 class LoadingScreen extends StatefulWidget {
-  const LoadingScreen({super.key});
+  /// Shows the failure message instead of the loading hints.
+  final bool failed;
+
+  /// Offered when [failed] or once loading takes very long.
+  final VoidCallback? onRetry;
+
+  const LoadingScreen({super.key, this.failed = false, this.onRetry});
 
   @override
   State<LoadingScreen> createState() => _LoadingScreenState();
@@ -149,6 +155,18 @@ class _LoadingScreenState extends State<LoadingScreen> {
     setState(() => _warning = _LoadingWarning.closeApp);
   }
 
+  void _retry() {
+    _connectionCheckTimer?.cancel();
+    _closeAppTimer?.cancel();
+    setState(() => _warning = null);
+    _connectionCheckTimer = Timer(_warningDelay, _checkConnectionAndWarn);
+    widget.onRetry!();
+  }
+
+  bool get _showRetry =>
+      widget.onRetry != null &&
+      (widget.failed || _warning == _LoadingWarning.closeApp);
+
   @override
   void dispose() {
     _timer?.cancel();
@@ -157,15 +175,18 @@ class _LoadingScreenState extends State<LoadingScreen> {
     super.dispose();
   }
 
-  String get _warningText => switch (_warning) {
-        _LoadingWarning.noConnection =>
-          context.tr('loading_warning_no_connection'),
-        _LoadingWarning.slowConnection =>
-          context.tr('loading_warning_slow_connection'),
-        _LoadingWarning.slowServer => context.tr('loading_warning_slow_server'),
-        _LoadingWarning.closeApp => context.tr('loading_warning_close_app'),
-        null => '',
-      };
+  String get _warningText => widget.failed
+      ? context.tr('loading_failed')
+      : switch (_warning) {
+          _LoadingWarning.noConnection =>
+            context.tr('loading_warning_no_connection'),
+          _LoadingWarning.slowConnection =>
+            context.tr('loading_warning_slow_connection'),
+          _LoadingWarning.slowServer =>
+            context.tr('loading_warning_slow_server'),
+          _LoadingWarning.closeApp => context.tr('loading_warning_close_app'),
+          null => '',
+        };
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +196,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
         alignment: Alignment.center,
         children: [
           AnimatedOpacity(
-            opacity: _visible ? 1.0 : 0.0,
+            opacity: _visible && !widget.failed ? 1.0 : 0.0,
             duration: const Duration(milliseconds: 300),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -198,20 +219,30 @@ class _LoadingScreenState extends State<LoadingScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: kPadding),
               child: AnimatedOpacity(
-                opacity: _warning != null ? 1.0 : 0.0,
+                opacity: _warning != null || widget.failed ? 1.0 : 0.0,
                 duration: const Duration(milliseconds: 400),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 400),
-                  child: Text(
-                    _warningText,
-                    key: ValueKey(_warning),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: kPrimaryColor.withValues(alpha: 0.5),
-                      fontFamily: 'Poppins',
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 400),
+                      child: Text(
+                        _warningText,
+                        key: ValueKey(widget.failed ? 'failed' : _warning),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: kPrimaryColor.withValues(alpha: 0.5),
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
                     ),
-                  ),
+                    if (_showRetry)
+                      TextButton(
+                        onPressed: _retry,
+                        child: Text(context.tr('try_again')),
+                      ),
+                  ],
                 ),
               ),
             ),
