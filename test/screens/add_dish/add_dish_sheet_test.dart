@@ -112,17 +112,18 @@ void main() {
     await type(tester, 'Lasagne');
     expect(
       find.text(
-          'No AI recipes left this week · links from recipe websites stay free'),
+          'No assistant recipes left this week · recipe website links are '
+          'unlimited'),
       findsOneWidget,
     );
-    expect(find.text('Get Premium'), findsOneWidget);
-    expect(find.text('Create with AI'), findsNothing);
+    expect(find.text('Get Plus'), findsOneWidget);
+    expect(find.text('Create with the assistant'), findsNothing);
   });
 
   testWidgets('get premium pops with the exhausted feature', (tester) async {
     final result = await pumpSheet(tester, usage: _usage(socialUsed: 3));
     await type(tester, 'https://www.instagram.com/reel/a/');
-    await tester.tap(find.text('Get Premium'));
+    await tester.tap(find.text('Get Plus'));
     await tester.pumpAndSettle();
     expect((result()! as AddDishPremium).feature, 'instagram');
   });
@@ -133,10 +134,10 @@ void main() {
     await type(tester, 'https://vm.tiktok.com/ZGdCqSCL3/');
     expect(
       find.text('No Instagram & TikTok imports left this week · '
-          'links from recipe websites stay free'),
+          'recipe website links are unlimited'),
       findsOneWidget,
     );
-    await tester.tap(find.text('Get Premium'));
+    await tester.tap(find.text('Get Plus'));
     await tester.pumpAndSettle();
     expect((result()! as AddDishPremium).feature, 'tiktok');
   });
@@ -151,16 +152,16 @@ void main() {
   testWidgets('premium users see no counts', (tester) async {
     await pumpSheet(tester, usage: _usage(textUsed: 3), subscribed: true);
     await type(tester, 'Lasagne');
-    expect(find.text('AI recipe'), findsOneWidget);
+    expect(find.text('Assistant'), findsOneWidget);
     expect(find.textContaining(' of '), findsNothing);
-    expect(find.text('Create with AI'), findsOneWidget);
+    expect(find.text('Create with the assistant'), findsOneWidget);
   });
 
   testWidgets('unknown quota still allows creating', (tester) async {
     final result = await pumpSheet(tester);
     await type(tester, 'Lasagne');
-    expect(find.text('AI recipe'), findsOneWidget);
-    await tester.tap(find.text('Create with AI'));
+    expect(find.text('Assistant'), findsOneWidget);
+    await tester.tap(find.text('Create with the assistant'));
     await tester.pumpAndSettle();
     expect(result(), isA<AddDishAi>());
     expect((result()! as AddDishAi).prompt, 'Lasagne');
@@ -181,7 +182,7 @@ void main() {
   testWidgets('no action button while the field is empty', (tester) async {
     await pumpSheet(tester);
     expect(find.text('Import'), findsNothing);
-    expect(find.text('Create with AI'), findsNothing);
+    expect(find.text('Create with the assistant'), findsNothing);
   });
 
   testWidgets('import pops with the link', (tester) async {
@@ -209,11 +210,11 @@ void main() {
     await type(tester, 'https://www.instagram.com/reel/a/');
     expect(
       find.text('Keine Instagram- & TikTok-Importe mehr diese Woche · '
-          'Links von Rezeptseiten bleiben kostenlos'),
+          'Rezeptseiten-Links ohne Limit'),
       findsOneWidget,
     );
     await type(tester, 'Spaghetti bolognese');
-    expect(find.text('KI-Rezept · noch 3 von 3 diese Woche'), findsOneWidget);
+    expect(find.text('Assistent · noch 3 von 3 diese Woche'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -247,7 +248,7 @@ void main() {
       (tester) async {
     await pumpSheet(tester, usage: _usage(textUsed: 3));
     await type(tester, 'Lasagne');
-    final label = tester.widget<Text>(find.text('Get Premium'));
+    final label = tester.widget<Text>(find.text('Get Plus'));
     // White on the yellow is about 1.6:1; the app's dark ink reads.
     expect(label.style?.color, kPrimaryColor);
   });
