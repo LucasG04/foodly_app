@@ -4,7 +4,7 @@ import '../../constants.dart';
 import '../../utils/tag_candidates.dart';
 import '../../widgets/tag_chip.dart';
 
-/// Sticky AI tag suggestions. While the AI works: skeleton chips with
+/// AI tag suggestions. While the AI works: skeleton chips with
 /// shimmering labels; then sparkle-marked chips that toggle in place.
 /// Collapses when there's nothing to suggest or while [hidden].
 class AiTagSuggestions extends StatelessWidget {
