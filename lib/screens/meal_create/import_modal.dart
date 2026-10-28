@@ -82,6 +82,8 @@ class _ImportModalState extends ConsumerState<ImportModal>
   String? _name;
   int? _servings;
   int? _duration;
+  // Whole recipe, only when the post states it.
+  int? _kcal;
   String? _instructions;
   // Index-ordered so out-of-order enrichment events still render in order.
   final SplayTreeMap<int, Ingredient> _ingredients =
@@ -285,14 +287,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
     return SizedBox(
       key: const ValueKey('import-button-loader'),
       height: 60,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          const SmallCircularProgressIndicator(),
-          const SizedBox(width: kPadding / 2),
-          Flexible(child: _loaderText()),
-        ],
-      ),
+      child: _statusRow(null, _loaderText()),
     );
   }
 
@@ -405,15 +400,11 @@ class _ImportModalState extends ConsumerState<ImportModal>
             ),
           ),
         ),
-        // Pinned status indicator — never scrolls away.
-        Padding(
-          padding: EdgeInsets.only(
-            top: kPadding / 2,
-            bottom:
-                mediaPadding.bottom > kPadding ? mediaPadding.bottom : kPadding,
-          ),
-          child: _buildFooter(),
-        ),
+        // Pinned status indicator — never scrolls away. Same footprint as the
+        // input state's button loader, so the loader doesn't jump when the
+        // post shows up.
+        SizedBox(height: 60, child: Center(child: _buildFooter())),
+        SizedBox(height: WidgetUtils.sheetBottomPadding(context)),
       ],
     );
   }
@@ -539,6 +530,11 @@ class _ImportModalState extends ConsumerState<ImportModal>
         _metaChip(EvaIcons.clockOutline, '$_duration min'),
       if (_servings != null && _servings! > 0)
         _metaChip(EvaIcons.peopleOutline, '$_servings'),
+      if (_kcal != null)
+        _metaChip(
+          EvaIcons.flashOutline,
+          context.tr('meal_details_kcal', args: ['$_kcal']),
+        ),
     ];
   }
 
@@ -635,6 +631,10 @@ class _ImportModalState extends ConsumerState<ImportModal>
                     ? context.tr('import_modal_partial_warning')
                     : _name ?? '',
                 style: const TextStyle(color: kLightTextColor),
+                textWidthBasis: TextWidthBasis.longestLine,
+                // Fits the footer's fixed 60 px slot even for long names.
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -646,14 +646,22 @@ class _ImportModalState extends ConsumerState<ImportModal>
     }
   }
 
-  Widget _statusRow(Key key, Widget text) {
+  Widget _statusRow(Key? key, Widget text) {
     return Row(
       key: key,
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
         const SmallCircularProgressIndicator(),
         const SizedBox(width: kPadding / 2),
-        Flexible(child: text),
+        // Wrapped text keeps its longest line's width, so the row stays
+        // centered.
+        Flexible(
+          child: DefaultTextStyle.merge(
+            textWidthBasis: TextWidthBasis.longestLine,
+            child: text,
+          ),
+        ),
       ],
     );
   }
@@ -769,6 +777,8 @@ class _ImportModalState extends ConsumerState<ImportModal>
               _servings = num.tryParse(value.toString())?.round();
             case 'duration':
               _duration = num.tryParse(value.toString())?.round();
+            case 'kcal':
+              _kcal = num.tryParse(value.toString())?.round();
             case 'instructions':
               _instructions = value as String?;
           }
@@ -912,6 +922,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
       name: _name ?? '',
       servings: servings,
       duration: _duration,
+      kcal: _kcal,
       instructions: _instructions,
       ingredients: _ingredients.values.toList(),
       imageUrl: _imageUrl ?? '',
@@ -991,9 +1002,15 @@ class _TypedHintTextState extends State<_TypedHintText> {
   Widget build(BuildContext context) {
     // The hint may shrink mid-typing (language change).
     final hint = widget.hint.substring(0, min(_typed, widget.hint.length));
-    return Text(
-      hint.isEmpty ? widget.text : '${widget.text} $hint',
-      style: widget.style,
+    // Own line: typing never re-wraps the label or shifts the centered row;
+    // the extra line eases in.
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 200),
+      alignment: Alignment.topLeft,
+      child: Text(
+        hint.isEmpty ? widget.text : '${widget.text}\n$hint',
+        style: widget.style,
+      ),
     );
   }
 }

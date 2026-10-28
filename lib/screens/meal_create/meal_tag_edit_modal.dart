@@ -12,9 +12,10 @@ import '../../widgets/tag_chip.dart';
 import '../../widgets/user_information.dart';
 import 'ai_tag_suggestions.dart';
 
-/// Tag picker sheet: search/create field, then sticky AI suggestions (hidden
-/// while searching), above a tag cloud where tapping toggles. Done pops the
-/// selection; swipe-dismiss leaves the caller's tags untouched.
+/// Tag picker sheet: a pinned search/create field above AI suggestions (hidden
+/// while searching) and a tag cloud where tapping toggles; those two scroll
+/// together. Done pops the selection; swipe-dismiss leaves the caller's tags
+/// untouched.
 class MealTagEditModal extends StatefulWidget {
   final List<String> selectedContent;
   final List<String> allContent;
@@ -33,6 +34,8 @@ class MealTagEditModal extends StatefulWidget {
 
 class _MealTagEditModalState extends State<MealTagEditModal>
     with OfContextMixin {
+  static const _fadeHeight = kPadding * 2;
+
   // Copies: the caller's list must stay untouched until Done.
   late final List<String> _selected = [...widget.selectedContent];
   // One entry per tag identity; the meal's own spelling wins over case variants.
@@ -50,11 +53,12 @@ class _MealTagEditModalState extends State<MealTagEditModal>
   List<String> _suggestions = const [];
 
   String get _query => _queryController.text.trim();
+  String _lastQuery = '';
 
   @override
   void initState() {
     super.initState();
-    _queryController.addListener(() => setState(() {}));
+    _queryController.addListener(_onQueryChanged);
     widget.suggestions?.then((tags) {
       if (mounted) {
         setState(() => _suggestions = tags);
@@ -66,6 +70,18 @@ class _MealTagEditModalState extends State<MealTagEditModal>
   void dispose() {
     _queryController.dispose();
     super.dispose();
+  }
+
+  void _onQueryChanged() {
+    // New results start at the top, not at the old list's scroll offset.
+    if (_query != _lastQuery) {
+      _lastQuery = _query;
+      final scroll = PrimaryScrollController.maybeOf(context);
+      if (scroll != null && scroll.hasClients) {
+        scroll.jumpTo(0);
+      }
+    }
+    setState(() {});
   }
 
   @override
@@ -114,54 +130,93 @@ class _MealTagEditModalState extends State<MealTagEditModal>
               textCapitalization: TextCapitalization.sentences,
               onSubmit: _submitQuery,
             ),
-            AiTagSuggestions(
-              suggestions: widget.suggestions,
-              hidden: _query.isNotEmpty,
-              selected: _selected,
-              onToggle: _onSuggestionTap,
-              semanticsLabel: context.tr('meal_tag_ai_suggestions_semantics'),
-            ),
-            const SizedBox(height: kPadding / 2),
             Flexible(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.only(
-                  bottom:
-                      kPadding + mediaPadding.bottom + mediaViewInsets.bottom,
-                ),
-                child: pool.isEmpty && !canCreate
-                    ? UserInformation(
-                        key: const ValueKey('tags-empty'),
-                        assetPath: 'assets/images/undraw_empty.png',
-                        title: context.tr('meal_create_edit_tags_no_results'),
-                        message:
-                            context.tr('meal_create_edit_tags_no_results_msg'),
-                      )
-                    : Wrap(
-                        spacing: kPadding / 2,
-                        runSpacing: kPadding / 2,
-                        children: [
-                          if (canCreate)
-                            TagChip(
-                              key: const ValueKey('tag-create'),
-                              label:
-                                  context.tr('meal_tag_create', args: [_query]),
-                              style: TagChipStyle.create,
-                              onTap: _submitQuery,
-                            ),
-                          for (final tag in visible)
-                            TagChip(
-                              key: ValueKey('tag-$tag'),
-                              label: tag,
-                              selected: _isSelected(tag),
-                              onTap: () => _onCloudTap(tag),
-                            ),
-                        ],
+              child: ShaderMask(
+                // Fades tags out where they pass the bottom edge (above the
+                // keyboard / home indicator), so more below reads as "scroll".
+                // The bottom padding is at least the fade, so a cloud that
+                // fits never fades.
+                shaderCallback: (bounds) {
+                  final edge = bounds.height - inset - mediaPadding.bottom;
+                  return LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: const [
+                      Colors.black,
+                      Colors.black,
+                      Colors.transparent,
+                      Colors.transparent,
+                    ],
+                    stops: [
+                      0,
+                      ((edge - _fadeHeight) / bounds.height).clamp(0.0, 1.0),
+                      (edge / bounds.height).clamp(0.0, 1.0),
+                      1,
+                    ],
+                  ).createShader(bounds);
+                },
+                blendMode: BlendMode.dstIn,
+                child: SingleChildScrollView(
+                  // Primary (inherits the sheet's controller): clamping hands
+                  // a pull-down at the top to the sheet instead of bouncing
+                  // the cloud along with it.
+                  physics: const ClampingScrollPhysics(),
+                  padding: EdgeInsets.only(
+                    bottom: _fadeHeight + mediaPadding.bottom + inset,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Scrolls with the cloud: only header and field stay.
+                      AiTagSuggestions(
+                        suggestions: widget.suggestions,
+                        hidden: _query.isNotEmpty,
+                        selected: _selected,
+                        onToggle: _onSuggestionTap,
+                        semanticsLabel:
+                            context.tr('meal_tag_ai_suggestions_semantics'),
                       ),
+                      const SizedBox(height: kPadding / 2),
+                      _buildCloud(pool, visible, canCreate),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildCloud(List<String> pool, List<String> visible, bool canCreate) {
+    if (pool.isEmpty && !canCreate) {
+      return UserInformation(
+        key: const ValueKey('tags-empty'),
+        assetPath: 'assets/images/undraw_empty.png',
+        title: context.tr('meal_create_edit_tags_no_results'),
+        message: context.tr('meal_create_edit_tags_no_results_msg'),
+      );
+    }
+    return Wrap(
+      spacing: kPadding / 2,
+      runSpacing: kPadding / 2,
+      children: [
+        if (canCreate)
+          TagChip(
+            key: const ValueKey('tag-create'),
+            label: context.tr('meal_tag_create', args: [_query]),
+            style: TagChipStyle.create,
+            onTap: _submitQuery,
+          ),
+        for (final tag in visible)
+          TagChip(
+            key: ValueKey('tag-$tag'),
+            label: tag,
+            selected: _isSelected(tag),
+            onTap: () => _onCloudTap(tag),
+          ),
+      ],
     );
   }
 
