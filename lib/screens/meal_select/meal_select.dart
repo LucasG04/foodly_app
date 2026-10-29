@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:blur/blur.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -278,7 +279,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
             final userIsSubscribed =
                 ref.watch(InAppPurchaseService.$userIsSubscribed);
             return !userIsSubscribed
-                ? _buildGetPremiumInfo()
+                ? _buildPreviewMeals(locked: true)
                 : SettingsService.showSuggestions
                     ? _buildPreviewMeals()
                     : _buildPaginatedMealList();
@@ -328,12 +329,18 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
     );
   }
 
-  Widget _buildPreviewMeals() {
+  /// Suggestions from the plan's dishes. [locked] (free users) shows the
+  /// first one as a taste and blurs the next behind the Plus info.
+  Widget _buildPreviewMeals({bool locked = false}) {
     final planId = ref.read(planProvider)!.id!;
     return FutureBuilder<List<Meal>>(
       future: MealStatService.getMealRecommendations(planId),
       builder: (context, snapshot) {
-        final meals = snapshot.hasData ? snapshot.data! : <Meal>[];
+        final allMeals = snapshot.hasData ? snapshot.data! : <Meal>[];
+        if (locked && snapshot.hasData && allMeals.isEmpty) {
+          return _buildGetPremiumInfo();
+        }
+        final meals = locked ? allMeals.take(1).toList() : allMeals;
 
         return ListView.builder(
           shrinkWrap: true,
@@ -341,9 +348,12 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
           physics: const NeverScrollableScrollPhysics(),
           itemCount: meals.isEmpty
               ? 0
-              : meals.length +
-                  1, // +1 to make space for title and 0 to not show title
+              // +1 for the title, +1 for the locked rest
+              : meals.length + (locked ? 2 : 1),
           itemBuilder: (context, index) {
+            if (index > meals.length) {
+              return _buildLockedMeals(allMeals.skip(1).take(2).toList());
+            }
             if (index == 0) {
               return _buildSizeWrapper(
                 padding: const EdgeInsets.symmetric(
@@ -407,6 +417,23 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
     );
   }
 
+  /// The suggestions after the first, blurred under the Plus info.
+  Widget _buildLockedMeals(List<Meal> meals) {
+    if (meals.isEmpty) {
+      return _buildGetPremiumInfo();
+    }
+    return Blur(
+      blur: 4,
+      colorOpacity: 0,
+      overlay: _buildGetPremiumInfo(),
+      child: IgnorePointer(
+        child: Column(
+          children: meals.map((meal) => SelectMealTile(meal: meal)).toList(),
+        ),
+      ),
+    );
+  }
+
   Widget _buildGetPremiumInfo() {
     return _buildSizeWrapper(
       padding: const EdgeInsets.symmetric(
@@ -414,7 +441,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
       ),
       child: GetPremiumInfo(
         title: context.tr('get_premium_modal_2_title'),
-        description: context.tr('get_premium_modal_2_description_ad'),
+        description: context.tr('meal_select_suggestions_plus'),
         source: 'meal_suggestions',
         highlight: PremiumFeature.suggestions,
       ),

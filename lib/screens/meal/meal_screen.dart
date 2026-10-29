@@ -238,14 +238,25 @@ class _MealScreenState extends ConsumerState<MealScreen>
             : MealSection(
                 title: context.tr('meal_details_stats'),
                 child: Consumer(
-                  builder: (context, ref, child) {
+                  builder: (context, ref, _) {
                     final isSubscribed =
                         ref.watch(InAppPurchaseService.$userIsSubscribed);
-                    return isSubscribed
-                        ? child!
-                        : _buildMealStatBlur(context, child!);
+                    final infos = _buildMealStatInfos(meal, mealStat);
+                    if (isSubscribed) {
+                      return _buildMealStatWrap(infos);
+                    }
+                    // Free: the planned count as a taste, the rest blurred.
+                    return Column(
+                      children: [
+                        infos.first,
+                        const SizedBox(height: kPadding),
+                        _buildMealStatBlur(
+                          context,
+                          _buildMealStatWrap(infos.skip(1).toList()),
+                        ),
+                      ],
+                    );
                   },
-                  child: _buildMealStatBody(meal, mealStat),
                 ),
               );
       },
@@ -291,30 +302,34 @@ class _MealScreenState extends ConsumerState<MealScreen>
     );
   }
 
-  Widget _buildMealStatBody(Meal meal, MealStat mealStat) {
+  Widget _buildMealStatWrap(List<Widget> infos) {
     return Wrap(
       runSpacing: kPadding,
       spacing: kPadding,
       alignment: WrapAlignment.spaceEvenly,
-      children: [
-        _buildMealStatInfo(
-          'Geplant',
-          '${mealStat.plannedCount} x',
-        ),
-        _buildMealStatInfo(
-          'Letzte Mal geplant',
-          mealStat.plannedCount != null && mealStat.plannedCount! > 0
-              ? DateFormat.yMd(context.locale.languageCode)
-                  .format(mealStat.lastTimePlanned!)
-              : '-',
-        ),
-        if (meal.createdAt != null)
-          _buildMealStatInfo(
-            'Erstellt',
-            DateFormat.yMd(context.locale.languageCode).format(meal.createdAt!),
-          ),
-      ],
+      children: infos,
     );
+  }
+
+  List<Widget> _buildMealStatInfos(Meal meal, MealStat mealStat) {
+    return [
+      _buildMealStatInfo(
+        'Geplant',
+        '${mealStat.plannedCount} x',
+      ),
+      _buildMealStatInfo(
+        'Letzte Mal geplant',
+        mealStat.plannedCount != null && mealStat.plannedCount! > 0
+            ? DateFormat.yMd(context.locale.languageCode)
+                .format(mealStat.lastTimePlanned!)
+            : '-',
+      ),
+      if (meal.createdAt != null)
+        _buildMealStatInfo(
+          'Erstellt',
+          DateFormat.yMd(context.locale.languageCode).format(meal.createdAt!),
+        ),
+    ];
   }
 
   Widget _buildMealStatInfo(String title, String stat) {

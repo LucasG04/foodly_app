@@ -4,6 +4,8 @@ import 'dart:math' as math;
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 
+import '../services/app_review_service.dart';
+
 /// Custom Snackbar.
 class MainSnackbar {
   final String? title;
@@ -38,6 +40,9 @@ class MainSnackbar {
   Future<void> show(BuildContext context) {
     if (!context.mounted) {
       return Future.value();
+    }
+    if (isError) {
+      AppReviewService.skipThisSession();
     }
     final host = context.findAncestorStateOfType<_SnackbarHostState>() ??
         _SnackbarHostState._current;

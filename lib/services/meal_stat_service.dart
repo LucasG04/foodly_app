@@ -66,6 +66,23 @@ class MealStatService {
     }
   }
 
+  /// How often the plan's dishes were planned in total; 0 on failure.
+  static Future<int> getPlannedTotal(String planId) async {
+    _log.finer('Call getPlannedTotal for $planId');
+    try {
+      final snapshot = await _firestore
+          .collection('plans')
+          .doc(planId)
+          .collection('stats')
+          .aggregate(sum('plannedCount'))
+          .get();
+      return snapshot.getSum('plannedCount')?.toInt() ?? 0;
+    } catch (e) {
+      _log.severe('Failed getPlannedTotal for $planId', e);
+      return 0;
+    }
+  }
+
   static Future<List<MealStat>> getLeastPlanned(String? planId,
       [int limit = 5]) async {
     _log.finer('Call getLeastPlanned from $planId');

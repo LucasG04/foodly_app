@@ -11,6 +11,7 @@ import '../../constants.dart';
 import '../../models/ai_usage.dart';
 import '../../models/meal.dart';
 import '../../providers/state_providers.dart';
+import '../../services/app_review_service.dart';
 import '../../services/in_app_purchase_service.dart';
 import '../../utils/analytics.dart';
 import '../../utils/basic_utils.dart';
@@ -251,6 +252,7 @@ class _AddDishSheetState extends ConsumerState<AddDishSheet> {
       logEvent(AnalyticsEvent.aiQuotaExceededShown, {
         'feature': _feature(input),
       });
+      AppReviewService.skipThisSession();
     }
   }
 
