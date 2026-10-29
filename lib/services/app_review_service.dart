@@ -35,8 +35,8 @@ class AppReviewService {
 
   /// Use of the app before the first ask, counted from the first start that
   /// recorded it.
-  static const _minTenure = Duration(days: 14);
-  static const _cooldown = Duration(days: 120);
+  static const _minTenure = Duration(days: 7);
+  static const _cooldown = Duration(days: 60);
 
   static bool _skipSession = false;
   static bool _requested = false;
