@@ -101,9 +101,6 @@
   "plan_day_dinner": "evening",
   "plan_day_tile_remove": "Remove",
   "plan_day_tile_edit": "Edit",
-  "plan_rate_title": "Are you enjoying {}?",
-  "plan_rate_feedback": "Send feedback",
-  "plan_rate_review": "Rate in the {} Store",
   "meal_list_title": "Dishes",
   "meal_list_empty_title": "Your cookbook is empty",
   "meal_list_empty_subtitle": "Add dishes once, plan them every week. Answer two questions and we'll suggest some.",
@@ -160,11 +157,24 @@
   "meal_create_kcal_ai_missing_input": "To estimate kcal, please enter at least a name and one ingredient — the more, the better.",
   "ai_usage_remaining": "{} free AI calls left",
   "ai_usage_exhausted": {
-    "zero": "You've used all your free AI calls. They reset today ({date}).",
-    "one": "You've used all your free AI calls. They reset tomorrow ({date}).",
-    "other": "You've used all your free AI calls. They reset in {} days ({date})."
+    "zero": "New ones today ({date}), or unlimited with Plus.",
+    "one": "New ones tomorrow ({date}), or unlimited with Plus.",
+    "other": "New ones in {} days ({date}), or unlimited with Plus."
   },
-  "ai_usage_upgrade": "Upgrade",
+  "ai_usage_upgrade": "Get Plus",
+  "ai_usage_used": "You've used this week's free AI calls 🙌",
+  "ai_usage_used_assistant": {
+    "one": "You've created {} recipe with AI this week 🙌",
+    "other": "You've created {} recipes with AI this week 🙌"
+  },
+  "ai_usage_used_social": {
+    "one": "You've imported {} recipe from Instagram and TikTok this week 🙌",
+    "other": "You've imported {} recipes from Instagram and TikTok this week 🙌"
+  },
+  "ai_usage_used_kcal": {
+    "one": "You've estimated kcal {} time this week 🙌",
+    "other": "You've estimated kcal {} times this week 🙌"
+  },
   "meal_create_tags_title": "Categories",
   "meal_create_error_unknown": "An error has occurred. Check your internet connection or try again later.",
   "meal_create_error_missing_input": "Please assign a name and at least one ingredient.",
@@ -200,6 +210,8 @@
   "import_modal_error_no_social": "Please paste a link to an Instagram post or a TikTok video.",
   "import_modal_error_social_fetch": "Couldn't read this {} post — it may be private, deleted, or have no caption. Try again, or paste the recipe into the assistant instead.",
   "import_modal_error_generation": "Something went wrong while generating the recipe.",
+  "error_feedback_action": "Tell us",
+  "meal_select_suggestions_plus": "More suggestions from your recipes with Plus.",
   "import_modal_partial_warning": "Some details couldn't be loaded.",
   "meal_details_import_success": "Dish has been added to your plan.",
   "meal_details_import": "Import dish",
@@ -216,7 +228,7 @@
   "meal_details_ingredient": "Ingredients",
   "meal_details_instructions": "Instructions",
   "meal_details_stats": "Stats",
-  "meal_details_stats_locked": "Statistics are available with a plus subscription.",
+  "meal_details_stats_locked": "More statistics with Plus",
   "meal_details_stats_unlock": "Get Plus",
   "meal_details_keep_screen_on": "Keep screen on 💡",
   "meal_details_keep_screen_on_description": "The screen will not turn off while you are cooking or until you press this button again.",
@@ -348,7 +360,6 @@
   "get_premium_modal_1_description_ad": "With Plus you will see matching suggestions as you type in groceries.",
   "get_premium_modal_2_title": "Never ask “What’s for dinner?” again",
   "get_premium_modal_2_description": "Meal ideas for the coming days, picked from your recipes.",
-  "get_premium_modal_2_description_ad": "With Plus you will see suggestions of dishes for the next days.",
   "get_premium_modal_3_description": "Ad-free & independent – thanks to you ❤️",
   "get_premium_modal_4_title": "Know your favourites",
   "get_premium_modal_4_description": "See how often and when you last planned each dish.",
@@ -361,6 +372,11 @@
   "get_premium_modal_8_description": "Import recipes from Instagram and TikTok, create them with the assistant and estimate kcal – as often as you like.",
   "get_premium_modal_8_free_limits": "Free: {}× assistant, {}× Instagram/TikTok, {}× kcal per week",
   "get_premium_modal_thanks": "Thanks {}",
+  "get_premium_modal_planned": "{} dishes planned with {} so far 💪",
+  "get_premium_modal_unlocked_title": "Welcome to {} Plus 🎉",
+  "get_premium_modal_unlocked_message": "Unlimited AI, suggestions from your recipes, statistics, the sorted shopping list and your own color: it's all yours now.",
+  "get_premium_modal_unlocked_color": "Pick your color",
+  "get_premium_modal_unlocked_done": "Let's go",
   "upcoming_features_title": "Upcoming Features",
   "shopping_list_sort_name": "Name",
   "shopping_list_sort_group": "Product group",

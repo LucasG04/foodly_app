@@ -8,7 +8,10 @@ import 'package:logging/logging.dart';
 
 import '../constants.dart';
 import '../providers/state_providers.dart';
+import '../screens/settings/settings_change_primary_color_modal.dart';
+import '../services/app_review_service.dart';
 import '../services/in_app_purchase_service.dart';
+import '../services/meal_stat_service.dart';
 import '../utils/ai_usage_period.dart';
 import '../utils/analytics.dart';
 import '../utils/main_snackbar.dart';
@@ -39,38 +42,58 @@ class GetPremiumModal extends ConsumerStatefulWidget {
 
   const GetPremiumModal({required this.source, this.highlight, super.key});
 
-  /// Error snackbar for an exhausted AI quota, with an upgrade action.
+  /// Snackbar for an exhausted AI quota: credits what the user made this
+  /// week instead of reporting an error, with an upgrade action.
   static void showAiQuotaExhausted(
     BuildContext context, {
     required String feature,
   }) {
     logEvent(AnalyticsEvent.aiQuotaExceededShown, {'feature': feature});
+    AppReviewService.skipThisSession();
     // The snackbar outlives the caller (often a bottom sheet); the
     // navigator doesn't, so the paywall opens from there.
     final navigatorContext = Navigator.of(context).context;
+    final limits = ProviderScope.containerOf(context, listen: false)
+        .read(aiLimitsProvider)
+        .valueOrNull;
+    final (usedKey, used) = switch (feature) {
+      'kcal' => ('ai_usage_used_kcal', limits?.kcal),
+      'assistant' => ('ai_usage_used_assistant', limits?.text),
+      'social' || 'instagram' || 'tiktok' => (
+          'ai_usage_used_social',
+          limits?.social
+        ),
+      _ => ('', null),
+    };
+    final usedText = used != null
+        ? context.plural(usedKey, used)
+        : context.tr('ai_usage_used');
+    final resetText = context.plural(
+      'ai_usage_exhausted',
+      AiUsagePeriod.daysUntilReset(),
+      namedArgs: {
+        'date': DateFormat.Md(context.locale.toLanguageTag())
+            .format(AiUsagePeriod.currentPeriodEnd().toLocal()),
+      },
+    );
     MainSnackbar(
-      message: context.plural(
-        'ai_usage_exhausted',
-        AiUsagePeriod.daysUntilReset(),
-        namedArgs: {
-          'date': DateFormat.Md(context.locale.toLanguageTag())
-              .format(AiUsagePeriod.currentPeriodEnd().toLocal()),
-        },
-      ),
-      isError: true,
-      action: TextButton(
-        onPressed: () {
-          if (!navigatorContext.mounted) {
-            return;
-          }
-          show(
-            navigatorContext,
-            source: 'ai_quota_$feature',
-            highlight: PremiumFeature.ai,
-          );
-        },
-        child: Text(context.tr('ai_usage_upgrade')),
-      ),
+      message: '$usedText $resetText',
+      // Right after the review prompt, no second ask in the same session.
+      action: AppReviewService.requestedThisSession
+          ? null
+          : TextButton(
+              onPressed: () {
+                if (!navigatorContext.mounted) {
+                  return;
+                }
+                show(
+                  navigatorContext,
+                  source: 'ai_quota_$feature',
+                  highlight: PremiumFeature.ai,
+                );
+              },
+              child: Text(context.tr('ai_usage_upgrade')),
+            ),
     ).show(context);
   }
 
@@ -98,6 +121,13 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
   late final AutoDisposeStateProvider<_PurchaseState> _$purchaseState;
   late final AutoDisposeStateProvider<int> _$selectedPremiumDuration;
 
+  /// How often the plan's dishes were planned, shown as the user's own
+  /// progress.
+  late final Future<int> _plannedTotal;
+
+  /// After a purchase or restore: what Plus unlocked, instead of the offer.
+  bool _unlocked = false;
+
   final products = [
     _PremiumDuration('get_premium_modal_monthly'),
     _PremiumDuration('get_premium_modal_yearly'),
@@ -115,7 +145,12 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
 
     if (!ref.read(InAppPurchaseService.$userIsSubscribed)) {
       logEvent(AnalyticsEvent.paywallView, {'source': widget.source});
+      AppReviewService.skipThisSession();
     }
+    final planId = ref.read(planProvider)?.id;
+    _plannedTotal = planId == null
+        ? Future.value(0)
+        : MealStatService.getPlannedTotal(planId);
     _getAdditionalProductInfo();
   }
 
@@ -127,6 +162,9 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
 
   @override
   Widget build(BuildContext context) {
+    if (_unlocked) {
+      return _buildUnlocked();
+    }
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -151,6 +189,7 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        _buildPlannedTotal(),
                         Padding(
                           padding: const EdgeInsets.only(bottom: kPadding / 2),
                           child: Text(
@@ -216,6 +255,87 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildPlannedTotal() {
+    return FutureBuilder<int>(
+      future: _plannedTotal,
+      builder: (context, snapshot) {
+        final total = snapshot.data ?? 0;
+        // A small number doesn't carry the line.
+        if (total < 10) {
+          return const SizedBox.shrink();
+        }
+        final theme = Theme.of(context);
+        return Padding(
+          padding: const EdgeInsets.only(bottom: kPadding / 4),
+          child: Text(
+            context.tr('get_premium_modal_planned',
+                args: [total.toString(), kAppName]),
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.primaryColor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Ends the purchase on a high: what's unlocked, thanks, and the color as
+  /// something to try right away.
+  Widget _buildUnlocked() {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        kPadding,
+        0,
+        kPadding,
+        WidgetUtils.sheetBottomPadding(context),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SheetHeader(
+            title: context
+                .tr('get_premium_modal_unlocked_title', args: [kAppName]),
+            showClose: false,
+          ),
+          const SizedBox(height: kPadding / 2),
+          Text(
+            context.tr('get_premium_modal_unlocked_message'),
+            style: theme.textTheme.titleMedium,
+          ),
+          const SizedBox(height: kPadding / 2),
+          Text(context.tr('get_premium_modal_3_description')),
+          const SizedBox(height: kPadding),
+          Center(
+            child: TextButton.icon(
+              onPressed: _openColorPicker,
+              icon: const Icon(EvaIcons.colorPaletteOutline),
+              label: Text(context.tr('get_premium_modal_unlocked_color')),
+            ),
+          ),
+          const SizedBox(height: kPadding / 2),
+          Center(
+            child: MainButton(
+              onTap: _close,
+              text: context.tr('get_premium_modal_unlocked_done'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openColorPicker() {
+    final navigatorContext = Navigator.of(context).context;
+    _close();
+    WidgetUtils.showFoodlyBottomSheet<void>(
+      context: navigatorContext,
+      builder: (_) => const SettingsChangePrimaryColorModal(),
     );
   }
 
@@ -415,8 +535,7 @@ class _GetPremiumModalState extends ConsumerState<GetPremiumModal>
   Future<void> _handlePurchase(bool success) async {
     if (success) {
       ref.read(_$purchaseState.notifier).state = _PurchaseState.purchased;
-      await Future<dynamic>.delayed(const Duration(seconds: 1));
-      _close();
+      setState(() => _unlocked = true);
     } else {
       ref.read(_$purchaseState.notifier).state = _PurchaseState.none;
     }

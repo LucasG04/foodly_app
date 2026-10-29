@@ -26,6 +26,7 @@ import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
+import '../../widgets/feedback_snackbar_action.dart';
 import '../../widgets/foodly_network_image.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_button.dart';
@@ -871,6 +872,7 @@ class _ImportModalState extends ConsumerState<ImportModal>
       MainSnackbar(
         isError: true,
         message: context.tr('import_modal_error_generation'),
+        action: feedbackSnackbarAction(context),
       ).show(context);
     }
     KeepScreenOn.turnOff();

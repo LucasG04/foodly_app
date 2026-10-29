@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -12,7 +10,6 @@ import '../../../constants.dart';
 import '../../../models/plan.dart';
 import '../../../models/plan_meal.dart';
 import '../../../providers/state_providers.dart';
-import '../../../services/app_review_service.dart';
 import '../../../services/plan_service.dart';
 import '../../../utils/basic_utils.dart';
 import '../../../utils/widget_utils.dart';
@@ -23,7 +20,6 @@ import '../../../widgets/page_title.dart';
 import '../../../widgets/small_circular_progress_indicator.dart';
 import 'plan_day_card.dart';
 import 'plan_download_modal.dart';
-import 'review_request_container.dart';
 
 class PlanTabView extends ConsumerStatefulWidget {
   const PlanTabView({super.key});
@@ -36,9 +32,6 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
   @override
   bool get wantKeepAlive => true;
 
-  // Survives remounts of the builder below (it remounts when the plan reloads).
-  final _shouldRequestReview = ValueNotifier(false);
-  late final StreamSubscription<bool> _shouldRequestReviewSub;
   final AutoDisposeStreamProvider<List<PlanMeal>> planMealsStreamProvider =
       StreamProvider.autoDispose<List<PlanMeal>>((ref) {
     final activePlan = ref.watch(planProvider);
@@ -46,20 +39,6 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
   });
 
   // TODO: initState to listen on plan meal changes; create providers for all days or one that can be used with select for individual days
-
-  @override
-  void initState() {
-    super.initState();
-    _shouldRequestReviewSub = AppReviewService.shouldRequestReview()
-        .listen((value) => _shouldRequestReview.value = value);
-  }
-
-  @override
-  void dispose() {
-    _shouldRequestReviewSub.cancel();
-    _shouldRequestReview.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,21 +74,6 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
                         ),
                       ],
                     ),
-                  ),
-                  ValueListenableBuilder<bool>(
-                    valueListenable: _shouldRequestReview,
-                    builder: (context, shouldRequestReview, _) {
-                      if (!shouldRequestReview) {
-                        return const SizedBox();
-                      }
-                      return SizedBox(
-                        width: BasicUtils.contentWidth(context),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5.0),
-                          child: ReviewRequestContainer(),
-                        ),
-                      );
-                    },
                   ),
                   SizedBox(
                     width: BasicUtils.contentWidth(context),

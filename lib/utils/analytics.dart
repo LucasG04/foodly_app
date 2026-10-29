@@ -62,7 +62,6 @@ enum AnalyticsEvent {
   // Feedback
   feedbackSubmit('feedback_submit'),
   reviewPromptShown('review_prompt_shown'),
-  reviewPromptResult('review_prompt_result'),
 
   // MCP
   mcpTokenCreate('mcp_token_create'),

@@ -5,6 +5,7 @@ import { test, before, beforeEach, after } from "node:test";
 import { assertFails, assertSucceeds, initializeTestEnvironment } from "@firebase/rules-unit-testing";
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
+import { collection, getAggregateFromServer, sum } from "firebase/firestore";
 
 const { FieldValue, FieldPath } = firebase.firestore;
 let env;
@@ -147,6 +148,8 @@ test("member history + stats queries", async () => {
   await assertSucceeds(db.doc("plans/p1/mealHistory/pm1").set({ date: 0, meal: "m1" }));
   await assertSucceeds(db.collection("plans/p1/stats").orderBy("plannedCount").limit(5).get());
   await assertSucceeds(db.collection("plans/p1/stats").where("mealId", "==", "m1").get());
+  // MealStatService.getPlannedTotal (paywall)
+  await assertSucceeds(getAggregateFromServer(collection(db._delegate, "plans/p1/stats"), { total: sum("plannedCount") }));
   await assertSucceeds(db.collection("plans/p1/stats").add({ mealId: "m9", plannedCount: 0, lastTimePlanned: 1 }));
 });
 test("non-member reads plan meals denied", () => assertFails(as("bob").collection("plans/p1/meals").get()));

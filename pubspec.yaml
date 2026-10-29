@@ -96,7 +96,6 @@ dependencies:
   like_button: ^2.0.5
   blur: ^4.0.2
   sticky_headers: ^0.3.0+2
-  custom_rating_bar: ^3.0.0
 
   # Icons/Styles/Animations
   cupertino_icons: ^1.0.8

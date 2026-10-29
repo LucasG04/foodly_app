@@ -26,6 +26,7 @@ import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/disposable_widget.dart';
+import '../../widgets/feedback_snackbar_action.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/options_modal/options_modal.dart';
@@ -562,6 +563,7 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
         error is AIRejectionException
             ? _messageFor(error.code)
             : context.tr('import_modal_error_generation'),
+        offerFeedback: error is! AIRejectionException,
       );
     }
     setState(_backToInput);
@@ -590,11 +592,15 @@ class _MealAssistantSheetState extends State<MealAssistantSheet>
         : context.tr('meal_assistant_error_not_food');
   }
 
-  void _showError(String message) {
+  void _showError(String message, {bool offerFeedback = false}) {
     if (!mounted) {
       return;
     }
-    MainSnackbar(message: message, isError: true).show(context);
+    MainSnackbar(
+      message: message,
+      isError: true,
+      action: offerFeedback ? feedbackSnackbarAction(context) : null,
+    ).show(context);
   }
 
   /// Shows the finished state briefly, then hands the meal to the form.

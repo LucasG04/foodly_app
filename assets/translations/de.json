@@ -101,9 +101,6 @@
   "plan_day_dinner": "Abend",
   "plan_day_tile_remove": "Entfernen",
   "plan_day_tile_edit": "Bearbeiten",
-  "plan_rate_title": "Gefällt dir {}?",
-  "plan_rate_feedback": "Feedback senden",
-  "plan_rate_review": "Im {} Store bewerten",
   "meal_list_title": "Gerichte",
   "meal_list_empty_title": "Dein Kochbuch ist leer",
   "meal_list_empty_subtitle": "Einmal Gerichte anlegen, jede Woche planen. Beantworte zwei Fragen und wir schlagen dir welche vor.",
@@ -160,11 +157,24 @@
   "meal_create_kcal_ai_missing_input": "Für die kcal-Schätzung wird mindestens ein Name und eine Zutat benötigt – je mehr, desto besser.",
   "ai_usage_remaining": "Noch {} Aufrufe übrig",
   "ai_usage_exhausted": {
-    "zero": "Du hast alle Aufrufe verbraucht. Sie werden heute ({date}) zurückgesetzt.",
-    "one": "Du hast alle Aufrufe verbraucht. Sie werden morgen ({date}) zurückgesetzt.",
-    "other": "Du hast alle Aufrufe verbraucht. Sie werden in {} Tagen ({date}) zurückgesetzt."
+    "zero": "Neue gibt's heute ({date}) – oder unbegrenzt mit Plus.",
+    "one": "Neue gibt's morgen ({date}) – oder unbegrenzt mit Plus.",
+    "other": "Neue gibt's in {} Tagen ({date}) – oder unbegrenzt mit Plus."
   },
-  "ai_usage_upgrade": "Upgrade",
+  "ai_usage_upgrade": "Plus holen",
+  "ai_usage_used": "Du hast die kostenlosen KI-Aufrufe dieser Woche genutzt 🙌",
+  "ai_usage_used_assistant": {
+    "one": "Du hast diese Woche schon {} Rezept mit KI erstellt 🙌",
+    "other": "Du hast diese Woche schon {} Rezepte mit KI erstellt 🙌"
+  },
+  "ai_usage_used_social": {
+    "one": "Du hast diese Woche schon {} Rezept aus Instagram und TikTok importiert 🙌",
+    "other": "Du hast diese Woche schon {} Rezepte aus Instagram und TikTok importiert 🙌"
+  },
+  "ai_usage_used_kcal": {
+    "one": "Du hast diese Woche schon {}× kcal geschätzt 🙌",
+    "other": "Du hast diese Woche schon {}× kcal geschätzt 🙌"
+  },
   "meal_create_tags_title": "Kategorien",
   "meal_create_error_unknown": "Es ist ein Fehler aufgetreten. Prüfe deine Internetverbindung oder versuche es später erneut.",
   "meal_create_error_missing_input": "Bitte vergib einen Namen und mindestens eine Zutat.",
@@ -200,6 +210,8 @@
   "import_modal_error_no_social": "Bitte füge einen Link zu einem Instagram-Post oder TikTok-Video ein.",
   "import_modal_error_social_fetch": "Der {}-Post konnte nicht gelesen werden – er ist möglicherweise privat, gelöscht oder hat keine Bildunterschrift. Versuche es erneut oder füge das Rezept stattdessen in den Assistenten ein.",
   "import_modal_error_generation": "Beim Erstellen des Rezepts ist etwas schiefgelaufen.",
+  "error_feedback_action": "Sag's uns",
+  "meal_select_suggestions_plus": "Mehr Vorschläge aus deinen Rezepten mit Plus.",
   "import_modal_partial_warning": "Einige Details konnten nicht geladen werden.",
   "meal_details_import_success": "Gericht wurde deinem Plan hinzugefügt.",
   "meal_details_import": "Gericht importieren",
@@ -216,7 +228,7 @@
   "meal_details_ingredient": "Zutaten",
   "meal_details_instructions": "Anleitung",
   "meal_details_stats": "Statistiken",
-  "meal_details_stats_locked": "Statistiken sind mit einem Plus-Abo verfügbar.",
+  "meal_details_stats_locked": "Mehr Statistiken mit Plus",
   "meal_details_stats_unlock": "Hol dir Plus",
   "meal_details_keep_screen_on": "Bildschirm bleibt an 💡",
   "meal_details_keep_screen_on_description": "Der Bildschirm bleibt an, solange du dir das Gericht anschaust oder du wieder auf den Button drückst.",
@@ -348,7 +360,6 @@
   "get_premium_modal_1_description_ad": "Mit Plus werden dir beim Eintippen von Lebensmitteln passende Vorschläge angezeigt.",
   "get_premium_modal_2_title": "Nie wieder „Was essen wir?“",
   "get_premium_modal_2_description": "Passende Gerichte für die nächsten Tage – vorgeschlagen aus deinen Rezepten.",
-  "get_premium_modal_2_description_ad": "Mit Plus werden dir hier Vorschläge für Gerichte für die nächsten Tage angezeigt.",
   "get_premium_modal_3_description": "Werbefrei & unabhängig – dank dir ❤️",
   "get_premium_modal_4_title": "Lieblingsgerichte im Blick",
   "get_premium_modal_4_description": "Sieh, wie oft und wann du ein Gericht zuletzt geplant hast.",
@@ -361,6 +372,11 @@
   "get_premium_modal_8_description": "Rezepte aus Instagram und TikTok importieren, mit dem Assistenten erstellen und kcal schätzen – so oft du willst.",
   "get_premium_modal_8_free_limits": "Kostenlos: {}× Assistent, {}× Instagram/TikTok, {}× kcal pro Woche",
   "get_premium_modal_thanks": "Danke {}",
+  "get_premium_modal_planned": "Schon {} Gerichte mit {} geplant 💪",
+  "get_premium_modal_unlocked_title": "Willkommen bei {} Plus 🎉",
+  "get_premium_modal_unlocked_message": "KI ohne Limit, Vorschläge aus deinen Rezepten, Statistiken, die sortierte Einkaufsliste und deine eigene Farbe – alles freigeschaltet.",
+  "get_premium_modal_unlocked_color": "Deine Farbe wählen",
+  "get_premium_modal_unlocked_done": "Los geht's",
   "upcoming_features_title": "Zukünftige Funktionen",
   "shopping_list_sort_name": "Name",
   "shopping_list_sort_group": "Produktgruppe",

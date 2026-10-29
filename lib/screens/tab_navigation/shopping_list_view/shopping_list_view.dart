@@ -398,7 +398,10 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
 
   void _removeBoughtGrocery(String listId, Grocery grocery, List<Grocery> items,
       List<Grocery> boughtItems) {
-    AppReviewService.logGroceryBought(items.isEmpty);
+    // [items] still holds this grocery: the last one makes the list done.
+    if (items.length == 1) {
+      AppReviewService.logSuccess('list_done');
+    }
     logEvent(AnalyticsEvent.groceryBought);
     if (!SettingsService.removeBoughtImmediately) {
       ShoppingListService.groceryToggleBought(

@@ -1,84 +1,107 @@
+import 'dart:math' as math;
+
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:in_app_review/in_app_review.dart';
 
+import '../utils/analytics.dart';
+
+/// Asks for a store review with the system prompt right when the user
+/// completes the plan-and-shop loop (list done, a few meals planned), never behind
+/// an "Enjoying it?" question: Google forbids that gating, and people rate
+/// the moment. Saving dishes doesn't count: new users do that while setting
+/// up, before the app proved itself.
+///
+/// Review prompt and Plus upsells share the app session: the review is asked
+/// at most once, and not after something went wrong, a quota ran out or the
+/// paywall showed.
 class AppReviewService {
   AppReviewService._();
 
   static late Box _eventBox;
 
-  static const _boxKeyPlanMeal = 'planMeal';
-  static const _boxKeyGrocery = 'groceryBought';
-  static const _boxKeyMealCreated = 'mealCreated';
+  static const _boxKeySuccessDays = 'successDays';
+  static const _boxKeyMealsPlanned = 'mealsPlanned';
+  static const _boxKeyFirstSeen = 'firstSeen';
   static const _boxKeyLastRequest = 'lastRequest';
+  // Set by the former in-app rating banner; those users aren't asked again.
   static const _boxKeyHasRated = 'hasRated';
+
+  /// Different days with a completed loop before the first ask.
+  static const _minSuccessDays = 2;
+
+  /// Meals the user adds to the plan per success moment, about a week's
+  /// dinners.
+  static const _mealsPerSuccess = 5;
+
+  /// Use of the app before the first ask, counted from the first start that
+  /// recorded it.
+  static const _minTenure = Duration(days: 14);
+  static const _cooldown = Duration(days: 120);
+
+  static bool _skipSession = false;
+  static bool _requested = false;
 
   static Future initialize() async {
     _eventBox = await Hive.openBox<dynamic>('reviewevents');
-  }
-
-  static Stream<bool> shouldRequestReview() async* {
-    await for (final _ in _eventBox.watch()) {
-      if (_eventBox.get(_boxKeyHasRated, defaultValue: false) as bool) {
-        yield false;
-        continue;
-      }
-
-      final planMealCount =
-          _eventBox.get(_boxKeyPlanMeal, defaultValue: 0) as int;
-      final groceryCount =
-          _eventBox.get(_boxKeyGrocery, defaultValue: 0) as int;
-      final mealCreatedCount =
-          _eventBox.get(_boxKeyMealCreated, defaultValue: 0) as int;
-
-      yield planMealCount >= 20 &&
-          groceryCount >= 50 &&
-          mealCreatedCount >= 5 &&
-          _timeSinceLastReviewRequest.inDays >= 60;
+    if (!_eventBox.containsKey(_boxKeyFirstSeen)) {
+      await _eventBox.put(_boxKeyFirstSeen, DateTime.now());
     }
   }
 
-  static Future<void> requestReview() async {
-    final InAppReview inAppReview = InAppReview.instance;
-    if (await inAppReview.isAvailable()) {
-      inAppReview.requestReview();
-      _eventBox.put(_boxKeyHasRated, true);
+  /// Whether the review prompt was requested this session; Plus upsells hold
+  /// back then.
+  static bool get requestedThisSession => _requested;
+
+  /// No review prompt for the rest of the session: something went wrong, a
+  /// quota ran out or the paywall showed.
+  static void skipThisSession() => _skipSession = true;
+
+  /// Counts a meal the user added to the plan; every [_mealsPerSuccess]th is
+  /// a success moment.
+  static void logMealPlanned() {
+    final count =
+        (_eventBox.get(_boxKeyMealsPlanned, defaultValue: 0) as int) + 1;
+    _eventBox.put(_boxKeyMealsPlanned, count % _mealsPerSuccess);
+    if (count == _mealsPerSuccess) {
+      logSuccess('meals_planned');
     }
   }
 
-  /// Resets all counters and flags. Used for testing.
-  static void reset() {
-    _eventBox.put(
-        _boxKeyLastRequest, DateTime.now().subtract(const Duration(days: 70)));
-    _eventBox.put(_boxKeyHasRated, false);
-    _eventBox.put(_boxKeyPlanMeal, 20);
-    _eventBox.put(_boxKeyGrocery, 50);
-    _eventBox.put(_boxKeyMealCreated, 5);
-  }
+  /// Counts a completed loop [moment] and asks for a review once there were
+  /// some on [_minSuccessDays] different days after [_minTenure] of use.
+  static Future<void> logSuccess(String moment) async {
+    final now = DateTime.now();
+    final today = now.toIso8601String().substring(0, 10);
+    final days = {
+      ...(_eventBox.get(_boxKeySuccessDays, defaultValue: <dynamic>[]) as List)
+          .cast<String>(),
+      today,
+    }.toList();
+    await _eventBox.put(
+      _boxKeySuccessDays,
+      days.sublist(math.max(0, days.length - _minSuccessDays)),
+    );
 
-  static void discardRequest() {
-    _eventBox.put(_boxKeyLastRequest, DateTime.now());
-  }
-
-  static void logPlanMeal() {
-    final count = _eventBox.get(_boxKeyPlanMeal, defaultValue: 0) as int;
-    _eventBox.put(_boxKeyPlanMeal, count + 1);
-  }
-
-  static void logGroceryBought(bool listIsEmpty) {
-    final count = _eventBox.get(_boxKeyGrocery, defaultValue: 0) as int;
-    _eventBox.put(_boxKeyGrocery, count + 1);
-  }
-
-  static void logMealCreated() {
-    final count = _eventBox.get(_boxKeyMealCreated, defaultValue: 0) as int;
-    _eventBox.put(_boxKeyMealCreated, count + 1);
-  }
-
-  static Duration get _timeSinceLastReviewRequest {
+    final firstSeen = _eventBox.get(_boxKeyFirstSeen) as DateTime;
     final lastRequest = _eventBox.get(_boxKeyLastRequest) as DateTime?;
-    if (lastRequest == null) {
-      return const Duration(days: 60);
+    final hasRated =
+        _eventBox.get(_boxKeyHasRated, defaultValue: false) as bool;
+    if (_skipSession ||
+        _requested ||
+        hasRated ||
+        days.length < _minSuccessDays ||
+        now.difference(firstSeen) < _minTenure ||
+        (lastRequest != null && now.difference(lastRequest) < _cooldown)) {
+      return;
     }
-    return DateTime.now().difference(lastRequest);
+    final inAppReview = InAppReview.instance;
+    if (!await inAppReview.isAvailable()) {
+      return;
+    }
+    _requested = true;
+    await _eventBox.put(_boxKeyLastRequest, DateTime.now());
+    await _eventBox.put(_boxKeySuccessDays, <String>[]);
+    logEvent(AnalyticsEvent.reviewPromptShown, {'moment': moment});
+    await inAppReview.requestReview();
   }
 }
