@@ -33,6 +33,14 @@ class BasicUtils {
     }
   }
 
+  /// Whether the status bar sits in a side column (iPhone Duo): a side inset
+  /// larger than the top one. iOS only: iPhones are portrait-only and iPads
+  /// have no side insets, while Android landscape gets side insets from its
+  /// navigation bar or camera cutout.
+  static bool hasSideStatusBar(EdgeInsets padding) =>
+      Platform.isIOS &&
+      (padding.left > padding.top || padding.right > padding.top);
+
   /// Width of a centered content column inside the safe area.
   static double contentWidth(
     BuildContext context, {

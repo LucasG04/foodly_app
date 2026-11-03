@@ -56,8 +56,9 @@ class _TabNavigationViewState extends ConsumerState<TabNavigationView>
     // iPhone Duo puts the status bar on a side edge (inset there instead of at
     // the top); the tab bar follows it there as a rail, like system tab bars.
     final padding = mediaPadding;
-    final railRight = padding.right > padding.top;
-    final railLeft = !railRight && padding.left > padding.top;
+    final sideBar = BasicUtils.hasSideStatusBar(padding);
+    final railRight = sideBar && padding.right > padding.top;
+    final railLeft = sideBar && !railRight;
     final railWidth = math.max(railLeft ? padding.left : padding.right, 72.0);
     return Scaffold(
       body: AnnotatedRegion<SystemUiOverlayStyle>(

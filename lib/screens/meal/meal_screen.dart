@@ -556,7 +556,9 @@ class _SideInsetFabLocation extends StandardFabLocation
   double getOffsetX(ScaffoldPrelayoutGeometry geometry, double adjustment) {
     final insets = geometry.minInsets;
     final fabWidth = geometry.floatingActionButtonSize.width;
-    if (insets.right > insets.top && insets.right >= fabWidth) {
+    if (BasicUtils.hasSideStatusBar(insets) &&
+        insets.right > insets.top &&
+        insets.right >= fabWidth) {
       return geometry.scaffoldSize.width - (insets.right + fabWidth) / 2;
     }
     return super.getOffsetX(geometry, adjustment);
