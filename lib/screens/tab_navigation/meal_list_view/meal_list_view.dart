@@ -139,6 +139,9 @@ class _MealListViewState extends ConsumerState<MealListView>
                   : const SizedBox(),
             );
           }),
+          SliverToBoxAdapter(
+            child: SizedBox(height: MediaQuery.paddingOf(context).bottom),
+          ),
         ],
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/plan.dart';
+import '../../widgets/sized_safe_area.dart';
 import 'code_input_view.dart';
 import 'login_view.dart';
 import 'plan_settings_view.dart';
@@ -27,9 +28,8 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: SafeArea(
+      body: SizedSafeArea(
         top: false,
-        left: false,
         child: GestureDetector(
           onTap: () {
             final FocusScopeNode currentFocus = FocusScope.of(context);

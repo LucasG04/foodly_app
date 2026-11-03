@@ -12,6 +12,7 @@ import '../../providers/state_providers.dart';
 import '../../services/plan_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../widgets/main_appbar.dart';
+import '../../widgets/sized_safe_area.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import 'plan_view/plan_day_card.dart';
 import 'plan_view/plan_tab_view.dart';
@@ -78,33 +79,37 @@ class _PlanHistoryViewState extends ConsumerState<PlanHistoryView> {
             });
           }
 
-          return SingleChildScrollView(
-            controller: _scrollController,
-            child: Column(
-              children: [
-                Center(
-                  child: SizedBox(
-                    width: BasicUtils.contentWidth(context),
-                    child: Column(
-                      children: planDays
-                          .map(
-                            (day) => PlanDayCard(
-                              date: day.date,
-                              meals: day.meals,
-                              readonly: true,
-                            ),
-                          )
-                          .toList(),
+          return SizedSafeArea(
+            top: false,
+            bottom: false,
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                children: [
+                  Center(
+                    child: SizedBox(
+                      width: BasicUtils.contentWidth(context),
+                      child: Column(
+                        children: planDays
+                            .map(
+                              (day) => PlanDayCard(
+                                date: day.date,
+                                meals: day.meals,
+                                readonly: true,
+                              ),
+                            )
+                            .toList(),
+                      ),
                     ),
                   ),
-                ),
-                IconButton(
-                  onPressed: navigateBack,
-                  tooltip: context.tr('plan_history_back_tooltip'),
-                  icon: const Icon(EvaIcons.arrowDownwardOutline),
-                ),
-                const SizedBox(height: kPadding),
-              ],
+                  IconButton(
+                    onPressed: navigateBack,
+                    tooltip: context.tr('plan_history_back_tooltip'),
+                    icon: const Icon(EvaIcons.arrowDownwardOutline),
+                  ),
+                  const SizedBox(height: kPadding),
+                ],
+              ),
             ),
           );
         },

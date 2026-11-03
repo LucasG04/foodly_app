@@ -11,6 +11,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../constants.dart';
 import '../services/in_app_purchase_service.dart';
+import '../widgets/sized_safe_area.dart';
 import 'basic_utils.dart';
 
 class WidgetUtils {
@@ -25,11 +26,22 @@ class WidgetUtils {
     if (!context.mounted) {
       return Future.value();
     }
-    final result = await showBarModalBottomSheet<T>(
+    // showBarModalBottomSheet, with the sheet kept out of side insets
+    // (iPhone Duo's status bar column).
+    final result = await showCustomModalBottomSheet<T>(
       enableDrag: enableDrag,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(10.0),
+      bounce: true,
+      barrierColor: Colors.black87,
+      containerWidget: (_, __, child) => SizedSafeArea(
+        top: false,
+        bottom: false,
+        child: BarBottomSheet(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(10.0),
+            ),
+          ),
+          child: child,
         ),
       ),
       context: context,

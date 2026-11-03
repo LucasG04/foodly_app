@@ -44,56 +44,67 @@ class _CodeInputViewState extends State<CodeInputView> with OfContextMixin {
   @override
   Widget build(BuildContext context) {
     final contentWidth = mediaSize.width > 599 ? 600 : mediaSize.width * 0.9;
+    // Fills the screen: the gap above "no plan" flexes, so short windows
+    // (e.g. iPhone Duo's outer display) fit without scrolling.
     return Stack(
       children: <Widget>[
-        ListView(
-          padding: EdgeInsets.symmetric(
-            horizontal: (mediaSize.width - contentWidth) / 2,
-          ),
-          children: [
-            SizedBox(
-                height: mediaSize.height * 0.41 - mediaViewInsets.bottom / 6),
-            SizedBox(
-              width: contentWidth * 0.7,
-              child: Text(
-                '${context.tr('login_code_title_msg')}:',
-                style: const TextStyle(fontSize: 18),
-              ),
+        LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            padding: EdgeInsets.symmetric(
+              horizontal: (mediaSize.width - contentWidth) / 2,
             ),
-            const SizedBox(height: kPadding),
-            _buildCodeInput(),
-            SizedBox(
-              width: double.infinity,
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  key: AuthenticationKeys.buttonForgotCode,
-                  child: Text(
-                    context.tr('login_code_forgot'),
-                    style: TextStyle(color: theme.primaryColor),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(
+                          height: mediaSize.height * 0.41 -
+                              mediaViewInsets.bottom / 6),
+                      Text(
+                        '${context.tr('login_code_title_msg')}:',
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(height: kPadding),
+                      _buildCodeInput(),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          key: AuthenticationKeys.buttonForgotCode,
+                          child: Text(
+                            context.tr('login_code_forgot'),
+                            style: TextStyle(color: theme.primaryColor),
+                          ),
+                          onPressed: () =>
+                              widget.onPageChange(CodeInputResult.FORGOT),
+                        ),
+                      ),
+                    ],
                   ),
-                  onPressed: () => widget.onPageChange(CodeInputResult.FORGOT),
-                ),
+                  Column(
+                    children: [
+                      const SizedBox(height: kPadding),
+                      Text(
+                        context.tr('login_code_no_plan'),
+                        style: const TextStyle(fontSize: 18),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: kPadding),
+                      MainButton(
+                        key: AuthenticationKeys.buttonCreatePlan,
+                        text: context.tr('login_code_create_plan'),
+                        onTap: () => widget.onPageChange(CodeInputResult.NEW),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: mediaSize.height * 0.1),
-            SizedBox(
-              width: contentWidth * 0.7,
-              child: Text(
-                context.tr('login_code_no_plan'),
-                style: const TextStyle(fontSize: 18),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(height: kPadding * 2),
-            Center(
-              child: MainButton(
-                key: AuthenticationKeys.buttonCreatePlan,
-                text: context.tr('login_code_create_plan'),
-                onTap: () => widget.onPageChange(CodeInputResult.NEW),
-              ),
-            ),
-          ],
+          ),
         ),
         ClipShadowPath(
           clipper: LoginDesignClipper(),

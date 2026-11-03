@@ -16,6 +16,7 @@ import '../../utils/main_snackbar.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/progress_button.dart';
+import '../../widgets/sized_safe_area.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import '../../widgets/tag_chip.dart';
 import '../../widgets/user_information.dart';
@@ -116,17 +117,21 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
             : 'library_title'),
         scrollController: _scroll,
       ),
-      body: CustomScrollView(
-        controller: _scroll,
-        slivers: [
-          SliverToBoxAdapter(child: _buildHeader()),
-          ..._buildList(),
-          // Room for the floating button over the last tile.
-          const SliverSafeArea(
-            top: false,
-            sliver: SliverToBoxAdapter(child: SizedBox(height: 88)),
-          ),
-        ],
+      body: SizedSafeArea(
+        top: false,
+        bottom: false,
+        child: CustomScrollView(
+          controller: _scroll,
+          slivers: [
+            SliverToBoxAdapter(child: _buildHeader()),
+            ..._buildList(),
+            // Room for the floating button over the last tile.
+            const SliverSafeArea(
+              top: false,
+              sliver: SliverToBoxAdapter(child: SizedBox(height: 88)),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: _selected.isEmpty ? null : _buildImportButton(),
     );

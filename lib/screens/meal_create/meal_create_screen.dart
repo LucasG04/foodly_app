@@ -44,6 +44,7 @@ import '../../widgets/meal_tag.dart';
 import '../../widgets/options_modal/options_modal.dart';
 import '../../widgets/options_modal/options_modal_option.dart';
 import '../../widgets/progress_button.dart';
+import '../../widgets/sized_safe_area.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import '../../widgets/small_number_input.dart';
 import '../../widgets/wrapped_image_picker/wrapped_image_picker.dart';
@@ -154,7 +155,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
 
   @override
   Widget build(BuildContext context) {
-    final fullWidth = mediaSize.width > 699 ? 700.0 : mediaSize.width * 0.85;
+    final safeWidth = mediaSize.width - mediaPadding.horizontal;
+    final fullWidth = safeWidth > 699 ? 700.0 : safeWidth * 0.85;
 
     // ignore: deprecated_member_use, see https://github.com/flutter/flutter/issues/138614
     return WillPopScope(
@@ -185,7 +187,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
               final isLoading = ref.watch(_$isLoading);
               return isLoading
                   ? const Center(child: SmallCircularProgressIndicator())
-                  : SafeArea(
+                  : SizedSafeArea(
                       bottom: false,
                       child: SingleChildScrollView(
                         controller: _scrollController,
@@ -500,12 +502,7 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
     );
   }
 
-  Center _buildDivider() => Center(
-        child: SizedBox(
-          width: mediaSize.width > 699 ? 650.0 : mediaSize.width * 0.8,
-          child: const Divider(),
-        ),
-      );
+  Widget _buildDivider() => const Divider();
 
   Future<Meal?> _initialParseId() async {
     if (widget.id == 'create') {
@@ -754,9 +751,8 @@ class _MealCreateScreenState extends ConsumerState<MealCreateScreen>
           OptionsSheetOptions(
             leading: const _SocialIcons(),
             title: context.tr('import_options_social'),
-            trailing: showQuotaBadges
-                ? _buildQuotaPill(usage.socialRemaining)
-                : null,
+            trailing:
+                showQuotaBadges ? _buildQuotaPill(usage.socialRemaining) : null,
             onTap: _onTapSocialImport,
           ),
         ],

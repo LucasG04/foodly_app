@@ -11,6 +11,7 @@ import '../../providers/data_provider.dart';
 import '../../services/settings_service.dart';
 import '../../utils/basic_utils.dart';
 import '../../widgets/main_appbar.dart';
+import '../../widgets/sized_safe_area.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 
 class ReorderProductGroupsScreen extends ConsumerStatefulWidget {
@@ -70,55 +71,59 @@ class _ReorderProductGroupsScreenState
                 ),
             ],
           ),
-          body: Center(
-            child: SizedBox(
-              width: BasicUtils.contentWidth(context, smallMultiplier: 1),
-              child: sortedGroups == null
-                  ? const SingleChildScrollView(
-                      child: SizedBox(
-                        height: 200,
-                        child: SmallCircularProgressIndicator(),
-                      ),
-                    )
-                  : SingleChildScrollView(
-                      controller: _scrollController,
-                      child: Column(
-                        children: [
-                          ReorderableListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: sortedGroups.length,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                key: ValueKey(sortedGroups[index].id),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: kPadding / 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Theme.of(context).dividerColor,
-                                      width: 0.5,
+          body: SizedSafeArea(
+            top: false,
+            bottom: false,
+            child: Center(
+              child: SizedBox(
+                width: BasicUtils.contentWidth(context, smallMultiplier: 1),
+                child: sortedGroups == null
+                    ? const SingleChildScrollView(
+                        child: SizedBox(
+                          height: 200,
+                          child: SmallCircularProgressIndicator(),
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        controller: _scrollController,
+                        child: Column(
+                          children: [
+                            ReorderableListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: sortedGroups.length,
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  key: ValueKey(sortedGroups[index].id),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: kPadding / 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Theme.of(context).dividerColor,
+                                        width: 0.5,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                child: ListTile(
-                                  title: Text(sortedGroups[index].name),
-                                  trailing: const Icon(EvaIcons.menu),
-                                ),
-                              );
-                            },
-                            onReorderItem: (oldIndex, newIndex) =>
-                                _updateProductGroupsOrder(
-                              oldIndex,
-                              newIndex,
-                              sortedGroups,
+                                  child: ListTile(
+                                    title: Text(sortedGroups[index].name),
+                                    trailing: const Icon(EvaIcons.menu),
+                                  ),
+                                );
+                              },
+                              onReorderItem: (oldIndex, newIndex) =>
+                                  _updateProductGroupsOrder(
+                                oldIndex,
+                                newIndex,
+                                sortedGroups,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: kPadding * 2)
-                        ],
+                            const SizedBox(height: kPadding * 2)
+                          ],
+                        ),
                       ),
-                    ),
+              ),
             ),
           ),
         );

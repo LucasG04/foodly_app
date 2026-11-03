@@ -1,6 +1,9 @@
+import 'dart:math' as math;
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
+import '../constants.dart';
 import '../models/page_data.dart';
 import '../utils/basic_utils.dart';
 
@@ -16,13 +19,18 @@ class PageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Centered on the screen like the page view's button, narrower when a side
+    // inset (iPhone Duo's status bar column) would cut into it.
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final padding = MediaQuery.paddingOf(context);
+    final halfWidth = screenWidth / 2 - math.max(padding.left, padding.right);
+    final width = math.min(
+      BasicUtils.contentWidth(context, smallMultiplier: 0.8),
+      2 * halfWidth - kPadding,
+    );
     return Container(
       height: height,
-      padding: EdgeInsets.symmetric(
-        horizontal: (MediaQuery.sizeOf(context).width -
-                BasicUtils.contentWidth(context, smallMultiplier: 0.8)) /
-            2,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: (screenWidth - width) / 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

@@ -19,6 +19,7 @@ import '../../services/meal_stat_service.dart';
 import '../../services/plan_service.dart';
 import '../../services/settings_service.dart';
 import '../../utils/analytics.dart';
+import '../../utils/basic_utils.dart';
 import '../../utils/main_snackbar.dart';
 import '../../utils/of_context_mixin.dart';
 import '../../utils/widget_utils.dart';
@@ -26,6 +27,7 @@ import '../../widgets/get_premium_info.dart';
 import '../../widgets/get_premium_modal.dart';
 import '../../widgets/main_appbar.dart';
 import '../../widgets/meal_pagination.dart';
+import '../../widgets/sized_safe_area.dart';
 import '../../widgets/user_information.dart';
 import '../add_dish/add_dish_sheet.dart';
 import '../library/library_import.dart';
@@ -79,10 +81,7 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
   // Drops results of older searches.
   int _searchToken = 0;
 
-  double get _containerWidth {
-    final width = mediaSize.width * 0.9;
-    return width > 599 ? 600 : width;
-  }
+  double get _containerWidth => BasicUtils.contentWidth(context);
 
   @override
   void dispose() {
@@ -99,65 +98,69 @@ class _MealSelectScreenState extends ConsumerState<MealSelectScreen>
         text: context.tr('meal_select_title'),
         scrollController: _scrollController,
       ),
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        child: Column(
-          children: [
-            foodly_search_bar.SearchBar(
-              onSearch: _onSearchEvent,
-              hintText: context.tr('meal_select_search_hint'),
-            ),
-            if (searchedMeals.isEmpty && _libraryMeals.isNotEmpty)
-              _buildLibraryMeals(activePlan.id!),
-            if (searchedMeals.isEmpty && _lastQuery.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: kPadding / 2),
-                child: TextButton.icon(
-                  onPressed: _createFromSheet,
-                  icon: Icon(Icons.auto_awesome, color: theme.primaryColor),
-                  label: Text(
-                    context.tr('search_create_ai', args: [_lastQuery]),
-                    style: TextStyle(color: theme.primaryColor),
+      body: SizedSafeArea(
+        top: false,
+        bottom: false,
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          child: Column(
+            children: [
+              foodly_search_bar.SearchBar(
+                onSearch: _onSearchEvent,
+                hintText: context.tr('meal_select_search_hint'),
+              ),
+              if (searchedMeals.isEmpty && _libraryMeals.isNotEmpty)
+                _buildLibraryMeals(activePlan.id!),
+              if (searchedMeals.isEmpty && _lastQuery.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: kPadding / 2),
+                  child: TextButton.icon(
+                    onPressed: _createFromSheet,
+                    icon: Icon(Icons.auto_awesome, color: theme.primaryColor),
+                    label: Text(
+                      context.tr('search_create_ai', args: [_lastQuery]),
+                      style: TextStyle(color: theme.primaryColor),
+                    ),
                   ),
                 ),
-              ),
-            Consumer(builder: (context, ref, _) {
-              final isSearching = ref.watch(_$isSearching);
+              Consumer(builder: (context, ref, _) {
+                final isSearching = ref.watch(_$isSearching);
 
-              if (isSearching) {
-                return _buildLoader();
-              }
+                if (isSearching) {
+                  return _buildLoader();
+                }
 
-              return ListView.builder(
-                shrinkWrap: true,
-                padding: const EdgeInsets.symmetric(vertical: kPadding),
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: searchedMeals.isEmpty
-                    ? 4 // there could be a max amount of 4 items if none is found
-                    : searchedMeals.length,
-                itemBuilder: (context, index) {
-                  return AnimationConfiguration.staggeredList(
-                    position: index,
-                    duration: const Duration(milliseconds: 375),
-                    child: SlideAnimation(
-                      verticalOffset: 50.0,
-                      child: FadeInAnimation(
-                        child: searchedMeals.isEmpty
-                            ? _buildNoResultsForIndex(index, activePlan.id!)
-                            : SelectMealTile(
-                                meal: searchedMeals[index],
-                                onAddMeal: () => _addMealToPlan(
-                                  searchedMeals[index].id!,
-                                  activePlan.id!,
+                return ListView.builder(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.symmetric(vertical: kPadding),
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: searchedMeals.isEmpty
+                      ? 4 // there could be a max amount of 4 items if none is found
+                      : searchedMeals.length,
+                  itemBuilder: (context, index) {
+                    return AnimationConfiguration.staggeredList(
+                      position: index,
+                      duration: const Duration(milliseconds: 375),
+                      child: SlideAnimation(
+                        verticalOffset: 50.0,
+                        child: FadeInAnimation(
+                          child: searchedMeals.isEmpty
+                              ? _buildNoResultsForIndex(index, activePlan.id!)
+                              : SelectMealTile(
+                                  meal: searchedMeals[index],
+                                  onAddMeal: () => _addMealToPlan(
+                                    searchedMeals[index].id!,
+                                    activePlan.id!,
+                                  ),
                                 ),
-                              ),
+                        ),
                       ),
-                    ),
-                  );
-                },
-              );
-            }),
-          ],
+                    );
+                  },
+                );
+              }),
+            ],
+          ),
         ),
       ),
     );

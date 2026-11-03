@@ -14,13 +14,13 @@ class LibraryActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final inset = MediaQuery.paddingOf(context).bottom;
+    final padding = MediaQuery.paddingOf(context);
     return Padding(
       padding: EdgeInsets.fromLTRB(
-        kPadding,
+        padding.left + kPadding,
         kPadding / 2,
-        kPadding,
-        math.max(kPadding / 2, inset - kPadding / 2),
+        padding.right + kPadding,
+        math.max(kPadding / 2, padding.bottom - kPadding / 2),
       ),
       child: child,
     );

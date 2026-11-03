@@ -157,6 +157,7 @@ class _MealScreenState extends ConsumerState<MealScreen>
                 ),
               ],
             ),
+      floatingActionButtonLocation: const _SideInsetFabLocation(),
       floatingActionButton: Consumer(builder: (context, ref, _) {
         final isActive = ref.watch(_$keepScreenOnActive);
         return FloatingActionButton.small(
@@ -542,5 +543,24 @@ class _MealScreenState extends ConsumerState<MealScreen>
       ).show(context);
       SettingsService.setKeepScreenOnHintSeen();
     }
+  }
+}
+
+/// End-float, but centered in a side inset column when there is one (iPhone
+/// Duo's status bar edge), so it doesn't cover the body's controls.
+class _SideInsetFabLocation extends StandardFabLocation
+    with FabEndOffsetX, FabFloatOffsetY {
+  const _SideInsetFabLocation();
+
+  @override
+  double getOffsetX(ScaffoldPrelayoutGeometry geometry, double adjustment) {
+    final insets = geometry.minInsets;
+    final fabWidth = geometry.floatingActionButtonSize.width;
+    if (BasicUtils.hasSideStatusBar(insets) &&
+        insets.right > insets.top &&
+        insets.right >= fabWidth) {
+      return geometry.scaffoldSize.width - (insets.right + fabWidth) / 2;
+    }
+    return super.getOffsetX(geometry, adjustment);
   }
 }

@@ -102,6 +102,7 @@ dependencies:
   flutter_staggered_animations: ^1.1.1
   font_awesome_flutter: ^11.0.0
   material_symbols_icons: ^4.2960.0
+  foldable: ^1.0.5
 
 dev_dependencies:
   integration_test:

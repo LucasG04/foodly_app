@@ -14,6 +14,7 @@ import '../../utils/main_snackbar.dart';
 import '../../utils/widget_utils.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/progress_button.dart';
+import '../../widgets/sized_safe_area.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import '../../widgets/small_number_input.dart';
 import '../../widgets/user_information.dart';
@@ -80,7 +81,7 @@ class _LibraryMealScreenState extends ConsumerState<LibraryMealScreen> {
   }
 
   Widget _buildError() {
-    return SafeArea(
+    return SizedSafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

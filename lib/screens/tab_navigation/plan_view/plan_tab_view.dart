@@ -52,6 +52,9 @@ class PlanTabViewState extends ConsumerState<PlanTabView>
 
     return plan != null
         ? SingleChildScrollView(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.paddingOf(context).bottom,
+            ),
             child: AnimationLimiter(
               child: Column(
                 children: [
