@@ -18,6 +18,7 @@ import '../../widgets/main_appbar.dart';
 import '../../widgets/main_button.dart';
 import '../../widgets/main_text_field.dart';
 import '../../widgets/progress_button.dart';
+import '../../widgets/sized_safe_area.dart';
 
 class FeedbackScreen extends ConsumerStatefulWidget {
   const FeedbackScreen({super.key});
@@ -51,9 +52,9 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final fullWidth = MediaQuery.sizeOf(context).width > 699
-        ? 700.0
-        : MediaQuery.sizeOf(context).width * 0.8;
+    final safeWidth = MediaQuery.sizeOf(context).width -
+        MediaQuery.paddingOf(context).horizontal;
+    final fullWidth = safeWidth > 699 ? 700.0 : safeWidth * 0.8;
 
     return KeyboardAutoDismiss(
       scaffold: Scaffold(
@@ -63,7 +64,7 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
         ),
         body: Stack(
           children: [
-            SafeArea(
+            SizedSafeArea(
               bottom: false,
               child: SingleChildScrollView(
                 controller: _scrollController,

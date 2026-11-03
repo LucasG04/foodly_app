@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -36,7 +38,11 @@ class MealImageAppBar extends StatelessWidget {
     final size = MediaQuery.sizeOf(context);
     final hasImage = imageUrl != null && imageUrl!.isNotEmpty;
     return SliverAppBar(
-      expandedHeight: size.width > 700.0 ? 400.0 : 250.0,
+      // At most 40 % of the height, e.g. iPhone Duo's inner display in landscape.
+      expandedHeight: math.min(
+        size.width > 700.0 ? 400.0 : 250.0,
+        size.height * 0.4,
+      ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       elevation: 4,
       stretch: true,
@@ -56,16 +62,17 @@ class MealImageAppBar extends StatelessWidget {
             ),
             if (hasImage && imageCredit != null)
               Positioned(
-                right: kPadding / 4,
+                right: MediaQuery.paddingOf(context).right + kPadding / 4,
                 bottom: kPadding / 4,
-                left: kPadding / 4,
+                left: MediaQuery.paddingOf(context).left + kPadding / 4,
                 child: Align(
                   alignment: Alignment.bottomRight,
                   child: ImageCreditChip(imageCredit),
                 ),
               ),
             Positioned(
-              width: size.width,
+              left: MediaQuery.paddingOf(context).left,
+              right: MediaQuery.paddingOf(context).right,
               top: kPadding / 2 + MediaQuery.paddingOf(context).top,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: kPadding),
@@ -98,7 +105,9 @@ class MealImageAppBar extends StatelessWidget {
 }
 
 /// The page body: [children] stacked at content width, each adding its own
-/// side padding (the tag row scrolls edge to edge).
+/// side padding (the tag row scrolls edge to edge). Like the image, it spans
+/// the side insets: iPhone Duo's status bar column only covers the top, which
+/// the body scrolls under like under a regular status bar.
 class MealDetailBody extends StatelessWidget {
   final List<Widget> children;
 
@@ -106,7 +115,8 @@ class MealDetailBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = BasicUtils.contentWidth(context, smallMultiplier: 1);
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final width = screenWidth > 599 ? 600.0 : screenWidth;
     return SliverToBoxAdapter(
       child: Center(
         child: Column(

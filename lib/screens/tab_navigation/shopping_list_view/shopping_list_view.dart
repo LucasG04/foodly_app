@@ -114,6 +114,7 @@ class _ShoppingListViewState extends ConsumerState<ShoppingListView>
       List<Grocery> todoItems, List<Grocery> boughtItems, String listId) {
     return SingleChildScrollView(
       controller: _scrollController,
+      padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
       child: Column(
         children: [
           const SizedBox(height: kPadding),

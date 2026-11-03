@@ -33,13 +33,30 @@ class BasicUtils {
     }
   }
 
+  /// Width of a centered content column inside the safe area.
   static double contentWidth(
     BuildContext context, {
     double smallMultiplier = 0.9,
   }) {
-    return MediaQuery.sizeOf(context).width > 599
-        ? 600.0
-        : MediaQuery.sizeOf(context).width * smallMultiplier;
+    final width = MediaQuery.sizeOf(context).width -
+        MediaQuery.paddingOf(context).horizontal;
+    return width > 599 ? 600.0 : width * smallMultiplier;
+  }
+
+  /// Horizontal padding that centers a [contentWidth] column in the safe area.
+  /// The insets can differ per side: iPhone Duo puts system controls on one
+  /// edge.
+  static EdgeInsets contentPadding(
+    BuildContext context, {
+    double smallMultiplier = 0.9,
+  }) {
+    final padding = MediaQuery.paddingOf(context);
+    final side = (MediaQuery.sizeOf(context).width -
+            padding.horizontal -
+            contentWidth(context, smallMultiplier: smallMultiplier)) /
+        2;
+    return EdgeInsets.only(
+        left: padding.left + side, right: padding.right + side);
   }
 
   /// A link candidate: optional scheme, dotted host (letters incl. umlauts)

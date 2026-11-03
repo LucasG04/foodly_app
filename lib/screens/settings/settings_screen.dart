@@ -91,11 +91,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               ? SingleChildScrollView(
                   controller: _scrollController,
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal:
-                          (mediaSize.width - BasicUtils.contentWidth(context)) /
-                              2,
-                    ),
+                    padding: BasicUtils.contentPadding(context),
                     child: Column(
                       children: [
                         _buildSectionTitle(

@@ -14,6 +14,7 @@ import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foldable/foldable.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:logging/logging.dart';
@@ -291,7 +292,13 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
                       _DeepLinkGuardedParser(_appRouter.defaultRouteParser()),
                   debugShowCheckedModeBanner: false,
                   // Snackbars live above all routes (see MainSnackbar.show).
-                  builder: (context, child) => SnackbarHost(child: child!),
+                  // Publishes iPhone Duo's fold to MediaQuery.displayFeatures
+                  // (Flutter only fills it on Android), so dialogs, sheets and
+                  // menus open beside the fold.
+                  builder: (context, child) => FoldableProvider(
+                    bridgeMode: DisplayFeatureBridgeMode.full,
+                    child: SnackbarHost(child: child!),
+                  ),
                   themeMode: ThemeMode.light,
                   localizationsDelegates: [
                     ...context.localizationDelegates,

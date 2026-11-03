@@ -81,180 +81,196 @@ class _LoginViewState extends ConsumerState<LoginView> {
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final contentWidth = BasicUtils.contentWidth(context);
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: (size.width - contentWidth) / 2,
-      ),
-      child: Column(
-        children: [
-          SizedBox(height: kPadding + MediaQuery.paddingOf(context).top),
-          FlutterToggleTab(
-            width: 50,
-            borderRadius: 15,
-            selectedTextStyle: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-            unSelectedTextStyle: const TextStyle(
-              color: Colors.grey,
-              fontWeight: FontWeight.w400,
-            ),
-            labels: _forgotPlan
-                ? [context.tr('login_title_login')]
-                : [
-                    context.tr('login_title_register'),
-                    context.tr('login_title_login')
-                  ],
-            selectedLabelIndex: (index) {
-              setState(() {
-                _isRegistering = index == 0;
-              });
-            },
-            buttonKeys: _forgotPlan
-                ? [AuthenticationKeys.buttonGroupLogin]
-                : [
-                    AuthenticationKeys.buttonGroupRegister,
-                    AuthenticationKeys.buttonGroupLogin
-                  ],
-          ),
-          const SizedBox(height: kPadding * 2),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 250),
-            child: _isRegistering
-                ? SizedBox(
-                    key: const ValueKey<int>(0),
-                    width: size.width,
-                    child: Text(
-                      '${context.tr('login_register_leading')} ',
-                      style: _titleTextStyle,
+    // Scrolls when the screen is too short for the form (e.g. iPhone Duo's
+    // inner display in landscape); otherwise the buttons sit at the bottom.
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        padding: EdgeInsets.symmetric(
+          horizontal: (size.width - contentWidth) / 2,
+        ),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                children: [
+                  SizedBox(
+                      height: kPadding + MediaQuery.paddingOf(context).top),
+                  FlutterToggleTab(
+                    width: 50,
+                    borderRadius: 15,
+                    selectedTextStyle: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
                     ),
-                  )
-                : SizedBox(
-                    key: const ValueKey<int>(1),
-                    width: size.width,
-                    child: Text(
-                      '${context.tr('login_login_leading')} ',
-                      style: _titleTextStyle,
+                    unSelectedTextStyle: const TextStyle(
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w400,
                     ),
+                    labels: _forgotPlan
+                        ? [context.tr('login_title_login')]
+                        : [
+                            context.tr('login_title_register'),
+                            context.tr('login_title_login')
+                          ],
+                    selectedLabelIndex: (index) {
+                      setState(() {
+                        _isRegistering = index == 0;
+                      });
+                    },
+                    buttonKeys: _forgotPlan
+                        ? [AuthenticationKeys.buttonGroupLogin]
+                        : [
+                            AuthenticationKeys.buttonGroupRegister,
+                            AuthenticationKeys.buttonGroupLogin
+                          ],
                   ),
-          ),
-          SizedBox(
-            width: size.width,
-            child: Text(
-              context.tr(widget.isCreatingPlan!
-                  ? 'login_cta_create'
-                  : 'login_cta_join'),
-              style: _titleTextStyle.copyWith(
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ),
-          const SizedBox(height: kPadding),
-          AutofillGroup(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                MainTextField(
-                  key: AuthenticationKeys.inputMail,
-                  controller: _emailController,
-                  title: context.tr('login_mail_title'),
-                  textInputAction: TextInputAction.next,
-                  errorText: _emailErrorText,
-                  autofocus: true,
-                  keyboardType: TextInputType.emailAddress,
-                  onSubmit: () => _passwordFocusNode.requestFocus(),
-                  autofillHints: const [AutofillHints.email],
-                ),
-                MainTextField(
-                  key: AuthenticationKeys.inputPassword,
-                  controller: _passwordController,
-                  title: context.tr('login_password_title'),
-                  textInputAction: TextInputAction.go,
-                  obscureText: true,
-                  errorText: _passwordErrorText,
-                  focusNode: _passwordFocusNode,
-                  onSubmit: _authWithEmail,
-                  onChange: _onPasswordChanged,
-                  autofillHints: _isRegistering
-                      ? [AutofillHints.newPassword]
-                      : [AutofillHints.password],
-                ),
-              ],
-            ),
-          ),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 250),
-            child: !_isRegistering
-                ? SizedBox(
-                    width: double.infinity,
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: _showPasswordReset,
-                        child: Text(
-                          context.tr('login_forgot_password'),
-                          style:
-                              TextStyle(color: Theme.of(context).primaryColor),
-                        ),
+                  const SizedBox(height: kPadding * 2),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    child: _isRegistering
+                        ? SizedBox(
+                            key: const ValueKey<int>(0),
+                            width: size.width,
+                            child: Text(
+                              '${context.tr('login_register_leading')} ',
+                              style: _titleTextStyle,
+                            ),
+                          )
+                        : SizedBox(
+                            key: const ValueKey<int>(1),
+                            width: size.width,
+                            child: Text(
+                              '${context.tr('login_login_leading')} ',
+                              style: _titleTextStyle,
+                            ),
+                          ),
+                  ),
+                  SizedBox(
+                    width: size.width,
+                    child: Text(
+                      context.tr(widget.isCreatingPlan!
+                          ? 'login_cta_create'
+                          : 'login_cta_join'),
+                      style: _titleTextStyle.copyWith(
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
-                  )
-                : const TextButton(
-                    onPressed: null,
-                    child: Text(''),
                   ),
-          ),
-          const SizedBox(height: kPadding / 2),
-          if (Platform.isIOS || Platform.isMacOS)
-            SignInWithAppleButton(onPressed: _authWithApple),
-          SizedBox(
-            height: size.height * 0.1,
-            child: _unknownErrorText != null
-                ? Row(
-                    children: [
-                      const Icon(EvaIcons.alertTriangleOutline,
-                          color: Colors.red),
-                      const SizedBox(width: kPadding),
-                      Expanded(
-                        child: Text(
-                          _unknownErrorText ?? '',
-                          style: const TextStyle(color: Colors.red),
+                  const SizedBox(height: kPadding),
+                  AutofillGroup(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        MainTextField(
+                          key: AuthenticationKeys.inputMail,
+                          controller: _emailController,
+                          title: context.tr('login_mail_title'),
+                          textInputAction: TextInputAction.next,
+                          errorText: _emailErrorText,
+                          autofocus: true,
+                          keyboardType: TextInputType.emailAddress,
+                          onSubmit: () => _passwordFocusNode.requestFocus(),
+                          autofillHints: const [AutofillHints.email],
                         ),
-                      )
-                    ],
-                  )
-                : Center(child: _buildLegalNotice()),
-          ),
-          const Spacer(),
-          LayoutBuilder(builder: (context, constraints) {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                MainButton(
-                  key: AuthenticationKeys.buttonLoginBack,
-                  iconData: Icons.arrow_back_ios_new_rounded,
-                  width: constraints.maxWidth * 0.25,
-                  onTap: widget.navigateBack,
-                  isSecondary: true,
-                ),
-                SizedBox(
-                  width: constraints.maxWidth * 0.65,
-                  child: Center(
-                    child: MainButton(
-                      key: AuthenticationKeys.buttonJoin,
-                      text: context.tr('login_join'),
-                      width: constraints.maxWidth * 0.65,
-                      onTap: _authWithEmail,
-                      isProgress: true,
-                      buttonState: _buttonState,
+                        MainTextField(
+                          key: AuthenticationKeys.inputPassword,
+                          controller: _passwordController,
+                          title: context.tr('login_password_title'),
+                          textInputAction: TextInputAction.go,
+                          obscureText: true,
+                          errorText: _passwordErrorText,
+                          focusNode: _passwordFocusNode,
+                          onSubmit: _authWithEmail,
+                          onChange: _onPasswordChanged,
+                          autofillHints: _isRegistering
+                              ? [AutofillHints.newPassword]
+                              : [AutofillHints.password],
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
-            );
-          }),
-          const SizedBox(height: kPadding * 2),
-        ],
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    child: !_isRegistering
+                        ? SizedBox(
+                            width: double.infinity,
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: _showPasswordReset,
+                                child: Text(
+                                  context.tr('login_forgot_password'),
+                                  style: TextStyle(
+                                      color: Theme.of(context).primaryColor),
+                                ),
+                              ),
+                            ),
+                          )
+                        : const TextButton(
+                            onPressed: null,
+                            child: Text(''),
+                          ),
+                  ),
+                  const SizedBox(height: kPadding / 2),
+                  if (Platform.isIOS || Platform.isMacOS)
+                    SignInWithAppleButton(onPressed: _authWithApple),
+                  SizedBox(
+                    height: size.height * 0.1,
+                    child: _unknownErrorText != null
+                        ? Row(
+                            children: [
+                              const Icon(EvaIcons.alertTriangleOutline,
+                                  color: Colors.red),
+                              const SizedBox(width: kPadding),
+                              Expanded(
+                                child: Text(
+                                  _unknownErrorText ?? '',
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                              )
+                            ],
+                          )
+                        : Center(child: _buildLegalNotice()),
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  LayoutBuilder(builder: (context, constraints) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        MainButton(
+                          key: AuthenticationKeys.buttonLoginBack,
+                          iconData: Icons.arrow_back_ios_new_rounded,
+                          width: constraints.maxWidth * 0.25,
+                          onTap: widget.navigateBack,
+                          isSecondary: true,
+                        ),
+                        SizedBox(
+                          width: constraints.maxWidth * 0.65,
+                          child: Center(
+                            child: MainButton(
+                              key: AuthenticationKeys.buttonJoin,
+                              text: context.tr('login_join'),
+                              width: constraints.maxWidth * 0.65,
+                              onTap: _authWithEmail,
+                              isProgress: true,
+                              buttonState: _buttonState,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                  const SizedBox(height: kPadding * 2),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

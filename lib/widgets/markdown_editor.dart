@@ -54,7 +54,7 @@ class _MarkdownEditorState extends ConsumerState<MarkdownEditor>
   Widget build(BuildContext context) {
     final textColor = theme.textTheme.bodyLarge!.color;
     return SizedBox(
-      width: mediaSize.width > 599 ? 600.0 : mediaSize.width * 0.9,
+      width: double.infinity,
       height: mediaSize.height < 500
           ? 250.0
           : mediaSize.height > 1000

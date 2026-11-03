@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/upcoming_feature.dart';
 import '../../services/lunix_api_service.dart';
 import '../../widgets/main_appbar.dart';
+import '../../widgets/sized_safe_area.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import 'upcoming_feature_tile.dart';
 
@@ -42,9 +43,9 @@ class _UpcomingFeaturesScreenState
 
   @override
   Widget build(BuildContext context) {
-    final fullWidth = MediaQuery.sizeOf(context).width > 699
-        ? 700.0
-        : MediaQuery.sizeOf(context).width * 0.9;
+    final safeWidth = MediaQuery.sizeOf(context).width -
+        MediaQuery.paddingOf(context).horizontal;
+    final fullWidth = safeWidth > 699 ? 700.0 : safeWidth * 0.9;
 
     return Scaffold(
       appBar: MainAppBar(
@@ -53,27 +54,31 @@ class _UpcomingFeaturesScreenState
       ),
       body: SingleChildScrollView(
         controller: _scrollController,
-        child: Center(
-          child: SizedBox(
-            width: fullWidth,
-            child: Consumer(builder: (context, ref, _) {
-              final isLoading = ref.watch(_$isLoading);
-              return isLoading
-                  ? const SizedBox(
-                      height: 60.0,
-                      child: Center(
-                        child: SmallCircularProgressIndicator(),
-                      ),
-                    )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _upcomingFeatures.length,
-                      itemBuilder: (context, index) => UpcomingFeatureTile(
-                        _upcomingFeatures[index],
-                      ),
-                    );
-            }),
+        child: SizedSafeArea(
+          top: false,
+          bottom: false,
+          child: Center(
+            child: SizedBox(
+              width: fullWidth,
+              child: Consumer(builder: (context, ref, _) {
+                final isLoading = ref.watch(_$isLoading);
+                return isLoading
+                    ? const SizedBox(
+                        height: 60.0,
+                        child: Center(
+                          child: SmallCircularProgressIndicator(),
+                        ),
+                      )
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: _upcomingFeatures.length,
+                        itemBuilder: (context, index) => UpcomingFeatureTile(
+                          _upcomingFeatures[index],
+                        ),
+                      );
+              }),
+            ),
           ),
         ),
       ),
