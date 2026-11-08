@@ -37,9 +37,9 @@ import '../onboarding/onboarding_screen.dart';
 import 'change_meal_types_modal.dart';
 import 'change_plan_name_modal.dart';
 import 'import_meals_modal.dart';
+import 'mcp/mcp_settings_modal.dart';
 import 'settings_alerts.dart';
 import 'settings_change_primary_color_modal.dart';
-import 'settings_mcp_token_modal.dart';
 import 'settings_reauthenticate_modal.dart';
 import 'settings_tile.dart';
 
@@ -348,10 +348,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                               onTap: () => WidgetUtils.showFoodlyBottomSheet(
                                 context: context,
                                 scrollable: true,
-                                // Drag-to-dismiss bypasses PopScope, which keeps
-                                // the freshly created token from being closed.
+                                // Pull-down would fight the sheet's own scroll.
                                 enableDrag: false,
-                                builder: (_) => const SettingsMcpTokenModal(),
+                                builder: (_) => const McpSettingsModal(),
                               ),
                               leadingIcon: EvaIcons.code,
                               text: context.tr('settings_section_account_mcp'),
