@@ -17,6 +17,7 @@ import '../models/kcal_estimate.dart';
 import '../models/library_meal.dart';
 import '../models/lunix_docx.dart';
 import '../models/lunix_image.dart';
+import '../models/mcp_connection.dart';
 import '../models/mcp_token.dart';
 import '../models/meal.dart';
 import '../models/meal_generation_event.dart';
@@ -888,6 +889,44 @@ class LunixApiService {
       );
     } catch (e) {
       _log.severe('ERR in deleteMcpToken', e);
+      rethrow;
+    }
+  }
+
+  /// AI apps connected via OAuth, most recently used first. Throws on failure.
+  static Future<List<McpConnection>> getMcpConnections() async {
+    _log.finer('Call getMcpConnections()');
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        '$apiEndpoint/mcp-connections',
+        options: await _firebaseAuthOptions(),
+      );
+      return (response.data!['connections'] as List)
+          .map((e) => McpConnection.fromMap(e as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      _log.severe('ERR in getMcpConnections', e);
+      rethrow;
+    }
+  }
+
+  /// Revokes the app's access at once. Already gone (404, e.g. re-authorized
+  /// or revoked elsewhere) counts as done. Throws on other failures.
+  static Future<void> deleteMcpConnection(String id) async {
+    _log.finer('Call deleteMcpConnection($id)');
+    try {
+      await _dio.delete<void>(
+        '$apiEndpoint/mcp-connections/${Uri.encodeComponent(id)}',
+        options: await _firebaseAuthOptions(),
+      );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        return;
+      }
+      _log.severe('ERR in deleteMcpConnection', e);
+      rethrow;
+    } catch (e) {
+      _log.severe('ERR in deleteMcpConnection', e);
       rethrow;
     }
   }

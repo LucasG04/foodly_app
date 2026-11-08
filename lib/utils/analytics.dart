@@ -66,7 +66,11 @@ enum AnalyticsEvent {
   // MCP
   mcpTokenCreate('mcp_token_create'),
   mcpTokenRegenerate('mcp_token_regenerate'),
-  mcpTokenDelete('mcp_token_delete');
+  mcpTokenDelete('mcp_token_delete'),
+  mcpUrlCopy('mcp_url_copy'),
+  mcpUrlShare('mcp_url_share'),
+  mcpConnectionAdded('mcp_connection_added'),
+  mcpConnectionDelete('mcp_connection_delete');
 
   const AnalyticsEvent(this.id);
   final String id;
