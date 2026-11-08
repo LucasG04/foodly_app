@@ -206,6 +206,25 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
       }
     });
     _lifecycleListener = AppLifecycleListener(onResume: _warmPlanMeals);
+    ref.listenManual(
+      InAppPurchaseService.$userIsSubscribed,
+      (_, __) => _syncAnalyticsUser(),
+    );
+    SettingsService.changes
+        .listen((_) => _syncAnalyticsUser())
+        .canceledBy(this);
+  }
+
+  void _syncAnalyticsUser() {
+    final uid = AuthenticationService.currentUser?.uid;
+    if (uid == null || !mounted) {
+      return;
+    }
+    Faro().setUser(FaroUser(id: uid, attributes: {
+      'lang': context.locale.languageCode,
+      'plus': '${ref.read(InAppPurchaseService.$userIsSubscribed)}',
+      ...SettingsService.analyticsAttributes,
+    }));
   }
 
   /// Lets the API load the plan's meals before the first search.
@@ -220,9 +239,15 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final langCode = context.locale.languageCode;
-    BasicUtils.afterBuild(
-      () => ref.read(languageCodeProvider.notifier).state = langCode,
-    );
+    BasicUtils.afterBuild(() {
+      final notifier = ref.read(languageCodeProvider.notifier);
+      // Not on the first frame: premium status isn't loaded yet.
+      final switched = notifier.state != null && notifier.state != langCode;
+      notifier.state = langCode;
+      if (switched) {
+        _syncAnalyticsUser();
+      }
+    });
   }
 
   @override
@@ -398,7 +423,6 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
     if (firebaseUser != null) {
       FirebaseCrashlytics.instance.setUserIdentifier(firebaseUser.uid);
       FirebaseCrashlytics.instance.setCustomKey('userId', firebaseUser.uid);
-      Faro().setUser(FaroUser(id: firebaseUser.uid));
       final FoodlyUser? user =
           await FoodlyUserService.getUserById(firebaseUser.uid);
       // Signed out meanwhile (e.g. login aborted): don't restore that user.
@@ -407,12 +431,15 @@ class _FoodlyAppState extends ConsumerState<FoodlyApp> with DisposableWidget {
         return;
       }
       if (user == null) {
+        _syncAnalyticsUser();
         refInitLoading.state = false;
         return;
       }
       refUserProvider.state = user;
       await InAppPurchaseService.setUserId(user.id!);
       _checkPremiumStatus();
+      // After the premium check, so plus-gated values aren't sent as free.
+      _syncAnalyticsUser();
       _checkUserSubsription();
     } else {
       FirebaseCrashlytics.instance.setUserIdentifier('');

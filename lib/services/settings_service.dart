@@ -138,6 +138,31 @@ class SettingsService {
     });
   }
 
+  /// Fires on every settings write.
+  static Stream<BoxEvent> get changes => _settingsBox.watch();
+
+  /// User-facing settings as Faro user attributes (Loki `user_attr_<key>`,
+  /// dashboard `foodly-product`). Effective values: premium-gated settings
+  /// report what the user gets. Keep keys and formats stable.
+  static Map<String, String> get analyticsAttributes {
+    String joinOrNone(Iterable<String> values) =>
+        values.isEmpty ? 'none' : values.join(',');
+    final rgb = primaryColor.toARGB32() & 0xFFFFFF;
+    final colorHex = rgb.toRadixString(16).padLeft(6, '0').toUpperCase();
+    return {
+      'color': '#$colorHex',
+      'multiple_dishes': '$multipleMealsPerTime',
+      'suggestions': '$showSuggestions',
+      'remove_bought': '$removeBoughtImmediately',
+      'plan_info': joinOrNone([
+        if (planMealShowDuration) 'duration',
+        if (planMealShowKcal) 'kcal',
+      ]),
+      'list_sort': shoppingListSort?.name ?? 'none',
+      'meal_types': joinOrNone(activeMealTypes.map((t) => t.name)),
+    };
+  }
+
   /// Rebuilds plan meal tiles when duration/kcal visibility changes.
   static ValueListenable<Box> get planMealInfoListenable =>
       _planMealInfoListenable;
