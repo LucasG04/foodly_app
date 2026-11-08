@@ -35,6 +35,7 @@ import '../../widgets/options_modal/options_modal_option.dart';
 import '../../widgets/small_circular_progress_indicator.dart';
 import '../onboarding/onboarding_screen.dart';
 import 'change_meal_types_modal.dart';
+import 'change_plan_meal_info_modal.dart';
 import 'change_plan_name_modal.dart';
 import 'import_meals_modal.dart';
 import 'mcp/mcp_settings_modal.dart';
@@ -202,6 +203,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             trailing: const Icon(
                               EvaIcons.arrowIosForwardOutline,
                             ),
+                          ),
+                          SettingsTile(
+                            onTap: _openChangePlanMealInfoModal,
+                            leadingIcon: EvaIcons.infoOutline,
+                            text: context
+                                .tr('settings_section_customization_plan_info'),
+                            value: _planMealInfoLabel(context),
                           ),
                           WidgetUtils.userIsSubscribed(
                             ref: ref,
@@ -709,6 +717,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       context: context,
       builder: (_) => const ChangeMealTypesModal(),
     );
+  }
+
+  Future<void> _openChangePlanMealInfoModal() async {
+    await WidgetUtils.showFoodlyBottomSheet<void>(
+      context: context,
+      builder: (_) => const ChangePlanMealInfoModal(),
+    );
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  String _planMealInfoLabel(BuildContext context) {
+    final shown = [
+      if (SettingsService.planMealShowDuration)
+        context.tr('settings_section_customization_plan_duration'),
+      if (SettingsService.planMealShowKcal) 'kcal',
+    ];
+    return shown.isEmpty
+        ? context.tr('settings_section_customization_plan_info_off')
+        : shown.join(', ');
   }
 
   Future<void> _onAiConsentChanged(bool allow) async {

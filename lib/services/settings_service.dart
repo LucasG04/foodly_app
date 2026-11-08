@@ -14,11 +14,14 @@ class SettingsService {
 
   static late Box _settingsBox;
   static late ValueListenable<Box> _primaryColorListenable;
+  static late ValueListenable<Box> _planMealInfoListenable;
   static WidgetRef? _ref;
 
   static Future initialize() async {
     _settingsBox = await Hive.openBox<dynamic>('settings');
     _primaryColorListenable = _settingsBox.listenable(keys: ['primaryColor']);
+    _planMealInfoListenable = _settingsBox
+        .listenable(keys: ['planMealShowDuration', 'planMealShowKcal']);
   }
 
   // ignore: use_setters_to_change_properties
@@ -116,6 +119,28 @@ class SettingsService {
   static List<MealType> get activeMealTypes {
     return _convertToMealTypes(_settingsBox.get('activeMealTypes'));
   }
+
+  static bool get planMealShowDuration =>
+      _settingsBox.get('planMealShowDuration', defaultValue: true) as bool;
+
+  static bool get planMealShowKcal =>
+      _settingsBox.get('planMealShowKcal', defaultValue: true) as bool;
+
+  /// Writes only changed values, so plan tiles rebuild at most once.
+  static Future<void> setPlanMealInfo({
+    required bool showDuration,
+    required bool showKcal,
+  }) async {
+    await _settingsBox.putAll(<String, bool>{
+      if (showDuration != planMealShowDuration)
+        'planMealShowDuration': showDuration,
+      if (showKcal != planMealShowKcal) 'planMealShowKcal': showKcal,
+    });
+  }
+
+  /// Rebuilds plan meal tiles when duration/kcal visibility changes.
+  static ValueListenable<Box> get planMealInfoListenable =>
+      _planMealInfoListenable;
 
   static bool get useDevApi =>
       _settingsBox.get('useDevApi', defaultValue: false) as bool;

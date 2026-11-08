@@ -13,11 +13,11 @@ import '../../../providers/state_providers.dart';
 import '../../../services/authentication_service.dart';
 import '../../../services/meal_service.dart';
 import '../../../services/plan_service.dart';
+import '../../../services/settings_service.dart';
 import '../../../utils/analytics.dart';
 import '../../../utils/widget_utils.dart';
 import '../../../widgets/add_to_shopping_list_modal.dart';
 import '../../../widgets/foodly_network_image.dart';
-import '../../../widgets/meal_tag.dart';
 import '../../../widgets/options_modal/options_modal.dart';
 import '../../../widgets/options_modal/options_modal_option.dart';
 import '../../../widgets/skeleton_container.dart';
@@ -141,41 +141,25 @@ class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: isPlaceholder || (meal!.tags == null || meal.tags!.isEmpty)
-                ? AutoSizeText(
-                    isPlaceholder ? placeholder : meal!.name,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        child: AutoSizeText(
-                          meal.name,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: MealTag.tagHeight,
-                        child: Wrap(
-                          clipBehavior: Clip.hardEdge,
-                          children: meal.tags!.map((e) => MealTag(e)).toList(),
-                        ),
-                      ),
-                    ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AutoSizeText(
+                  isPlaceholder ? placeholder : meal!.name,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
                   ),
+                ),
+                if (!isPlaceholder)
+                  ValueListenableBuilder(
+                    valueListenable: SettingsService.planMealInfoListenable,
+                    builder: (context, _, __) => _buildMetaLine(context, meal!),
+                  ),
+              ],
+            ),
           ),
         ),
         if (widget.enableVoting && !widget.readonly) ...[
@@ -217,6 +201,57 @@ class PlanDayMealTileState extends ConsumerState<PlanDayMealTile> {
             onPressed: () => _showOptionsModal(ref.read(planProvider)!.id!),
           ),
       ],
+    );
+  }
+
+  /// Duration and kcal per serving (stored `kcal` covers all servings).
+  Widget _buildMetaLine(BuildContext context, Meal meal) {
+    final duration =
+        SettingsService.planMealShowDuration ? meal.duration ?? 0 : 0;
+    final kcal = SettingsService.planMealShowKcal ? meal.kcal ?? 0 : 0;
+    final servings = meal.servings < 1 ? 1 : meal.servings;
+    final kcalPerServing = (kcal / servings).round();
+    final color =
+        Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.6);
+    final items = [
+      if (duration > 0)
+        (
+          EvaIcons.clockOutline,
+          context.tr('plan_meal_duration', args: ['$duration'])
+        ),
+      if (kcalPerServing > 0)
+        (
+          Icons.local_fire_department_outlined,
+          context.tr('plan_meal_kcal', args: ['$kcalPerServing'])
+        ),
+    ];
+    if (items.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 4.0),
+      child: Wrap(
+        spacing: kPadding / 2,
+        children: [
+          for (final (icon, label) in items)
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 14.0, color: color),
+                const SizedBox(width: 4.0),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 13.0, color: color),
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
     );
   }
 
